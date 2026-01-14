@@ -49,9 +49,29 @@ jobs:
             ${{ steps.changelog.outputs.content }}
             
             ## 📥 Installation
-````bash
-            git clone -b ${{ github.ref }} https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
-````
+            
+            ### Quick Install (Recommended)
+            Clone the repository with minimal history for faster download:
+            
+            ```bash
+            git clone --depth 1 --branch ${{ github.ref_name }} https://github.com/${{ github.repository }}.git cerebratechai-claude-skills
+            cd cerebratechai-claude-skills
+            ```
+            
+            ### Alternative Installation Methods
+            
+            **Using SSH (requires SSH key setup):**
+            ```bash
+            git clone --depth 1 --branch ${{ github.ref_name }} git@github.com:${{ github.repository }}.git cerebratechai-claude-skills
+            ```
+            
+            **Download Release Archive:**
+            Visit [${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }}](${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }}) to download the release archive.
+            
+            ### Prerequisites
+            - Git 2.0 or higher
+            - Python 3.11+ (for running scripts)
+            - See [documentation](./README.md) for complete setup instructions
           draft: false
           prerelease: false
 
