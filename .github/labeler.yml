@@ -1,0 +1,41 @@
+# Frontend skills
+'frontend':
+  - '02-frontend/**/*'
+
+# Backend skills
+'backend':
+  - '03-backend-api/**/*'
+
+# Database skills
+'database':
+  - '04-database/**/*'
+
+# AI/ML skills
+'ai-ml':
+  - '05-ai-ml-core/**/*'
+  - '06-ai-ml-production/**/*'
+  - '39-data-science-ml/**/*'
+
+# DevOps skills
+'devops':
+  - '15-devops-infrastructure/**/*'
+
+# Documentation
+'documentation':
+  - '21-documentation/**/*'
+  - '**/README.md'
+  - 'CONTRIBUTING.md'
+
+# E-commerce
+'ecommerce':
+  - '30-ecommerce/**/*'
+
+# Mobile
+'mobile':
+  - '31-mobile-development/**/*'
+
+# Security
+'security':
+  - '10-authentication-authorization/**/*'
+  - '12-compliance-governance/**/*'
+  - '24-security-practices/**/*'

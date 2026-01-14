@@ -1,0 +1,39 @@
+name: Weekly Statistics
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Every Sunday at midnight
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Generate statistics
+        run: |
+          python scripts/generate-stats.py > stats.md
+
+      - name: Create issue with stats
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const stats = fs.readFileSync('stats.md', 'utf8');
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `📊 Weekly Statistics - ${new Date().toISOString().split('T')[0]}`,
+              body: stats,
+              labels: ['statistics', 'automated']
+            });

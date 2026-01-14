@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          python .github/scripts/generate-changelog.py > CHANGELOG.md
+
+      - name: Count skills
+        id: count
+        run: |
+          SKILL_COUNT=$(find . -name "SKILL.md" | wc -l)
+          echo "count=$SKILL_COUNT" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ## 🎉 New Release
+            
+            **Total Skills**: ${{ steps.count.outputs.count }}
+            
+            ## 📝 Changelog
+            
+            ${{ steps.changelog.outputs.content }}
+            
+            ## 📥 Installation
+````bash
+            git clone -b ${{ github.ref }} https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+````
+          draft: false
+          prerelease: false
+
+      - name: Notify community
+        run: |
+          python .github/scripts/notify-release.py

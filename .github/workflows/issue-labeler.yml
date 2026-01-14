@@ -1,0 +1,66 @@
+name: Issue Labeler
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title.toLowerCase();
+            const body = issue.body ? issue.body.toLowerCase() : '';
+            const labels = [];
+            
+            // Skill request
+            if (title.includes('skill') || body.includes('skill request')) {
+              labels.push('skill request');
+            }
+            
+            // Bug
+            if (title.includes('bug') || title.includes('error') || title.includes('fix')) {
+              labels.push('bug');
+            }
+            
+            // Documentation
+            if (title.includes('doc') || body.includes('documentation')) {
+              labels.push('documentation');
+            }
+            
+            // Enhancement
+            if (title.includes('feature') || title.includes('enhancement')) {
+              labels.push('enhancement');
+            }
+            
+            // Question
+            if (title.includes('question') || title.includes('how to')) {
+              labels.push('question');
+            }
+            
+            // Category labels
+            const categories = {
+              'frontend': ['frontend', 'react', 'next.js', 'vue'],
+              'backend': ['backend', 'api', 'server', 'node'],
+              'database': ['database', 'sql', 'mongodb', 'prisma'],
+              'ai-ml': ['ai', 'ml', 'machine learning', 'llm'],
+              'devops': ['devops', 'docker', 'kubernetes', 'ci/cd'],
+            };
+            
+            for (const [label, keywords] of Object.entries(categories)) {
+              if (keywords.some(kw => title.includes(kw) || body.includes(kw))) {
+                labels.push(label);
+              }
+            }
+            
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labels
+              });
+            }

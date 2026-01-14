@@ -1,0 +1,64 @@
+name: Validate Skills
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - '**/*.md'
+      - '.github/workflows/validate-skills.yml'
+
+jobs:
+  validate:
+    name: Validate Skill Files
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install markdown-link-check
+          pip install pyspelling
+          npm install -g markdownlint-cli
+
+      - name: Validate markdown syntax
+        run: |
+          markdownlint '**/*.md' --ignore node_modules --ignore .github
+
+      - name: Check for broken links
+        run: |
+          find . -name "*.md" -not -path "./node_modules/*" | xargs markdown-link-check --config .github/markdown-link-check.json
+
+      - name: Spell check
+        run: |
+          pyspelling -c .github/spellcheck.yml
+
+      - name: Validate skill structure
+        run: python .github/scripts/validate-skill-structure.py
+
+      - name: Check for required sections
+        run: python .github/scripts/check-required-sections.py
+
+      - name: Validate code examples
+        run: python .github/scripts/validate-code-examples.py
+
+      - name: Generate validation report
+        if: always()
+        run: python .github/scripts/generate-report.py
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: validation-report
+          path: validation-report.html

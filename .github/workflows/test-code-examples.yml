@@ -1,0 +1,67 @@
+name: Test Code Examples
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '**/SKILL.md'
+
+jobs:
+  extract-and-test:
+    name: Extract and test code examples
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        language: [typescript, python]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        if: matrix.language == 'typescript'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Python
+        if: matrix.language == 'python'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Extract code examples
+        run: |
+          python .github/scripts/extract-code-examples.py --language ${{ matrix.language }}
+
+      - name: Install TypeScript dependencies
+        if: matrix.language == 'typescript'
+        run: |
+          cd extracted-examples/typescript
+          npm install
+
+      - name: Install Python dependencies
+        if: matrix.language == 'python'
+        run: |
+          cd extracted-examples/python
+          pip install -r requirements.txt
+
+      - name: Run TypeScript tests
+        if: matrix.language == 'typescript'
+        run: |
+          cd extracted-examples/typescript
+          npm test
+
+      - name: Run Python tests
+        if: matrix.language == 'python'
+        run: |
+          cd extracted-examples/python
+          pytest
+
+      - name: Report results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-${{ matrix.language }}
+          path: extracted-examples/${{ matrix.language }}/test-results/

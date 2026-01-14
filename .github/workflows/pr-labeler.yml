@@ -1,0 +1,52 @@
+name: PR Labeler
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  label:
+    name: Label PR
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Label based on files
+        uses: actions/labeler@v4
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+
+      - name: Label based on title
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const title = context.payload.pull_request.title.toLowerCase();
+            const labels = [];
+            
+            if (title.includes('feat') || title.includes('skill')) {
+              labels.push('enhancement');
+            }
+            if (title.includes('fix')) {
+              labels.push('bug');
+            }
+            if (title.includes('docs')) {
+              labels.push('documentation');
+            }
+            if (title.includes('batch')) {
+              const match = title.match(/batch[ -]?(\d+)/i);
+              if (match) {
+                labels.push(`batch-${match[1]}`);
+              }
+            }
+            
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                labels: labels
+              });
+            }

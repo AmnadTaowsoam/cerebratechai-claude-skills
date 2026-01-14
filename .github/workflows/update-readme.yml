@@ -1,0 +1,41 @@
+name: Auto-update README
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**/SKILL.md'
+      - '.github/workflows/update-readme.yml'
+
+jobs:
+  update-readme:
+    name: Update README with new skills
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Scan for skills
+        id: scan
+        run: |
+          python .github/scripts/scan-skills.py > skills.json
+
+      - name: Update README
+        run: |
+          python .github/scripts/update-readme.py
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+          git diff --quiet && git diff --staged --quiet || git commit -m "docs: auto-update README with skill changes"
+          git push
