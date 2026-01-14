@@ -5,202 +5,793 @@
 รองรับ Python 3.11+
 
 ## Core Principles
-- PEP 8 Compliance
-- Type Hints Always
-- Explicit is Better Than Implicit
-- Fail Fast with Clear Error Messages
+- **PEP 8 Compliance**: ปฏิบัติตามมาตรฐาน Python
+- **Type Hints Always**: ระบุ type ทุกที่
+- **Explicit is Better Than Implicit**: ชัดเจนดีกว่าคลุมเครือ
+- **Fail Fast with Clear Error Messages**: ล้มเหลวเร็ว พร้อม error ที่ชัดเจน
 
-## Python Version & Setup
+---
+
+## 1. Python Version and Setup
 
 ### pyproject.toml (Modern Python)
 ```toml
 [project]
 name = "your-project"
 version = "0.1.0"
+description = "Project description"
+readme = "README.md"
 requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+    { name = "Your Name", email = "your@email.com" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 dependencies = [
-    "fastapi>=0.104.0",
-    "pydantic>=2.0.0",
-    "python-dotenv>=1.0.0",
+    "fastapi>=0.109.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "uvicorn[standard]>=0.25.0",
+    "httpx>=0.26.0",
+    "sqlalchemy>=2.0.0",
+    "alembic>=1.13.0",
+    "asyncpg>=0.29.0",
+    "redis>=5.0.0",
+    "structlog>=24.1.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.4.0",
-    "black>=23.0.0",
-    "ruff>=0.1.0",
-    "mypy>=1.7.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "black>=24.1.0",
+    "ruff>=0.1.14",
+    "mypy>=1.8.0",
+    "pre-commit>=3.6.0",
+    "faker>=22.0.0",
+    "httpx>=0.26.0",
 ]
+ml = [
+    "torch>=2.1.0",
+    "numpy>=1.26.0",
+    "pandas>=2.1.0",
+    "scikit-learn>=1.4.0",
+]
+
+[project.scripts]
+app = "app.main:main"
+migrate = "app.db.migrate:run_migrations"
+
+[build-system]
+requires = ["setuptools>=69.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.black]
 line-length = 88
-target-version = ['py311']
+target-version = ['py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.git
+    | \.venv
+    | build
+    | dist
+    | migrations
+)/
+'''
 
 [tool.ruff]
 line-length = 88
-select = ["E", "F", "I", "N", "W"]
-ignore = ["E501"]
+target-version = "py311"
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # Pyflakes
+    "I",      # isort
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+    "ANN",    # flake8-annotations
+    "ASYNC",  # flake8-async
+    "S",      # flake8-bandit (security)
+    "B",      # flake8-bugbear
+    "A",      # flake8-builtins
+    "C4",     # flake8-comprehensions
+    "DTZ",    # flake8-datetimez
+    "T10",    # flake8-debugger
+    "EXE",    # flake8-executable
+    "ISC",    # flake8-implicit-str-concat
+    "ICN",    # flake8-import-conventions
+    "LOG",    # flake8-logging
+    "G",      # flake8-logging-format
+    "PIE",    # flake8-pie
+    "PYI",    # flake8-pyi
+    "PT",     # flake8-pytest-style
+    "Q",      # flake8-quotes
+    "RSE",    # flake8-raise
+    "RET",    # flake8-return
+    "SLF",    # flake8-self
+    "SIM",    # flake8-simplify
+    "TID",    # flake8-tidy-imports
+    "TCH",    # flake8-type-checking
+    "ARG",    # flake8-unused-arguments
+    "PTH",    # flake8-use-pathlib
+    "ERA",    # eradicate
+    "PL",     # Pylint
+    "TRY",    # tryceratops
+    "PERF",   # Perflint
+    "RUF",    # Ruff-specific rules
+]
+ignore = [
+    "E501",   # line too long (handled by black)
+    "ANN101", # missing type for self
+    "ANN102", # missing type for cls
+    "ANN401", # Dynamically typed expressions (Any)
+    "S101",   # assert usage (needed for tests)
+    "TRY003", # Avoid long messages in exceptions
+]
+
+[tool.ruff.per-file-ignores]
+"tests/**/*.py" = [
+    "S101",   # asserts allowed in tests
+    "ARG",    # unused arguments allowed in fixtures
+    "ANN",    # type annotations not required in tests
+    "PLR2004", # magic values allowed in tests
+]
+
+[tool.ruff.isort]
+known-first-party = ["app"]
+force-single-line = false
+lines-after-imports = 2
 
 [tool.mypy]
 python_version = "3.11"
 strict = true
 warn_return_any = true
 warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+show_error_codes = true
+show_column_numbers = true
+pretty = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = [
+    "redis.*",
+    "uvicorn.*",
+]
+ignore_missing_imports = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "-ra",
+]
+markers = [
+    "slow: marks tests as slow",
+    "integration: marks tests as integration tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/migrations/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+    "@abstractmethod",
+]
 ```
 
-## Naming Conventions
+---
 
-### Variables & Functions
+## 2. Naming Conventions (PEP 8)
+
+### Variables & Functions (snake_case)
 ```python
 # ❌ Bad
 UserData = {}
 def Get_User(): pass
 def getUserData(): pass  # camelCase is not Pythonic
+myVariable = 42
 
 # ✅ Good
 user_data = {}
 def get_user(): pass
 def get_user_data(): pass
+my_variable = 42
 ```
 
-### Classes
+### Classes (PascalCase)
 ```python
 # ❌ Bad
 class user_service: pass
 class userService: pass
+class USER_SERVICE: pass
 
 # ✅ Good
 class UserService: pass
 class HTTPRequestHandler: pass
+class XMLParser: pass
+class OAuth2Client: pass
 ```
 
-### Constants
+### Constants (SCREAMING_SNAKE_CASE)
 ```python
 # ❌ Bad
 apiKey = "..."
 max_retries = 3
+MaxConnections = 100
 
 # ✅ Good
 API_KEY = "..."
 MAX_RETRIES = 3
+MAX_CONNECTIONS = 100
 DATABASE_URL = "postgresql://..."
+DEFAULT_TIMEOUT_SECONDS = 30
 ```
 
-### Private vs Public
+### Private vs Protected vs Public
 ```python
 class UserService:
-    # Public attribute
-    name: str
-    
-    # Protected (internal use, subclasses OK)
+    """Demonstrates naming conventions for visibility."""
+
+    # Public attribute - accessible everywhere
+    name: str = "UserService"
+
+    # Protected attribute - internal use, subclasses OK
+    # Single underscore is a convention, not enforced
     _cache: dict[str, Any]
-    
-    # Private (name mangling)
+
+    # Private attribute - name mangling applied
+    # Becomes _UserService__secret_key
     __secret_key: str
-    
-    def public_method(self) -> None:
-        pass
-    
-    def _internal_helper(self) -> None:
-        """Used internally, but subclasses can override."""
-        pass
-    
-    def __private_method(self) -> None:
-        """Truly private, name mangled."""
-        pass
+
+    def __init__(self) -> None:
+        self._cache = {}
+        self.__secret_key = "secret"
+
+    def public_method(self) -> str:
+        """Public method - part of the API."""
+        return self._internal_helper()
+
+    def _internal_helper(self) -> str:
+        """Protected method - used internally, subclasses can override."""
+        return "helper"
+
+    def __private_method(self) -> str:
+        """Private method - name mangled, truly private."""
+        return self.__secret_key
 ```
 
-## Type Hints
+### Boolean Variables (use is/has/can/should/was prefix)
+```python
+# ❌ Bad
+active = True
+admin = False
+valid = True
+
+# ✅ Good
+is_active = True
+is_admin = False
+is_valid = True
+has_permission = True
+can_edit = False
+should_retry = True
+was_processed = False
+```
+
+### Module and Package Names
+```python
+# ❌ Bad
+UserService.py
+My-Module.py
+myModule.py
+
+# ✅ Good (lowercase, underscores if needed)
+user_service.py
+my_module.py
+utils.py
+helpers.py
+```
+
+---
+
+## 3. Type Hints (Modern Python 3.10+ Syntax)
 
 ### Basic Types
 ```python
-from typing import Any
-
 # ❌ Bad - no type hints
 def process_data(data):
     return data
 
-# ✅ Good
-def process_data(data: str | int) -> str:
-    return str(data)
-
-# ✅ Generic types
-from typing import TypeVar
-
-T = TypeVar("T")
-
-def get_first(items: list[T]) -> T | None:
-    return items[0] if items else None
-```
-
-### Modern Python 3.10+ Syntax
-```python
-# ❌ Old style (Python 3.9)
-from typing import Optional, Union, List, Dict
+# ❌ Bad - old style (Python 3.9)
+from typing import Optional, Union, List, Dict, Tuple, Set
 
 def get_user(user_id: str) -> Optional[Dict[str, Union[str, int]]]:
     pass
 
-# ✅ New style (Python 3.10+)
+# ✅ Good - modern Python 3.10+ syntax
+def process_data(data: str | int) -> str:
+    return str(data)
+
 def get_user(user_id: str) -> dict[str, str | int] | None:
     pass
 
-# ✅ List, Dict, Set, Tuple
+# ✅ Good - built-in generic types
 def process_users(
     user_ids: list[str],
     metadata: dict[str, Any],
     tags: set[str],
     coords: tuple[float, float],
+    matrix: list[list[int]],
 ) -> list[dict[str, Any]]:
     pass
 ```
 
-### Pydantic Models (Recommended)
+### TypeVar and Generic Types
 ```python
-from pydantic import BaseModel, Field, ConfigDict, field_validator
+from typing import TypeVar, Generic
+
+# Simple TypeVar
+T = TypeVar("T")
+K = TypeVar("K")
+V = TypeVar("V")
+
+def get_first(items: list[T]) -> T | None:
+    """Return first item or None if empty."""
+    return items[0] if items else None
+
+# Bounded TypeVar
+from typing import TypeVar
+from collections.abc import Hashable
+
+THashable = TypeVar("THashable", bound=Hashable)
+
+def deduplicate(items: list[THashable]) -> list[THashable]:
+    """Remove duplicates while preserving order."""
+    seen: set[THashable] = set()
+    result: list[THashable] = []
+    for item in items:
+        if item not in seen:
+            seen.add(item)
+            result.append(item)
+    return result
+
+# Generic class
+class Repository(Generic[T]):
+    """Generic repository pattern."""
+
+    def __init__(self) -> None:
+        self._items: dict[str, T] = {}
+
+    def get(self, id: str) -> T | None:
+        return self._items.get(id)
+
+    def save(self, id: str, item: T) -> None:
+        self._items[id] = item
+
+    def all(self) -> list[T]:
+        return list(self._items.values())
+
+# Usage
+user_repo: Repository[User] = Repository()
+user_repo.save("123", User(id="123", name="John"))
+```
+
+### Callable Types
+```python
+from collections.abc import Callable, Awaitable, Coroutine
+from typing import ParamSpec, TypeVar, Concatenate
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+# Simple callable
+Handler = Callable[[str, int], bool]
+
+def register_handler(handler: Handler) -> None:
+    pass
+
+# Callable with keyword arguments
+def apply_function(
+    func: Callable[..., R],
+    *args: Any,
+    **kwargs: Any,
+) -> R:
+    return func(*args, **kwargs)
+
+# Async callable
+AsyncHandler = Callable[[str], Awaitable[dict[str, Any]]]
+
+async def process_with_handler(
+    data: str,
+    handler: AsyncHandler,
+) -> dict[str, Any]:
+    return await handler(data)
+
+# Decorator with ParamSpec (preserves signature)
+def log_calls(func: Callable[P, R]) -> Callable[P, R]:
+    """Decorator that logs function calls."""
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        print(f"Calling {func.__name__}")
+        return func(*args, **kwargs)
+    return wrapper
+```
+
+### TypedDict for Structured Dictionaries
+```python
+from typing import TypedDict, Required, NotRequired
+
+# ❌ Bad - untyped dict
+def process_config(config: dict[str, Any]) -> None:
+    host = config["host"]  # No type safety
+    port = config["port"]
+
+# ✅ Good - TypedDict
+class DatabaseConfig(TypedDict):
+    host: str
+    port: int
+    database: str
+    user: str
+    password: str
+    pool_size: NotRequired[int]  # Optional key
+    ssl: NotRequired[bool]
+
+def process_config(config: DatabaseConfig) -> None:
+    host = config["host"]  # Type: str
+    port = config["port"]  # Type: int
+    pool_size = config.get("pool_size", 10)  # Type: int
+
+# Total=False makes all keys optional
+class PartialConfig(TypedDict, total=False):
+    host: str
+    port: int
+```
+
+### Literal Types
+```python
+from typing import Literal
+
+# Restrict to specific values
+LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+HttpMethod = Literal["GET", "POST", "PUT", "PATCH", "DELETE"]
+Environment = Literal["development", "staging", "production"]
+
+def configure_logging(level: LogLevel) -> None:
+    pass
+
+def make_request(method: HttpMethod, url: str) -> None:
+    pass
+
+# Overloads with Literal
+from typing import overload
+
+@overload
+def fetch_data(format: Literal["json"]) -> dict[str, Any]: ...
+@overload
+def fetch_data(format: Literal["text"]) -> str: ...
+@overload
+def fetch_data(format: Literal["bytes"]) -> bytes: ...
+
+def fetch_data(format: Literal["json", "text", "bytes"]) -> dict[str, Any] | str | bytes:
+    if format == "json":
+        return {"data": "value"}
+    elif format == "text":
+        return "text data"
+    else:
+        return b"bytes data"
+```
+
+### Self Type (Python 3.11+)
+```python
+from typing import Self
+
+class Builder:
+    """Builder pattern with proper Self type."""
+
+    def __init__(self) -> None:
+        self._name: str = ""
+        self._value: int = 0
+
+    def with_name(self, name: str) -> Self:
+        self._name = name
+        return self
+
+    def with_value(self, value: int) -> Self:
+        self._value = value
+        return self
+
+class ExtendedBuilder(Builder):
+    def __init__(self) -> None:
+        super().__init__()
+        self._extra: str = ""
+
+    def with_extra(self, extra: str) -> Self:
+        self._extra = extra
+        return self
+
+# Self correctly types the return
+builder = ExtendedBuilder().with_name("test").with_extra("data")  # Type: ExtendedBuilder
+```
+
+---
+
+## 4. Pydantic Models for Validation
+
+### Basic Model Definition
+```python
 from datetime import datetime
+from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
+from typing import Annotated
+
 
 class User(BaseModel):
-    """User model with validation."""
-    
+    """User model with comprehensive validation."""
+
     model_config = ConfigDict(
         str_strip_whitespace=True,
         validate_assignment=True,
-        frozen=False,  # Set to True for immutable
+        frozen=False,
+        extra="forbid",
+        populate_by_name=True,
+        use_enum_values=True,
     )
-    
-    id: str
-    email: str = Field(..., pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
+
+    id: str = Field(..., min_length=1, max_length=50, description="Unique identifier")
+    email: str = Field(
+        ...,
+        pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$",
+        description="User email address",
+    )
     name: str = Field(..., min_length=1, max_length=100)
     age: int = Field(..., ge=0, le=150)
-    is_active: bool = True
-    created_at: datetime = Field(default_factory=datetime.now)
-    tags: list[str] = Field(default_factory=list)
-    
+    is_active: bool = Field(default=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime | None = Field(default=None)
+    tags: list[str] = Field(default_factory=list, max_length=10)
+    metadata: dict[str, str] = Field(default_factory=dict)
+
     @field_validator("email")
     @classmethod
     def validate_email(cls, v: str) -> str:
-        if not v.endswith(("@company.com", "@example.com")):
-            raise ValueError("Must be company email")
+        """Normalize email to lowercase."""
         return v.lower()
 
-# Usage
-user = User(
-    id="123",
-    email="John.Doe@Company.COM",
-    name="John Doe",
-    age=30,
-)
-print(user.email)  # john.doe@company.com (validated & normalized)
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str) -> str:
+        """Capitalize name properly."""
+        return v.strip().title()
+
+    @field_validator("tags", mode="before")
+    @classmethod
+    def validate_tags(cls, v: list[str] | str) -> list[str]:
+        """Accept comma-separated string or list."""
+        if isinstance(v, str):
+            return [tag.strip() for tag in v.split(",") if tag.strip()]
+        return v
+
+    @model_validator(mode="after")
+    def validate_model(self) -> Self:
+        """Cross-field validation."""
+        if self.age < 18 and "admin" in self.tags:
+            raise ValueError("Users under 18 cannot be admins")
+        return self
 ```
 
-## Error Handling
-
-### Custom Exceptions
+### Nested Models and Relationships
 ```python
+from pydantic import BaseModel, Field
+from enum import Enum
+
+
+class AddressType(str, Enum):
+    HOME = "home"
+    WORK = "work"
+    OTHER = "other"
+
+
+class Address(BaseModel):
+    """Address model."""
+    street: str = Field(..., min_length=1)
+    city: str = Field(..., min_length=1)
+    country: str = Field(..., min_length=2, max_length=2)  # ISO code
+    postal_code: str = Field(..., pattern=r"^\d{5}(-\d{4})?$")
+    type: AddressType = Field(default=AddressType.HOME)
+
+
+class UserProfile(BaseModel):
+    """User profile with nested models."""
+    user: User
+    addresses: list[Address] = Field(default_factory=list, max_length=5)
+    primary_address: Address | None = Field(default=None)
+
+    @model_validator(mode="after")
+    def validate_primary_address(self) -> Self:
+        """Ensure primary address is in addresses list."""
+        if self.primary_address and self.addresses:
+            if self.primary_address not in self.addresses:
+                raise ValueError("Primary address must be in addresses list")
+        return self
+```
+
+### Request/Response Models
+```python
+from pydantic import BaseModel, Field, field_validator
+from datetime import datetime
+from typing import Generic, TypeVar
+
+T = TypeVar("T")
+
+
+# Request models (input validation)
+class CreateUserRequest(BaseModel):
+    """Request model for creating a user."""
+
+    model_config = ConfigDict(
+        str_strip_whitespace=True,
+        extra="forbid",
+    )
+
+    email: str = Field(..., pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
+    name: str = Field(..., min_length=1, max_length=100)
+    password: str = Field(..., min_length=8, max_length=128)
+    age: int = Field(..., ge=0, le=150)
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, v: str) -> str:
+        """Validate password complexity."""
+        if not any(c.isupper() for c in v):
+            raise ValueError("Password must contain uppercase letter")
+        if not any(c.islower() for c in v):
+            raise ValueError("Password must contain lowercase letter")
+        if not any(c.isdigit() for c in v):
+            raise ValueError("Password must contain digit")
+        return v
+
+
+class UpdateUserRequest(BaseModel):
+    """Request model for updating a user (partial)."""
+
+    model_config = ConfigDict(
+        str_strip_whitespace=True,
+        extra="forbid",
+    )
+
+    name: str | None = Field(default=None, min_length=1, max_length=100)
+    age: int | None = Field(default=None, ge=0, le=150)
+    is_active: bool | None = Field(default=None)
+
+
+# Response models (output serialization)
+class UserResponse(BaseModel):
+    """Response model for user data."""
+
+    model_config = ConfigDict(
+        from_attributes=True,  # Allow ORM model conversion
+    )
+
+    id: str
+    email: str
+    name: str
+    age: int
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime | None = None
+
+
+# Generic API response wrapper
+class ApiResponse(BaseModel, Generic[T]):
+    """Standard API response wrapper."""
+    success: bool = True
+    data: T | None = None
+    error: str | None = None
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+
+class PaginatedResponse(BaseModel, Generic[T]):
+    """Paginated response model."""
+    items: list[T]
+    total: int
+    page: int
+    page_size: int
+    pages: int
+
+    @property
+    def has_next(self) -> bool:
+        return self.page < self.pages
+
+    @property
+    def has_previous(self) -> bool:
+        return self.page > 1
+```
+
+### Custom Types with Annotated
+```python
+from typing import Annotated
+from pydantic import Field, AfterValidator, BeforeValidator
+from pydantic.functional_validators import AfterValidator
+import re
+
+
+def validate_slug(v: str) -> str:
+    """Validate and normalize slug."""
+    if not re.match(r"^[a-z0-9]+(?:-[a-z0-9]+)*$", v):
+        raise ValueError("Invalid slug format")
+    return v
+
+
+def normalize_phone(v: str) -> str:
+    """Normalize phone number."""
+    # Remove all non-digits
+    digits = re.sub(r"\D", "", v)
+    if len(digits) != 10:
+        raise ValueError("Phone must have 10 digits")
+    return f"+1-{digits[:3]}-{digits[3:6]}-{digits[6:]}"
+
+
+# Reusable annotated types
+Slug = Annotated[str, AfterValidator(validate_slug)]
+PhoneNumber = Annotated[str, BeforeValidator(normalize_phone)]
+PositiveInt = Annotated[int, Field(gt=0)]
+NonEmptyStr = Annotated[str, Field(min_length=1)]
+EmailStr = Annotated[str, Field(pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")]
+
+
+class Article(BaseModel):
+    """Article with custom types."""
+    title: NonEmptyStr
+    slug: Slug
+    author_phone: PhoneNumber
+    view_count: PositiveInt = 1
+```
+
+---
+
+## 5. Error Handling
+
+### Custom Exception Hierarchy
+```python
+from typing import Any
+from datetime import datetime
+
+
 class AppException(Exception):
-    """Base exception for application errors."""
-    
+    """Base exception for all application errors."""
+
     def __init__(
         self,
         message: str,
@@ -213,141 +804,667 @@ class AppException(Exception):
         self.code = code
         self.status_code = status_code
         self.details = details or {}
+        self.timestamp = datetime.utcnow()
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert exception to dictionary for API response."""
+        return {
+            "error": {
+                "code": self.code,
+                "message": self.message,
+                "details": self.details,
+                "timestamp": self.timestamp.isoformat(),
+            }
+        }
 
 
-class ValidationException(AppException):
-    """Raised when validation fails."""
-    
-    def __init__(self, message: str, details: dict[str, Any] | None = None) -> None:
+# Client Errors (4xx)
+class BadRequestException(AppException):
+    """Raised for malformed requests."""
+
+    def __init__(
+        self,
+        message: str = "Bad request",
+        details: dict[str, Any] | None = None,
+    ) -> None:
         super().__init__(
             message=message,
-            code="VALIDATION_ERROR",
+            code="BAD_REQUEST",
             status_code=400,
             details=details,
         )
 
 
-class NotFoundException(AppException):
-    """Raised when resource not found."""
-    
-    def __init__(self, resource: str, resource_id: str) -> None:
+class ValidationException(AppException):
+    """Raised when validation fails."""
+
+    def __init__(
+        self,
+        message: str,
+        errors: list[dict[str, Any]] | None = None,
+    ) -> None:
         super().__init__(
-            message=f"{resource} with id {resource_id} not found",
+            message=message,
+            code="VALIDATION_ERROR",
+            status_code=400,
+            details={"errors": errors or []},
+        )
+
+
+class UnauthorizedException(AppException):
+    """Raised when authentication is required."""
+
+    def __init__(self, message: str = "Authentication required") -> None:
+        super().__init__(
+            message=message,
+            code="UNAUTHORIZED",
+            status_code=401,
+        )
+
+
+class ForbiddenException(AppException):
+    """Raised when access is denied."""
+
+    def __init__(self, message: str = "Access denied") -> None:
+        super().__init__(
+            message=message,
+            code="FORBIDDEN",
+            status_code=403,
+        )
+
+
+class NotFoundException(AppException):
+    """Raised when resource is not found."""
+
+    def __init__(self, resource: str, resource_id: str | None = None) -> None:
+        message = f"{resource} not found"
+        if resource_id:
+            message = f"{resource} with id '{resource_id}' not found"
+        super().__init__(
+            message=message,
             code="NOT_FOUND",
             status_code=404,
+            details={"resource": resource, "id": resource_id},
+        )
+
+
+class ConflictException(AppException):
+    """Raised for resource conflicts."""
+
+    def __init__(
+        self,
+        message: str,
+        resource: str | None = None,
+    ) -> None:
+        super().__init__(
+            message=message,
+            code="CONFLICT",
+            status_code=409,
+            details={"resource": resource} if resource else {},
+        )
+
+
+class RateLimitException(AppException):
+    """Raised when rate limit is exceeded."""
+
+    def __init__(
+        self,
+        message: str = "Rate limit exceeded",
+        retry_after: int | None = None,
+    ) -> None:
+        super().__init__(
+            message=message,
+            code="RATE_LIMIT_EXCEEDED",
+            status_code=429,
+            details={"retry_after": retry_after} if retry_after else {},
+        )
+
+
+# Server Errors (5xx)
+class InternalException(AppException):
+    """Raised for internal server errors."""
+
+    def __init__(
+        self,
+        message: str = "Internal server error",
+        details: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(
+            message=message,
+            code="INTERNAL_ERROR",
+            status_code=500,
+            details=details,
+        )
+
+
+class ServiceUnavailableException(AppException):
+    """Raised when a service is unavailable."""
+
+    def __init__(self, service: str) -> None:
+        super().__init__(
+            message=f"{service} is currently unavailable",
+            code="SERVICE_UNAVAILABLE",
+            status_code=503,
+            details={"service": service},
+        )
+
+
+class ExternalServiceException(AppException):
+    """Raised when an external service fails."""
+
+    def __init__(
+        self,
+        service: str,
+        message: str | None = None,
+        original_error: Exception | None = None,
+    ) -> None:
+        super().__init__(
+            message=message or f"External service '{service}' failed",
+            code="EXTERNAL_SERVICE_ERROR",
+            status_code=502,
+            details={
+                "service": service,
+                "original_error": str(original_error) if original_error else None,
+            },
         )
 ```
 
 ### Try-Except Patterns
 ```python
+import logging
+from typing import TypeVar
+
+logger = logging.getLogger(__name__)
+T = TypeVar("T")
+
+
 # ❌ Bad - bare except
-try:
-    result = risky_operation()
-except:
-    print("Error occurred")
+def process_data_bad1(data: str) -> dict[str, Any]:
+    try:
+        return json.loads(data)
+    except:  # Catches everything, including KeyboardInterrupt!
+        return {}
 
-# ❌ Bad - catching too broad
-try:
-    result = risky_operation()
-except Exception as e:
-    print(e)
 
-# ✅ Good - specific exceptions
-try:
-    result = risky_operation()
-except ValueError as e:
-    logger.error(f"Invalid value: {e}")
-    raise ValidationException(str(e)) from e
-except FileNotFoundError as e:
-    logger.error(f"File not found: {e}")
-    raise NotFoundException("File", str(e)) from e
-except Exception as e:
-    logger.exception("Unexpected error in risky_operation")
-    raise AppException("Internal error", "INTERNAL_ERROR") from e
+# ❌ Bad - catching too broad, swallowing errors
+def process_data_bad2(data: str) -> dict[str, Any]:
+    try:
+        return json.loads(data)
+    except Exception as e:
+        print(e)  # Just printing, not handling
+        return {}
+
+
+# ❌ Bad - re-raising without context
+def process_data_bad3(data: str) -> dict[str, Any]:
+    try:
+        return json.loads(data)
+    except json.JSONDecodeError:
+        raise  # Loses context of where error occurred
+
+
+# ✅ Good - specific exceptions with proper handling
+def process_data(data: str) -> dict[str, Any]:
+    """Parse JSON data with proper error handling."""
+    try:
+        return json.loads(data)
+    except json.JSONDecodeError as e:
+        logger.error(
+            "Failed to parse JSON",
+            extra={"data_preview": data[:100], "error": str(e)},
+        )
+        raise ValidationException(
+            message="Invalid JSON format",
+            errors=[{"field": "data", "message": str(e)}],
+        ) from e
+
+
+# ✅ Good - multiple exception types
+async def fetch_user(user_id: str) -> User:
+    """Fetch user with comprehensive error handling."""
+    try:
+        user = await db.users.find_one({"id": user_id})
+
+        if user is None:
+            raise NotFoundException("User", user_id)
+
+        return User.model_validate(user)
+
+    except NotFoundException:
+        # Re-raise our custom exceptions as-is
+        raise
+    except ValidationError as e:
+        # Data corruption in database
+        logger.error(
+            "Invalid user data in database",
+            extra={"user_id": user_id, "error": str(e)},
+        )
+        raise InternalException(
+            "User data is corrupted",
+            details={"user_id": user_id},
+        ) from e
+    except Exception as e:
+        # Unexpected errors
+        logger.exception(
+            "Unexpected error fetching user",
+            extra={"user_id": user_id},
+        )
+        raise InternalException("Failed to fetch user") from e
+
 
 # ✅ Good - using else and finally
-try:
-    result = risky_operation()
-except ValueError as e:
-    handle_error(e)
-else:
-    # Runs only if no exception
-    process_success(result)
-finally:
-    # Always runs
-    cleanup()
+def process_file(path: str) -> list[str]:
+    """Process file with proper cleanup."""
+    file_handle = None
+    try:
+        file_handle = open(path)
+        lines = file_handle.readlines()
+    except FileNotFoundError as e:
+        logger.error(f"File not found: {path}")
+        raise NotFoundException("File", path) from e
+    except PermissionError as e:
+        logger.error(f"Permission denied: {path}")
+        raise ForbiddenException(f"Cannot access file: {path}") from e
+    except IOError as e:
+        logger.error(f"IO error reading file: {path}")
+        raise InternalException(f"Failed to read file: {path}") from e
+    else:
+        # Only runs if no exception
+        logger.info(f"Successfully read {len(lines)} lines from {path}")
+        return lines
+    finally:
+        # Always runs
+        if file_handle:
+            file_handle.close()
 ```
 
 ### Context Managers
 ```python
-from contextlib import contextmanager
-from typing import Generator
+from contextlib import contextmanager, asynccontextmanager
+from typing import Generator, AsyncGenerator
+from datetime import datetime
 
-# ✅ Custom context manager
+
+# ✅ Synchronous context manager
 @contextmanager
-def database_transaction() -> Generator[None, None, None]:
+def database_transaction(
+    db: Database,
+    *,
+    readonly: bool = False,
+) -> Generator[Connection, None, None]:
     """Context manager for database transactions."""
+    connection = db.get_connection()
     try:
-        db.begin()
-        yield
-        db.commit()
+        if not readonly:
+            connection.begin()
+        yield connection
+        if not readonly:
+            connection.commit()
     except Exception as e:
-        db.rollback()
+        if not readonly:
+            connection.rollback()
         logger.error(f"Transaction failed: {e}")
         raise
     finally:
-        db.close()
+        connection.close()
+
 
 # Usage
-with database_transaction():
-    db.insert_user(user)
-    db.insert_profile(profile)
+with database_transaction(db) as conn:
+    conn.execute("INSERT INTO users ...")
+    conn.execute("INSERT INTO profiles ...")
+
+
+# ✅ Async context manager
+@asynccontextmanager
+async def async_database_transaction(
+    db: AsyncDatabase,
+) -> AsyncGenerator[AsyncConnection, None]:
+    """Async context manager for database transactions."""
+    connection = await db.acquire()
+    transaction = connection.transaction()
+    try:
+        await transaction.start()
+        yield connection
+        await transaction.commit()
+    except Exception as e:
+        await transaction.rollback()
+        logger.error(f"Async transaction failed: {e}")
+        raise
+    finally:
+        await db.release(connection)
+
+
+# Usage
+async with async_database_transaction(db) as conn:
+    await conn.execute("INSERT INTO users ...")
+
+
+# ✅ Timing context manager
+@contextmanager
+def timer(operation: str) -> Generator[None, None, None]:
+    """Context manager to time operations."""
+    start = datetime.utcnow()
+    try:
+        yield
+    finally:
+        elapsed = (datetime.utcnow() - start).total_seconds()
+        logger.info(f"{operation} completed in {elapsed:.3f}s")
+
+
+# Usage
+with timer("User creation"):
+    create_user(data)
+
+
+# ✅ Resource cleanup context manager
+@contextmanager
+def temp_directory() -> Generator[Path, None, None]:
+    """Create and cleanup temporary directory."""
+    import tempfile
+    import shutil
+    from pathlib import Path
+
+    temp_dir = Path(tempfile.mkdtemp())
+    try:
+        yield temp_dir
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+# Usage
+with temp_directory() as tmp:
+    file_path = tmp / "data.json"
+    file_path.write_text('{"key": "value"}')
+    process_file(file_path)
+# Directory automatically cleaned up
 ```
 
-## Async/Await Best Practices
+---
+
+## 6. Async/Await Patterns
+
+### Basic Async Functions
 ```python
 import asyncio
-from typing import Coroutine
-
-# ❌ Bad - not actually async
-async def fetch_user(user_id: str) -> User:
-    return db.get_user(user_id)  # Blocking call!
-
-# ✅ Good - properly async
-async def fetch_user(user_id: str) -> User:
-    return await db_async.get_user(user_id)
-
-# ✅ Parallel execution
-async def fetch_multiple_users(user_ids: list[str]) -> list[User]:
-    tasks = [fetch_user(uid) for uid in user_ids]
-    return await asyncio.gather(*tasks)
-
-# ✅ With error handling
-async def safe_fetch_user(user_id: str) -> User | None:
-    try:
-        return await fetch_user(user_id)
-    except NotFoundException:
-        logger.warning(f"User {user_id} not found")
-        return None
-    except Exception as e:
-        logger.error(f"Error fetching user {user_id}: {e}")
-        raise
-```
-
-## Logging
-```python
-import logging
 from typing import Any
 
-# Setup logger
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-logger = logging.getLogger(__name__)
 
+# ❌ Bad - blocking call in async function
+async def fetch_user_bad(user_id: str) -> User:
+    # This blocks the event loop!
+    return db.get_user(user_id)
+
+
+# ❌ Bad - unnecessary async
+async def calculate_sum(numbers: list[int]) -> int:
+    # No I/O, no need for async
+    return sum(numbers)
+
+
+# ✅ Good - properly async with await
+async def fetch_user(user_id: str) -> User:
+    """Fetch user asynchronously."""
+    return await db_async.get_user(user_id)
+
+
+# ✅ Good - running blocking code in executor
+async def fetch_user_from_sync_db(user_id: str) -> User:
+    """Run sync code without blocking event loop."""
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(
+        None,  # Default executor (ThreadPoolExecutor)
+        lambda: sync_db.get_user(user_id),
+    )
+```
+
+### Parallel Execution
+```python
+import asyncio
+
+
+# ❌ Bad - sequential when parallel is possible
+async def fetch_all_data_bad() -> tuple[list[User], list[Product], list[Order]]:
+    users = await fetch_users()
+    products = await fetch_products()
+    orders = await fetch_orders()
+    return users, products, orders
+
+
+# ✅ Good - parallel execution with gather
+async def fetch_all_data() -> tuple[list[User], list[Product], list[Order]]:
+    """Fetch all data in parallel."""
+    users, products, orders = await asyncio.gather(
+        fetch_users(),
+        fetch_products(),
+        fetch_orders(),
+    )
+    return users, products, orders
+
+
+# ✅ Good - parallel with error handling
+async def fetch_all_data_safe() -> tuple[
+    list[User] | None,
+    list[Product] | None,
+    list[Order] | None,
+]:
+    """Fetch all data, returning None for failed requests."""
+    results = await asyncio.gather(
+        fetch_users(),
+        fetch_products(),
+        fetch_orders(),
+        return_exceptions=True,
+    )
+
+    processed: list[Any] = []
+    for i, result in enumerate(results):
+        if isinstance(result, Exception):
+            logger.error(f"Request {i} failed: {result}")
+            processed.append(None)
+        else:
+            processed.append(result)
+
+    return tuple(processed)
+```
+
+### TaskGroup (Python 3.11+)
+```python
+import asyncio
+
+
+async def process_users(user_ids: list[str]) -> list[User]:
+    """Process users using TaskGroup for better error handling."""
+    results: list[User] = []
+
+    async with asyncio.TaskGroup() as tg:
+        tasks = [
+            tg.create_task(fetch_user(uid))
+            for uid in user_ids
+        ]
+
+    # All tasks completed successfully
+    results = [task.result() for task in tasks]
+    return results
+
+
+# With exception handling
+async def process_users_safe(user_ids: list[str]) -> dict[str, User | Exception]:
+    """Process users, capturing individual failures."""
+    results: dict[str, User | Exception] = {}
+
+    async def fetch_and_store(uid: str) -> None:
+        try:
+            results[uid] = await fetch_user(uid)
+        except Exception as e:
+            results[uid] = e
+
+    async with asyncio.TaskGroup() as tg:
+        for uid in user_ids:
+            tg.create_task(fetch_and_store(uid))
+
+    return results
+```
+
+### Semaphore for Concurrency Control
+```python
+import asyncio
+
+
+async def fetch_urls(urls: list[str], max_concurrent: int = 10) -> list[str]:
+    """Fetch URLs with limited concurrency."""
+    semaphore = asyncio.Semaphore(max_concurrent)
+
+    async def fetch_with_limit(url: str) -> str:
+        async with semaphore:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url)
+                return response.text
+
+    return await asyncio.gather(*[fetch_with_limit(url) for url in urls])
+
+
+# Using asyncio.Queue for producer-consumer pattern
+async def process_queue(
+    items: list[str],
+    num_workers: int = 5,
+) -> list[str]:
+    """Process items using worker queue pattern."""
+    queue: asyncio.Queue[str | None] = asyncio.Queue()
+    results: list[str] = []
+    results_lock = asyncio.Lock()
+
+    async def worker() -> None:
+        while True:
+            item = await queue.get()
+            if item is None:  # Poison pill
+                queue.task_done()
+                break
+            try:
+                result = await process_item(item)
+                async with results_lock:
+                    results.append(result)
+            finally:
+                queue.task_done()
+
+    # Start workers
+    workers = [asyncio.create_task(worker()) for _ in range(num_workers)]
+
+    # Add items to queue
+    for item in items:
+        await queue.put(item)
+
+    # Add poison pills to stop workers
+    for _ in range(num_workers):
+        await queue.put(None)
+
+    # Wait for all items to be processed
+    await queue.join()
+    await asyncio.gather(*workers)
+
+    return results
+```
+
+### Timeout Handling
+```python
+import asyncio
+
+
+async def fetch_with_timeout(
+    url: str,
+    timeout_seconds: float = 30.0,
+) -> str:
+    """Fetch URL with timeout."""
+    try:
+        async with asyncio.timeout(timeout_seconds):
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url)
+                return response.text
+    except asyncio.TimeoutError:
+        logger.error(f"Request to {url} timed out after {timeout_seconds}s")
+        raise ServiceUnavailableException(f"Request to {url} timed out")
+
+
+# Retry with exponential backoff
+async def fetch_with_retry(
+    url: str,
+    max_retries: int = 3,
+    base_delay: float = 1.0,
+) -> str:
+    """Fetch URL with retry and exponential backoff."""
+    last_exception: Exception | None = None
+
+    for attempt in range(max_retries):
+        try:
+            return await fetch_with_timeout(url)
+        except (httpx.HTTPError, asyncio.TimeoutError) as e:
+            last_exception = e
+            if attempt < max_retries - 1:
+                delay = base_delay * (2 ** attempt)
+                logger.warning(
+                    f"Attempt {attempt + 1} failed, retrying in {delay}s",
+                    extra={"url": url, "error": str(e)},
+                )
+                await asyncio.sleep(delay)
+
+    raise ExternalServiceException(
+        service=url,
+        message=f"Failed after {max_retries} attempts",
+        original_error=last_exception,
+    )
+```
+
+---
+
+## 7. Logging Best Practices
+
+### Structured Logging Setup
+```python
+import logging
+import sys
+from typing import Any
+import structlog
+from datetime import datetime
+
+
+def setup_logging(
+    level: str = "INFO",
+    json_format: bool = True,
+) -> None:
+    """Configure structured logging."""
+
+    # Configure structlog
+    processors = [
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+    ]
+
+    if json_format:
+        processors.append(structlog.processors.JSONRenderer())
+    else:
+        processors.append(structlog.dev.ConsoleRenderer(colors=True))
+
+    structlog.configure(
+        processors=processors,
+        wrapper_class=structlog.make_filtering_bound_logger(
+            getattr(logging, level.upper())
+        ),
+        context_class=dict,
+        logger_factory=structlog.PrintLoggerFactory(),
+        cache_logger_on_first_use=True,
+    )
+
+
+# Get logger instance
+logger = structlog.get_logger()
+```
+
+### Using Structured Logging
+```python
 # ❌ Bad - using print
-def process_order(order_id: str) -> None:
+def process_order_bad(order_id: str) -> None:
     print(f"Processing order {order_id}")
     try:
         result = process(order_id)
@@ -355,297 +1472,1596 @@ def process_order(order_id: str) -> None:
     except Exception as e:
         print(f"Error: {e}")
 
-# ✅ Good - using logger with context
+
+# ❌ Bad - f-string in log message
+def process_order_bad2(order_id: str) -> None:
+    logger.info(f"Processing order {order_id}")  # Interpolated before sent
+
+
+# ✅ Good - structured logging with context
 def process_order(order_id: str) -> None:
-    logger.info("Processing order", extra={"order_id": order_id})
+    """Process order with proper logging."""
+    log = logger.bind(order_id=order_id)
+
+    log.info("processing_order_started")
+
     try:
         result = process(order_id)
-        logger.info(
-            "Order processed successfully",
-            extra={"order_id": order_id, "result": result},
+        log.info(
+            "processing_order_completed",
+            result=result,
+            duration_ms=calculate_duration(),
         )
+    except ValidationException as e:
+        log.warning(
+            "processing_order_validation_failed",
+            error=str(e),
+            error_code=e.code,
+        )
+        raise
     except Exception as e:
-        logger.exception(
-            "Failed to process order",
-            extra={"order_id": order_id},
+        log.exception(
+            "processing_order_failed",
+            error=str(e),
         )
         raise
 
-# ✅ Structured logging helper
-def log_with_context(
-    level: str,
-    message: str,
-    **context: Any,
-) -> None:
-    """Log with structured context."""
-    log_func = getattr(logger, level.lower())
-    log_func(message, extra=context)
 
-# Usage
-log_with_context("info", "User logged in", user_id="123", ip="1.2.3.4")
+# ✅ Context binding for request tracing
+async def handle_request(request_id: str, user_id: str) -> None:
+    """Handle request with context bound to logger."""
+    # Bind context for all subsequent log calls
+    structlog.contextvars.clear_contextvars()
+    structlog.contextvars.bind_contextvars(
+        request_id=request_id,
+        user_id=user_id,
+    )
+
+    logger.info("request_started")
+
+    # All log calls from here will include request_id and user_id
+    await process_request()
+
+    logger.info("request_completed")
 ```
 
-## Function Patterns
-
-### Dependency Injection
+### Log Levels Usage
 ```python
-from typing import Protocol
+# DEBUG - Detailed information for debugging
+logger.debug(
+    "cache_lookup",
+    key=cache_key,
+    hit=True,
+)
 
-# ❌ Bad - tight coupling
-class UserService:
-    def __init__(self) -> None:
-        self.db = Database()  # Hard-coded dependency
-    
-    def get_user(self, user_id: str) -> User:
-        return self.db.users.find_one(user_id)
+# INFO - General operational events
+logger.info(
+    "user_created",
+    user_id=user.id,
+    email=user.email,
+)
 
-# ✅ Good - dependency injection with Protocol
-class DatabaseProtocol(Protocol):
-    """Database interface."""
-    
-    def find_user(self, user_id: str) -> User | None:
+# WARNING - Something unexpected but handled
+logger.warning(
+    "rate_limit_approaching",
+    current_rate=current,
+    limit=limit,
+    percentage=current / limit * 100,
+)
+
+# ERROR - Error that affected a specific operation
+logger.error(
+    "payment_failed",
+    user_id=user_id,
+    amount=amount,
+    error=str(e),
+)
+
+# CRITICAL - System-wide critical failure
+logger.critical(
+    "database_connection_lost",
+    host=db_host,
+    retry_count=retry_count,
+)
+
+# EXCEPTION - Error with stack trace
+try:
+    process()
+except Exception:
+    logger.exception(
+        "unexpected_error",
+        operation="process",
+    )
+```
+
+### Logging Decorator
+```python
+from functools import wraps
+from typing import Callable, ParamSpec, TypeVar
+import time
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def log_function_call(
+    logger: structlog.BoundLogger,
+) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    """Decorator to log function calls with timing."""
+
+    def decorator(func: Callable[P, R]) -> Callable[P, R]:
+        @wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            start = time.perf_counter()
+            log = logger.bind(function=func.__name__)
+
+            log.debug("function_call_started")
+
+            try:
+                result = func(*args, **kwargs)
+                elapsed = (time.perf_counter() - start) * 1000
+                log.info(
+                    "function_call_completed",
+                    duration_ms=round(elapsed, 2),
+                )
+                return result
+            except Exception as e:
+                elapsed = (time.perf_counter() - start) * 1000
+                log.error(
+                    "function_call_failed",
+                    duration_ms=round(elapsed, 2),
+                    error=str(e),
+                    error_type=type(e).__name__,
+                )
+                raise
+
+        return wrapper
+
+    return decorator
+
+
+# Async version
+def log_async_function_call(
+    logger: structlog.BoundLogger,
+) -> Callable[[Callable[P, Awaitable[R]]], Callable[P, Awaitable[R]]]:
+    """Decorator to log async function calls with timing."""
+
+    def decorator(func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
+        @wraps(func)
+        async def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            start = time.perf_counter()
+            log = logger.bind(function=func.__name__)
+
+            log.debug("async_function_call_started")
+
+            try:
+                result = await func(*args, **kwargs)
+                elapsed = (time.perf_counter() - start) * 1000
+                log.info(
+                    "async_function_call_completed",
+                    duration_ms=round(elapsed, 2),
+                )
+                return result
+            except Exception as e:
+                elapsed = (time.perf_counter() - start) * 1000
+                log.error(
+                    "async_function_call_failed",
+                    duration_ms=round(elapsed, 2),
+                    error=str(e),
+                )
+                raise
+
+        return wrapper
+
+    return decorator
+
+
+# Usage
+@log_function_call(logger)
+def process_data(data: str) -> dict[str, Any]:
+    return {"processed": data}
+
+
+@log_async_function_call(logger)
+async def fetch_data(url: str) -> str:
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url)
+        return response.text
+```
+
+---
+
+## 8. Function Patterns (Dependency Injection with Protocol)
+
+### Protocol-Based Interfaces
+```python
+from typing import Protocol, runtime_checkable
+
+
+# Define protocols (interfaces)
+@runtime_checkable
+class UserRepository(Protocol):
+    """Protocol for user repository operations."""
+
+    async def get_by_id(self, user_id: str) -> User | None:
+        """Get user by ID."""
         ...
 
+    async def get_by_email(self, email: str) -> User | None:
+        """Get user by email."""
+        ...
+
+    async def create(self, user: User) -> User:
+        """Create a new user."""
+        ...
+
+    async def update(self, user: User) -> User:
+        """Update existing user."""
+        ...
+
+    async def delete(self, user_id: str) -> bool:
+        """Delete user by ID."""
+        ...
+
+
+@runtime_checkable
+class EmailService(Protocol):
+    """Protocol for email service."""
+
+    async def send_email(
+        self,
+        to: str,
+        subject: str,
+        body: str,
+    ) -> bool:
+        """Send an email."""
+        ...
+
+    async def send_template_email(
+        self,
+        to: str,
+        template: str,
+        context: dict[str, Any],
+    ) -> bool:
+        """Send templated email."""
+        ...
+
+
+@runtime_checkable
+class CacheService(Protocol):
+    """Protocol for cache operations."""
+
+    async def get(self, key: str) -> Any | None:
+        ...
+
+    async def set(
+        self,
+        key: str,
+        value: Any,
+        ttl: int | None = None,
+    ) -> None:
+        ...
+
+    async def delete(self, key: str) -> bool:
+        ...
+```
+
+### Service with Dependency Injection
+```python
 class UserService:
-    def __init__(self, db: DatabaseProtocol) -> None:
-        self._db = db
-    
-    def get_user(self, user_id: str) -> User:
-        user = self._db.find_user(user_id)
+    """User service with injected dependencies."""
+
+    def __init__(
+        self,
+        user_repo: UserRepository,
+        email_service: EmailService,
+        cache: CacheService,
+        logger: structlog.BoundLogger,
+    ) -> None:
+        self._user_repo = user_repo
+        self._email_service = email_service
+        self._cache = cache
+        self._logger = logger
+
+    async def get_user(self, user_id: str) -> User:
+        """Get user by ID with caching."""
+        cache_key = f"user:{user_id}"
+
+        # Try cache first
+        cached = await self._cache.get(cache_key)
+        if cached:
+            self._logger.debug("cache_hit", user_id=user_id)
+            return User.model_validate(cached)
+
+        # Fetch from repository
+        user = await self._user_repo.get_by_id(user_id)
         if user is None:
             raise NotFoundException("User", user_id)
+
+        # Cache the result
+        await self._cache.set(cache_key, user.model_dump(), ttl=3600)
+
         return user
 
-# Usage
-db = Database()
-service = UserService(db)
+    async def create_user(self, request: CreateUserRequest) -> User:
+        """Create a new user."""
+        # Check for existing user
+        existing = await self._user_repo.get_by_email(request.email)
+        if existing:
+            raise ConflictException(
+                f"User with email {request.email} already exists",
+                resource="User",
+            )
+
+        # Create user
+        user = User(
+            id=generate_id(),
+            email=request.email,
+            name=request.name,
+            age=request.age,
+        )
+
+        created = await self._user_repo.create(user)
+
+        # Send welcome email
+        await self._email_service.send_template_email(
+            to=user.email,
+            template="welcome",
+            context={"name": user.name},
+        )
+
+        self._logger.info("user_created", user_id=created.id)
+
+        return created
 ```
 
-### Dataclasses vs Pydantic
+### Concrete Implementations
 ```python
-from dataclasses import dataclass, field
-from datetime import datetime
+from sqlalchemy.ext.asyncio import AsyncSession
+
+
+class SQLAlchemyUserRepository:
+    """SQLAlchemy implementation of UserRepository."""
+
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def get_by_id(self, user_id: str) -> User | None:
+        result = await self._session.execute(
+            select(UserModel).where(UserModel.id == user_id)
+        )
+        row = result.scalar_one_or_none()
+        return User.model_validate(row) if row else None
+
+    async def get_by_email(self, email: str) -> User | None:
+        result = await self._session.execute(
+            select(UserModel).where(UserModel.email == email)
+        )
+        row = result.scalar_one_or_none()
+        return User.model_validate(row) if row else None
+
+    async def create(self, user: User) -> User:
+        model = UserModel(**user.model_dump())
+        self._session.add(model)
+        await self._session.commit()
+        await self._session.refresh(model)
+        return User.model_validate(model)
+
+    # ... other methods
+
+
+class RedisCache:
+    """Redis implementation of CacheService."""
+
+    def __init__(self, redis: Redis) -> None:
+        self._redis = redis
+
+    async def get(self, key: str) -> Any | None:
+        value = await self._redis.get(key)
+        if value:
+            return json.loads(value)
+        return None
+
+    async def set(
+        self,
+        key: str,
+        value: Any,
+        ttl: int | None = None,
+    ) -> None:
+        await self._redis.set(
+            key,
+            json.dumps(value),
+            ex=ttl,
+        )
+
+    async def delete(self, key: str) -> bool:
+        return await self._redis.delete(key) > 0
+```
+
+### Dependency Container / Factory
+```python
+from dataclasses import dataclass
+from functools import lru_cache
+
+
+@dataclass
+class Container:
+    """Dependency injection container."""
+
+    db_session: AsyncSession
+    redis: Redis
+    logger: structlog.BoundLogger
+
+    @property
+    def user_repository(self) -> UserRepository:
+        return SQLAlchemyUserRepository(self.db_session)
+
+    @property
+    def cache(self) -> CacheService:
+        return RedisCache(self.redis)
+
+    @property
+    def email_service(self) -> EmailService:
+        return SendGridEmailService(settings.sendgrid_api_key)
+
+    @property
+    def user_service(self) -> UserService:
+        return UserService(
+            user_repo=self.user_repository,
+            email_service=self.email_service,
+            cache=self.cache,
+            logger=self.logger.bind(service="UserService"),
+        )
+
+
+# FastAPI dependency injection
+async def get_container(
+    db: AsyncSession = Depends(get_db),
+    redis: Redis = Depends(get_redis),
+) -> Container:
+    return Container(
+        db_session=db,
+        redis=redis,
+        logger=structlog.get_logger(),
+    )
+
+
+async def get_user_service(
+    container: Container = Depends(get_container),
+) -> UserService:
+    return container.user_service
+
+
+# Usage in route
+@router.get("/users/{user_id}")
+async def get_user(
+    user_id: str,
+    user_service: UserService = Depends(get_user_service),
+) -> UserResponse:
+    user = await user_service.get_user(user_id)
+    return UserResponse.model_validate(user)
+```
+
+---
+
+## 9. Dataclasses vs Pydantic
+
+### When to Use Dataclasses
+```python
+from dataclasses import dataclass, field, asdict, astuple
+from typing import ClassVar
+
 
 # ✅ Use dataclass for internal data structures (no validation needed)
-@dataclass(frozen=True)  # immutable
+@dataclass
 class Point:
+    """Simple data container - no validation needed."""
     x: float
     y: float
-    
-    def distance_from_origin(self) -> float:
-        return (self.x**2 + self.y**2) ** 0.5
 
-# ✅ Use Pydantic for API models (with validation)
-from pydantic import BaseModel, Field
+    def distance_to(self, other: "Point") -> float:
+        return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5
 
-class CreateUserRequest(BaseModel):
-    """API request model."""
-    email: str = Field(..., pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
-    name: str = Field(..., min_length=1)
-    age: int = Field(..., ge=0)
+
+# ✅ Use frozen dataclass for immutable value objects
+@dataclass(frozen=True)
+class Coordinate:
+    """Immutable coordinate - can be used as dict key."""
+    latitude: float
+    longitude: float
+
+    def __post_init__(self) -> None:
+        # Validation in __post_init__ for dataclasses
+        if not -90 <= self.latitude <= 90:
+            raise ValueError("Latitude must be between -90 and 90")
+        if not -180 <= self.longitude <= 180:
+            raise ValueError("Longitude must be between -180 and 180")
+
+
+# ✅ Dataclass with default factory and class variables
+@dataclass
+class CacheEntry:
+    """Cache entry with metadata."""
+    key: str
+    value: Any
+    created_at: datetime = field(default_factory=datetime.utcnow)
+    ttl_seconds: int = 3600
+    hits: int = field(default=0, repr=False)
+
+    # Class variable (not included in __init__)
+    DEFAULT_TTL: ClassVar[int] = 3600
+
+    @property
+    def is_expired(self) -> bool:
+        age = (datetime.utcnow() - self.created_at).total_seconds()
+        return age > self.ttl_seconds
+
+
+# ✅ Dataclass with slots for memory efficiency
+@dataclass(slots=True)
+class LogEntry:
+    """Memory-efficient log entry."""
+    timestamp: datetime
+    level: str
+    message: str
+    context: dict[str, Any] = field(default_factory=dict)
+
+
+# ✅ Dataclass for internal DTOs
+@dataclass
+class UserCreationResult:
+    """Internal result of user creation."""
+    user: User
+    verification_token: str
+    email_sent: bool
 ```
 
-## File Organization
-```
-src/
-├── core/
-│   ├── __init__.py
-│   ├── config.py          # Configuration
-│   ├── exceptions.py      # Custom exceptions
-│   └── logging.py         # Logging setup
-├── models/
-│   ├── __init__.py
-│   ├── user.py
-│   └── base.py
-├── services/
-│   ├── __init__.py
-│   └── user_service.py
-├── api/
-│   ├── __init__.py
-│   ├── routes/
-│   │   ├── __init__.py
-│   │   └── users.py
-│   └── dependencies.py
-└── utils/
-    ├── __init__.py
-    └── helpers.py
-```
-
-## Import Organization
+### When to Use Pydantic
 ```python
-"""Module docstring."""
+from pydantic import BaseModel, Field, field_validator
 
-# 1. Standard library
+
+# ✅ Use Pydantic for API request/response models
+class CreateOrderRequest(BaseModel):
+    """API request - needs validation."""
+
+    model_config = ConfigDict(
+        str_strip_whitespace=True,
+        extra="forbid",
+    )
+
+    product_id: str = Field(..., min_length=1)
+    quantity: int = Field(..., ge=1, le=100)
+    shipping_address: str = Field(..., min_length=10)
+
+    @field_validator("product_id")
+    @classmethod
+    def validate_product_id(cls, v: str) -> str:
+        if not v.startswith("PROD-"):
+            raise ValueError("Product ID must start with PROD-")
+        return v
+
+
+# ✅ Use Pydantic for configuration
+class DatabaseConfig(BaseModel):
+    """Database configuration with validation."""
+    host: str
+    port: int = Field(ge=1, le=65535)
+    database: str
+    user: str
+    password: str
+    pool_size: int = Field(default=10, ge=1, le=100)
+
+    @property
+    def connection_string(self) -> str:
+        return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
+
+
+# ✅ Use Pydantic for external data parsing
+class ExternalApiResponse(BaseModel):
+    """Parse external API response with validation."""
+
+    model_config = ConfigDict(
+        extra="ignore",  # Ignore unknown fields from API
+    )
+
+    id: str
+    status: Literal["success", "error", "pending"]
+    data: dict[str, Any] | None = None
+    error_message: str | None = None
+
+
+# ✅ Use Pydantic for ORM model serialization
+class UserFromDB(BaseModel):
+    """User model from database."""
+
+    model_config = ConfigDict(
+        from_attributes=True,  # Allow ORM object conversion
+    )
+
+    id: str
+    email: str
+    name: str
+    created_at: datetime
+```
+
+### Comparison Summary
+```python
+# Summary: Dataclass vs Pydantic
+
+# Use DATACLASS when:
+# - Internal data structures
+# - No validation needed
+# - Performance critical (slightly faster)
+# - Simple DTOs between internal layers
+# - Value objects (frozen=True)
+# - Need slots for memory efficiency
+
+# Use PYDANTIC when:
+# - API request/response models
+# - Configuration with validation
+# - External data parsing (JSON, API responses)
+# - ORM model serialization
+# - Complex validation rules
+# - Need schema export (OpenAPI)
+```
+
+---
+
+## 10. File Organization and Imports
+
+### Project Structure
+```
+project/
+├── src/
+│   └── app/
+│       ├── __init__.py
+│       ├── main.py              # Application entry point
+│       ├── core/
+│       │   ├── __init__.py
+│       │   ├── config.py        # Settings and configuration
+│       │   ├── exceptions.py    # Custom exceptions
+│       │   ├── logging.py       # Logging setup
+│       │   └── security.py      # Security utilities
+│       ├── models/
+│       │   ├── __init__.py
+│       │   ├── base.py          # Base model classes
+│       │   ├── user.py          # User models
+│       │   └── order.py         # Order models
+│       ├── schemas/
+│       │   ├── __init__.py
+│       │   ├── user.py          # Pydantic schemas for users
+│       │   └── order.py         # Pydantic schemas for orders
+│       ├── repositories/
+│       │   ├── __init__.py
+│       │   ├── base.py          # Base repository
+│       │   └── user.py          # User repository
+│       ├── services/
+│       │   ├── __init__.py
+│       │   ├── user.py          # User service
+│       │   └── order.py         # Order service
+│       ├── api/
+│       │   ├── __init__.py
+│       │   ├── dependencies.py  # FastAPI dependencies
+│       │   ├── middleware.py    # API middleware
+│       │   └── routes/
+│       │       ├── __init__.py
+│       │       ├── users.py     # User routes
+│       │       └── orders.py    # Order routes
+│       ├── db/
+│       │   ├── __init__.py
+│       │   ├── session.py       # Database session
+│       │   └── migrations/      # Alembic migrations
+│       └── utils/
+│           ├── __init__.py
+│           └── helpers.py       # Utility functions
+├── tests/
+│   ├── __init__.py
+│   ├── conftest.py              # Shared fixtures
+│   ├── unit/
+│   │   ├── __init__.py
+│   │   └── test_user_service.py
+│   └── integration/
+│       ├── __init__.py
+│       └── test_user_api.py
+├── pyproject.toml
+├── .pre-commit-config.yaml
+└── .env.example
+```
+
+### Import Organization
+```python
+"""Module docstring describing the module's purpose.
+
+This module handles user-related operations.
+"""
+
+# 1. Future imports (if needed for compatibility)
+from __future__ import annotations
+
+# 2. Standard library imports (alphabetical)
 import logging
 import os
-from datetime import datetime
-from typing import Any
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, TypeVar
 
-# 2. Third-party packages
-import fastapi
-from pydantic import BaseModel
+# 3. Third-party imports (alphabetical)
+import httpx
+import structlog
+from fastapi import Depends, HTTPException
+from pydantic import BaseModel, Field
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-# 3. Local imports (absolute)
+# 4. Local application imports (absolute, alphabetical)
 from app.core.config import settings
-from app.core.exceptions import AppException
-from app.models.user import User
-from app.services.user_service import UserService
+from app.core.exceptions import NotFoundException, ValidationException
+from app.models.user import User as UserModel
+from app.repositories.user import UserRepository
+from app.schemas.user import CreateUserRequest, UserResponse
 
-# 4. Relative imports (if needed)
+# 5. Relative imports (if within same package)
 from .dependencies import get_db
-from .schemas import UserResponse
+from .middleware import RequestContextMiddleware
+
+
+# Constants after imports
+DEFAULT_PAGE_SIZE = 20
+MAX_PAGE_SIZE = 100
+
+
+# Module-level logger
+logger = structlog.get_logger(__name__)
 ```
 
-## Environment Variables
+### __init__.py Exports (Barrel Files)
 ```python
+# app/schemas/__init__.py
+"""Schema exports for clean imports."""
+
+from .user import (
+    CreateUserRequest,
+    UpdateUserRequest,
+    UserResponse,
+    UserListResponse,
+)
+from .order import (
+    CreateOrderRequest,
+    OrderResponse,
+)
+
+__all__ = [
+    # User schemas
+    "CreateUserRequest",
+    "UpdateUserRequest",
+    "UserResponse",
+    "UserListResponse",
+    # Order schemas
+    "CreateOrderRequest",
+    "OrderResponse",
+]
+
+
+# Usage elsewhere:
+from app.schemas import CreateUserRequest, UserResponse
+```
+
+---
+
+## 11. Environment Variables (Pydantic Settings)
+
+### Comprehensive Settings
+```python
+from pydantic import Field, PostgresDsn, RedisDsn, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, PostgresDsn
+from typing import Literal, Self
+
 
 class Settings(BaseSettings):
     """Application settings with validation."""
-    
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
+        env_nested_delimiter="__",
     )
-    
-    # App
-    app_name: str = "My App"
-    debug: bool = False
-    environment: str = Field(default="development", pattern="^(development|staging|production)$")
-    
+
+    # Application
+    app_name: str = Field(default="MyApp")
+    app_version: str = Field(default="0.1.0")
+    debug: bool = Field(default=False)
+    environment: Literal["development", "staging", "production"] = Field(
+        default="development"
+    )
+
+    # Server
+    host: str = Field(default="0.0.0.0")
+    port: int = Field(default=8000, ge=1, le=65535)
+    workers: int = Field(default=4, ge=1, le=32)
+
     # Database
     database_url: PostgresDsn
     db_pool_size: int = Field(default=10, ge=1, le=100)
-    
-    # API
-    api_key: str = Field(..., min_length=32)
-    api_rate_limit: int = Field(default=100, ge=1)
-    
+    db_pool_max_overflow: int = Field(default=20, ge=0, le=100)
+    db_echo: bool = Field(default=False)
+
     # Redis
-    redis_url: str = "redis://localhost:6379"
-    
+    redis_url: RedisDsn = Field(default="redis://localhost:6379/0")
+    redis_password: str | None = Field(default=None)
+
+    # Security
+    secret_key: str = Field(..., min_length=32)
+    jwt_algorithm: str = Field(default="HS256")
+    jwt_expiration_minutes: int = Field(default=30, ge=1)
+    refresh_token_expiration_days: int = Field(default=7, ge=1)
+
+    # External Services
+    openai_api_key: str | None = Field(default=None)
+    sendgrid_api_key: str | None = Field(default=None)
+    stripe_api_key: str | None = Field(default=None)
+    stripe_webhook_secret: str | None = Field(default=None)
+
+    # Rate Limiting
+    rate_limit_enabled: bool = Field(default=True)
+    rate_limit_requests: int = Field(default=100, ge=1)
+    rate_limit_window_seconds: int = Field(default=60, ge=1)
+
+    # Logging
+    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = Field(
+        default="INFO"
+    )
+    log_format: Literal["json", "console"] = Field(default="json")
+
+    # CORS
+    cors_origins: list[str] = Field(default=["http://localhost:3000"])
+    cors_allow_credentials: bool = Field(default=True)
+
+    @field_validator("secret_key")
+    @classmethod
+    def validate_secret_key(cls, v: str) -> str:
+        if v == "change-me-in-production":
+            raise ValueError("Must change default secret key in production")
+        return v
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v: str | list[str]) -> list[str]:
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(",")]
+        return v
+
+    @model_validator(mode="after")
+    def validate_production_settings(self) -> Self:
+        if self.environment == "production":
+            if self.debug:
+                raise ValueError("Debug must be False in production")
+            if not self.openai_api_key:
+                logger.warning("OpenAI API key not set in production")
+        return self
+
     @property
     def is_production(self) -> bool:
         return self.environment == "production"
 
-# Singleton instance
+    @property
+    def is_development(self) -> bool:
+        return self.environment == "development"
+
+    @property
+    def database_url_async(self) -> str:
+        """Convert sync URL to async."""
+        url = str(self.database_url)
+        return url.replace("postgresql://", "postgresql+asyncpg://")
+
+
+# Create singleton instance
 settings = Settings()
 
+
 # Usage
-print(settings.database_url)  # Fully validated PostgreSQL URL
-print(settings.is_production)  # False
+print(settings.database_url_async)
+print(settings.is_production)
 ```
 
-## Testing Patterns
+### Environment-Specific Settings
 ```python
-import pytest
-from unittest.mock import Mock, patch, AsyncMock
+from pydantic_settings import BaseSettings
+from functools import lru_cache
 
-# ✅ Fixture
-@pytest.fixture
-def sample_user() -> User:
-    """Create a sample user for testing."""
-    return User(
-        id="test-123",
-        email="test@example.com",
-        name="Test User",
-        age=30,
-    )
 
-# ✅ Parametrize
-@pytest.mark.parametrize(
-    "age,expected",
-    [
-        (17, False),
-        (18, True),
-        (100, True),
-    ],
-)
-def test_is_adult(age: int, expected: bool) -> None:
-    assert is_adult(age) == expected
+class BaseConfig(BaseSettings):
+    """Base configuration."""
+    app_name: str = "MyApp"
+    debug: bool = False
 
-# ✅ Async test
-@pytest.mark.asyncio
-async def test_fetch_user() -> None:
-    user = await fetch_user("123")
-    assert user.id == "123"
 
-# ✅ Mocking
-def test_user_service_with_mock() -> None:
-    # Mock database
-    mock_db = Mock()
-    mock_db.find_user.return_value = User(
-        id="123",
-        email="test@example.com",
-        name="Test",
-        age=25,
-    )
-    
-    # Test service
-    service = UserService(mock_db)
-    user = service.get_user("123")
-    
-    assert user.id == "123"
-    mock_db.find_user.assert_called_once_with("123")
+class DevelopmentConfig(BaseConfig):
+    """Development configuration."""
+    debug: bool = True
+    database_url: str = "postgresql://localhost:5432/dev_db"
+    log_level: str = "DEBUG"
+
+
+class ProductionConfig(BaseConfig):
+    """Production configuration."""
+    debug: bool = False
+    database_url: str  # Required in production
+    log_level: str = "INFO"
+
+
+class TestConfig(BaseConfig):
+    """Test configuration."""
+    debug: bool = True
+    database_url: str = "postgresql://localhost:5432/test_db"
+    log_level: str = "DEBUG"
+
+
+@lru_cache
+def get_settings() -> BaseConfig:
+    """Get settings based on environment."""
+    env = os.getenv("ENVIRONMENT", "development")
+
+    config_map = {
+        "development": DevelopmentConfig,
+        "production": ProductionConfig,
+        "test": TestConfig,
+    }
+
+    config_class = config_map.get(env, DevelopmentConfig)
+    return config_class()
 ```
 
-## Code Quality Tools
+---
+
+## 12. Testing Patterns
+
+### Pytest Configuration and Fixtures
+```python
+# tests/conftest.py
+import asyncio
+from collections.abc import AsyncGenerator, Generator
+from typing import Any
+
+import pytest
+import pytest_asyncio
+from faker import Faker
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
+
+from app.core.config import settings
+from app.db.session import Base
+from app.main import app
+
+
+fake = Faker()
+
+
+# Event loop fixture for async tests
+@pytest.fixture(scope="session")
+def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
+    """Create event loop for async tests."""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+# Database fixtures
+@pytest_asyncio.fixture
+async def db_engine():
+    """Create test database engine."""
+    engine = create_async_engine(
+        settings.database_url_async.replace("/app", "/test"),
+        echo=False,
+    )
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    yield engine
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+
+    await engine.dispose()
+
+
+@pytest_asyncio.fixture
+async def db_session(db_engine) -> AsyncGenerator[AsyncSession, None]:
+    """Create test database session."""
+    async_session = sessionmaker(
+        db_engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+    )
+
+    async with async_session() as session:
+        yield session
+        await session.rollback()
+
+
+# HTTP client fixture
+@pytest_asyncio.fixture
+async def client() -> AsyncGenerator[AsyncClient, None]:
+    """Create test HTTP client."""
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as ac:
+        yield ac
+
+
+# Factory fixtures
+@pytest.fixture
+def user_factory() -> callable:
+    """Factory for creating test users."""
+    def create_user(**kwargs: Any) -> User:
+        defaults = {
+            "id": fake.uuid4(),
+            "email": fake.email(),
+            "name": fake.name(),
+            "age": fake.random_int(min=18, max=80),
+            "is_active": True,
+        }
+        defaults.update(kwargs)
+        return User(**defaults)
+    return create_user
+
+
+@pytest.fixture
+def sample_user(user_factory) -> User:
+    """Create a sample user."""
+    return user_factory()
+```
+
+### Unit Tests
+```python
+# tests/unit/test_user_service.py
+import pytest
+from unittest.mock import AsyncMock, Mock
+
+from app.services.user import UserService
+from app.core.exceptions import NotFoundException, ConflictException
+
+
+class TestUserService:
+    """Tests for UserService."""
+
+    @pytest.fixture
+    def mock_user_repo(self) -> AsyncMock:
+        return AsyncMock()
+
+    @pytest.fixture
+    def mock_email_service(self) -> AsyncMock:
+        return AsyncMock()
+
+    @pytest.fixture
+    def mock_cache(self) -> AsyncMock:
+        return AsyncMock()
+
+    @pytest.fixture
+    def mock_logger(self) -> Mock:
+        logger = Mock()
+        logger.bind.return_value = logger
+        return logger
+
+    @pytest.fixture
+    def user_service(
+        self,
+        mock_user_repo,
+        mock_email_service,
+        mock_cache,
+        mock_logger,
+    ) -> UserService:
+        return UserService(
+            user_repo=mock_user_repo,
+            email_service=mock_email_service,
+            cache=mock_cache,
+            logger=mock_logger,
+        )
+
+    async def test_get_user_from_cache(
+        self,
+        user_service: UserService,
+        mock_cache: AsyncMock,
+        sample_user: User,
+    ) -> None:
+        """Test getting user from cache."""
+        # Arrange
+        mock_cache.get.return_value = sample_user.model_dump()
+
+        # Act
+        result = await user_service.get_user(sample_user.id)
+
+        # Assert
+        assert result.id == sample_user.id
+        mock_cache.get.assert_called_once_with(f"user:{sample_user.id}")
+
+    async def test_get_user_from_repository(
+        self,
+        user_service: UserService,
+        mock_cache: AsyncMock,
+        mock_user_repo: AsyncMock,
+        sample_user: User,
+    ) -> None:
+        """Test getting user from repository when not in cache."""
+        # Arrange
+        mock_cache.get.return_value = None
+        mock_user_repo.get_by_id.return_value = sample_user
+
+        # Act
+        result = await user_service.get_user(sample_user.id)
+
+        # Assert
+        assert result.id == sample_user.id
+        mock_user_repo.get_by_id.assert_called_once_with(sample_user.id)
+        mock_cache.set.assert_called_once()
+
+    async def test_get_user_not_found(
+        self,
+        user_service: UserService,
+        mock_cache: AsyncMock,
+        mock_user_repo: AsyncMock,
+    ) -> None:
+        """Test getting non-existent user raises NotFoundException."""
+        # Arrange
+        mock_cache.get.return_value = None
+        mock_user_repo.get_by_id.return_value = None
+
+        # Act & Assert
+        with pytest.raises(NotFoundException) as exc_info:
+            await user_service.get_user("nonexistent")
+
+        assert "User" in str(exc_info.value.message)
+
+    async def test_create_user_success(
+        self,
+        user_service: UserService,
+        mock_user_repo: AsyncMock,
+        mock_email_service: AsyncMock,
+    ) -> None:
+        """Test successful user creation."""
+        # Arrange
+        request = CreateUserRequest(
+            email="test@example.com",
+            name="Test User",
+            password="SecurePass123",
+            age=25,
+        )
+        mock_user_repo.get_by_email.return_value = None
+        mock_user_repo.create.return_value = User(
+            id="new-id",
+            email=request.email,
+            name=request.name,
+            age=request.age,
+        )
+
+        # Act
+        result = await user_service.create_user(request)
+
+        # Assert
+        assert result.email == request.email
+        mock_email_service.send_template_email.assert_called_once()
+
+    async def test_create_user_conflict(
+        self,
+        user_service: UserService,
+        mock_user_repo: AsyncMock,
+        sample_user: User,
+    ) -> None:
+        """Test creating user with existing email raises ConflictException."""
+        # Arrange
+        request = CreateUserRequest(
+            email=sample_user.email,
+            name="New User",
+            password="SecurePass123",
+            age=25,
+        )
+        mock_user_repo.get_by_email.return_value = sample_user
+
+        # Act & Assert
+        with pytest.raises(ConflictException):
+            await user_service.create_user(request)
+```
+
+### Parametrized Tests
+```python
+# tests/unit/test_validators.py
+import pytest
+from app.utils.validators import validate_email, validate_password
+
+
+class TestValidators:
+    """Tests for validation functions."""
+
+    @pytest.mark.parametrize(
+        "email,expected",
+        [
+            ("user@example.com", True),
+            ("user.name@domain.co.uk", True),
+            ("user+tag@example.com", True),
+            ("invalid", False),
+            ("@example.com", False),
+            ("user@", False),
+            ("", False),
+        ],
+        ids=[
+            "valid_simple",
+            "valid_subdomain",
+            "valid_plus_tag",
+            "invalid_no_at",
+            "invalid_no_user",
+            "invalid_no_domain",
+            "invalid_empty",
+        ],
+    )
+    def test_validate_email(self, email: str, expected: bool) -> None:
+        """Test email validation."""
+        assert validate_email(email) == expected
+
+    @pytest.mark.parametrize(
+        "password,is_valid,error_message",
+        [
+            ("ValidPass123", True, None),
+            ("short", False, "at least 8 characters"),
+            ("nouppercase123", False, "uppercase letter"),
+            ("NOLOWERCASE123", False, "lowercase letter"),
+            ("NoDigitsHere", False, "digit"),
+        ],
+    )
+    def test_validate_password(
+        self,
+        password: str,
+        is_valid: bool,
+        error_message: str | None,
+    ) -> None:
+        """Test password validation."""
+        result = validate_password(password)
+
+        if is_valid:
+            assert result.is_valid
+            assert result.errors == []
+        else:
+            assert not result.is_valid
+            assert any(error_message in err for err in result.errors)
+```
+
+### Integration Tests
+```python
+# tests/integration/test_user_api.py
+import pytest
+from httpx import AsyncClient
+
+
+@pytest.mark.integration
+class TestUserAPI:
+    """Integration tests for User API."""
+
+    async def test_create_and_get_user(
+        self,
+        client: AsyncClient,
+    ) -> None:
+        """Test creating and retrieving a user."""
+        # Create user
+        create_response = await client.post(
+            "/api/v1/users",
+            json={
+                "email": "test@example.com",
+                "name": "Test User",
+                "password": "SecurePass123",
+                "age": 25,
+            },
+        )
+        assert create_response.status_code == 201
+        user_data = create_response.json()["data"]
+        user_id = user_data["id"]
+
+        # Get user
+        get_response = await client.get(f"/api/v1/users/{user_id}")
+        assert get_response.status_code == 200
+        assert get_response.json()["data"]["email"] == "test@example.com"
+
+    async def test_create_user_validation_error(
+        self,
+        client: AsyncClient,
+    ) -> None:
+        """Test creating user with invalid data."""
+        response = await client.post(
+            "/api/v1/users",
+            json={
+                "email": "invalid-email",
+                "name": "",
+                "password": "short",
+                "age": -1,
+            },
+        )
+        assert response.status_code == 422
+
+    async def test_get_user_not_found(
+        self,
+        client: AsyncClient,
+    ) -> None:
+        """Test getting non-existent user."""
+        response = await client.get("/api/v1/users/nonexistent-id")
+        assert response.status_code == 404
+        assert response.json()["error"]["code"] == "NOT_FOUND"
+```
+
+### Mocking External Services
+```python
+# tests/unit/test_external_service.py
+import pytest
+from unittest.mock import AsyncMock, patch
+import httpx
+
+
+class TestExternalServiceClient:
+    """Tests for external service client."""
+
+    async def test_fetch_data_success(self) -> None:
+        """Test successful data fetch."""
+        mock_response = httpx.Response(
+            200,
+            json={"status": "success", "data": {"key": "value"}},
+        )
+
+        with patch("httpx.AsyncClient.get", new_callable=AsyncMock) as mock_get:
+            mock_get.return_value = mock_response
+
+            client = ExternalServiceClient()
+            result = await client.fetch_data("test-id")
+
+            assert result["key"] == "value"
+            mock_get.assert_called_once()
+
+    async def test_fetch_data_retry_on_failure(self) -> None:
+        """Test retry logic on transient failures."""
+        # First two calls fail, third succeeds
+        mock_responses = [
+            httpx.HTTPStatusError(
+                "Server Error",
+                request=httpx.Request("GET", "http://test"),
+                response=httpx.Response(500),
+            ),
+            httpx.HTTPStatusError(
+                "Server Error",
+                request=httpx.Request("GET", "http://test"),
+                response=httpx.Response(503),
+            ),
+            httpx.Response(200, json={"status": "success"}),
+        ]
+
+        with patch("httpx.AsyncClient.get", new_callable=AsyncMock) as mock_get:
+            mock_get.side_effect = mock_responses
+
+            client = ExternalServiceClient(max_retries=3)
+            result = await client.fetch_data("test-id")
+
+            assert result["status"] == "success"
+            assert mock_get.call_count == 3
+```
+
+---
+
+## 13. Code Quality Tools
 
 ### Black (Formatter)
 ```bash
-black src/
-black --check src/  # CI/CD
+# Format all files
+black src/ tests/
+
+# Check without modifying (CI/CD)
+black --check src/ tests/
+
+# Show diff
+black --diff src/
+
+# Format specific file
+black src/app/services/user.py
 ```
 
 ### Ruff (Linter - Fast)
 ```bash
-ruff check src/
-ruff check --fix src/
+# Check for issues
+ruff check src/ tests/
+
+# Fix auto-fixable issues
+ruff check --fix src/ tests/
+
+# Show all violations
+ruff check --show-fixes src/
+
+# Format (alternative to Black)
+ruff format src/ tests/
 ```
 
 ### Mypy (Type Checker)
 ```bash
+# Check types
 mypy src/
+
+# Strict mode
+mypy --strict src/
+
+# Show error codes
+mypy --show-error-codes src/
+
+# Generate type stubs
+stubgen -p app -o stubs/
 ```
 
-### Pre-commit Configuration
+### Running All Tools
+```bash
+# Create a script: scripts/lint.sh
+#!/bin/bash
+set -e
+
+echo "Running Black..."
+black --check src/ tests/
+
+echo "Running Ruff..."
+ruff check src/ tests/
+
+echo "Running Mypy..."
+mypy src/
+
+echo "All checks passed!"
+```
+
+---
+
+## 14. Pre-commit Configuration
+
+### .pre-commit-config.yaml
 ```yaml
 # .pre-commit-config.yaml
+default_language_version:
+  python: python3.11
+
 repos:
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--unsafe]
+      - id: check-json
+      - id: check-toml
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: detect-private-key
+      - id: debug-statements
+      - id: check-docstring-first
+
+  # Python formatting with Black
   - repo: https://github.com/psf/black
-    rev: 23.11.0
+    rev: 24.1.1
     hooks:
       - id: black
         language_version: python3.11
 
+  # Import sorting and linting with Ruff
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.6
+    rev: v0.1.14
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
 
+  # Type checking with Mypy
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
+    rev: v1.8.0
     hooks:
       - id: mypy
-        additional_dependencies: [pydantic>=2.0.0]
+        additional_dependencies:
+          - pydantic>=2.5.0
+          - pydantic-settings>=2.1.0
+          - types-redis
+          - sqlalchemy[mypy]>=2.0.0
+        args: [--config-file=pyproject.toml]
+
+  # Security checks
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.7
+    hooks:
+      - id: bandit
+        args: [-c, pyproject.toml]
+        additional_dependencies: ["bandit[toml]"]
+
+  # Detect secrets
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
+
+  # Commit message format
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.13.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+ci:
+  autofix_commit_msg: "style: auto-fix by pre-commit hooks"
+  autoupdate_commit_msg: "chore: update pre-commit hooks"
+  skip: [mypy]  # Skip mypy in CI (run separately)
 ```
+
+### Installation and Usage
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Install hooks
+pre-commit install
+pre-commit install --hook-type commit-msg
+
+# Run on all files
+pre-commit run --all-files
+
+# Update hooks
+pre-commit autoupdate
+
+# Skip hooks temporarily
+git commit --no-verify -m "WIP: work in progress"
+```
+
+---
 
 ## Common Patterns Checklist
 
 When writing Python code, ensure:
-- [ ] All functions have type hints (args + return)
+
+### Type Safety
+- [ ] All functions have type hints (parameters and return types)
 - [ ] Using Python 3.10+ syntax (`list[str]` not `List[str]`)
-- [ ] Pydantic models for API/external data
-- [ ] Dataclasses for internal structures
-- [ ] Custom exceptions for error handling
-- [ ] Proper logging (not print statements)
-- [ ] Environment variables validated with Pydantic
-- [ ] Async/await where appropriate
-- [ ] Code formatted with Black
-- [ ] Type-checked with Mypy
-- [ ] No bare `except:` clauses
+- [ ] Using `|` for union types (`str | None` not `Optional[str]`)
+- [ ] Generic types use TypeVar with constraints
+- [ ] Protocol used for interfaces
+
+### Data Validation
+- [ ] Pydantic models for API request/response
+- [ ] Pydantic Settings for environment variables
+- [ ] Dataclasses for internal data structures
+- [ ] Field validators for complex validation
+
+### Error Handling
+- [ ] Custom exception hierarchy defined
+- [ ] Specific exceptions caught (not bare `except:`)
+- [ ] Errors logged with context
+- [ ] `from e` used when re-raising exceptions
+- [ ] Context managers for resource cleanup
+
+### Async Code
+- [ ] Async functions properly await I/O operations
+- [ ] `asyncio.gather` for parallel operations
+- [ ] `asyncio.TaskGroup` for structured concurrency
+- [ ] Timeouts on external calls
+- [ ] Semaphores for concurrency limits
+
+### Logging
+- [ ] Structured logging (not print statements)
+- [ ] Appropriate log levels used
+- [ ] Context included in log messages
+- [ ] Sensitive data not logged
+
+### Testing
+- [ ] Unit tests with mocked dependencies
+- [ ] Integration tests for API endpoints
+- [ ] Parametrized tests for multiple cases
+- [ ] Fixtures for test data and setup
+- [ ] Async tests with pytest-asyncio
+
+### Code Quality
+- [ ] Black formatting applied
+- [ ] Ruff linting passes
+- [ ] Mypy type checking passes
+- [ ] Pre-commit hooks configured
+- [ ] PEP 8 naming conventions followed
