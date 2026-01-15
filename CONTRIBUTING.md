@@ -1,4 +1,4 @@
-# Contributing to Cerebrate Chai Claude Skills
+# Contributing to CerebraTechAI Claude Skills
 
 First off, thank you for considering contributing to Cerebrate Chai Claude Skills! 🎉
 
