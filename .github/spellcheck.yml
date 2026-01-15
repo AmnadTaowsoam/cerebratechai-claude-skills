@@ -1,0 +1,35 @@
+matrix:
+  - name: Markdown
+    sources:
+      - '**/*.md'
+    expect_match: false
+    aspell:
+      lang: en
+      d: en_US
+    dictionary:
+      wordlists:
+        - .github/wordlist.txt
+      output: wordlist.dic
+    pipeline:
+      - pyspelling.filters.markdown:
+          comments: false
+      - pyspelling.filters.html:
+          comments: true
+          ignores:
+            - code
+            - pre
+      - pyspelling.filters.context:
+          context_visible_first: true
+          delimiters:
+            # Ignore code blocks
+            - open: '(?s)^```.*?$'
+              close: '^```$'
+            # Ignore inline code
+            - open: '`'
+              close: '`'
+            # Ignore URLs
+            - open: '\[.*?\]\('
+              close: '\)'
+            # Ignore HTML tags
+            - open: '<'
+              close: '>'
