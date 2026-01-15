@@ -1,6 +1,8 @@
 # Distributed Tracing
 
-A comprehensive guide to distributed tracing with OpenTelemetry and Jaeger for observability in microservices.
+## Overview
+
+Distributed tracing helps you understand how requests flow through your distributed system by tracking the journey of a request across multiple services. This skill covers OpenTelemetry, Jaeger, and tracing best practices.
 
 ## Table of Contents
 
@@ -20,129 +22,115 @@ A comprehensive guide to distributed tracing with OpenTelemetry and Jaeger for o
 
 ## Tracing Concepts
 
-### Core Concepts
+### Trace, Span, Context
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         Trace                                    │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │   Span 1     │  │   Span 2     │  │   Span 3     │          │
-│  │  (Client)    │──>│  (API)      │──>│  (Database) │          │
-│  │              │  │              │  │              │          │
-│  │ Start: 0ms   │  │ Start: 10ms  │  │ Start: 25ms  │          │
-│  │ End: 50ms    │  │ End: 40ms    │  │ End: 35ms    │          │
-│  └──────────────┘  └──────────────┘  └──────────────┘          │
-└─────────────────────────────────────────────────────────────────┘
+Trace: The complete journey of a request
+  ├─ Span A: Service 1 (HTTP Handler)
+  │   └─ Span B: Service 1 (Database Query)
+  ├─ Span C: Service 2 (HTTP Handler)
+  │   ├─ Span D: Service 2 (Cache Lookup)
+  │   └─ Span E: Service 2 (External API Call)
+  └─ Span F: Service 3 (HTTP Handler)
 ```
 
-### Key Terms
+### Key Concepts
 
-| Term | Description |
-|------|-------------|
-| **Trace** | A collection of spans representing a single request across services |
-| **Span** | A single unit of work within a trace |
+| Concept | Description |
+|---------|-------------|
+| **Trace** | A tree of spans representing the full journey of a request |
+| **Span** | A single operation within a trace |
 | **Trace ID** | Unique identifier for the entire trace |
-| **Span ID** | Unique identifier for a span |
+| **Span ID** | Unique identifier for a specific span |
 | **Parent Span ID** | ID of the parent span (for nested spans) |
-| **Context** | Contains trace ID, span ID, and propagation data |
-| **Baggage** | Key-value pairs propagated across spans |
+| **Context** | Container for trace and span IDs |
+| **Baggage** | Key-value pairs that propagate across services |
 
 ### Span Attributes
 
-```typescript
-interface Span {
-  traceId: string;
-  spanId: string;
-  parentSpanId?: string;
-  name: string;
-  kind: 'CLIENT' | 'SERVER' | 'PRODUCER' | 'CONSUMER';
-  startTime: number;
-  endTime: number;
-  status: 'OK' | 'ERROR';
-  attributes: Record<string, string | number | boolean>;
-  events: SpanEvent[];
-  links: SpanLink[];
-}
-```
+| Attribute | Description | Example |
+|------------|-------------|---------|
+| `http.method` | HTTP method | `GET`, `POST` |
+| `http.url` | Request URL | `/api/users` |
+| `http.status_code` | Response status | `200`, `404`, `500` |
+| `db.system` | Database type | `postgresql`, `mysql` |
+| `db.statement` | SQL query | `SELECT * FROM users` |
+| `net.peer.name` | Remote host | `api.example.com` |
+| `error` | Error flag | `true` |
 
 ---
 
 ## OpenTelemetry Setup
 
-### Installation
+### Node.js Setup
 
 ```bash
-# Node.js
-npm install @opentelemetry/api @opentelemetry/sdk-node
-npm install @opentelemetry/auto-instrumentations
-
-# Python
-pip install opentelemetry-api
-pip install opentelemetry-sdk
-pip install opentelemetry-instrumentation
+npm install @opentelemetry/api @opentelemetry/sdk-node @opentelemetry/auto-instrumentations-node @opentelemetry/exporter-trace-otlp-grpc
 ```
-
-### Node.js Setup
 
 ```typescript
 // tracing.ts
 import { NodeSDK } from '@opentelemetry/sdk-node';
-import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { JaegerExporter } from '@opentelemetry/exporter-trace-jaeger';
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations';
-
-const resource = Resource.default().merge(
-  new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: 'api-server',
-    [SemanticResourceAttributes.SERVICE_VERSION]: '1.0.0',
-    [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: 'production',
-  })
-);
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 
 const sdk = new NodeSDK({
-  resource,
-  traceExporter: new JaegerExporter({
-    endpoint: 'http://jaeger:14268/api/traces',
+  resource: new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: 'my-service',
+    [SemanticResourceAttributes.SERVICE_VERSION]: '1.0.0',
+    [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: 'production',
+  }),
+  traceExporter: new OTLPTraceExporter({
+    url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4317',
   }),
   instrumentations: [getNodeAutoInstrumentations()],
 });
 
 sdk.start();
+
+console.log('OpenTelemetry tracing initialized');
 ```
 
 ### Python Setup
+
+```bash
+pip install opentelemetry-api opentelemetry-sdk opentelemetry-auto-instrumentation opentelemetry-exporter-otlp
+```
 
 ```python
 # tracing.py
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.jaeger import JaegerExporter
-from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk.resources import Resource, SERVICE_NAME
 from opentelemetry.instrumentation.auto_instrumentation import AutoInstrumentation
 
+# Configure resource
 resource = Resource.create({
-    SERVICE_NAME: "api-server",
+    SERVICE_NAME: "my-service",
     "service.version": "1.0.0",
     "deployment.environment": "production"
 })
 
-trace.set_tracer_provider(TracerProvider(resource=resource))
-
-jaeger_exporter = JaegerExporter(
-    agent_host_name="jaeger",
-    agent_port=6831,
+# Configure exporter
+exporter = OTLPSpanExporter(
+    endpoint="localhost:4317",
+    insecure=True
 )
 
-trace.get_tracer_provider().add_span_processor(
-    BatchSpanProcessor(jaeger_exporter)
-)
+# Configure tracer provider
+provider = TracerProvider(resource=resource)
+provider.add_span_processor(BatchSpanProcessor(exporter))
+trace.set_tracer_provider(provider)
 
 # Auto-instrumentation
 auto_instrumentation = AutoInstrumentation()
 auto_instrumentation.instrument()
+
+print("OpenTelemetry tracing initialized")
 ```
 
 ---
@@ -152,80 +140,77 @@ auto_instrumentation.instrument()
 ### Automatic Instrumentation
 
 ```typescript
-// Node.js - Auto-instrumentation covers:
-// - HTTP/HTTPS
-// - Express
-// - PostgreSQL
-// - MongoDB
-// - Redis
-// - GraphQL
-// - gRPC
+// Node.js - Automatic instrumentation is enabled by default
+// No code changes needed for HTTP, database, etc.
 
-import { NodeSDK } from '@opentelemetry/sdk-node';
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations';
+// Express example - automatically traced
+import express from 'express';
 
-const sdk = new NodeSDK({
-  instrumentations: [getNodeAutoInstrumentations()],
+const app = express();
+
+app.get('/api/users', async (req, res) => {
+  // This request is automatically traced
+  const users = await db.query('SELECT * FROM users');
+  res.json(users);
 });
-
-sdk.start();
 ```
 
 ```python
-# Python - Auto-instrumentation covers:
-# - Flask, Django, FastAPI
-# - Requests, httpx
-# - SQLAlchemy
-# - Redis
-# - Celery
-# - psycopg2
+# Python - Automatic instrumentation
+# No code changes needed for Flask, FastAPI, etc.
 
-from opentelemetry.instrumentation.auto_instrumentation import AutoInstrumentation
+from fastapi import FastAPI
 
-auto_instrumentation = AutoInstrumentation()
-auto_instrumentation.instrument()
+app = FastAPI()
+
+@app.get("/api/users")
+async def get_users():
+    # This request is automatically traced
+    users = await db.query("SELECT * FROM users")
+    return users
 ```
 
-### Manual Instrumentation (Node.js)
+### Manual Instrumentation
 
 ```typescript
+// manual-tracing.ts
 import { trace } from '@opentelemetry/api';
 
-const tracer = trace.getTracer('my-service');
+const tracer = trace.getTracer('my-service', '1.0.0');
 
 async function processOrder(orderId: string) {
-  // Create a span
   const span = tracer.startSpan('processOrder', {
     attributes: {
       'order.id': orderId,
-      'order.type': 'purchase',
     },
   });
 
   try {
-    // Add event
-    span.addEvent('Order received');
-
-    // Do work
-    const result = await validateOrder(orderId);
-    span.setAttribute('order.valid', true);
-
-    // Create child span
-    const childSpan = tracer.startSpan('validateOrder', {
+    // Validate order
+    const validateSpan = tracer.startSpan('validateOrder', {
       parent: span,
     });
+    await validateOrder(orderId);
+    validateSpan.end();
 
-    try {
-      await chargePayment(orderId);
-    } finally {
-      childSpan.end();
-    }
+    // Process payment
+    const paymentSpan = tracer.startSpan('processPayment', {
+      parent: span,
+    });
+    await processPayment(orderId);
+    paymentSpan.end();
 
-    span.setStatus({ code: SpanStatusCode.OK });
-    return result;
+    // Send confirmation
+    const confirmSpan = tracer.startSpan('sendConfirmation', {
+      parent: span,
+    });
+    await sendConfirmation(orderId);
+    confirmSpan.end();
+
+    span.setStatus({ code: 1, message: 'OK' });
   } catch (error) {
-    span.recordException(error);
-    span.setStatus({ code: SpanStatusCode.ERROR, message: error.message });
+    span.recordException(error as Error);
+    span.setStatus({ code: 2, message: 'ERROR' });
     throw error;
   } finally {
     span.end();
@@ -233,95 +218,169 @@ async function processOrder(orderId: string) {
 }
 ```
 
-### Manual Instrumentation (Python)
-
 ```python
+# manual_tracing.py
 from opentelemetry import trace
-from opentelemetry.trace import Status, StatusCode
 
-tracer = trace.get_tracer(__name__)
+tracer = trace.get_tracer("my-service", "1.0.0")
 
 async def process_order(order_id: str):
-    # Create a span
-    with tracer.start_as_current_span(
-        "processOrder",
-        attributes={
-            "order.id": order_id,
-            "order.type": "purchase"
-        }
-    ) as span:
-        # Add event
-        span.add_event("Order received")
-
+    with tracer.start_as_current_span("processOrder") as span:
+        span.set_attribute("order.id", order_id)
+        
         try:
-            # Do work
-            result = await validate_order(order_id)
-            span.set_attribute("order.valid", True)
-
-            # Create child span
-            with tracer.start_as_current_span("validateOrder") as child_span:
-                await charge_payment(order_id)
-
-            span.set_status(Status(StatusCode.OK))
-            return result
+            # Validate order
+            with tracer.start_as_current_span("validateOrder") as validate_span:
+                await validate_order(order_id)
+            
+            # Process payment
+            with tracer.start_as_current_span("processPayment") as payment_span:
+                await process_payment(order_id)
+            
+            # Send confirmation
+            with tracer.start_as_current_span("sendConfirmation") as confirm_span:
+                await send_confirmation(order_id)
+            
+            span.set_status(trace.Status(trace.StatusCode.OK))
         except Exception as error:
             span.record_exception(error)
-            span.set_status(Status(StatusCode.ERROR, str(error)))
+            span.set_status(trace.Status(trace.StatusCode.ERROR, str(error)))
             raise
 ```
 
-### HTTP Client Instrumentation (Node.js)
+### Database Instrumentation
 
 ```typescript
-import { trace } from '@opentelemetry/api';
+// db-tracing.ts
+import { trace, SpanKind } from '@opentelemetry/api';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
-async function fetchUserData(userId: string) {
-  const tracer = trace.getTracer('user-service');
+const tracer = trace.getTracer('database', '1.0.0');
 
-  return tracer.startActiveSpan('fetchUserData', async (span) => {
-    span.setAttribute('user.id', userId);
-
-    try {
-      const response = await fetch(`https://api.example.com/users/${userId}`);
-      span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, response.status);
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      return response.json();
-    } catch (error) {
-      span.recordException(error);
-      throw error;
-    }
+async function queryDatabase(sql: string, params: any[]) {
+  const span = tracer.startSpan('database.query', {
+    kind: SpanKind.CLIENT,
+    attributes: {
+      [SemanticAttributes.DB_SYSTEM]: 'postgresql',
+      [SemanticAttributes.DB_STATEMENT]: sql,
+      [SemanticAttributes.DB_NAME]: 'mydb',
+    },
   });
+
+  try {
+    const result = await pool.query(sql, params);
+    span.setAttribute('db.rows', result.rows.length);
+    return result;
+  } catch (error) {
+    span.recordException(error as Error);
+    throw error;
+  } finally {
+    span.end();
+  }
 }
 ```
 
-### Database Instrumentation (Python)
-
 ```python
-from opentelemetry import trace
-from opentelemetry.trace import SpanKind
+# db_tracing.py
+from opentelemetry import trace, SpanKind
 from opentelemetry.semconv.trace import SpanAttributes
 
-tracer = trace.get_tracer(__name__)
+tracer = trace.get_tracer("database", "1.0.0")
 
-def get_user(user_id: str):
+async def query_database(sql: str, params: list):
     with tracer.start_as_current_span(
         "database.query",
         kind=SpanKind.CLIENT
     ) as span:
         span.set_attribute(SpanAttributes.DB_SYSTEM, "postgresql")
-        span.set_attribute(SpanAttributes.DB_NAME, "production")
-        span.set_attribute(SpanAttributes.DB_OPERATION, "SELECT")
-        span.set_attribute(SpanAttributes.DB_STATEMENT, f"SELECT * FROM users WHERE id = {user_id}")
-
+        span.set_attribute(SpanAttributes.DB_STATEMENT, sql)
+        span.set_attribute(SpanAttributes.DB_NAME, "mydb")
+        
         try:
-            result = db.execute(f"SELECT * FROM users WHERE id = {user_id}")
-            span.set_attribute(SpanAttributes.DB_ROW_COUNT, len(result))
+            result = await pool.query(sql, params)
+            span.set_attribute("db.rows", len(result))
             return result
+        except Exception as error:
+            span.record_exception(error)
+            raise
+```
+
+### HTTP Client Instrumentation
+
+```typescript
+// http-client-tracing.ts
+import { trace, SpanKind, propagation } from '@opentelemetry/api';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+
+const tracer = trace.getTracer('http-client', '1.0.0');
+
+async function makeRequest(url: string, options: RequestInit = {}) {
+  const span = tracer.startSpan('http.request', {
+    kind: SpanKind.CLIENT,
+    attributes: {
+      [SemanticAttributes.HTTP_METHOD]: options.method || 'GET',
+      [SemanticAttributes.HTTP_URL]: url,
+    },
+  });
+
+  try {
+    // Inject trace context into headers
+    const headers: Record<string, string> = {};
+    propagation.inject(trace.setSpanContext(span.context()), headers);
+
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...headers,
+        ...options.headers,
+      },
+    });
+
+    span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, response.status);
+
+    return response;
+  } catch (error) {
+    span.recordException(error as Error);
+    throw error;
+  } finally {
+    span.end();
+  }
+}
+```
+
+```python
+# http_client_tracing.py
+from opentelemetry import trace, SpanKind, propagation
+from opentelemetry.semconv.trace import SpanAttributes
+import httpx
+
+tracer = trace.get_tracer("http-client", "1.0.0")
+
+async def make_request(url: str, **kwargs):
+    with tracer.start_as_current_span(
+        "http.request",
+        kind=SpanKind.CLIENT
+    ) as span:
+        method = kwargs.get("method", "GET")
+        span.set_attribute(SpanAttributes.HTTP_METHOD, method)
+        span.set_attribute(SpanAttributes.HTTP_URL, url)
+        
+        # Inject trace context into headers
+        headers = kwargs.get("headers", {})
+        ctx = trace.get_current()
+        propagation.inject(ctx, headers)
+        
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.request(
+                    method=method,
+                    url=url,
+                    headers=headers,
+                    **{k: v for k, v in kwargs.items() if k != "headers"}
+                )
+            
+            span.set_attribute(SpanAttributes.HTTP_STATUS_CODE, response.status_code)
+            return response
         except Exception as error:
             span.record_exception(error)
             raise
@@ -331,26 +390,41 @@ def get_user(user_id: str):
 
 ## Jaeger Backend
 
-### Docker Compose Setup
+### Docker Compose
 
 ```yaml
+# docker-compose.yml
 version: '3.8'
+
 services:
   jaeger:
-    image: jaegertracing/all-in-one:1.50
+    image: jaegertracing/all-in-one:latest
     container_name: jaeger
     ports:
-      - "5775:5775/udp"   # accept zipkin.thrift over compact thrift protocol
-      - "6831:6831/udp"   # accept jaeger.thrift over compact thrift protocol
-      - "6832:6832/udp"   # accept jaeger.thrift over binary thrift protocol
-      - "5778:5778"       # serve configs
-      - "16686:16686"     # serve frontend
-      - "14268:14268"     # accept jaeger.thrift directly from clients
-      - "14250:14250"     # accept model.proto
-      - "9411:9411"       # Zipkin compatible endpoint
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "14250:14250"
+      - "9411:9411"
     environment:
-      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
       - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - tracing
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    depends_on:
+      - jaeger
     networks:
       - tracing
 
@@ -359,426 +433,400 @@ networks:
     driver: bridge
 ```
 
-### Kubernetes Deployment
+### Collector Configuration
 
 ```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: tracing
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: jaeger
-  namespace: tracing
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: jaeger
-  template:
-    metadata:
-      labels:
-        app: jaeger
-    spec:
-      containers:
-      - name: jaeger
-        image: jaegertracing/all-in-one:1.50
-        ports:
-        - containerPort: 16686
-        - containerPort: 14268
-        env:
-        - name: COLLECTOR_ZIPKIN_HOST_PORT
-          value: ":9411"
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: jaeger
-  namespace: tracing
-spec:
-  selector:
-    app: jaeger
-  ports:
-  - name: ui
-    port: 16686
-    targetPort: 16686
-  - name: collector
-    port: 14268
-    targetPort: 14268
-  type: LoadBalancer
-```
-
-### Jaeger Configuration
-
-```yaml
-# jaeger-config.yml
-collector:
-  zipkin:
-    host-port: :9411
+# otel-collector-config.yaml
+receivers:
   otlp:
-    enabled: true
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
 
-storage:
-  type: elasticsearch
-  elasticsearch:
-    server-urls: http://elasticsearch:9200
-    index-prefix: jaeger
-    tags-as-fields:
-      all: true
+processors:
+  batch:
 
-query:
-  base-path: /
+exporters:
+  jaeger:
+    endpoint: jaeger:14250
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [jaeger]
 ```
 
 ---
 
 ## Trace Correlation
 
-### Correlating Logs with Traces
+### Correlate with Logs
 
 ```typescript
+// log-correlation.ts
+import pino from 'pino';
 import { trace } from '@opentelemetry/api';
 
-const logger = winston.createLogger({
-  format: winston.format.combine(
-    winston.format.printf(({ message, ...meta }) => {
-      const spanContext = trace.getSpanContext(trace.getActiveSpan());
-      return JSON.stringify({
-        message,
-        traceId: spanContext?.traceId,
-        spanId: spanContext?.spanId,
-        ...meta,
-      });
-    })
-  ),
+const logger = pino({
+  level: 'info',
+  formatters: {
+    level: (label) => ({ level: label }),
+  },
+  base: {
+    trace_id: () => trace.getSpanContext()?.traceId,
+    span_id: () => trace.getSpanContext()?.spanId,
+  },
 });
 
 // Usage
-logger.info('User logged in', { userId: '123' });
-// Output: {"message":"User logged in","traceId":"abc123","spanId":"def456","userId":"123"}
+logger.info({ userId: '123' }, 'User logged in');
 ```
 
 ```python
+# log_correlation.py
 import logging
 from opentelemetry import trace
 
 class TraceContextFilter(logging.Filter):
     def filter(self, record):
-        span = trace.get_current_span()
-        context = span.get_span_context()
-        record.trace_id = f"{context.trace_id:032x}"
-        record.span_id = f"{context.span_id:016x}"
+        span_context = trace.get_current_span().get_span_context()
+        record.trace_id = span_context.trace_id if span_context else None
+        record.span_id = span_context.span_id if span_context else None
         return True
 
+# Configure logging
 logger = logging.getLogger(__name__)
 logger.addFilter(TraceContextFilter())
 
 # Usage
 logger.info("User logged in", extra={"user_id": "123"})
-# Output: User logged in trace_id=abc123 span_id=def456 user_id=123
 ```
 
-### Correlating Metrics with Traces
+### Correlate with Metrics
 
 ```typescript
-import { trace, metrics } from '@opentelemetry/api';
+// metric-correlation.ts
+import { Counter } from 'prom-client';
+import { trace } from '@opentelemetry/api';
 
-const meter = metrics.getMeter('my-service');
-const requestCounter = meter.createCounter('requests_total', {
-  description: 'Total requests',
+const httpRequestsTotal = new Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests',
+  labelNames: ['method', 'path', 'status_code', 'trace_id'],
 });
 
-function handleRequest(req, res) {
-  const span = trace.getActiveSpan();
-  const traceId = span?.spanContext().traceId;
-
-  requestCounter.add(1, {
-    'trace.id': traceId,
-    'route': req.path,
-  });
-}
+// Usage
+const spanContext = trace.getSpanContext();
+httpRequestsTotal.inc({
+  method: 'GET',
+  path: '/api/users',
+  status_code: '200',
+  trace_id: spanContext?.traceId,
+});
 ```
 
 ---
 
 ## Context Propagation
 
-### HTTP Headers Propagation
+### HTTP Headers
 
 ```typescript
-import { propagation, trace } from '@opentelemetry/api';
+// context-propagation.ts
+import { propagation } from '@opentelemetry/api';
 
-// Server-side - Extract context from incoming request
-function handleRequest(req, res) {
-  const carrier = propagation.extract(trace.getSpanContext(), propagation.defaultTextMapGetter, req.headers);
-  const span = trace.getTracer('server').startSpan('handleRequest', {
-    root: carrier === undefined,
+// Extract context from incoming request
+function extractContext(headers: Headers) {
+  const carrier: Record<string, string> = {};
+  headers.forEach((value, key) => {
+    carrier[key] = value;
   });
 
-  trace.setActiveSpan(span);
-  // ... handle request ...
-  span.end();
+  return propagation.extract(carrier);
 }
 
-// Client-side - Inject context into outgoing request
-async function makeRequest(url: string) {
-  const headers = {};
-  propagation.inject(trace.getActiveSpan(), propagation.defaultTextMapSetter, headers);
+// Inject context into outgoing request
+function injectContext(headers: Headers) {
+  const carrier: Record<string, string> = {};
+  propagation.inject(trace.setSpanContext(trace.getSpanContext()), carrier);
 
-  return fetch(url, { headers });
+  for (const [key, value] of Object.entries(carrier)) {
+    headers.set(key, value);
+  }
 }
 ```
 
 ```python
-from opentelemetry import trace, propagate
-from flask import request, make_response
+# context_propagation.py
+from opentelemetry import trace, propagation
 
-# Server-side - Extract context from incoming request
-@app.route('/api/endpoint')
-def handle_request():
-    carrier = {}
-    for key, value in request.headers:
-        carrier[key] = value
+def extract_context(headers: dict):
+    """Extract trace context from incoming headers."""
+    ctx = propagation.extract(headers)
+    return ctx
 
-    ctx = propagate.extract(carrier)
-    token = context.attach(ctx)
-
-    try:
-        # ... handle request ...
-        return make_response("OK")
-    finally:
-        context.detach(token)
-
-# Client-side - Inject context into outgoing request
-import requests
-
-def make_request(url: str):
-    headers = {}
-    propagate.inject(headers)
-
-    return requests.get(url, headers=headers)
+def inject_context(headers: dict):
+    """Inject trace context into outgoing headers."""
+    ctx = trace.get_current()
+    propagation.inject(ctx, headers)
 ```
 
-### gRPC Propagation
+### Express Middleware
 
 ```typescript
-import { propagation, trace } from '@opentelemetry/api';
-import * as grpc from '@grpc/grpc-js';
+// express-middleware.ts
+import express from 'express';
+import { propagation, context } from '@opentelemetry/api';
 
-// Server middleware
-function traceInterceptor(options, nextCall) {
-  return new grpc.InterceptingCall(nextCall(options), {
-    start: (metadata, listener, next) => {
-      const carrier = propagation.extract(trace.getSpanContext(), propagation.defaultTextMapGetter, metadata);
-      const span = trace.getTracer('grpc').startSpan('grpc.server', {
-        root: carrier === undefined,
-      });
+function tracingMiddleware() {
+  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    // Extract context from incoming headers
+    const extractedContext = propagation.extract(req.headers);
 
-      next(metadata, {
-        ...listener,
-        onReceiveMetadata: (metadata, next) => {
-          span.setAttributes({
-            'rpc.method': metadata.get('method'),
-            'rpc.service': metadata.get('service'),
-          });
-          next(metadata);
-        },
-      });
-    },
-  });
-}
-```
-
-### Message Queue Propagation
-
-```typescript
-import { propagation, trace } from '@opentelemetry/api';
-
-// Producer - Inject context into message
-async function publishMessage(queue: string, message: any) {
-  const headers = {};
-  propagation.inject(trace.getActiveSpan(), propagation.defaultTextMapSetter, headers);
-
-  await channel.sendToQueue(queue, Buffer.from(JSON.stringify({
-    ...message,
-    _traceHeaders: headers,
-  })));
+    // Set as current context
+    context.with(extractedContext, () => {
+      next();
+    });
+  };
 }
 
-// Consumer - Extract context from message
-channel.consume(queue, async (msg) => {
-  const { _traceHeaders, ...message } = JSON.parse(msg.content.toString());
-  const ctx = propagation.extract(trace.getSpanContext(), propagation.defaultTextMapGetter, _traceHeaders);
-  const token = context.with(ctx, () => trace.startSpan('processMessage'));
-
-  try {
-    await processMessage(message);
-  } finally {
-    token.end();
-  }
-});
+// Usage
+const app = express();
+app.use(tracingMiddleware());
 ```
 
 ---
 
 ## Sampling Strategies
 
-### Always Sample
+### Fixed Rate Sampling
 
 ```typescript
-import { TraceIdRatioBased } from '@opentelemetry/sdk-trace-base';
+// sampling.ts
+import { Sampler, SamplingResult, TraceIdRatioBased } from '@opentelemetry/sdk-trace-base';
 
-const sdk = new NodeSDK({
-  traceExporter: new JaegerExporter({ endpoint: 'http://jaeger:14268/api/traces' }),
-  sampler: new TraceIdRatioBased(1.0), // 100% sampling
-});
-```
-
-### Probability Sampling
-
-```typescript
 // Sample 10% of traces
-const sdk = new NodeSDK({
-  sampler: new TraceIdRatioBased(0.1),
-});
-```
+const sampler = new TraceIdRatioBased(0.1);
 
-### Parent-Based Sampling
-
-```typescript
-import { ParentBasedSampler } from '@opentelemetry/sdk-trace-base';
-
-const sdk = new NodeSDK({
-  sampler: new ParentBasedSampler({
-    root: new TraceIdRatioBased(0.1), // 10% for root spans
-    remoteParentSampled: new AlwaysOnSampler(),
-    remoteParentNotSampled: new AlwaysOffSampler(),
-    localParentSampled: new AlwaysOnSampler(),
-    localParentNotSampled: new AlwaysOffSampler(),
-  }),
-});
-```
-
-### Custom Sampling
-
-```typescript
-import { Sampler, SamplingResult } from '@opentelemetry/sdk-trace-base';
-
+// Or custom sampler
 class CustomSampler implements Sampler {
-  shouldSample(context, traceId, name, kind, attributes, links) {
-    // Sample all error spans
+  shouldSample(
+    context: any,
+    traceId: string,
+    spanName: string,
+    spanKind: any,
+    attributes: any
+  ): SamplingResult {
+    // Sample all error traces
     if (attributes['error'] === true) {
       return {
-        decision: SamplingDecision.RECORD_AND_SAMPLED,
+        decision: 1, // RECORD_AND_SAMPLED
       };
     }
 
-    // Sample 10% of health check spans
-    if (name === 'health-check') {
-      return {
-        decision: Math.random() < 0.1 ? SamplingDecision.RECORD_AND_SAMPLED : SamplingDecision.NOT_RECORD,
-      };
-    }
-
-    // Sample 5% of all other spans
+    // Sample 1% of other traces
+    const shouldSample = Math.random() < 0.01;
     return {
-      decision: Math.random() < 0.05 ? SamplingDecision.RECORD_AND_SAMPLED : SamplingDecision.NOT_RECORD,
+      decision: shouldSample ? 1 : 0,
     };
   }
+}
+```
 
-  toString() {
-    return 'CustomSampler';
+```python
+# sampling.py
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.sampling import TraceIdRatioBased
+
+# Sample 10% of traces
+sampler = TraceIdRatioBased(0.1)
+
+# Or custom sampler
+from opentelemetry.sdk.trace.sampling import Sampler, SamplingResult, Decision
+
+class CustomSampler(Sampler):
+    def should_sample(
+        self,
+        parent_context,
+        trace_id,
+        name,
+        kind,
+        attributes,
+        links,
+    ):
+        # Sample all error traces
+        if attributes.get("error"):
+            return SamplingResult(Decision.RECORD_AND_SAMPLED)
+        
+        # Sample 1% of other traces
+        import random
+        should_sample = random.random() < 0.01
+        return SamplingResult(
+            Decision.RECORD_AND_SAMPLED if should_sample else Decision.DROP
+        )
+```
+
+### Dynamic Sampling
+
+```typescript
+// dynamic-sampling.ts
+import { Sampler, SamplingResult } from '@opentelemetry/sdk-trace-base';
+
+class DynamicSampler implements Sampler {
+  private sampleRates: Map<string, number> = new Map();
+
+  constructor(
+    private baseRate: number = 0.01,
+    private maxRate: number = 1.0
+  ) {}
+
+  shouldSample(
+    context: any,
+    traceId: string,
+    spanName: string,
+    spanKind: any,
+    attributes: any
+  ): SamplingResult {
+    // Get service name
+    const serviceName = attributes['service.name'] || 'unknown';
+
+    // Get sample rate for this service
+    let rate = this.sampleRates.get(serviceName) || this.baseRate;
+
+    // Increase rate for high-traffic services
+    if (serviceName === 'api' && rate < this.maxRate) {
+      rate = Math.min(rate * 1.1, this.maxRate);
+      this.sampleRates.set(serviceName, rate);
+    }
+
+    const shouldSample = Math.random() < rate;
+    return {
+      decision: shouldSample ? 1 : 0,
+      attributes: {
+        'sampling.rate': rate,
+      },
+    };
   }
 }
-
-const sdk = new NodeSDK({
-  sampler: new CustomSampler(),
-});
 ```
 
 ---
 
 ## Performance Impact
 
-### Reducing Overhead
+### Async Span Processing
 
 ```typescript
-// Use async span processors
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
+// async-spans.ts
+import { trace, SpanProcessor } from '@opentelemetry/sdk-trace-base';
 
-const sdk = new NodeSDK({
-  spanProcessor: new BatchSpanProcessor(new JaegerExporter({
-    endpoint: 'http://jaeger:14268/api/traces',
-  })),
-  // Configure batch size and timeout
-  traceExporter: new JaegerExporter({
-    maxQueueSize: 2048,
-    scheduledDelayMillis: 5000,
-    exportTimeoutMillis: 30000,
-  }),
-});
-```
+class AsyncSpanProcessor implements SpanProcessor {
+  async forceFlush(): Promise<void> {
+    // Flush pending spans
+  }
 
-### Selective Instrumentation
+  onStart(span: any, parentContext: any): void {
+    // Called when span starts
+  }
 
-```typescript
-// Only instrument critical paths
-import { trace } from '@opentelemetry/api';
+  onEnd(span: any): void {
+    // Called when span ends
+    // Process asynchronously
+    setImmediate(() => {
+      // Export span
+    });
+  }
 
-const tracer = trace.getTracer('critical-service');
-
-async function criticalOperation() {
-  const span = tracer.startSpan('criticalOperation');
-  try {
-    // ... critical work ...
-  } finally {
-    span.end();
+  shutdown(): Promise<void> {
+    return Promise.resolve();
   }
 }
+```
 
-// Skip instrumentation for non-critical paths
-async function backgroundTask() {
-  // No tracing for background tasks
-  // ... background work ...
-}
+### Batch Processing
+
+```typescript
+// batch-processor.ts
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
+
+const exporter = new OTLPTraceExporter({
+  url: 'http://localhost:4317',
+});
+
+// Batch spans for better performance
+const batchProcessor = new BatchSpanProcessor(exporter, {
+  maxQueueSize: 2048,
+  maxExportBatchSize: 512,
+  scheduledDelayMillis: 5000,
+});
+
+tracerProvider.addSpanProcessor(batchProcessor);
 ```
 
 ---
 
 ## Common Patterns
 
-### Database Query Tracing
+### Request-Response Pattern
 
 ```typescript
-import { trace } from '@opentelemetry/api';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-
-async function queryDatabase(sql: string, params: any[]) {
-  const tracer = trace.getTracer('database');
-  const span = tracer.startSpan('database.query', {
+// request-response.ts
+async function handleRequest(req: express.Request, res: express.Response) {
+  const tracer = trace.getTracer('http-server');
+  const span = tracer.startSpan('http.request', {
     attributes: {
-      [SemanticAttributes.DB_SYSTEM]: 'postgresql',
-      [SemanticAttributes.DB_NAME]: 'production',
-      [SemanticAttributes.DB_STATEMENT]: sql,
-      [SemanticAttributes.DB_OPERATION]: sql.split(' ')[0].toUpperCase(),
+      'http.method': req.method,
+      'http.url': req.path,
+    },
+  });
+
+  try {
+    // Process request
+    const result = await processRequest(req);
+
+    span.setAttribute('http.status_code', res.statusCode);
+    res.json(result);
+  } catch (error) {
+    span.recordException(error as Error);
+    span.setAttribute('http.status_code', 500);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    span.end();
+  }
+}
+```
+
+### Database Operation Pattern
+
+```typescript
+// db-operation.ts
+async function executeQuery(sql: string, params: any[]) {
+  const tracer = trace.getTracer('database');
+  const span = tracer.startSpan('db.query', {
+    attributes: {
+      'db.system': 'postgresql',
+      'db.statement': sql,
     },
   });
 
   try {
     const start = Date.now();
-    const result = await db.query(sql, params);
+    const result = await pool.query(sql, params);
     const duration = Date.now() - start;
 
-    span.setAttribute(SemanticAttributes.DB_ROW_COUNT, result.rowCount);
     span.setAttribute('db.duration_ms', duration);
+    span.setAttribute('db.rows', result.rows.length);
 
     return result;
   } catch (error) {
-    span.recordException(error);
+    span.recordException(error as Error);
     throw error;
   } finally {
     span.end();
@@ -786,87 +834,26 @@ async function queryDatabase(sql: string, params: any[]) {
 }
 ```
 
-### External API Call Tracing
+### External Service Pattern
 
 ```typescript
-import { trace } from '@opentelemetry/api';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-
-async function callExternalAPI(url: string, options: RequestInit) {
+// external-service.ts
+async function callExternalService(url: string) {
   const tracer = trace.getTracer('http-client');
   const span = tracer.startSpan('http.request', {
-    kind: SpanKind.CLIENT,
     attributes: {
-      [SemanticAttributes.HTTP_URL]: url,
-      [SemanticAttributes.HTTP_METHOD]: options.method || 'GET',
+      'http.method': 'GET',
+      'http.url': url,
     },
   });
 
   try {
-    const response = await fetch(url, options);
-    span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, response.status);
-
-    if (!response.ok) {
-      span.setStatus({
-        code: SpanStatusCode.ERROR,
-        message: `HTTP ${response.status}`,
-      });
-    }
-
-    return response;
+    const response = await fetch(url);
+    span.setAttribute('http.status_code', response.status);
+    return response.json();
   } catch (error) {
-    span.recordException(error);
-    span.setStatus({
-      code: SpanStatusCode.ERROR,
-      message: error.message,
-    });
+    span.recordException(error as Error);
     throw error;
-  } finally {
-    span.end();
-  }
-}
-```
-
-### Cache Tracing
-
-```typescript
-import { trace } from '@opentelemetry/api';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-
-async function getFromCache<T>(key: string): Promise<T | null> {
-  const tracer = trace.getTracer('cache');
-  const span = tracer.startSpan('cache.get', {
-    attributes: {
-      'cache.key': key,
-      'cache.hit': false,
-    },
-  });
-
-  try {
-    const value = await redis.get(key);
-
-    if (value) {
-      span.setAttribute('cache.hit', true);
-      return JSON.parse(value);
-    }
-
-    return null;
-  } finally {
-    span.end();
-  }
-}
-
-async function setCache<T>(key: string, value: T, ttl: number): Promise<void> {
-  const tracer = trace.getTracer('cache');
-  const span = tracer.startSpan('cache.set', {
-    attributes: {
-      'cache.key': key,
-      'cache.ttl': ttl,
-    },
-  });
-
-  try {
-    await redis.setex(key, ttl, JSON.stringify(value));
   } finally {
     span.end();
   }
@@ -877,138 +864,114 @@ async function setCache<T>(key: string, value: T, ttl: number): Promise<void> {
 
 ## Debugging with Traces
 
-### Finding Slow Requests
+### Find Slow Requests
 
 ```typescript
-// Jaeger UI Search
-1. Go to http://jaeger:16686
-2. Select service
-3. Filter by operation
-4. Sort by duration
-5. Click on trace to view details
+// debug-slow.ts
+// In Jaeger UI:
+// 1. Search by service name
+// 2. Sort by duration (descending)
+// 3. Click on trace to see span details
+// 4. Identify slow spans
+// 5. Check span attributes and logs
 ```
 
-### Identifying Bottlenecks
-
-```
-Trace Timeline:
-┌─────────────────────────────────────────────────────────────┐
-│ Service A          ┌──────────────────────┐                 │
-│                    │     200ms            │                 │
-│                    └──────────────────────┘                 │
-├─────────────────────────────────────────────────────────────┤
-│ Service B          ┌──────────────────────────────────────┐ │
-│                    │           180ms                      │ │
-│                    └──────────────────────────────────────┘ │
-├─────────────────────────────────────────────────────────────┤
-│ Database           ┌──────────────────────┐                 │
-│                    │     150ms            │                 │
-│                    └──────────────────────┘                 │
-└─────────────────────────────────────────────────────────────┘
-
-Bottleneck: Database query (150ms / 200ms = 75% of total time)
-```
-
-### Error Analysis
+### Find Error Traces
 
 ```typescript
-// Search for error traces
-const errorTraces = await jaegerClient.search({
-  service: 'api-server',
-  operation: 'processOrder',
-  tags: [{ key: 'error', value: 'true' }],
-});
+// debug-errors.ts
+// In Jaeger UI:
+// 1. Search by service name
+// 2. Filter by tags: error=true
+// 3. Click on trace to see error details
+// 4. Check span exceptions
+// 5. Correlate with logs
+```
 
-// Analyze common error patterns
-const errorPatterns = errorTraces.reduce((acc, trace) => {
-  const errorMessage = trace.spans.find(s => s.tags.find(t => t.key === 'error'))?.tags.find(t => t.key === 'error.message')?.value;
-  acc[errorMessage] = (acc[errorMessage] || 0) + 1;
-  return acc;
-}, {});
+### Trace Waterfall Analysis
+
+```typescript
+// waterfall-analysis.ts
+// In Jaeger UI:
+// 1. Select a trace
+// 2. View waterfall visualization
+// 3. Identify parallel vs sequential operations
+// 4. Find bottlenecks (long spans)
+// 5. Check for unnecessary synchronous operations
 ```
 
 ---
 
 ## Production Setup
 
-### Elasticsearch Storage
+### High Availability
 
 ```yaml
-# docker-compose.yml
+# docker-compose-ha.yml
+version: '3.8'
+
 services:
-  jaeger:
-    image: jaegertracing/all-in-one:1.50
+  jaeger-collector:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger-collector
+    ports:
+      - "14269:14269"
+      - "14268:14268"
+      - "14267:14267"
+      - "9411:9411"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - tracing
+
+  jaeger-query:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger-query
+    ports:
+      - "16686:16686"
+      - "16687:16687"
     environment:
       - SPAN_STORAGE_TYPE=elasticsearch
       - ES_SERVER_URLS=http://elasticsearch:9200
-      - ES_TAGS_AS_FIELDS_ALL=true
     depends_on:
       - elasticsearch
+    networks:
+      - tracing
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: elasticsearch
     environment:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-    volumes:
-      - es-data:/usr/share/elasticsearch/data
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    networks:
+      - tracing
 
-volumes:
-  es-data:
-```
-
-### Sampling in Production
-
-```typescript
-// Production: Sample 1% of traces
-const sampler = process.env.NODE_ENV === 'production'
-  ? new TraceIdRatioBased(0.01)
-  : new TraceIdRatioBased(1.0);
-
-const sdk = new NodeSDK({ sampler });
-```
-
-### Retention Policy
-
-```yaml
-# Elasticsearch Index Lifecycle Management
-PUT _ilm/policy/jaeger-policy
-{
-  "policy": {
-    "phases": {
-      "hot": {
-        "actions": {
-          "rollover": {
-            "max_size": "50GB",
-            "max_age": "7d"
-          }
-        }
-      },
-      "warm": {
-        "min_age": "7d",
-        "actions": {
-          "shrink": {
-            "number_of_shards": 1
-          }
-        }
-      },
-      "delete": {
-        "min_age": "30d",
-        "actions": {
-          "delete": {}
-        }
-      }
-    }
-  }
-}
+networks:
+  tracing:
+    driver: bridge
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [OpenTelemetry Documentation](https://opentelemetry.io/docs/)
-- [Jaeger Documentation](https://www.jaegertracing.io/docs/)
-- [OpenTelemetry JavaScript](https://github.com/open-telemetry/opentelemetry-js)
-- [OpenTelemetry Python](https://github.com/open-telemetry/opentelemetry-python)
-- [Trace Context Specification](https://www.w3.org/TR/trace-context/)
+This skill covers comprehensive distributed tracing implementation including:
+
+- **Tracing Concepts**: Trace, span, context, and attributes
+- **OpenTelemetry Setup**: Node.js and Python setup
+- **Instrumentation**: Automatic and manual instrumentation
+- **Jaeger Backend**: Docker Compose and collector configuration
+- **Trace Correlation**: Correlating with logs and metrics
+- **Context Propagation**: HTTP headers and Express middleware
+- **Sampling Strategies**: Fixed rate and dynamic sampling
+- **Performance Impact**: Async span processing and batch processing
+- **Common Patterns**: Request-response, database operation, external service
+- **Debugging with Traces**: Finding slow requests, error traces, waterfall analysis
+- **Production Setup**: High availability configuration

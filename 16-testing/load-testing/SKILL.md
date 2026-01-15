@@ -1,11 +1,17 @@
 # Load Testing
 
-A comprehensive guide to load testing patterns for applications.
+## Overview
+
+Load testing evaluates system performance under expected and peak load conditions. This skill covers load testing concepts, tools, test scenarios, metrics, ramp-up strategies, and best practices.
 
 ## Table of Contents
 
 1. [Load Testing Concepts](#load-testing-concepts)
 2. [Tools](#tools)
+   - [k6](#k6)
+   - [Artillery](#artillery)
+   - [Locust](#locust)
+   - [JMeter](#jmeter)
 3. [Test Scenarios](#test-scenarios)
 4. [Metrics to Track](#metrics-to-track)
 5. [Ramp-up Strategies](#ramp-up-strategies)
@@ -19,101 +25,199 @@ A comprehensive guide to load testing patterns for applications.
 
 ## Load Testing Concepts
 
-### What is Load Testing?
+### Why Load Testing?
 
-Load testing simulates real-world load on your application to identify performance bottlenecks.
+1. **Verify system capacity**
+2. **Identify performance bottlenecks**
+3. **Ensure scalability**
+4. **Validate SLA compliance**
+5. **Prevent production failures**
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                   Load Testing Flow                      │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐              │
-│  │  Load    │──>│ System   │──>│  Metrics │              │
-│  │ Generator│  │ Under    │  │  &      │              │
-│  │          │  │  Test    │  │ Analysis │              │
-│  └─────────┘  └─────────┘  └─────────┘              │
-│                                                             │
-│  Load Types:                                                │
-│  - Load: Normal expected traffic                            │
-│  - Stress: Beyond normal capacity                            │
-│  - Spike: Sudden traffic surge                              │
-│  - Endurance: Sustained load over time                        │
-└─────────────────────────────────────────────────────────────┘
-```
+### Load Testing Types
 
-### Key Metrics
+| Type | Purpose | Duration |
+|------|---------|----------|
+| **Smoke Test** | Basic functionality | Short (5-10 min) |
+| **Load Test** | Normal traffic patterns | Medium (30-60 min) |
+| **Stress Test** | Find breaking point | Variable |
+| **Spike Test** | Sudden traffic surge | Short (5-10 min) |
+| **Endurance Test** | Long-term stability | Long (several hours/days) |
 
-| Metric | Description |
-|--------|-------------|
-| **Requests Per Second (RPS)** | Number of requests handled per second |
-| **Response Time** | Time to process a request |
-| **Throughput** | Data transferred per second |
-| **Error Rate** | Percentage of failed requests |
-| **Concurrent Users** | Number of simultaneous users |
-| **CPU Usage** | Server CPU utilization |
-| **Memory Usage** | Server memory utilization |
+### Key Concepts
+
+- **Virtual Users (VUs)**: Simulated users
+- **Requests Per Second (RPS)**: Request rate
+- **Throughput**: Successful requests per time unit
+- **Response Time**: Time to receive response
+- **Latency**: Network delay
+- **Error Rate**: Percentage of failed requests
 
 ---
 
 ## Tools
 
-### K6
+### k6
+
+#### Installation
 
 ```bash
-# Install K6
-brew install k6  # macOS
-# or
-curl https://github.com/grafana/k6/releases/download/v0.47.0/k6-v0.47.0-linux-amd64.tar.gz -L | tar xvz
+# macOS
+brew install k6
+
+# Linux
+sudo gpg -k
+sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+sudo apt-get update
+sudo apt-get install k6
+
+# Windows
+choco install k6
+
+# Or via npm
+npm install -g k6
 ```
 
+#### Basic Test Script
+
 ```javascript
-// load-test.js
+// load-tests/basic.js
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '30s', target: 10 },   // Ramp up to 10 users
-    { duration: '1m', target: 10 },    // Stay at 10 users
-    { duration: '20s', target: 0 },    // Ramp down to 0
+    { duration: '30s', target: 100 },  // Ramp up to 100 users
+    { duration: '1m', target: 100 },   // Stay at 100 users
+    { duration: '20s', target: 0 },   // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<500'], // 95% of requests < 500ms
-    http_req_failed: ['rate<0.01'], // < 1% error rate
+    http_req_duration: ['p(95)<500'], // 95% of requests must be under 500ms
+    http_req_failed: ['rate<0.01'],   // Error rate must be less than 1%
   },
 };
 
 export default function () {
   const res = http.get('https://api.example.com/users');
+  
   check(res, {
     'status is 200': (r) => r.status === 200,
     'response time < 500ms': (r) => r.timings.duration < 500,
   });
-  sleep(1);
+  
+  sleep(1); // Pause between iterations
 }
 ```
 
+#### Advanced Test Script
+
+```javascript
+// load-tests/advanced.js
+import http from 'k6/http';
+import { check, group, sleep } from 'k6';
+import { Rate, Trend } from 'k6/metrics';
+
+const errorRate = new Rate('errors');
+const responseTime = new Trend('response_time');
+
+export const options = {
+  stages: [
+    { duration: '2m', target: 100 },   // Ramp up to 100 users
+    { duration: '5m', target: 100 },    // Stay at 100 users
+    { duration: '2m', target: 200 },   // Ramp up to 200 users
+    { duration: '5m', target: 200 },   // Stay at 200 users
+    { duration: '2m', target: 0 },     // Ramp down
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)<500', 'p(99)<1000'],
+    http_req_failed: ['rate<0.01'],
+    errors: ['rate<0.01'],
+  },
+};
+
+export function setup() {
+  // Setup: Create test data
+  const loginRes = http.post('https://api.example.com/auth/login', JSON.stringify({
+    email: 'test@example.com',
+    password: 'password123',
+  }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
+  
+  return { token: loginRes.json('token') };
+}
+
+export default function (data) {
+  group('User Flow', () => {
+    // Get users
+    const usersRes = http.get('https://api.example.com/users', {
+      headers: { Authorization: `Bearer ${data.token}` },
+    });
+    
+    const usersOk = check(usersRes, {
+      'users status is 200': (r) => r.status === 200,
+      'users has data': (r) => r.json().length > 0,
+    });
+    
+    errorRate.add(!usersOk);
+    responseTime.add(usersRes.timings.duration);
+    
+    sleep(1);
+    
+    // Get user details
+    if (usersRes.json().length > 0) {
+      const userId = usersRes.json()[0].id;
+      const userRes = http.get(`https://api.example.com/users/${userId}`, {
+        headers: { Authorization: `Bearer ${data.token}` },
+      });
+      
+      const userOk = check(userRes, {
+        'user status is 200': (r) => r.status === 200,
+        'user has correct id': (r) => r.json().id === userId,
+      });
+      
+      errorRate.add(!userOk);
+      responseTime.add(userRes.timings.duration);
+    }
+  });
+}
+
+export function teardown(data) {
+  // Teardown: Clean up test data
+  console.log('Cleaning up test data...');
+}
+```
+
+#### Running k6 Tests
+
 ```bash
-# Run K6 test
-k6 run load-test.js
+# Run basic test
+k6 run load-tests/basic.js
 
 # Run with output
-k6 run load-test.js --out json=results.json
+k6 run --out json=results.json load-tests/basic.js
 
-# Run with specific VUs
-k6 run load-test.js --vus 100
+# Run with custom options
+k6 run --vus 50 --duration 30s load-tests/basic.js
+
+# Run with environment variables
+k6 run -e BASE_URL=https://api.example.com load-tests/basic.js
 ```
+
+---
 
 ### Artillery
 
+#### Installation
+
 ```bash
-# Install Artillery
 npm install -g artillery
 ```
 
+#### Basic Configuration
+
 ```yaml
-# config.yml
+# load-tests/basic.yml
 config:
   target: "https://api.example.com"
   phases:
@@ -122,269 +226,472 @@ config:
       name: "Warm up"
     - duration: 120
       arrivalRate: 50
-      name: "Ramp up load"
+      name: "Ramp up to 50 users"
     - duration: 60
-      arrivalRate: 50
-      name: "Sustained load"
+      arrivalRate: 100
+      name: "Spike to 100 users"
     - duration: 60
-      arrivalRate: 0
-      name: "Ramp down"
-  processor:
-    - function: "randomString.js"
+      arrivalRate: 10
+      name: "Cool down"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+  processor: "./load-tests/functions.js"
 
 scenarios:
-  - name: "Get Users"
+  - name: "User Flow"
     flow:
       - get:
           url: "/users"
-          capture:
-            - json: "$.id"
+          name: "Get Users"
+      - think: 1
+      - post:
+          url: "/users"
+          name: "Create User"
+          json:
+            name: "Test User"
+            email: "test@example.com"
       - think: 1
 ```
 
+#### Advanced Configuration
+
+```yaml
+# load-tests/advanced.yml
+config:
+  target: "https://api.example.com"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      name: "Warm up"
+    - duration: 300
+      arrivalRate: 50
+      name: "Sustained load"
+    - duration: 60
+      arrivalRate: 100
+      name: "Spike test"
+    - duration: 60
+      arrivalRate: 10
+      name: "Cool down"
+  defaults:
+    headers:
+      Content-Type: "application/json"
+      Authorization: "Bearer {{ $processEnvironment.TOKEN }}"
+  processor: "./load-tests/functions.js"
+  ensure:
+    p95: 500
+    maxErrorRate: 1
+
+scenarios:
+  - name: "User Flow"
+    weight: 70
+    flow:
+      - get:
+          url: "/users"
+          name: "Get Users"
+          capture:
+            - json: "$[0].id"
+              as: "userId"
+      - think: 1
+      - get:
+          url: "/users/{{ userId }}"
+          name: "Get User Details"
+      - think: 1
+      - post:
+          url: "/orders"
+          name: "Create Order"
+          json:
+            userId: "{{ userId }}"
+            items:
+              - productId: 1
+                quantity: 2
+      - think: 1
+
+  - name: "Search Flow"
+    weight: 30
+    flow:
+      - get:
+          url: "/products/search?q={{ $randomString() }}"
+          name: "Search Products"
+      - think: 1
+```
+
+#### Processor Functions
+
 ```javascript
-// randomString.js
-module.exports = function(userContext, events, done) {
-  const randomString = Math.random().toString(36).substring(7);
-  userContext.vars.randomString = randomString;
-  return done();
+// load-tests/functions.js
+module.exports = {
+  // Generate random email
+  randomEmail() {
+    const domains = ['gmail.com', 'yahoo.com', 'outlook.com'];
+    const domain = domains[Math.floor(Math.random() * domains.length)];
+    const random = Math.floor(Math.random() * 10000);
+    return `user${random}@${domain}`;
+  },
+
+  // Generate random string
+  randomString(length = 10) {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  },
+
+  // Generate random number
+  randomNumber(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  },
+
+  // Setup function
+  setup(config, events, done) {
+    console.log('Setting up load test...');
+    done();
+  },
+
+  // Teardown function
+  teardown(context, events, done) {
+    console.log('Tearing down load test...');
+    done();
+  },
 };
 ```
 
-```bash
-# Run Artillery test
-artillery run config.yml
+#### Running Artillery Tests
 
-# Run with report
-artillery run config.yml --output results.json
+```bash
+# Run basic test
+artillery run load-tests/basic.yml
+
+# Run with output
+artillery run --output results.json load-tests/basic.yml
+
+# Run with environment variables
+TOKEN=your_token artillery run load-tests/advanced.yml
+
+# Run with custom config
+artillery run --config custom.yml load-tests/basic.yml
 ```
+
+---
 
 ### Locust
 
+#### Installation
+
 ```bash
-# Install Locust
 pip install locust
 ```
 
+#### Basic Test Script
+
 ```python
-# locustfile.py
+# load-tests/basic.py
 from locust import HttpUser, task, between
 
 class WebsiteUser(HttpUser):
-    wait_time = between(1, 5)
-
+    wait_time = between(1, 3)
+    
+    @task
+    def get_users(self):
+        self.client.get("/users")
+    
     @task(3)
-    def index(self):
-        self.client.get("/")
-
-    @task(1)
-    def about(self):
-        self.client.get("/about")
+    def get_products(self):
+        self.client.get("/products")
 ```
+
+#### Advanced Test Script
+
+```python
+# load-tests/advanced.py
+from locust import HttpUser, task, between, events
+from locust.runners import MasterRunner
+import random
+
+class WebsiteUser(HttpUser):
+    wait_time = between(1, 3)
+    
+    def on_start(self):
+        """Login on start."""
+        response = self.client.post("/auth/login", json={
+            "email": "test@example.com",
+            "password": "password123"
+        })
+        self.token = response.json()["token"]
+        self.headers = {"Authorization": f"Bearer {self.token}"}
+    
+    @task(2)
+    def get_users(self):
+        """Get users list."""
+        self.client.get("/users", headers=self.headers)
+    
+    @task
+    def get_user_details(self):
+        """Get user details."""
+        users = self.client.get("/users", headers=self.headers).json()
+        if users:
+            user_id = random.choice(users)["id"]
+            self.client.get(f"/users/{user_id}", headers=self.headers)
+    
+    @task(3)
+    def search_products(self):
+        """Search products."""
+        query = "".join(random.choices("abcdefghijklmnopqrstuvwxyz", k=5))
+        self.client.get(f"/products/search?q={query}")
+    
+    @task
+    def create_order(self):
+        """Create order."""
+        users = self.client.get("/users", headers=self.headers).json()
+        if users:
+            user_id = random.choice(users)["id"]
+            self.client.post("/orders", headers=self.headers, json={
+                "userId": user_id,
+                "items": [
+                    {"productId": 1, "quantity": 2},
+                    {"productId": 2, "quantity": 1}
+                ]
+            })
+
+@events.test_start.add_listener
+def on_test_start(environment, **kwargs):
+    """Called when test starts."""
+    print("Starting load test...")
+
+@events.test_stop.add_listener
+def on_test_stop(environment, **kwargs):
+    """Called when test stops."""
+    print("Load test completed.")
+    if isinstance(environment.runner, MasterRunner):
+        print(f"Total requests: {environment.runner.stats.total.num_requests}")
+        print(f"Failures: {environment.runner.stats.total.num_failures}")
+```
+
+#### Running Locust Tests
 
 ```bash
-# Run Locust
-locust -f locustfile.py --host=https://example.com
+# Run Locust web UI
+locust -f load-tests/basic.py
 
-# Run headless
-locust -f locustfile.py --headless --users 100 --spawn-rate 10
+# Run Locust headless
+locust -f load-tests/basic.py --headless -u 100 -r 10 -t 1m
+
+# Run with custom host
+locust -f load-tests/basic.py --host https://api.example.com
+
+# Run with environment variables
+API_URL=https://api.example.com locust -f load-tests/basic.py
 ```
+
+---
 
 ### JMeter
 
+#### Installation
+
+```bash
+# Download from https://jmeter.apache.org/download_jmeter.cgi
+# Or use Homebrew
+brew install jmeter
+
+# Or use Chocolatey
+choco install jmeter
+```
+
+#### Basic Test Plan
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<jmeterTestPlan version="1.2">
+<jmeterTestPlan version="1.2" properties="5.0">
   <hashTree>
-    <TestPlan guiclass="TestPlan">
-      <elementProp name="TestPlan.user_defined_variables">
-        <collectionProp name="BASE_URL">
-          <stringProp name="BASE_URL">https://api.example.com</stringProp>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan">
+      <stringProp name="TestPlan.comments">Basic Load Test</stringProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="BASE_URL" elementType="Argument">
+            <stringProp name="Argument.name">BASE_URL</stringProp>
+            <stringProp name="Argument.value">https://api.example.com</stringProp>
+          </elementProp>
         </collectionProp>
       </elementProp>
-      <ThreadGroup guiclass="ThreadGroup">
-        <stringProp name="ThreadGroup.num_threads">10</stringProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup">
+        <stringProp name="ThreadGroup.num_threads">100</stringProp>
         <stringProp name="ThreadGroup.ramp_time">10</stringProp>
-        <LoopController guiclass="LoopController">
-          <stringProp name="LoopController.loops">100</stringProp>
-        </LoopController>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui">
+        <stringProp name="ThreadGroup.duration">60</stringProp>
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy">
           <stringProp name="HTTPSampler.domain">${BASE_URL}</stringProp>
           <stringProp name="HTTPSampler.path">/users</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
         </HTTPSamplerProxy>
-      </ThreadGroup>
-    </TestPlan>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
   </hashTree>
 </jmeterTestPlan>
+```
+
+#### Running JMeter Tests
+
+```bash
+# Run JMeter GUI
+jmeter
+
+# Run JMeter in non-GUI mode
+jmeter -n -t load-tests/basic.jmx -l results.jtl
+
+# Run with output file
+jmeter -n -t load-tests/basic.jmx -l results.jtl -e -o report
+
+# Run with properties
+jmeter -n -t load-tests/basic.jmx -Jusers=100 -Jduration=60
 ```
 
 ---
 
 ## Test Scenarios
 
-### User Journey Scenario
+### Smoke Test
 
 ```javascript
-// k6
-import http from 'k6/http';
-import { check, sleep } from 'k6';
-
-export default function () {
-  // Login
-  const loginRes = http.post('https://api.example.com/auth/login', JSON.stringify({
-    email: 'user@example.com',
-    password: 'password',
-  }), {
-    headers: { 'Content-Type': 'application/json' },
-  });
-
-  check(loginRes, {
-    'login successful': (r) => r.status === 200,
-  });
-
-  const token = loginRes.json('token');
-
-  // Get users
-  const usersRes = http.get('https://api.example.com/users', {
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-
-  check(usersRes, {
-    'users fetched': (r) => r.status === 200,
-  });
-
-  sleep(1);
-}
-```
-
-### API Endpoint Scenario
-
-```javascript
-// k6
-import http from 'k6/http';
-import { check, group } from 'k6';
-
-export default function () {
-  group('Get Users', function () {
-    const res = http.get('https://api.example.com/users');
-    check(res, {
-      'status is 200': (r) => r.status === 200,
-      'has users': (r) => r.json('users.length') > 0,
-    });
-  });
-
-  group('Create User', function () {
-    const res = http.post('https://api.example.com/users', JSON.stringify({
-      name: 'Test User',
-      email: 'test@example.com',
-    }), {
-      headers: { 'Content-Type': 'application/json' },
-    });
-    check(res, {
-      'user created': (r) => r.status === 201,
-    });
-  });
-}
-```
-
-### Mixed Traffic Scenario
-
-```javascript
-// k6
-import http from 'k6/http';
-import { check, sleep, randomIntBetween } from 'k6';
-
+// k6 smoke test
 export const options = {
-  scenarios: {
-    read_requests: {
-      executor: 'constant-arrival-rate',
-      rate: 100,
-      timeUnit: '1s',
-      duration: '5m',
-      exec: 'readRequest',
-    },
-    write_requests: {
-      executor: 'constant-arrival-rate',
-      rate: 10,
-      timeUnit: '1s',
-      duration: '5m',
-      exec: 'writeRequest',
-    },
+  stages: [
+    { duration: '30s', target: 10 },
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)<1000'],
+    http_req_failed: ['rate<0.05'],
   },
 };
+```
 
-export function readRequest() {
-  const res = http.get('https://api.example.com/users');
-  check(res, { 'status is 200': (r) => r.status === 200 });
-}
+### Load Test
 
-export function writeRequest() {
-  const res = http.post('https://api.example.com/users', JSON.stringify({
-    name: `User ${randomIntBetween(1, 1000)}`,
-    email: `user${randomIntBetween(1, 1000)}@example.com`,
-  }), {
-    headers: { 'Content-Type': 'application/json' },
-  });
-  check(res, { 'status is 201': (r) => r.status === 201 });
-}
+```javascript
+// k6 load test
+export const options = {
+  stages: [
+    { duration: '2m', target: 50 },
+    { duration: '5m', target: 50 },
+    { duration: '2m', target: 100 },
+    { duration: '5m', target: 100 },
+    { duration: '2m', target: 0 },
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)<500'],
+    http_req_failed: ['rate<0.01'],
+  },
+};
+```
+
+### Stress Test
+
+```javascript
+// k6 stress test
+export const options = {
+  stages: [
+    { duration: '2m', target: 100 },
+    { duration: '5m', target: 100 },
+    { duration: '2m', target: 200 },
+    { duration: '5m', target: 200 },
+    { duration: '2m', target: 400 },
+    { duration: '5m', target: 400 },
+    { duration: '2m', target: 800 },
+    { duration: '5m', target: 800 },
+    { duration: '2m', target: 0 },
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)<1000'],
+    http_req_failed: ['rate<0.05'],
+  },
+};
+```
+
+### Spike Test
+
+```javascript
+// k6 spike test
+export const options = {
+  stages: [
+    { duration: '2m', target: 100 },
+    { duration: '5m', target: 100 },
+    { duration: '1m', target: 1000 }, // Spike
+    { duration: '5m', target: 1000 },
+    { duration: '1m', target: 100 },
+    { duration: '2m', target: 0 },
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)<2000'],
+    http_req_failed: ['rate<0.1'],
+  },
+};
+```
+
+### Endurance Test
+
+```javascript
+// k6 endurance test
+export const options = {
+  stages: [
+    { duration: '10m', target: 100 },
+    { duration: '4h', target: 100 },
+    { duration: '10m', target: 0 },
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)<500'],
+    http_req_failed: ['rate<0.01'],
+  },
+};
 ```
 
 ---
 
 ## Metrics to Track
 
-### Response Time Metrics
+### Key Metrics
+
+| Metric | Description | Target |
+|--------|-------------|--------|
+| **Response Time** | Time to complete request | < 500ms (p95) |
+| **Throughput** | Requests per second | > 100 RPS |
+| **Error Rate** | Percentage of failed requests | < 1% |
+| **Latency** | Network delay | < 100ms |
+| **CPU Usage** | Server CPU utilization | < 70% |
+| **Memory Usage** | Server memory utilization | < 80% |
+| **Database Connections** | Active database connections | < 80% of pool |
+
+### Custom Metrics (k6)
 
 ```javascript
-// k6
-import http from 'k6/http';
-import { check, Trend } from 'k6';
+import { Counter, Rate, Trend } from 'k6/metrics';
 
-const responseTime = new Trend('response_time', true);
+export const metrics = {
+  // Counter: Count occurrences
+  requests: new Counter('requests'),
+  
+  // Rate: Percentage of values
+  errors: new Rate('errors'),
+  
+  // Trend: Statistical distribution
+  responseTime: new Trend('response_time'),
+};
 
 export default function () {
   const res = http.get('https://api.example.com/users');
-  responseTime.add(res.timings.duration);
-
-  check(res, {
-    'p(95) < 500ms': (r) => r.timings.duration < 500,
-    'p(99) < 1000ms': (r) => r.timings.duration < 1000,
-  });
-}
-```
-
-### Error Rate Metrics
-
-```javascript
-// k6
-import http from 'k6/http';
-import { Rate } from 'k6';
-
-const errorRate = new Rate('errors');
-
-export default function () {
-  const res = http.get('https://api.example.com/users');
-  errorRate.add(res.status !== 200);
-
-  check(res, {
-    'status is 200': (r) => r.status === 200,
-  });
-}
-```
-
-### Throughput Metrics
-
-```javascript
-// k6
-import http from 'k6/http';
-import { Counter } from 'k6';
-
-const requestCount = new Counter('requests');
-
-export default function () {
-  const res = http.get('https://api.example.com/users');
-  requestCount.add(1);
+  
+  metrics.requests.add(1);
+  metrics.errors.add(res.status !== 200);
+  metrics.responseTime.add(res.timings.duration);
 }
 ```
 
@@ -395,12 +702,10 @@ export default function () {
 ### Linear Ramp-up
 
 ```javascript
-// k6
+// Linear ramp-up
 export const options = {
   stages: [
-    { duration: '5m', target: 100 },  // Ramp up to 100 users over 5 minutes
-    { duration: '10m', target: 100 }, // Stay at 100 users for 10 minutes
-    { duration: '5m', target: 0 },    // Ramp down to 0 over 5 minutes
+    { duration: '10m', target: 100 }, // 10 users per minute
   ],
 };
 ```
@@ -408,44 +713,42 @@ export const options = {
 ### Step Ramp-up
 
 ```javascript
-// k6
+// Step ramp-up
+export const options = {
+  stages: [
+    { duration: '5m', target: 25 },
+    { duration: '5m', target: 50 },
+    { duration: '5m', target: 75 },
+    { duration: '5m', target: 100 },
+  ],
+};
+```
+
+### Exponential Ramp-up
+
+```javascript
+// Exponential ramp-up
 export const options = {
   stages: [
     { duration: '2m', target: 10 },
     { duration: '2m', target: 20 },
-    { duration: '2m', target: 30 },
     { duration: '2m', target: 40 },
-    { duration: '2m', target: 50 },
-    { duration: '5m', target: 50 },
-    { duration: '5m', target: 0 },
+    { duration: '2m', target: 80 },
+    { duration: '2m', target: 160 },
   ],
 };
 ```
 
-### Spike Test
+### Spike Ramp-up
 
 ```javascript
-// k6
-export const options = {
-  stages: [
-    { duration: '1m', target: 10 },
-    { duration: '30s', target: 100 }, // Spike to 100 users
-    { duration: '1m', target: 10 },  // Back to 10 users
-    { duration: '2m', target: 0 },
-  ],
-};
-```
-
-### Stress Test
-
-```javascript
-// k6
+// Spike ramp-up
 export const options = {
   stages: [
     { duration: '5m', target: 100 },
-    { duration: '10m', target: 200 }, // Beyond normal capacity
-    { duration: '5m', target: 300 },
-    { duration: '5m', target: 0 },
+    { duration: '1m', target: 1000 }, // Spike
+    { duration: '5m', target: 1000 },
+    { duration: '1m', target: 100 },
   ],
 };
 ```
@@ -454,148 +757,98 @@ export const options = {
 
 ## Analyzing Results
 
-### K6 Results
+### k6 Results
 
 ```bash
-# Run K6 with output
-k6 run load-test.js --out json=results.json
+# Run with JSON output
+k6 run --out json=results.json load-tests/basic.js
 
 # Analyze results
-k6 run load-test.js --out influxdb=http://localhost:8086/k6
-```
-
-```javascript
-// Custom metrics
-import { Trend, Rate, Counter, Gauge } from 'k6';
-
-export const options = {
-  thresholds: {
-    http_req_duration: ['p(95)<500'],
-    http_req_failed: ['rate<0.01'],
-  },
-};
-
-const responseTime = new Trend('response_time', true);
-const errorRate = new Rate('errors', true);
-const requestCount = new Counter('requests', true);
-const activeUsers = new Gauge('active_users', true);
-
-export default function () {
-  activeUsers.add(__VUS);
-  const res = http.get('https://api.example.com/users');
-  responseTime.add(res.timings.duration);
-  errorRate.add(res.status !== 200);
-  requestCount.add(1);
-}
+# Check response time percentiles
+# Check error rates
+# Check throughput
 ```
 
 ### Artillery Results
 
-```yaml
-# config.yml
-config:
-  target: "https://api.example.com"
-  phases:
-    - duration: 60
-      arrivalRate: 10
-  plugins:
-    ensure: {}
-    metrics-by-endpoint:
-      use: true
-```
-
 ```bash
-# Run with report
-artillery run config.yml --output results.json
+# Run with output
+artillery run --output results.json load-tests/basic.yml
 
 # Generate HTML report
 artillery report results.json
+
+# Analyze results
+# Check p95, p99 response times
+# Check error rates
+# Check RPS
 ```
 
 ### Locust Results
 
-```python
-# locustfile.py
-from locust import events
-
-def on_request(request_type, name, response_time, response_length, exception, **kwargs):
-    events.request.fire(
-        request_type=request_type,
-        name=name,
-        response_time=response_time,
-        response_length=response_length,
-        exception=exception
-    )
-
-events.request += on_request
-```
-
 ```bash
-# Run with HTML report
-locust -f locustfile.py --host=https://example.com --html report.html
+# Run Locust with output
+locust -f load-tests/basic.py --headless -u 100 -r 10 -t 1m --csv results
+
+# Analyze results
+# Check response times
+# Check failure rates
+# Check RPS
 ```
 
 ---
 
 ## Bottleneck Identification
 
-### Database Bottleneck
+### Database Bottlenecks
 
 ```javascript
-// k6
-import http from 'k6/http';
-import { Trend } from 'k6';
-
-const dbQueryTime = new Trend('db_query_time', true);
-
+// Identify slow database queries
 export default function () {
-  const start = new Date();
+  const start = Date.now();
+  
   const res = http.get('https://api.example.com/users');
-  const duration = new Date() - start;
-
-  dbQueryTime.add(duration);
-
+  
+  const duration = Date.now() - start;
+  
   if (duration > 1000) {
-    console.log(`Slow query: ${duration}ms`);
+    console.log(`Slow request: ${duration}ms`);
   }
 }
 ```
 
-### API Bottleneck
+### API Bottlenecks
 
 ```javascript
-// k6
-import http from 'k6/http';
-import { check } from 'k6';
+// Identify slow API endpoints
+export default function () {
+  const endpoints = [
+    '/users',
+    '/products',
+    '/orders',
+  ];
+  
+  endpoints.forEach(endpoint => {
+    const res = http.get(`https://api.example.com${endpoint}`);
+    
+    if (res.timings.duration > 500) {
+      console.log(`Slow endpoint: ${endpoint} - ${res.timings.duration}ms`);
+    }
+  });
+}
+```
 
+### Network Bottlenecks
+
+```javascript
+// Identify network latency
 export default function () {
   const res = http.get('https://api.example.com/users');
-
-  check(res, {
-    'response time < 500ms': (r) => r.timings.duration < 500,
-    'response time < 1000ms': (r) => r.timings.duration < 1000,
-    'response time < 2000ms': (r) => r.timings.duration < 2000,
-  });
-
-  if (res.timings.duration > 2000) {
-    console.log(`Slow endpoint: ${res.url} - ${res.timings.duration}ms`);
-  }
-}
-```
-
-### Memory Bottleneck
-
-```javascript
-// k6
-import { Gauge } from 'k6';
-
-const memoryUsage = new Gauge('memory_usage', true);
-
-export default function () {
-  const res = http.get('https://api.example.com/metrics');
-  const metrics = res.json();
-
-  memoryUsage.add(metrics.memory.used);
+  
+  const latency = res.timings.waiting;
+  const processing = res.timings.duration - latency;
+  
+  console.log(`Latency: ${latency}ms, Processing: ${processing}ms`);
 }
 ```
 
@@ -606,34 +859,34 @@ export default function () {
 ### GitHub Actions
 
 ```yaml
+# .github/workflows/load-test.yml
 name: Load Tests
 
 on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0' # Weekly
 
 jobs:
   load-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install K6
+      - name: Install k6
         run: |
-          curl https://github.com/grafana/k6/releases/download/v0.47.0/k6-v0.47.0-linux-amd64.tar.gz -L | tar xvz
-          sudo mv k6 /usr/local/bin/
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
 
-      - name: Run Load Tests
-        run: k6 run load-test.js
+      - name: Run load tests
+        run: k6 run load-tests/basic.js
 
-      - name: Upload Results
+      - name: Upload results
         if: always()
         uses: actions/upload-artifact@v3
         with:
@@ -644,75 +897,84 @@ jobs:
 ### GitLab CI
 
 ```yaml
+# .gitlab-ci.yml
+stages:
+  - load-test
+
 load-test:
-  stage: test
+  stage: load-test
   image:
-    name: grafana/k6:latest
-    entrypoint: [""]
+    name: loadimpact/k6:latest
+    entrypoint: ['']
   script:
-    - k6 run load-test.js --out json=results.json
+    - k6 run load-tests/basic.js
   artifacts:
+    when: always
     paths:
       - results.json
+    expire_in: 1 week
+  only:
+    - main
+    - merge_requests
 ```
 
 ---
 
 ## Production Testing
 
-### Safe Production Testing
-
-```javascript
-// k6 - Production safe
-export const options = {
-  stages: [
-    { duration: '5m', target: 10 },   // Low load
-    { duration: '10m', target: 20 }, // Medium load
-    { duration: '5m', target: 0 },    // Ramp down
-  ],
-  thresholds: {
-    http_req_failed: ['rate<0.01'], // Strict error rate
-    http_req_duration: ['p(95)<1000'], // Strict response time
-  },
-};
-
-export default function () {
-  const res = http.get('https://api.example.com/health');
-  check(res, {
-    'status is 200': (r) => r.status === 200,
-  });
-}
-```
-
 ### Canary Testing
 
 ```javascript
-// k6 - Canary testing
+// Test canary deployment
 export const options = {
+  stages: [
+    { duration: '5m', target: 10 }, // Small load on canary
+  ],
   scenarios: {
-    production: {
-      executor: 'constant-arrival-rate',
-      rate: 5,
-      timeUnit: '1s',
-      duration: '10m',
-      exec: 'productionRequest',
-    },
     canary: {
-      executor: 'constant-arrival-rate',
-      rate: 5,
-      timeUnit: '1s',
-      duration: '10m',
-      exec: 'canaryRequest',
+      executor: 'constant-vus',
+      vus: 10,
+      duration: '5m',
+      exec: 'canary',
     },
   },
 };
 
-export function productionRequest() {
-  http.get('https://api.example.com/users');
+export function canary() {
+  const res = http.get('https://canary.example.com/api/users');
+  check(res, { 'status is 200': (r) => r.status === 200 });
+}
+```
+
+### Blue-Green Testing
+
+```javascript
+// Test blue-green deployment
+export const options = {
+  scenarios: {
+    blue: {
+      executor: 'constant-vus',
+      vus: 50,
+      duration: '5m',
+      exec: 'blue',
+    },
+    green: {
+      executor: 'constant-vus',
+      vus: 50,
+      duration: '5m',
+      exec: 'green',
+    },
+  },
+};
+
+export function blue() {
+  const res = http.get('https://blue.example.com/api/users');
+  check(res, { 'status is 200': (r) => r.status === 200 });
 }
 
-export function canaryRequest() {
-  http.get('https://canary-api.example.com/users');
+export function green() {
+  const res = http.get('https://green.example.com/api/users');
+  check(res, { 'status is 200': (r) => r.status === 200 });
 }
 ```
 
@@ -723,123 +985,111 @@ export function canaryRequest() {
 ### 1. Start Small
 
 ```javascript
-// Start with low load
+// Good: Start with small load
 export const options = {
   stages: [
-    { duration: '5m', target: 10 },
+    { duration: '30s', target: 10 },
+  ],
+};
+
+// Bad: Start with maximum load
+export const options = {
+  stages: [
+    { duration: '1m', target: 1000 },
   ],
 };
 ```
 
-### 2. Gradually Increase Load
+### 2. Use Realistic Scenarios
 
 ```javascript
-// Gradual ramp-up
-export const options = {
-  stages: [
-    { duration: '5m', target: 10 },
-    { duration: '5m', target: 20 },
-    { duration: '5m', target: 30 },
-  ],
-};
+// Good: Realistic user flow
+export default function () {
+  group('User Flow', () => {
+    const res = http.get('/users');
+    const userId = res.json()[0].id;
+    http.get(`/users/${userId}`);
+  });
+}
+
+// Bad: Unrelated requests
+export default function () {
+  http.get('/users');
+  http.get('/products');
+  http.get('/orders');
+}
 ```
 
 ### 3. Monitor System Resources
 
 ```javascript
-// Track CPU and memory
-const cpuUsage = new Trend('cpu_usage', true);
-const memoryUsage = new Trend('memory_usage', true);
-```
-
-### 4. Use Realistic Scenarios
-
-```javascript
-// Simulate real user behavior
+// Good: Monitor resources
 export default function () {
-  group('Login', () => {
-    // Login logic
-  });
+  const res = http.get('/users');
+  
+  // Log response time
+  console.log(`Response time: ${res.timings.duration}ms`);
+  
+  // Check for errors
+  if (res.status !== 200) {
+    console.log(`Error: ${res.status}`);
+  }
+}
 
-  group('Browse', () => {
-    // Browse logic
-  });
-
-  group('Checkout', () => {
-    // Checkout logic
-  });
+// Bad: No monitoring
+export default function () {
+  http.get('/users');
 }
 ```
 
-### 5. Test During Off-Peak Hours
-
-```bash
-# Schedule tests during off-peak hours
-# Use cron jobs or CI schedulers
-```
-
-### 6. Use Thresholds
+### 4. Use Thresholds
 
 ```javascript
-// Set performance thresholds
+// Good: Define thresholds
 export const options = {
   thresholds: {
     http_req_duration: ['p(95)<500'],
     http_req_failed: ['rate<0.01'],
   },
 };
+
+// Bad: No thresholds
+export const options = {
+  stages: [
+    { duration: '5m', target: 100 },
+  ],
+};
 ```
 
-### 7. Analyze Results
-
-```bash
-# Generate reports
-k6 run load-test.js --out json=results.json
-artillery run config.yml --output results.json
-locust -f locustfile.py --html report.html
-```
-
-### 8. Test Error Handling
+### 5. Test in Staging First
 
 ```javascript
-// Test error scenarios
+// Good: Test in staging
+const BASE_URL = __ENV.BASE_URL || 'https://staging.example.com';
+
 export default function () {
-  const res = http.get('https://api.example.com/users/999');
-  check(res, {
-    'handles 404': (r) => r.status === 404,
-  });
+  http.get(`${BASE_URL}/users`);
 }
-```
 
-### 9. Test Caching
-
-```javascript
-// Test cache effectiveness
+// Bad: Test in production directly
 export default function () {
-  const res1 = http.get('https://api.example.com/users');
-  const res2 = http.get('https://api.example.com/users');
-
-  check(res2, {
-    'cached response': (r) => r.timings.duration < res1.timings.duration,
-  });
+  http.get('https://production.example.com/users');
 }
-```
-
-### 10. Document Results
-
-```javascript
-// Document findings
-console.log('Test completed');
-console.log('Average response time: ${getAverageResponseTime()}');
-console.log('Error rate: ${getErrorRate()}');
-console.log('Bottlenecks: ${identifyBottlenecks()}');
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [K6 Documentation](https://k6.io/docs/)
-- [Artillery Documentation](https://artillery.io/docs/)
-- [Locust Documentation](https://docs.locust.io/)
-- [JMeter Documentation](https://jmeter.apache.org/usermanual/index.html)
+This skill covers comprehensive load testing patterns including:
+
+- **Load Testing Concepts**: Why load testing, types, key concepts
+- **Tools**: k6, Artillery, Locust, JMeter with installation and usage
+- **Test Scenarios**: Smoke, load, stress, spike, endurance tests
+- **Metrics to Track**: Response time, throughput, error rate, latency, CPU, memory
+- **Ramp-up Strategies**: Linear, step, exponential, spike ramp-up
+- **Analyzing Results**: k6, Artillery, Locust result analysis
+- **Bottleneck Identification**: Database, API, network bottlenecks
+- **CI/CD Integration**: GitHub Actions, GitLab CI configurations
+- **Production Testing**: Canary, blue-green testing
+- **Best Practices**: Start small, realistic scenarios, monitoring, thresholds, staging first

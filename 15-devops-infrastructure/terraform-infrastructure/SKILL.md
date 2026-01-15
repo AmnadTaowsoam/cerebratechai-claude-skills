@@ -1,6 +1,8 @@
 # Terraform Infrastructure
 
-A comprehensive guide to Infrastructure as Code with Terraform.
+## Overview
+
+Terraform is an Infrastructure as Code (IaC) tool that allows you to define and provision cloud infrastructure. This skill covers Terraform basics, providers, resources, and best practices.
 
 ## Table of Contents
 
@@ -20,48 +22,12 @@ A comprehensive guide to Infrastructure as Code with Terraform.
 
 ## Terraform Basics
 
-### What is Terraform?
-
-Terraform is an Infrastructure as Code (IaC) tool that allows you to define and provision infrastructure using a declarative configuration language.
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                   Terraform Workflow                      │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐      │
-│  │   Write    │──>│   Plan     │──>│   Apply    │      │
-│  │  (.tf files)│  │  (terraform │  │ (terraform │      │
-│  │             │  │   plan)    │  │   apply)   │      │
-│  └─────────────┘  └─────────────┘  └─────────────┘      │
-│                                                             │
-│  State File = Current infrastructure state                 │
-│  Provider = Plugin for specific cloud provider            │
-│  Resource = Infrastructure component                     │
-│  Module = Reusable collection of resources              │
-└─────────────────────────────────────────────────────────────┘
-```
-
 ### Basic Structure
-
-```
-my-terraform-project/
-├── main.tf              # Main configuration
-├── variables.tf         # Variable declarations
-├── outputs.tf          # Output definitions
-├── terraform.tfvars    # Variable values
-├── modules/            # Reusable modules
-│   ├── vpc/
-│   ├── ec2/
-│   └── rds/
-└── backend.tf          # State backend configuration
-```
-
-### Basic Example
 
 ```hcl
 # main.tf
 terraform {
+  required_version = ">= 1.0"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -74,14 +40,45 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_instance" "example" {
-  ami           = "ami-0c55b159cbfafe1f0"
-  instance_type = "t2.micro"
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
 
   tags = {
-    Name = "terraform-example"
+    Name = "main-vpc"
   }
 }
+
+output "vpc_id" {
+  value = aws_vpc.main.id
+}
+```
+
+### Terraform Commands
+
+```bash
+# Initialize Terraform
+terraform init
+
+# Format configuration
+terraform fmt
+
+# Validate configuration
+terraform validate
+
+# Plan changes
+terraform plan
+
+# Apply changes
+terraform apply
+
+# Destroy infrastructure
+terraform destroy
+
+# Show state
+terraform show
+
+# Import existing resources
+terraform import aws_vpc.main vpc-12345678
 ```
 
 ---
@@ -91,29 +88,91 @@ resource "aws_instance" "example" {
 ### AWS Provider
 
 ```hcl
-# Basic AWS configuration
-provider "aws" {
-  region = "us-east-1"
+# providers.tf
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
 }
 
-# AWS with credentials
-provider "aws" {
-  region     = "us-east-1"
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
-}
-
-# AWS with assume role
 provider "aws" {
   region = "us-east-1"
+
+  default_tags {
+    Environment = "production"
+    ManagedBy = "Terraform"
+  }
+
   assume_role {
     role_arn = "arn:aws:iam::123456789012:role/TerraformRole"
   }
 }
+```
 
-# Multiple AWS providers
+### Azure Provider
+
+```hcl
+# providers.tf
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+  subscription_id = var.subscription_id
+  tenant_id       = var.tenant_id
+  client_id       = var.client_id
+  client_secret   = var.client_secret
+}
+```
+
+### GCP Provider
+
+```hcl
+# providers.tf
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 4.0"
+    }
+  }
+}
+
+provider "google" {
+  project = var.project_id
+  region  = var.region
+  zone    = var.zone
+}
+```
+
+### Multiple Providers
+
+```hcl
+# providers.tf
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    aws.west = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+      configuration_aliases = [west]
+    }
+  }
+}
+
 provider "aws" {
-  alias  = "east"
   region = "us-east-1"
 }
 
@@ -123,159 +182,185 @@ provider "aws" {
 }
 ```
 
-### Azure Provider
-
-```hcl
-# Basic Azure configuration
-provider "azurerm" {
-  features {}
-}
-
-# Azure with service principal
-provider "azurerm" {
-  features {}
-  subscription_id = var.subscription_id
-  tenant_id       = var.tenant_id
-  client_id       = var.client_id
-  client_secret   = var.client_secret
-}
-
-# Azure with managed identity
-provider "azurerm" {
-  features {}
-  use_msi = true
-}
-```
-
-### GCP Provider
-
-```hcl
-# Basic GCP configuration
-provider "google" {
-  project = "my-project-id"
-  region  = "us-central1"
-}
-
-# GCP with credentials
-provider "google" {
-  project     = "my-project-id"
-  region      = "us-central1"
-  credentials = file("account.json")
-}
-
-# GCP with impersonation
-provider "google" {
-  project              = "my-project-id"
-  region               = "us-central1"
-  impersonate_service_account = "terraform@my-project-id.iam.gserviceaccount.com"
-}
-```
-
 ---
 
 ## Resource Definitions
 
-### EC2 Instance (AWS)
+### VPC Setup
 
 ```hcl
-resource "aws_instance" "web" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
-
-  tags = {
-    Name        = "WebServer"
-    Environment = var.environment
-  }
-
-  user_data = <<-EOF
-              #!/bin/bash
-              apt-get update
-              apt-get install -y nginx
-              EOF
-
-  root_block_device {
-    volume_type = "gp3"
-    volume_size = 20
-  }
-
-  vpc_security_group_ids = [aws_security_group.web.id]
-
-  depends_on = [aws_security_group.web]
-}
-```
-
-### VPC (AWS)
-
-```hcl
+# vpc.tf
 resource "aws_vpc" "main" {
-  cidr_block           = "10.0.0.0/16"
-  enable_dns_support   = true
+  cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
+  enable_dns_support   = true
 
   tags = {
-    Name        = "main-vpc"
+    Name        = "${var.project_name}-vpc"
     Environment = var.environment
   }
 }
 
 resource "aws_subnet" "public" {
-  count             = 2
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
-  availability_zone = data.aws_availability_zones.available.names[count.index]
+  count = length(var.availability_zones)
+
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
+  availability_zone       = var.availability_zones[count.index]
+  map_public_ip_on_launch = true
 
   tags = {
-    Name = "public-subnet-${count.index}"
+    Name = "${var.project_name}-public-subnet-${count.index}"
   }
-
-  map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "private" {
-  count             = 2
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index + 2)
-  availability_zone = data.aws_availability_zones.available.names[count.index]
+  count = length(var.availability_zones)
+
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index + 3)
+  availability_zone       = var.availability_zones[count.index]
 
   tags = {
-    Name = "private-subnet-${count.index}"
+    Name = "${var.project_name}-private-subnet-${count.index}"
+  }
+}
+
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "${var.project_name}-igw"
+  }
+}
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main.id
+  }
+
+  tags = {
+    Name = "${var.project_name}-public-rt"
+  }
+}
+
+resource "aws_route_table_association" "public" {
+  count = length(aws_subnet.public)
+
+  subnet_id      = aws_subnet.public[count.index].id
+  route_table_id = aws_route_table.public.id
+}
+```
+
+### ECS/EKS Cluster
+
+```hcl
+# ecs.tf
+resource "aws_ecs_cluster" "main" {
+  name = "${var.project_name}-cluster"
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
+
+  tags = {
+    Name        = "${var.project_name}-cluster"
+    Environment = var.environment
+  }
+}
+
+resource "aws_ecs_task_definition" "app" {
+  family                   = "${var.project_name}-task"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = var.task_cpu
+  memory                   = var.task_memory
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn           = aws_iam_role.ecs_task.arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "app"
+      image     = var.container_image
+      cpu       = var.task_cpu
+      memory    = var.task_memory
+      essential = true
+
+      portMappings = [
+        {
+          containerPort = var.container_port
+          protocol      = "tcp"
+        }
+      ]
+
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = "/ecs/${var.project_name}"
+          "awslogs-region"        = var.region
+          "awslogs-stream-prefix"   = "ecs"
+          "awslogs-create-group"   = "true"
+        }
+      }
+
+      environment = [
+        {
+          name  = "DATABASE_URL"
+          value = var.database_url
+        },
+        {
+          name  = "REDIS_URL"
+          value = var.redis_url
+        }
+      ]
+    }
+  ])
+}
+
+resource "aws_ecs_service" "app" {
+  name            = "${var.project_name}-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.app.arn
+  desired_count   = var.service_desired_count
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = aws_subnet.private[*].id
+    security_groups  = [aws_security_group.app.id]
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.app.arn
+    container_name   = "app"
+    container_port   = var.container_port
+  }
+
+  tags = {
+    Name        = "${var.project_name}-service"
+    Environment = var.environment
   }
 }
 ```
 
-### RDS Database (AWS)
+### RDS Database
 
 ```hcl
-resource "aws_db_instance" "main" {
-  allocated_storage    = 20
-  storage_type        = "gp2"
-  engine              = "postgres"
-  engine_version      = "15.4"
-  instance_class     = "db.t3.micro"
-  db_name            = "mydb"
-  username           = "admin"
-  password           = var.db_password
-  parameter_group_name = "default.postgres15"
-
-  vpc_security_group_ids = [aws_security_group.db.id]
-  db_subnet_group_name   = aws_db_subnet_group.main.name
-
-  skip_final_snapshot = false
-  final_snapshot_identifier = "mydb-final-snapshot"
+# rds.tf
+resource "aws_db_subnet_group" "main" {
+  name       = "${var.project_name}-db-subnet-group"
+  subnet_ids = aws_subnet.private[*].id
 
   tags = {
-    Name = "mydb"
+    Name = "${var.project_name}-db-subnet-group"
   }
 }
 
-resource "aws_db_subnet_group" "main" {
-  name       = "mydb-subnet-group"
-  subnet_ids = aws_subnet.private[*].id
-}
-
 resource "aws_security_group" "db" {
-  name        = "db-security-group"
-  description = "Allow database access"
+  name_prefix = "${var.project_name}-db-"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -291,82 +376,38 @@ resource "aws_security_group" "db" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-```
 
-### Kubernetes Deployment
-
-```hcl
-provider "kubernetes" {
-  config_path = "~/.kube/config"
-}
-
-resource "kubernetes_deployment" "nginx" {
-  metadata {
-    name = "nginx-deployment"
-    labels = {
-      app = "nginx"
-    }
-  }
-
-  spec {
-    replicas = 3
-
-    selector {
-      match_labels = {
-        app = "nginx"
-      }
-    }
-
-    template {
-      metadata {
-        labels = {
-          app = "nginx"
-        }
-      }
-
-      spec {
-        container {
-          name  = "nginx"
-          image = "nginx:1.21"
-
-          port {
-            container_port = 80
-          }
-
-          resources {
-            limits = {
-              cpu    = "0.5"
-              memory = "512Mi"
-            }
-            requests = {
-              cpu    = "250m"
-              memory = "256Mi"
-            }
-          }
-        }
-      }
-    }
+  tags = {
+    Name = "${var.project_name}-db-sg"
   }
 }
 
-resource "kubernetes_service" "nginx" {
-  metadata {
-    name = "nginx-service"
-  }
+resource "aws_db_instance" "main" {
+  identifier = "${var.project_name}-db"
+  engine     = "postgres"
+  engine_version = "15.4"
+  instance_class = var.db_instance_class
+  allocated_storage = var.db_allocated_storage
+  storage_type      = "gp2"
+  storage_encrypted = true
 
-  spec {
-    selector = {
-      app = "nginx"
-    }
+  db_name  = var.db_name
+  username = var.db_username
+  password = var.db_password
 
-    port {
-      protocol    = "TCP"
-      port        = 80
-      target_port = 80
-    }
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+  vpc_security_group_ids = [aws_security_group.db.id]
 
-    type = "LoadBalancer"
+  backup_retention_period = var.db_backup_retention_period
+  backup_window          = "03:00-04:00"
+
+  skip_final_snapshot  = var.db_skip_final_snapshot
+
+  performance_insights_enabled = true
+
+  tags = {
+    Name        = "${var.project_name}-db"
+    Environment = var.environment
   }
 }
 ```
@@ -375,298 +416,82 @@ resource "kubernetes_service" "nginx" {
 
 ## Variables and Outputs
 
-### Variable Declarations
+### Variables
 
 ```hcl
 # variables.tf
-variable "region" {
-  description = "AWS region"
+variable "project_name" {
+  description = "Project name"
   type        = string
-  default     = "us-east-1"
+  default     = "myapp"
 }
 
 variable "environment" {
   description = "Environment name"
   type        = string
   default     = "production"
+
+  validation {
+    condition     = contains(["development", "staging", "production"], var.environment)
+    error_message = "Environment must be development, staging, or production."
+  }
 }
 
-variable "instance_type" {
-  description = "EC2 instance type"
+variable "vpc_cidr" {
+  description = "CIDR block for VPC"
   type        = string
-  default     = "t3.micro"
-}
-
-variable "instance_count" {
-  description = "Number of instances"
-  type        = number
-  default     = 1
-}
-
-variable "enable_monitoring" {
-  description = "Enable monitoring"
-  type        = bool
-  default     = true
-}
-
-variable "tags" {
-  description = "Resource tags"
-  type        = map(string)
-  default     = {}
+  default     = "10.0.0.0/16"
 }
 
 variable "availability_zones" {
   description = "List of availability zones"
   type        = list(string)
-  default     = ["us-east-1a", "us-east-1b"]
+  default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
-variable "instance_config" {
-  description = "Instance configuration"
-  type = object({
-    type     = string
-    size     = string
-    monitoring = bool
-  })
-  default = {
-    type      = "t3"
-    size      = "micro"
-    monitoring = true
-  }
-}
-```
-
-### Variable Usage
-
-```hcl
-# Using variables
-resource "aws_instance" "web" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = var.instance_type
-
-  tags = merge(
-    {
-      Name        = "${var.environment}-web"
-      Environment = var.environment
-    },
-    var.tags
-  )
-
-  dynamic "tag" {
-    for_each = var.tags
-    content {
-      key                 = tag.key
-      value               = tag.value
-      propagate_at_launch = true
-    }
-  }
-}
-```
-
-### Variable Files
-
-```hcl
-# terraform.tfvars
-region      = "us-east-1"
-environment  = "production"
-instance_type = "t3.micro"
-instance_count = 3
-
-tags = {
-  Owner       = "DevOps"
-  CostCenter  = "Engineering"
-  Project     = "WebApp"
+variable "container_image" {
+  description = "Docker image for the application"
+  type        = string
 }
 
-instance_config = {
-  type      = "t3"
-  size      = "micro"
-  monitoring = true
-}
-```
-
-### Output Definitions
-
-```hcl
-# outputs.tf
-output "instance_public_ip" {
-  description = "Public IP of the instance"
-  value       = aws_instance.web.public_ip
+variable "container_port" {
+  description = "Container port"
+  type        = number
+  default     = 3000
 }
 
-output "instance_private_ip" {
-  description = "Private IP of the instance"
-  value       = aws_instance.web.private_ip
+variable "task_cpu" {
+  description = "Task CPU units"
+  type        = number
+  default     = 256
 }
 
-output "instance_id" {
-  description = "ID of the instance"
-  value       = aws_instance.web.id
+variable "task_memory" {
+  description = "Task memory in MB"
+  type        = number
+  default     = 512
 }
 
-output "db_endpoint" {
-  description = "Database endpoint"
-  value       = aws_db_instance.main.endpoint
+variable "database_url" {
+  description = "Database connection URL"
+  type        = string
   sensitive   = true
 }
 
-output "vpc_id" {
-  description = "VPC ID"
-  value       = aws_vpc.main.id
-}
-
-output "subnet_ids" {
-  description = "List of subnet IDs"
-  value       = aws_subnet.public[*].id
-}
-```
-
----
-
-## Modules
-
-### Module Structure
-
-```
-modules/
-└── vpc/
-    ├── main.tf
-    ├── variables.tf
-    ├── outputs.tf
-    └── README.md
-```
-
-### Module Definition
-
-```hcl
-# modules/vpc/main.tf
-resource "aws_vpc" "this" {
-  cidr_block           = var.cidr_block
-  enable_dns_support   = var.enable_dns_support
-  enable_dns_hostnames = var.enable_dns_hostnames
-
-  tags = merge(
-    {
-      Name = var.name
-    },
-    var.tags
-  )
-}
-
-resource "aws_subnet" "public" {
-  count                   = length(var.public_subnet_cidrs)
-  vpc_id                  = aws_vpc.this.id
-  cidr_block              = var.public_subnet_cidrs[count.index]
-  availability_zone       = var.availability_zones[count.index]
-  map_public_ip_on_launch = true
-
-  tags = merge(
-    {
-      Name = "${var.name}-public-${count.index}"
-    },
-    var.tags
-  )
-}
-
-resource "aws_subnet" "private" {
-  count             = length(var.private_subnet_cidrs)
-  vpc_id            = aws_vpc.this.id
-  cidr_block        = var.private_subnet_cidrs[count.index]
-  availability_zone = var.availability_zones[count.index]
-
-  tags = merge(
-    {
-      Name = "${var.name}-private-${count.index}"
-    },
-    var.tags
-  )
-}
-
-resource "aws_internet_gateway" "this" {
-  vpc_id = aws_vpc.this.id
-
-  tags = merge(
-    {
-      Name = "${var.name}-igw"
-    },
-    var.tags
-  )
-}
-
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.this.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.this.id
-  }
-
-  tags = merge(
-    {
-      Name = "${var.name}-public-rt"
-    },
-    var.tags
-  )
-}
-
-resource "aws_route_table_association" "public" {
-  count          = length(aws_subnet.public)
-  subnet_id      = aws_subnet.public[count.index].id
-  route_table_id = aws_route_table.public.id
-}
-```
-
-```hcl
-# modules/vpc/variables.tf
-variable "name" {
-  description = "Name of the VPC"
+variable "redis_url" {
+  description = "Redis connection URL"
   type        = string
-}
-
-variable "cidr_block" {
-  description = "CIDR block for the VPC"
-  type        = string
-}
-
-variable "public_subnet_cidrs" {
-  description = "CIDR blocks for public subnets"
-  type        = list(string)
-}
-
-variable "private_subnet_cidrs" {
-  description = "CIDR blocks for private subnets"
-  type        = list(string)
-}
-
-variable "availability_zones" {
-  description = "List of availability zones"
-  type        = list(string)
-}
-
-variable "enable_dns_support" {
-  description = "Enable DNS support"
-  type        = bool
-  default     = true
-}
-
-variable "enable_dns_hostnames" {
-  description = "Enable DNS hostnames"
-  type        = bool
-  default     = true
-}
-
-variable "tags" {
-  description = "Tags to apply to resources"
-  type        = map(string)
-  default     = {}
+  sensitive   = true
 }
 ```
 
+### Outputs
+
 ```hcl
-# modules/vpc/outputs.tf
+# outputs.tf
 output "vpc_id" {
   description = "ID of the VPC"
-  value       = aws_vpc.this.id
+  value       = aws_vpc.main.id
 }
 
 output "public_subnet_ids" {
@@ -679,40 +504,137 @@ output "private_subnet_ids" {
   value       = aws_subnet.private[*].id
 }
 
-output "internet_gateway_id" {
-  description = "ID of the internet gateway"
-  value       = aws_internet_gateway.this.id
+output "ecs_cluster_id" {
+  description = "ID of the ECS cluster"
+  value       = aws_ecs_cluster.main.id
+}
+
+output "ecs_service_name" {
+  description = "Name of the ECS service"
+  value       = aws_ecs_service.app.name
+}
+
+output "rds_instance_endpoint" {
+  description = "RDS instance endpoint"
+  value       = aws_db_instance.main.endpoint
+  sensitive   = true
 }
 ```
 
-### Using Modules
+---
+
+## Modules
+
+### Module Structure
+
+```
+modules/
+├── vpc/
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
+├── ecs/
+│   ├── main.tf
+│   ├── variables.tf
+│   └── outputs.tf
+└── rds/
+    ├── main.tf
+    ├── variables.tf
+    └── outputs.tf
+```
+
+### VPC Module
+
+```hcl
+# modules/vpc/main.tf
+resource "aws_vpc" "main" {
+  cidr_block = var.cidr_block
+
+  tags = {
+    Name = var.name
+  }
+}
+
+resource "aws_subnet" "public" {
+  count = length(var.availability_zones)
+
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
+  availability_zone       = var.availability_zones[count.index]
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.name}-public-subnet-${count.index}"
+  }
+}
+
+resource "aws_subnet" "private" {
+  count = length(var.availability_zones)
+
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index + 3)
+  availability_zone       = var.availability_zones[count.index]
+
+  tags = {
+    Name = "${var.name}-private-subnet-${count.index}"
+  }
+}
+```
+
+```hcl
+# modules/vpc/variables.tf
+variable "name" {
+  description = "Name of the VPC"
+  type        = string
+}
+
+variable "cidr_block" {
+  description = "CIDR block for VPC"
+  type        = string
+}
+
+variable "availability_zones" {
+  description = "List of availability zones"
+  type        = list(string)
+}
+```
+
+```hcl
+# modules/vpc/outputs.tf
+output "vpc_id" {
+  description = "ID of the VPC"
+  value       = aws_vpc.main.id
+}
+
+output "public_subnet_ids" {
+  description = "IDs of public subnets"
+  value       = aws_subnet.public[*].id
+}
+
+output "private_subnet_ids" {
+  description = "IDs of private subnets"
+  value       = aws_subnet.private[*].id
+}
+```
+
+### Using Module
 
 ```hcl
 # main.tf
 module "vpc" {
   source = "./modules/vpc"
 
-  name                = "main-vpc"
-  cidr_block          = "10.0.0.0/16"
-  public_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]
-  private_subnet_cidrs = ["10.0.10.0/24", "10.0.11.0/24"]
-  availability_zones  = ["us-east-1a", "us-east-1b"]
-
-  tags = {
-    Environment = "production"
-    Owner       = "DevOps"
-  }
+  name               = "myapp"
+  cidr_block        = var.vpc_cidr
+  availability_zones = var.availability_zones
 }
 
-# Use module outputs
-resource "aws_instance" "web" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
-  subnet_id     = module.vpc.public_subnet_ids[0]
+module "ecs" {
+  source = "./modules/ecs"
 
-  tags = {
-    Name = "web-server"
-  }
+  vpc_id           = module.vpc.vpc_id
+  subnet_ids       = module.vpc.private_subnet_ids
+  container_image  = var.container_image
 }
 ```
 
@@ -723,16 +645,18 @@ resource "aws_instance" "web" {
 ### Local State
 
 ```hcl
-# Default: terraform.tfstate in current directory
+# terraform.tf
 terraform {
-  # No backend block = local state
+  backend "local" {
+    path = "terraform.tfstate"
+  }
 }
 ```
 
-### Remote State (S3)
+### S3 Backend
 
 ```hcl
-# backend.tf
+# terraform.tf
 terraform {
   backend "s3" {
     bucket         = "my-terraform-state"
@@ -744,91 +668,53 @@ terraform {
 }
 ```
 
-### Remote State (Terraform Cloud)
+### Azure Storage Backend
 
 ```hcl
+# terraform.tf
 terraform {
-  cloud {
-    organization = "my-org"
-    workspaces {
-      name = "my-workspace"
-    }
+  backend "azurerm" {
+    resource_group_name  = "terraform-state-rg"
+    storage_account_name = "terraformstate12345"
+    container_name       = "tfstate"
+    key                  = "prod.terraform.tfstate"
   }
 }
 ```
 
-### State Commands
+### GCS Backend
 
-```bash
-# Initialize backend
-terraform init
-
-# Show state
-terraform state list
-
-# Show specific resource
-terraform state show aws_instance.web
-
-# Move resource in state
-terraform state mv aws_instance.web aws_instance.web_new
-
-# Remove resource from state
-terraform state rm aws_instance.web
-
-# Import existing resource
-terraform import aws_instance.web i-1234567890abcdef0
-
-# Refresh state
-terraform refresh
-
-# Plan with state
-terraform plan -refresh=false
+```hcl
+# terraform.tf
+terraform {
+  backend "gcs" {
+    bucket  = "my-terraform-state"
+    prefix  = "prod/terraform"
+  }
+}
 ```
 
 ---
 
 ## Remote State
 
-### S3 Backend with DynamoDB Locking
+### Configure Remote State
 
 ```hcl
+# terraform.tf
 terraform {
   backend "s3" {
-    bucket         = "my-terraform-state"
-    key            = "prod/terraform.tfstate"
-    region         = "us-east-1"
-    encrypt        = true
-    dynamodb_table = "terraform-locks"
-    acl            = "bucket-owner-full-control"
-  }
-}
-
-# Create DynamoDB table for locking
-resource "aws_dynamodb_table" "terraform_locks" {
-  name         = "terraform-locks"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
-
-  attribute {
-    name = "LockID"
-    type = "S"
+    bucket = "my-terraform-state"
+    key    = "network/terraform.tfstate"
+    region = "us-east-1"
   }
 }
 ```
 
-### S3 Backend with Versioning
-
-```bash
-# Enable versioning on S3 bucket
-aws s3api put-bucket-versioning \
-  --bucket my-terraform-state \
-  --versioning-configuration Status=Enabled
-```
-
-### Accessing Remote State Data
+### Reference Remote State
 
 ```hcl
-# Access state from another workspace
+# main.tf
 data "terraform_remote_state" "network" {
   backend = "s3"
   config = {
@@ -838,11 +724,30 @@ data "terraform_remote_state" "network" {
   }
 }
 
-# Use remote state data
-resource "aws_instance" "web" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
-  subnet_id     = data.terraform_remote_state.network.outputs.public_subnet_ids[0]
+resource "aws_subnet" "app" {
+  vpc_id     = data.terraform_remote_state.network.outputs.vpc_id
+  cidr_block = "10.0.1.0/24"
+}
+```
+
+### Terraform Cloud
+
+```hcl
+# terraform.tf
+terraform {
+  cloud {
+    organization = "my-org"
+    workspaces {
+      name = "prod"
+    }
+  }
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
 }
 ```
 
@@ -850,46 +755,42 @@ resource "aws_instance" "web" {
 
 ## Workspaces
 
-### Workspace Commands
+### Workspaces Configuration
+
+```hcl
+# terraform.tf
+terraform {
+  backend "s3" {
+    bucket = "my-terraform-state"
+    key    = "workspaces/${terraform.workspace}/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+```
+
+### Use Workspace Variables
+
+```hcl
+# variables.tf
+variable "environment" {
+  default = terraform.workspace
+}
+```
+
+### Multiple Workspaces
 
 ```bash
+# Create workspace
+terraform workspace new dev
+
 # List workspaces
 terraform workspace list
 
+# Select workspace
+terraform workspace select dev
+
 # Show current workspace
 terraform workspace show
-
-# Create new workspace
-terraform workspace new dev
-
-# Switch workspace
-terraform workspace select prod
-
-# Delete workspace
-terraform workspace delete dev
-```
-
-### Using Workspaces
-
-```hcl
-# Use workspace name in configuration
-resource "aws_instance" "web" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = var.instance_type
-
-  tags = {
-    Name        = "${terraform.workspace}-web"
-    Environment = terraform.workspace
-  }
-}
-
-# Conditional resources based on workspace
-resource "aws_instance" "dev_instance" {
-  count = terraform.workspace == "dev" ? 1 : 0
-
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
-}
 ```
 
 ---
@@ -899,49 +800,24 @@ resource "aws_instance" "dev_instance" {
 ### VPC Setup
 
 ```hcl
-# Complete VPC with public and private subnets
+# vpc.tf
 resource "aws_vpc" "main" {
-  cidr_block           = "10.0.0.0/16"
-  enable_dns_support   = true
-  enable_dns_hostnames = true
+  cidr_block = var.vpc_cidr
 
   tags = {
-    Name        = "main-vpc"
-    Environment = var.environment
+    Name = "${var.project_name}-vpc"
   }
 }
 
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
-
-  tags = {
-    Name = "main-igw"
-  }
 }
 
-resource "aws_subnet" "public" {
-  count                   = 2
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
-  availability_zone       = data.aws_availability_zones.available.names[count.index]
-  map_public_ip_on_launch = true
+resource "aws_nat_gateway" "main" {
+  allocation_id = aws_eip.main.id
+  subnet_id     = aws_subnet.public[0].id
 
-  tags = {
-    Name = "public-subnet-${count.index}"
-    Type = "public"
-  }
-}
-
-resource "aws_subnet" "private" {
-  count             = 2
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index + 2)
-  availability_zone = data.aws_availability_zones.available.names[count.index]
-
-  tags = {
-    Name = "private-subnet-${count.index}"
-    Type = "private"
-  }
+  depends_on = [aws_internet_gateway.main]
 }
 
 resource "aws_route_table" "public" {
@@ -951,129 +827,14 @@ resource "aws_route_table" "public" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.main.id
   }
-
-  tags = {
-    Name = "public-rt"
-  }
-}
-
-resource "aws_route_table_association" "public" {
-  count          = length(aws_subnet.public)
-  subnet_id      = aws_subnet.public[count.index].id
-  route_table_id = aws_route_table.public.id
-}
-
-resource "aws_eip" "nat" {
-  count  = 2
-  domain = "vpc"
-
-  tags = {
-    Name = "nat-eip-${count.index}"
-  }
-
-  depends_on = [aws_internet_gateway.main]
-}
-
-resource "aws_nat_gateway" "main" {
-  count         = 2
-  allocation_id = aws_eip.nat[count.index].id
-  subnet_id     = aws_subnet.public[count.index].id
-
-  tags = {
-    Name = "nat-gateway-${count.index}"
-  }
-
-  depends_on = [aws_internet_gateway.main]
 }
 
 resource "aws_route_table" "private" {
-  count  = 2
-  vpc_id  = aws_vpc.main.id
+  vpc_id = aws_vpc.main.id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.main[count.index].id
-  }
-
-  tags = {
-    Name = "private-rt-${count.index}"
-  }
-}
-
-resource "aws_route_table_association" "private" {
-  count          = length(aws_subnet.private)
-  subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private[count.index].id
-}
-```
-
-### ECS Cluster
-
-```hcl
-resource "aws_ecs_cluster" "main" {
-  name = "${var.environment}-cluster"
-
-  setting {
-    name  = "containerInsights"
-    value = "enabled"
-  }
-}
-
-resource "aws_ecs_task_definition" "app" {
-  family                   = "app"
-  network_mode             = "awsvpc"
-  requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"
-  memory                   = "512"
-
-  container_definitions = jsonencode([
-    {
-      name      = "app"
-      image     = "${var.ecr_repository_url}:${var.image_tag}"
-      cpu       = 256
-      memory    = 512
-      essential = true
-      portMappings = [
-        {
-          containerPort = 3000
-          protocol      = "tcp"
-        }
-      ]
-      environment = [
-        {
-          name  = "NODE_ENV"
-          value = var.environment
-        }
-      ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.app.name
-          "awslogs-region"        = var.region
-          "awslogs-stream-prefix" = "ecs"
-        }
-      }
-    }
-  ])
-}
-
-resource "aws_ecs_service" "app" {
-  name            = "app-service"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.app.arn
-  desired_count   = var.desired_count
-  launch_type    = "FARGATE"
-
-  network_configuration {
-    subnets          = var.private_subnet_ids
-    security_groups  = [aws_security_group.app.id]
-    assign_public_ip = false
-  }
-
-  load_balancer {
-    target_group_arn = aws_lb_target_group.app.arn
-    container_name   = "app"
-    container_port   = 3000
+    nat_gateway_id = aws_nat_gateway.main.id
   }
 }
 ```
@@ -1081,39 +842,71 @@ resource "aws_ecs_service" "app" {
 ### EKS Cluster
 
 ```hcl
+# eks.tf
 resource "aws_eks_cluster" "main" {
-  name     = "${var.environment}-cluster"
-  role_arn = aws_iam_role.eks_cluster.arn
-  version  = "1.27"
+  name     = "${var.project_name}-cluster"
+  role_arn = aws_iam_role.cluster.arn
+  version = var.kubernetes_version
 
   vpc_config {
-    subnet_ids = var.subnet_ids
-    endpoint_private_access = true
-    endpoint_public_access  = true
+    subnet_ids = concat(aws_subnet.public[*].id, aws_subnet.private[*].id)
   }
 
-  depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
+  enabled_cluster_log_types = ["api", "audit"]
+
+  tags = {
+    Name = "${var.project_name}-cluster"
+  }
 }
 
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
-  node_group_name = "main-node-group"
-  node_role_arn   = aws_iam_role.eks_nodes.arn
-  subnet_ids      = var.subnet_ids
+  node_group_name = "${var.project_name}-node-group"
+  node_role_arn   = aws_iam_role.node.arn
+  subnet_ids      = aws_subnet.private[*].id
 
   scaling_config {
-    desired_size = var.desired_size
-    max_size     = var.max_size
-    min_size     = var.min_size
+    desired_size = var.node_desired_size
+    max_size     = var.node_max_size
+    min_size     = var.node_min_size
   }
 
-  instance_types = var.instance_types
+  instance_types = [var.node_instance_type]
 
   labels = {
-    environment = var.environment
+    Environment = var.environment
   }
+}
+```
 
-  depends_on = [aws_iam_role_policy_attachment.eks_nodes_policy]
+### RDS Database
+
+```hcl
+# rds.tf
+resource "aws_db_instance" "main" {
+  identifier = "${var.project_name}-db"
+  engine     = "postgres"
+  engine_version = "15.4"
+  instance_class = var.db_instance_class
+  allocated_storage = var.db_allocated_storage
+  storage_encrypted = true
+
+  db_name  = var.db_name
+  username = var.db_username
+  password = var.db_password
+
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+  vpc_security_group_ids = [aws_security_group.db.id]
+
+  backup_retention_period = var.db_backup_retention_period
+  backup_window          = "03:00-04:00"
+  multi_az                = true
+
+  performance_insights_enabled = true
+
+  tags = {
+    Name = "${var.project_name}-db"
+  }
 }
 ```
 
@@ -1124,144 +917,125 @@ resource "aws_eks_node_group" "main" {
 ### 1. Use Modules
 
 ```hcl
+# Good: Use modules
 module "vpc" {
   source = "./modules/vpc"
-  # ...
+  name   = "myapp"
 }
+
+# Bad: Duplicate code
+resource "aws_vpc" "main" { ... }
+resource "aws_subnet" "public" { ... }
 ```
 
-### 2. Use Remote State
+### 2. Use Variables
 
 ```hcl
-terraform {
-  backend "s3" {
-    bucket         = "my-terraform-state"
-    key            = "prod/terraform.tfstate"
-    region         = "us-east-1"
-    encrypt        = true
-    dynamodb_table = "terraform-locks"
-  }
+# Good: Use variables
+variable "project_name" {
+  type = string
 }
-```
 
-### 3. Use Variables
-
-```hcl
-variable "region" {
-  description = "AWS region"
-  type        = string
-  default     = "us-east-1"
-}
-```
-
-### 4. Use Outputs
-
-```hcl
-output "vpc_id" {
-  description = "VPC ID"
-  value       = aws_vpc.main.id
-}
-```
-
-### 5. Use Tags
-
-```hcl
-resource "aws_instance" "web" {
+# Bad: Hardcode values
+resource "aws_vpc" "main" {
   tags = {
-    Name        = "web-server"
-    Environment = var.environment
-    Owner       = "DevOps"
+    Name = "myapp-vpc"
   }
 }
 ```
 
-### 6. Use Locking
+### 3. Use Outputs
 
 ```hcl
+# Good: Use outputs
+output "vpc_id" {
+  value = aws_vpc.main.id
+}
+
+# Bad: Hardcode references
+resource "aws_subnet" "app" {
+  vpc_id = "vpc-12345678"
+}
+```
+
+### 4. Use Remote State
+
+```hcl
+# Good: Use remote state
+data "terraform_remote_state" "network" {
+  backend = "s3"
+  config = {
+    bucket = "my-terraform-state"
+    key    = "network/terraform.tfstate"
+  }
+}
+
+# Bad: Duplicate resources
+resource "aws_vpc" "main" { ... }
+```
+
+### 5. Use Workspaces
+
+```hcl
+# Good: Use workspaces
 terraform {
   backend "s3" {
-    dynamodb_table = "terraform-locks"
+    key = "workspaces/${terraform.workspace}/terraform.tfstate"
   }
 }
-```
 
-### 7. Use Workspaces
-
-```bash
-terraform workspace select prod
-```
-
-### 8. Use Validation
-
-```hcl
-variable "instance_type" {
-  type        = string
-  description = "EC2 instance type"
-
-  validation {
-    condition     = can(regex("^t[23]\\.(nano|micro|small|medium|large|xlarge|2xlarge)$", var.instance_type))
-    error_message = "The instance_type must be a valid t2 or t3 instance type."
-  }
-}
-```
-
-### 9. Use Version Constraints
-
-```hcl
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-```
-
-### 10. Use `.gitignore`
-
-```gitignore
-# .gitignore
-*.tfstate
-*.tfstate.*
-.terraform/
-.terraform.lock.hcl
-crash.log
-crash.*.log
-override.tf
-*_override.tf
-.terraformrc
-terraform.rc
+# Bad: Separate state files
 ```
 
 ---
 
 ## Security
 
-### Sensitive Variables
+### 1. Encrypt State
 
 ```hcl
-variable "db_password" {
+terraform {
+  backend "s3" {
+    bucket  = "my-terraform-state"
+    key     = "terraform.tfstate"
+    region  = "us-east-1"
+    encrypt = true
+  }
+}
+```
+
+### 2. Use State Locking
+
+```hcl
+terraform {
+  backend "s3" {
+    bucket         = "my-terraform-state"
+    key            = "terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-locks"
+  }
+}
+```
+
+### 3. Use Sensitive Variables
+
+```hcl
+variable "database_password" {
   type      = string
   sensitive = true
 }
 
 resource "aws_db_instance" "main" {
-  password = var.db_password
+  password = var.database_password
+}
+
+output "database_password" {
+  value     = aws_db_instance.main.password
+  sensitive = true
 }
 ```
 
-### Sensitive Outputs
-
-```hcl
-output "db_endpoint" {
-  description = "Database endpoint"
-  value       = aws_db_instance.main.endpoint
-  sensitive   = true
-}
-```
-
-### IAM Roles
+### 4. Use IAM Roles
 
 ```hcl
 resource "aws_iam_role" "terraform" {
@@ -1276,23 +1050,31 @@ resource "aws_iam_role" "terraform" {
         Principal = {
           Service = "ec2.amazonaws.com"
         }
+        Condition = {
+          StringEquals = {
+            "aws:SourceOwner" = var.aws_account_id
+          }
+        }
       }
     ]
   })
-}
-
-resource "aws_iam_role_policy_attachment" "terraform_policy" {
-  role       = aws_iam_role.terraform.name
-  policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
 }
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [Terraform Documentation](https://www.terraform.io/docs)
-- [AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
-- [Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
-- [GCP Provider](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
-- [Terraform Module Registry](https://registry.terraform.io/)
+This skill covers comprehensive Terraform infrastructure implementation including:
+
+- **Terraform Basics**: Basic structure, Terraform commands
+- **Provider Configuration**: AWS, Azure, GCP, multiple providers
+- **Resource Definitions**: VPC setup, ECS/EKS cluster, RDS database
+- **Variables and Outputs**: Variables definition and outputs
+- **Modules**: Module structure and usage
+- **State Management**: Local, S3, Azure Storage, GCS backends
+- **Remote State**: Configure and reference remote state
+- **Workspaces**: Workspace configuration and usage
+- **Common Patterns**: VPC setup, EKS cluster, RDS database
+- **Best Practices**: Use modules, variables, outputs, remote state, workspaces
+- **Security**: Encrypt state, state locking, sensitive variables, IAM roles

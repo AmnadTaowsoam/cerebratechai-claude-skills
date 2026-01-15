@@ -1,198 +1,95 @@
 # Error Tracking
 
-A comprehensive guide to error tracking with Sentry and custom solutions for production applications.
+## Overview
+
+Error tracking helps you identify, diagnose, and fix errors in your applications. This skill covers Sentry setup, error capture, releases, and best practices.
 
 ## Table of Contents
 
 1. [Error Tracking Concepts](#error-tracking-concepts)
 2. [Sentry Setup](#sentry-setup)
-3. [Frontend Integration (React)](#frontend-integration-react)
-4. [Backend Integration (Node.js)](#backend-integration-nodejs)
-5. [Backend Integration (Python)](#backend-integration-python)
-6. [Error Capture](#error-capture)
-7. [Source Maps](#source-maps)
-8. [Releases and Environments](#releases-and-environments)
-9. [User Feedback](#user-feedback)
-10. [Performance Monitoring](#performance-monitoring)
-11. [Alerts and Notifications](#alerts-and-notifications)
-12. [Custom Error Handlers](#custom-error-handlers)
-13. [Privacy Considerations](#privacy-considerations)
-14. [Best Practices](#best-practices)
+3. [Error Capture](#error-capture)
+4. [Source Maps](#source-maps)
+5. [Releases and Environments](#releases-and-environments)
+6. [User Feedback](#user-feedback)
+7. [Performance Monitoring](#performance-monitoring)
+8. [Alerts and Notifications](#alerts-and-notifications)
+9. [Custom Error Handlers](#custom-error-handlers)
+10. [Privacy Considerations](#privacy-considerations)
+11. [Best Practices](#best-practices)
 
 ---
 
 ## Error Tracking Concepts
 
-### Why Error Tracking Matters
+### Why Track Errors?
 
-```
-Without Error Tracking:
-- Users encounter errors → frustration → churn
-- Developers unaware → bugs persist → technical debt
-- No context → difficult to debug → slow resolution
+1. **Proactive Detection**: Know about errors before users report them
+2. **Context**: Get stack traces, user info, and environment details
+3. **Prioritization**: Focus on high-impact errors
+4. **Trends**: Track error rates over time
+5. **Releases**: Correlate errors with deployments
 
-With Error Tracking:
-- Real-time alerts → immediate awareness
-- Stack traces & context → faster debugging
-- User impact analysis → prioritize fixes
-- Trend analysis → prevent regressions
-```
+### Key Concepts
 
-### Key Features
-
-| Feature | Description |
+| Concept | Description |
 |---------|-------------|
-| **Real-time Alerts** | Get notified immediately when errors occur |
-| **Stack Traces** | Detailed call stack with source code context |
-| **Breadcrumbs** | User actions leading up to the error |
-| **User Context** | User info, device, browser, IP |
-| **Release Tracking** | Correlate errors with deployments |
-| **Grouping** | Similar errors grouped together |
-| **Performance Monitoring** | Track slow requests and transactions |
-| **Source Maps** | Debug minified production code |
+| **Event** | A single error occurrence |
+| **Issue** | Group of similar events |
+| **Project** | Application or service being tracked |
+| **Release** | Version of your application |
+| **Environment** | Development, staging, production |
+| **Breadcrumbs** | Trail of events leading to error |
+| **Context** | Additional data (user, request, tags) |
 
 ---
 
 ## Sentry Setup
 
-### Self-Hosted Sentry
-
-```yaml
-# docker-compose.yml
-version: '3.8'
-services:
-  sentry:
-    image: sentry:latest
-    container_name: sentry
-    ports:
-      - "9000:9000"
-    environment:
-      - SENTRY_SECRET_KEY=your-secret-key
-      - SENTRY_POSTGRES_HOST=postgres
-      - SENTRY_POSTGRES_PORT=5432
-      - SENTRY_DB_USER=sentry
-      - SENTRY_DB_PASSWORD=sentry
-      - SENTRY_REDIS_HOST=redis
-      - SENTRY_REDIS_PORT=6379
-    depends_on:
-      - postgres
-      - redis
-    volumes:
-      - sentry-data:/var/lib/sentry/files
-
-  postgres:
-    image: postgres:15
-    environment:
-      - POSTGRES_USER=sentry
-      - POSTGRES_PASSWORD=sentry
-      - POSTGRES_DB=sentry
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-
-  redis:
-    image: redis:7
-    volumes:
-      - redis-data:/data
-
-volumes:
-  sentry-data:
-  postgres-data:
-  redis-data:
-```
-
-### Cloud Sentry (SaaS)
+### Frontend (React)
 
 ```bash
-# Create project at https://sentry.io
-# Get DSN (Data Source Name)
-# Example DSN: https://examplePublicKey@o0.ingest.sentry.io/0
+npm install @sentry/react
 ```
 
-### Configuration
-
-```typescript
-// sentry.config.ts
-import * as Sentry from '@sentry/node';
+```tsx
+// src/sentry.ts
+import * as Sentry from '@sentry/react';
+import { BrowserTracing } from '@sentry/tracing';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
-  environment: process.env.NODE_ENV || 'development',
-  release: process.env.GIT_SHA || '1.0.0',
-  tracesSampleRate: 0.1, // 10% of transactions
   integrations: [
-    new Sentry.Integrations.Http({ tracing: true }),
-    new Sentry.Integrations.Express({ app }),
-    new Sentry.Integrations.Postgres(),
+    new BrowserTracing({
+      tracePropagationTargets: ['localhost', /^https:\/\/yourdomain\.com/],
+    }),
+    new Sentry.Replay({
+      maskAllText: true,
+      blockAllMedia: true,
+    }),
   ],
+  tracesSampleRate: 1.0,
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+  environment: process.env.NODE_ENV,
+  release: process.env.APP_VERSION,
   beforeSend(event, hint) {
     // Filter out certain errors
     if (event.exception) {
       const error = hint.originalException;
       if (error instanceof Error && error.message.includes('ResizeObserver')) {
-        return null; // Don't send this error
+        return null; // Don't send
       }
     }
     return event;
   },
 });
-```
 
-```python
-# sentry.py
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
-from sentry_sdk.integrations.redis import RedisIntegration
-
-sentry_sdk.init(
-    dsn=os.environ.get('SENTRY_DSN'),
-    environment=os.environ.get('ENVIRONMENT', 'development'),
-    release=os.environ.get('GIT_SHA', '1.0.0'),
-    traces_sample_rate=0.1,
-    integrations=[
-        DjangoIntegration(),
-        RedisIntegration(),
-    ],
-    before_send=event, hint=None:
-        # Filter out certain errors
-        if event.get('exception'):
-            exception = event['exception']['values'][0]
-            if 'ResizeObserver' in exception.get('value', ''):
-                return None
-        return event
-)
-```
-
----
-
-## Frontend Integration (React)
-
-### Installation
-
-```bash
-npm install @sentry/react @sentry/tracing
-```
-
-### Basic Setup
-
-```tsx
-// index.tsx
+// src/index.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/react';
 import App from './App';
-
-Sentry.init({
-  dsn: process.env.REACT_APP_SENTRY_DSN,
-  environment: process.env.NODE_ENV,
-  release: process.env.REACT_APP_VERSION,
-  integrations: [
-    new BrowserTracing({
-      tracingOrigins: ['localhost', 'https://api.example.com'],
-    }),
-  ],
-  tracesSampleRate: 0.1,
-});
+import './sentry';
 
 const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(
@@ -202,7 +99,158 @@ root.render(
 );
 ```
 
-### Error Boundary
+### Backend (Node.js)
+
+```bash
+npm install @sentry/node
+```
+
+```typescript
+// sentry.ts
+import * as Sentry from '@sentry/node';
+import { nodeProfilingIntegration } from '@sentry/profiling-node';
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  integrations: [
+    nodeProfilingIntegration(),
+  ],
+  tracesSampleRate: 1.0,
+  profilesSampleRate: 1.0,
+  environment: process.env.NODE_ENV,
+  release: process.env.APP_VERSION,
+});
+
+// Express middleware
+import express from 'express';
+
+const app = express();
+
+// Sentry request handler
+app.use(Sentry.Handlers.requestHandler());
+
+// Sentry error handler
+app.use(Sentry.Handlers.errorHandler());
+```
+
+### Backend (Python)
+
+```bash
+pip install sentry-sdk
+```
+
+```python
+# sentry.py
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+
+sentry_sdk.init(
+    dsn=os.getenv('SENTRY_DSN'),
+    integrations=[
+        FlaskIntegration(),
+    ],
+    traces_sample_rate=1.0,
+    environment=os.getenv('NODE_ENV', 'production'),
+    release=os.getenv('APP_VERSION', '1.0.0'),
+)
+
+# Flask app
+from flask import Flask
+
+app = Flask(__name__)
+```
+
+---
+
+## Error Capture
+
+### Automatic Error Capture
+
+```typescript
+// React - Automatic capture
+// No additional code needed
+// Errors in components are automatically captured
+
+// Node.js - Automatic capture
+// Uncaught exceptions and unhandled rejections are captured
+```
+
+```python
+# Python - Automatic capture
+# Uncaught exceptions are automatically captured
+```
+
+### Manual Error Capture
+
+```typescript
+// manual-capture.ts
+import * as Sentry from '@sentry/react';
+
+// Capture exception
+try {
+  throw new Error('Something went wrong');
+} catch (error) {
+  Sentry.captureException(error);
+}
+
+// Capture message
+Sentry.captureMessage('User performed action X');
+
+// Capture with context
+Sentry.captureException(new Error('Database connection failed'), {
+  tags: {
+    component: 'database',
+    action: 'connect',
+  },
+  user: {
+    id: '123',
+    email: 'user@example.com',
+  },
+  extra: {
+    database: 'production',
+    host: 'db.example.com',
+  },
+});
+
+// Capture with level
+Sentry.captureException(error, {
+  level: 'warning', // fatal, error, warning, log, info, debug
+});
+```
+
+```python
+# manual_capture.py
+import sentry_sdk
+
+# Capture exception
+try:
+    raise Exception('Something went wrong')
+except Exception as error:
+    sentry_sdk.capture_exception(error)
+
+# Capture message
+sentry_sdk.capture_message('User performed action X')
+
+# Capture with context
+sentry_sdk.capture_exception(
+    error,
+    tags={
+        'component': 'database',
+        'action': 'connect'
+    },
+    user={
+        'id': '123',
+        'email': 'user@example.com'
+    },
+    extra={
+        'database': 'production',
+        'host': 'db.example.com'
+    },
+    level='warning'  # fatal, error, warning, log, info, debug
+)
+```
+
+### Error Boundaries (React)
 
 ```tsx
 // ErrorBoundary.tsx
@@ -216,7 +264,6 @@ interface Props {
 
 interface State {
   hasError: boolean;
-  eventId?: string;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -229,30 +276,19 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    const eventId = Sentry.captureException(error, {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    Sentry.captureException(error, {
       contexts: {
         react: {
           componentStack: errorInfo.componentStack,
         },
       },
     });
-    this.setState({ eventId });
   }
 
-  render() {
+  render(): ReactNode {
     if (this.state.hasError) {
-      return (
-        this.props.fallback || (
-          <div className="error-fallback">
-            <h1>Something went wrong</h1>
-            <p>We've been notified and are working on a fix.</p>
-            <button onClick={() => window.location.reload()}>
-              Reload Page
-            </button>
-          </div>
-        )
-      );
+      return this.props.fallback || <div>Something went wrong.</div>;
     }
 
     return this.props.children;
@@ -260,45 +296,164 @@ export class ErrorBoundary extends Component<Props, State> {
 }
 
 // Usage
-<ErrorBoundary>
+<ErrorBoundary fallback={<ErrorFallback />}>
   <App />
 </ErrorBoundary>
 ```
 
-### User Feedback
+---
+
+## Source Maps
+
+### Upload Source Maps
+
+```bash
+# Using Sentry CLI
+npm install -g @sentry/cli
+
+sentry-cli releases \
+  files VERSION \
+  upload-sourcemaps ./build \
+  --url-prefix '~/static/js' \
+  --validate
+```
+
+```typescript
+// webpack.config.js
+const SentryWebpackPlugin = require('@sentry/webpack-plugin');
+
+module.exports = {
+  // ... other config
+  devtool: 'source-map',
+  plugins: [
+    new SentryWebpackPlugin({
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      org: 'your-org',
+      project: 'your-project',
+      release: process.env.APP_VERSION,
+      include: './build',
+      ignore: ['node_modules'],
+      urlPrefix: '~/',
+    }),
+  ],
+};
+```
+
+### Vite Configuration
+
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite';
+import sentryVitePlugin from '@sentry/vite-plugin';
+
+export default defineConfig({
+  plugins: [
+    sentryVitePlugin({
+      org: 'your-org',
+      project: 'your-project',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    }),
+  ],
+  build: {
+    sourcemap: true,
+  },
+});
+```
+
+---
+
+## Releases and Environments
+
+### Create Release
+
+```bash
+# Using Sentry CLI
+sentry-cli releases new VERSION
+sentry-cli releases set-commits --auto VERSION
+sentry-cli releases finalize VERSION
+sentry-cli releases deploy VERSION --env production
+```
+
+```typescript
+// Node.js
+Sentry.setRelease(process.env.APP_VERSION);
+Sentry.setEnvironment(process.env.NODE_ENV);
+```
+
+```python
+# Python
+sentry_sdk.set_release(os.getenv('APP_VERSION'))
+sentry_sdk.set_environment(os.getenv('NODE_ENV'))
+```
+
+### Release Health
+
+```typescript
+// Track release health
+Sentry.captureMessage('Release deployed', {
+  level: 'info',
+  release: process.env.APP_VERSION,
+  environment: process.env.NODE_ENV,
+});
+```
+
+---
+
+## User Feedback
+
+### User Feedback Widget
 
 ```tsx
-// UserFeedbackDialog.tsx
-import React from 'react';
+// UserFeedback.tsx
+import * as Sentry from '@sentry/react';
+import { useFeedback } from '@sentry/react';
+
+function UserFeedbackButton() {
+  const { feedback } = useFeedback();
+
+  return (
+    <button
+      onClick={() => {
+        feedback({
+          name: 'Report Issue',
+          email: 'user@example.com',
+          message: 'Describe the issue...',
+        });
+      }}
+    >
+      Report Issue
+    </button>
+  );
+}
+```
+
+### Custom Feedback Form
+
+```tsx
+// CustomFeedback.tsx
 import * as Sentry from '@sentry/react';
 
-export function UserFeedbackDialog({ eventId }: { eventId: string }) {
-  const [email, setEmail] = React.useState('');
+function CustomFeedback() {
   const [message, setMessage] = React.useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    Sentry.captureUserFeedback({
-      event_id: eventId,
-      email,
+
+    Sentry.captureFeedback({
+      name: 'User Feedback',
+      email: 'user@example.com',
       comments: message,
     });
-    alert('Thank you for your feedback!');
+
+    setMessage('');
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <h3>Report Issue</h3>
-      <input
-        type="email"
-        placeholder="your@email.com"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
       <textarea
-        placeholder="What happened?"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
+        placeholder="Describe the issue..."
       />
       <button type="submit">Submit</button>
     </form>
@@ -308,562 +463,74 @@ export function UserFeedbackDialog({ eventId }: { eventId: string }) {
 
 ---
 
-## Backend Integration (Node.js)
-
-### Express Integration
-
-```typescript
-// app.ts
-import express from 'express';
-import * as Sentry from '@sentry/node';
-import { ProfilingIntegration } from '@sentry/profiling-node';
-
-const app = express();
-
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  environment: process.env.NODE_ENV,
-  release: process.env.GIT_SHA,
-  integrations: [
-    new Sentry.Integrations.Http({ tracing: true }),
-    new Sentry.Integrations.Express({ app }),
-    new ProfilingIntegration(),
-  ],
-  tracesSampleRate: 0.1,
-  profilesSampleRate: 0.1,
-});
-
-// Request handler
-app.use(Sentry.Handlers.requestHandler());
-
-// Error handler
-app.use(Sentry.Handlers.errorHandler());
-
-// Routes
-app.get('/', (req, res) => {
-  res.send('Hello World');
-});
-
-// 404 handler
-app.use(Sentry.Handlers.errorHandler());
-
-app.listen(3000);
-```
-
-### Custom Error Capture
-
-```typescript
-import * as Sentry from '@sentry/node';
-
-class CustomError extends Error {
-  constructor(
-    message: string,
-    public code: string,
-    public statusCode: number = 500
-  ) {
-    super(message);
-    this.name = 'CustomError';
-  }
-}
-
-async function handleRequest(req, res) {
-  try {
-    // ... do work ...
-  } catch (error) {
-    if (error instanceof CustomError) {
-      Sentry.captureException(error, {
-        tags: {
-          error_code: error.code,
-        },
-        extra: {
-          statusCode: error.statusCode,
-        },
-      });
-      res.status(error.statusCode).json({ error: error.message });
-    } else {
-      Sentry.captureException(error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  }
-}
-```
-
-### Async Error Tracking
-
-```typescript
-import * as Sentry from '@sentry/node';
-
-// Track unhandled promise rejections
-process.on('unhandledRejection', (reason, promise) => {
-  Sentry.captureException(reason, {
-    tags: {
-      rejection: true,
-    },
-    extra: {
-      promise: String(promise),
-    },
-  });
-});
-
-// Track uncaught exceptions
-process.on('uncaughtException', (error) => {
-  Sentry.captureException(error);
-  process.exit(1);
-});
-```
-
----
-
-## Backend Integration (Python)
-
-### Django Integration
-
-```python
-# settings.py
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
-
-sentry_sdk.init(
-    dsn=os.environ.get('SENTRY_DSN'),
-    environment=os.environ.get('ENVIRONMENT'),
-    release=os.environ.get('GIT_SHA'),
-    integrations=[DjangoIntegration()],
-    traces_sample_rate=0.1,
-)
-
-# views.py
-from django.http import JsonResponse
-import sentry_sdk
-
-def my_view(request):
-    try:
-        # ... do work ...
-        pass
-    except Exception as e:
-        sentry_sdk.capture_exception(e)
-        return JsonResponse({'error': str(e)}, status=500)
-```
-
-### FastAPI Integration
-
-```python
-# main.py
-from fastapi import FastAPI
-import sentry_sdk
-from sentry_sdk.integrations.fastapi import FastApiIntegration
-
-sentry_sdk.init(
-    dsn=os.environ.get('SENTRY_DSN'),
-    integrations=[FastApiIntegration()],
-    traces_sample_rate=0.1,
-)
-
-app = FastAPI()
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-```
-
-### Custom Error Capture
-
-```python
-import sentry_sdk
-
-class CustomError(Exception):
-    def __init__(self, message, code, status_code=500):
-        super().__init__(message)
-        self.code = code
-        self.status_code = status_code
-
-def handle_request():
-    try:
-        # ... do work ...
-        pass
-    except CustomError as e:
-        sentry_sdk.capture_exception(e, tags={
-            'error_code': e.code
-        }, extra={
-            'status_code': e.status_code
-        })
-        raise
-    except Exception as e:
-        sentry_sdk.capture_exception(e)
-        raise
-```
-
----
-
-## Error Capture
-
-### Manual Capture
-
-```typescript
-import * as Sentry from '@sentry/node';
-
-// Capture exception
-try {
-  // ... code that may throw ...
-} catch (error) {
-  Sentry.captureException(error);
-}
-
-// Capture message
-Sentry.captureMessage('User clicked button', 'info');
-
-// Capture with context
-Sentry.captureException(error, {
-  tags: {
-    section: 'checkout',
-    user_type: 'premium',
-  },
-  extra: {
-    userId: '123',
-    cartItems: 5,
-  },
-  user: {
-    id: '123',
-    email: 'user@example.com',
-  },
-});
-```
-
-```python
-import sentry_sdk
-
-# Capture exception
-try:
-    # ... code that may raise ...
-except Exception as e:
-    sentry_sdk.capture_exception(e)
-
-# Capture message
-sentry_sdk.capture_message('User clicked button', level='info')
-
-# Capture with context
-sentry_sdk.capture_exception(e, tags={
-    'section': 'checkout',
-    'user_type': 'premium'
-}, extra={
-    'user_id': '123',
-    'cart_items': 5
-}, user={
-    'id': '123',
-    'email': 'user@example.com'
-})
-```
-
-### Breadcrumbs
-
-```typescript
-// Add breadcrumb
-Sentry.addBreadcrumb({
-  category: 'user',
-  message: 'User clicked checkout button',
-  level: 'info',
-  data: {
-    userId: '123',
-    cartValue: 99.99,
-  },
-});
-
-// Automatic breadcrumbs from navigation
-Sentry.addBreadcrumb({
-  category: 'navigation',
-  message: 'Navigated to /checkout',
-  level: 'info',
-});
-```
-
-```python
-# Add breadcrumb
-sentry_sdk.add_breadcrumb(
-    category='user',
-    message='User clicked checkout button',
-    level='info',
-    data={
-        'user_id': '123',
-        'cart_value': 99.99
-    }
-)
-```
-
-### Context Management
-
-```typescript
-// Set user context
-Sentry.setUser({
-  id: '123',
-  email: 'user@example.com',
-  username: 'johndoe',
-  ip_address: '192.168.1.1',
-});
-
-// Set tags
-Sentry.setTag('environment', 'production');
-Sentry.setTag('plan', 'premium');
-
-// Set extra context
-Sentry.setContext('cart', {
-  items: 5,
-  total: 99.99,
-  currency: 'USD',
-});
-
-// Clear context
-Sentry.setUser(null);
-```
-
-```python
-# Set user context
-sentry_sdk.set_user({
-    'id': '123',
-    'email': 'user@example.com',
-    'username': 'johndoe',
-    'ip_address': '192.168.1.1'
-})
-
-# Set tags
-sentry_sdk.set_tag('environment', 'production')
-sentry_sdk.set_tag('plan', 'premium')
-
-# Set extra context
-sentry_sdk.set_context('cart', {
-    'items': 5,
-    'total': 99.99,
-    'currency': 'USD'
-})
-
-# Clear context
-sentry_sdk.set_user(None)
-```
-
----
-
-## Source Maps
-
-### Uploading Source Maps
-
-```bash
-# Using Sentry CLI
-npm install -g @sentry/cli
-
-sentry-cli releases new $VERSION
-sentry-cli releases upload-sourcemaps $VERSION ./build
-sentry-cli releases finalize $VERSION
-```
-
-### Webpack Integration
-
-```javascript
-// webpack.config.js
-const { sentryWebpackPlugin } = require('@sentry/webpack-plugin');
-
-module.exports = {
-  plugins: [
-    sentryWebpackPlugin({
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-      org: 'your-org',
-      project: 'your-project',
-      release: process.env.GIT_SHA,
-      include: './dist',
-    }),
-  ],
-};
-```
-
-### Vite Integration
-
-```typescript
-// vite.config.ts
-import { defineConfig } from 'vite';
-import sentry from '@sentry/vite-plugin';
-
-export default defineConfig({
-  plugins: [
-    sentry({
-      org: 'your-org',
-      project: 'your-project',
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-      release: process.env.GIT_SHA,
-    }),
-  ],
-});
-```
-
----
-
-## Releases and Environments
-
-### Creating Releases
-
-```typescript
-// Set release in Sentry.init
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  release: process.env.GIT_SHA || '1.0.0',
-  environment: process.env.NODE_ENV || 'development',
-});
-```
-
-### Deploying Releases
-
-```bash
-# Associate commits with release
-sentry-cli releases set-commits $VERSION --auto
-
-# Create deployment
-sentry-cli releases deploys $VERSION new -e production
-```
-
-### Environment-Specific Configuration
-
-```typescript
-const config = {
-  development: {
-    dsn: process.env.SENTRY_DSN,
-    environment: 'development',
-    tracesSampleRate: 1.0, // Trace everything in dev
-  },
-  staging: {
-    dsn: process.env.SENTRY_DSN,
-    environment: 'staging',
-    tracesSampleRate: 0.5,
-  },
-  production: {
-    dsn: process.env.SENTRY_DSN,
-    environment: 'production',
-    tracesSampleRate: 0.1, // Sample 10% in production
-  },
-};
-
-Sentry.init(config[process.env.NODE_ENV || 'development']);
-```
-
----
-
-## User Feedback
-
-### Sentry User Feedback Widget
-
-```tsx
-import { useSentry } from '@sentry/react';
-
-export function FeedbackButton() {
-  const { showReportDialog } = useSentry();
-
-  return (
-    <button onClick={() => showReportDialog()}>
-      Report an Issue
-    </button>
-  );
-}
-```
-
-### Custom Feedback Form
-
-```tsx
-import React from 'react';
-import * as Sentry from '@sentry/react';
-
-export function CustomFeedbackForm({ eventId }: { eventId: string }) {
-  const [email, setEmail] = React.useState('');
-  const [comments, setComments] = React.useState('');
-  const [submitted, setSubmitted] = React.useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    Sentry.captureUserFeedback({
-      event_id: eventId,
-      email,
-      comments,
-    });
-    setSubmitted(true);
-  };
-
-  if (submitted) {
-    return <p>Thank you for your feedback!</p>;
-  }
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        placeholder="Email (optional)"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <textarea
-        placeholder="What happened?"
-        value={comments}
-        onChange={(e) => setComments(e.target.value)}
-        required
-      />
-      <button type="submit">Submit Feedback</button>
-    </form>
-  );
-}
-```
-
----
-
 ## Performance Monitoring
 
-### Transaction Tracking
-
-```typescript
-import * as Sentry from '@sentry/node';
-
-async function processOrder(orderId: string) {
-  const transaction = Sentry.startTransaction({
-    op: 'processOrder',
-    name: 'Process Order',
-  });
-
-  try {
-    const validateSpan = transaction.startChild({
-      op: 'validation',
-      description: 'Validate order',
-    });
-
-    await validateOrder(orderId);
-    validateSpan.finish();
-
-    const paymentSpan = transaction.startChild({
-      op: 'payment',
-      description: 'Process payment',
-    });
-
-    await processPayment(orderId);
-    paymentSpan.finish();
-
-    return { success: true };
-  } catch (error) {
-    transaction.setStatus('internal_error');
-    throw error;
-  } finally {
-    transaction.finish();
-  }
-}
-```
-
-### React Performance
+### Web Vitals
 
 ```tsx
+// WebVitals.tsx
+import { onCLS, onFID, onFCP, onLCP, onTTFB } from 'web-vitals';
 import * as Sentry from '@sentry/react';
 
-export function UserProfile({ userId }: { userId: string }) {
-  const transaction = Sentry.startTransaction({
-    name: 'UserProfile',
-    op: 'component',
+onCLS((metric) => {
+  Sentry.captureMessage('CLS', {
+    level: 'info',
+    extra: { metric },
   });
+});
 
-  React.useEffect(() => {
-    return () => transaction.finish();
-  }, []);
+onFID((metric) => {
+  Sentry.captureMessage('FID', {
+    level: 'info',
+    extra: { metric },
+  });
+});
 
-  return <div>User Profile</div>;
-}
+onFCP((metric) => {
+  Sentry.captureMessage('FCP', {
+    level: 'info',
+    extra: { metric },
+  });
+});
+
+onLCP((metric) => {
+  Sentry.captureMessage('LCP', {
+    level: 'info',
+    extra: { metric },
+  });
+});
+
+onTTFB((metric) => {
+  Sentry.captureMessage('TTFB', {
+    level: 'info',
+    extra: { metric },
+  });
+});
+```
+
+### Custom Performance Metrics
+
+```typescript
+// performance.ts
+import * as Sentry from '@sentry/react';
+
+// Start a transaction
+const transaction = Sentry.startTransaction({
+  op: 'http',
+  name: 'GET /api/users',
+});
+
+// Add spans
+const dbSpan = transaction.startChild({
+  op: 'db',
+  description: 'SELECT * FROM users',
+});
+
+await db.query('SELECT * FROM users');
+dbSpan.finish();
+
+// Finish transaction
+transaction.finish();
 ```
 
 ---
@@ -873,73 +540,27 @@ export function UserProfile({ userId }: { userId: string }) {
 ### Alert Rules
 
 ```typescript
-// Configure via Sentry UI or API
-// Example: Alert when error rate > 1% for 5 minutes
-
-// Create alert via API
-const response = await fetch(
-  `https://sentry.io/api/0/projects/${org}/${project}/rules/`,
-  {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      name: 'High Error Rate Alert',
-      conditions: [
-        {
-          id: 'sentry.rules.conditions.high_error_rate.HighErrorRateCondition',
-          interval: '1h',
-          threshold: 0.01,
-        },
-      ],
-      actions: [
-        {
-          id: 'sentry.rules.actions.notify_event.NotifyEventAction',
-          targetType: 'member',
-          targetIdentifier: userId,
-        },
-      ],
-    }),
-  }
-);
+// Configure in Sentry UI
+// 1. Go to Settings > Alerts
+// 2. Create new alert rule
+// 3. Configure conditions (e.g., error rate > 10%)
+// 4. Set notification channels
 ```
 
-### Slack Integration
+### Notification Channels
 
 ```typescript
-// Configure Slack webhook in Sentry settings
-// Or use custom notification
+// Slack
+// Configure in Sentry UI
+// Settings > Integrations > Slack
 
-async function sendSlackAlert(error: Sentry.Event) {
-  await fetch(process.env.SLACK_WEBHOOK_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      text: `🚨 New Error: ${error.message}`,
-      attachments: [
-        {
-          color: 'danger',
-          fields: [
-            { title: 'Environment', value: error.environment, short: true },
-            { title: 'Release', value: error.release, short: true },
-            { title: 'Error ID', value: error.event_id, short: true },
-          ],
-        },
-      ],
-    }),
-  });
-}
+// Email
+// Configure in Sentry UI
+// Settings > Notifications > Email
 
-Sentry.init({
-  beforeSend(event) {
-    if (event.level === 'error') {
-      sendSlackAlert(event);
-    }
-    return event;
-  },
-});
+// PagerDuty
+// Configure in Sentry UI
+// Settings > Integrations > PagerDuty
 ```
 
 ---
@@ -949,19 +570,18 @@ Sentry.init({
 ### Express Error Handler
 
 ```typescript
+// express-error-handler.ts
+import express from 'express';
 import * as Sentry from '@sentry/node';
 
-export function errorHandler(
-  err: Error,
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) {
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   // Capture error
   Sentry.captureException(err, {
-    extra: {
-      url: req.url,
+    tags: {
+      route: req.path,
       method: req.method,
+    },
+    extra: {
       body: req.body,
       query: req.query,
       headers: req.headers,
@@ -970,112 +590,146 @@ export function errorHandler(
 
   // Send response
   res.status(500).json({
-    error: {
-      message: process.env.NODE_ENV === 'production'
-        ? 'Internal server error'
-        : err.message,
-      eventId: Sentry.lastEventId(),
-    },
+    error: 'Internal server error',
+    requestId: res.getHeader('x-request-id'),
   });
-}
-
-// Usage
-app.use(errorHandler);
+});
 ```
 
-### Django Error Handler
+### Flask Error Handler
 
 ```python
-# middleware.py
+# flask_error_handler.py
+from flask import Flask, jsonify
 import sentry_sdk
-from django.http import JsonResponse
 
-class SentryErrorMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
+app = Flask(__name__)
 
-    def __call__(self, request):
-        response = self.get_response(request)
-        return response
-
-    def process_exception(self, request, exception):
-        sentry_sdk.capture_exception(exception, extra={
-            'url': request.path,
-            'method': request.method,
-            'user': str(request.user),
-        })
-        return JsonResponse({
-            'error': 'Internal server error',
-            'event_id': sentry_sdk.last_event_id()
-        }, status=500)
+@app.errorhandler(Exception)
+def handle_exception(error):
+    # Capture error
+    sentry_sdk.capture_exception(error)
+    
+    # Send response
+    return jsonify({
+        'error': 'Internal server error',
+        'request_id': request.headers.get('X-Request-ID')
+    }), 500
 ```
 
 ---
 
 ## Privacy Considerations
 
-### Filtering Sensitive Data
+### PII Redaction
 
 ```typescript
+// pii-redaction.ts
+import * as Sentry from '@sentry/react';
+
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   beforeSend(event, hint) {
-    // Remove sensitive data
-    if (event.request) {
-      delete event.request.cookies;
-      delete event.request.headers?.['authorization'];
-      delete event.request.headers?.['cookie'];
+    // Redact PII
+    if (event.user) {
+      delete event.user.email;
+      delete event.user.ip_address;
     }
 
-    // Scrub PII from extra data
-    if (event.extra) {
-      delete event.extra.password;
-      delete event.extra.creditCard;
-      delete event.extra.ssn;
+    // Redact sensitive data
+    if (event.request?.headers) {
+      delete event.request.headers.authorization;
+      delete event.request.headers.cookie;
+    }
+
+    // Redact request body
+    if (event.request?.data) {
+      event.request.data = redactPII(event.request.data);
     }
 
     return event;
   },
 });
+
+function redactPII(data: any): any {
+  if (typeof data !== 'object' || data === null) {
+    return data;
+  }
+
+  const sensitiveFields = ['password', 'creditCard', 'ssn', 'token'];
+
+  const redacted: any = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (sensitiveFields.some(field => key.toLowerCase().includes(field))) {
+      redacted[key] = '[REDACTED]';
+    } else {
+      redacted[key] = redactPII(value);
+    }
+  }
+
+  return redacted;
+}
 ```
 
 ```python
+# pii_redaction.py
+import sentry_sdk
+
+SENSITIVE_FIELDS = ['password', 'credit_card', 'ssn', 'token']
+
+def redact_pii(data):
+    """Redact personally identifiable information."""
+    if not isinstance(data, dict):
+        return data
+    
+    redacted = {}
+    for key, value in data.items():
+        if any(field in key.lower() for field in SENSITIVE_FIELDS):
+            redacted[key] = '[REDACTED]'
+        else:
+            redacted[key] = redact_pii(value)
+    
+    return redacted
+
+def before_send(event, hint):
+    """Redact PII before sending event."""
+    if event.get('user'):
+        event['user'].pop('email', None)
+        event['user'].pop('ip_address', None)
+    
+    if event.get('request', {}).get('headers'):
+        event['request']['headers'].pop('authorization', None)
+        event['request']['headers'].pop('cookie', None)
+    
+    if event.get('request', {}).get('data'):
+        event['request']['data'] = redact_pii(event['request']['data'])
+    
+    return event
+
 sentry_sdk.init(
-    dsn=os.environ.get('SENTRY_DSN'),
-    before_send=event, hint=None:
-        # Remove sensitive data
-        if 'request' in event:
-            event['request'].pop('cookies', None)
-            if 'headers' in event['request']:
-                event['request']['headers'].pop('authorization', None)
-                event['request']['headers'].pop('cookie', None)
-
-        # Scrub PII from extra data
-        if 'extra' in event:
-            event['extra'].pop('password', None)
-            event['extra'].pop('credit_card', None)
-            event['extra'].pop('ssn', None)
-
-        return event
+    dsn=os.getenv('SENTRY_DSN'),
+    before_send=before_send
 )
 ```
 
 ### GDPR Compliance
 
 ```typescript
-// User data deletion
-async function deleteUser(userId: string) {
-  // Delete from database
-  await db.users.delete({ where: { id: userId } });
+// gdpr-compliance.ts
+import * as Sentry from '@sentry/react';
+
+// Delete user data
+async function deleteUserData(userId: string): Promise<void> {
+  // Delete from your database
+  await db.user.delete({ where: { id: userId }});
 
   // Delete from Sentry
-  await fetch(
-    `https://sentry.io/api/0/organizations/${org}/user-feedback/?query=${userId}`,
-    {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` },
-    }
-  );
+  await fetch(`https://sentry.io/api/0/organizations/ORG/users/${userId}/`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${process.env.SENTRY_AUTH_TOKEN}`,
+    },
+  });
 }
 ```
 
@@ -1083,89 +737,114 @@ async function deleteUser(userId: string) {
 
 ## Best Practices
 
-### 1. Set Appropriate Sampling Rates
+### 1. Use Appropriate Error Levels
 
 ```typescript
-// Development: Capture everything
-// Production: Sample to reduce costs
-const tracesSampleRate = process.env.NODE_ENV === 'production' ? 0.1 : 1.0;
+// error-levels.ts
+// Fatal: Application cannot continue
+Sentry.captureException(fatalError, { level: 'fatal' });
+
+// Error: Application can continue but functionality is broken
+Sentry.captureException(error, { level: 'error' });
+
+// Warning: Application works but something is wrong
+Sentry.captureException(warning, { level: 'warning' });
+
+// Info: Important information
+Sentry.captureMessage('User logged in', { level: 'info' });
+
+// Debug: Detailed debugging information
+Sentry.captureMessage('Cache hit', { level: 'debug' });
 ```
 
-### 2. Use Meaningful Tags
+### 2. Add Context to Errors
 
 ```typescript
-Sentry.setTag('feature', 'checkout');
-Sentry.setTag('user_tier', 'premium');
-Sentry.setTag('api_version', 'v2');
-```
-
-### 3. Add Context to Errors
-
-```typescript
+// error-context.ts
 Sentry.captureException(error, {
+  tags: {
+    component: 'api',
+    route: '/users',
+    method: 'GET',
+  },
+  user: {
+    id: userId,
+    username: user.username,
+  },
   extra: {
-    userId: user.id,
-    cartValue: cart.total,
-    paymentMethod: cart.method,
+    request_id: requestId,
+    timestamp: new Date().toISOString(),
   },
 });
 ```
 
-### 4. Don't Capture Expected Errors
+### 3. Filter Noise
 
 ```typescript
-try {
-  const user = await getUser(id);
-  if (!user) {
-    // Expected error, don't send to Sentry
-    throw new NotFoundError('User not found');
-  }
-} catch (error) {
-  if (!(error instanceof NotFoundError)) {
-    Sentry.captureException(error);
-  }
-  throw error;
-}
-```
+// filter-noise.ts
+Sentry.init({
+  beforeSend(event, hint) {
+    // Filter out third-party errors
+    if (event.exception) {
+      const error = hint.originalException as Error;
+      if (error.message.includes('ResizeObserver')) {
+        return null;
+      }
+      if (error.message.includes('Non-Error promise rejection')) {
+        return null;
+      }
+    }
 
-### 5. Use Source Maps in Production
-
-```bash
-# Always upload source maps for production builds
-sentry-cli releases upload-sourcemaps $VERSION ./dist
-```
-
-### 6. Monitor Performance
-
-```typescript
-// Track critical transactions
-Sentry.startTransaction({
-  name: 'checkout',
-  op: 'transaction',
+    return event;
+  },
 });
 ```
 
-### 7. Set Up Alerts
+### 4. Set Release and Environment
 
 ```typescript
-// Alert on critical errors
-// Alert on high error rates
-// Alert on performance degradation
+// release-env.ts
+Sentry.init({
+  release: process.env.APP_VERSION,
+  environment: process.env.NODE_ENV,
+});
 ```
 
-### 8. Review Errors Regularly
+### 5. Use Breadcrumbs
 
 ```typescript
-// Set up weekly error review meetings
-// Prioritize by user impact
-// Track error trends over time
+// breadcrumbs.ts
+import * as Sentry from '@sentry/react';
+
+// Add breadcrumb
+Sentry.addBreadcrumb({
+  category: 'user',
+  message: 'User clicked button',
+  level: 'info',
+  data: {
+    button: 'submit',
+    form: 'login',
+  },
+});
+
+// Automatic breadcrumbs (navigation, HTTP requests, etc.)
+// are enabled by default
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [Sentry Documentation](https://docs.sentry.io/)
-- [Sentry JavaScript SDK](https://docs.sentry.io/platforms/javascript/)
-- [Sentry Python SDK](https://docs.sentry.io/platforms/python/)
-- [Source Maps Guide](https://docs.sentry.io/platforms/javascript/sourcemaps/)
+This skill covers comprehensive error tracking implementation including:
+
+- **Error Tracking Concepts**: Why track errors and key concepts
+- **Sentry Setup**: Frontend (React), backend (Node.js, Python)
+- **Error Capture**: Automatic and manual error capture, error boundaries
+- **Source Maps**: Uploading and configuring source maps
+- **Releases and Environments**: Creating releases and tracking health
+- **User Feedback**: Feedback widget and custom forms
+- **Performance Monitoring**: Web vitals and custom performance metrics
+- **Alerts and Notifications**: Alert rules and notification channels
+- **Custom Error Handlers**: Express and Flask error handlers
+- **Privacy Considerations**: PII redaction and GDPR compliance
+- **Best Practices**: Error levels, context, filtering, releases, breadcrumbs

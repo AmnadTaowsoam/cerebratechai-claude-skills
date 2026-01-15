@@ -1,6 +1,8 @@
 # Performance Monitoring
 
-A comprehensive guide to Application Performance Monitoring (APM) for production applications.
+## Overview
+
+Application Performance Monitoring (APM) helps you understand how your application performs from the user's perspective. This skill covers APM concepts, key metrics, tools, and best practices.
 
 ## Table of Contents
 
@@ -21,39 +23,44 @@ A comprehensive guide to Application Performance Monitoring (APM) for production
 
 ### What is APM?
 
-Application Performance Monitoring (APM) is the practice of monitoring software applications to ensure they perform well and meet user expectations.
+APM (Application Performance Monitoring) is the practice of monitoring software applications to ensure they perform as expected and meet user expectations.
+
+### APM Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    APM Architecture                         │
-├─────────────────────────────────────────────────────────────┤
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐       │
-│  │   Client    │  │   Server    │  │  Database   │       │
-│  │   Browser   │  │   Node.js   │  │  PostgreSQL │       │
-│  │             │  │             │  │             │       │
-│  │  [Metrics]  │  │  [Metrics]  │  │  [Metrics]  │       │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘       │
-│         │                │                │               │
-│         └────────────────┼────────────────┘               │
-│                          ▼                                │
-│                   ┌─────────────┐                         │
-│                   │   APM Tool  │                         │
-│                   │ (New Relic) │                         │
-│                   │ (DataDog)   │                         │
-│                   │ (Elastic)   │                         │
-│                   └─────────────┘                         │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────┐
+│  End Users  │
+└──────┬──────┘
+       │ Requests
+       ↓
+┌─────────────┐
+│  Your App   │
+└──────┬──────┘
+       │ Metrics
+       ↓
+┌─────────────┐
+│   APM Agent │
+└──────┬──────┘
+       │ Data
+       ↓
+┌─────────────┐
+│ APM Backend │
+└──────┬──────┘
+       │
+       ↓
+┌─────────────┐
+│  Dashboard  │
+└─────────────┘
 ```
 
-### APM Benefits
+### APM Components
 
-| Benefit | Description |
-|---------|-------------|
-| **Proactive Detection** | Identify issues before users report them |
-| **Root Cause Analysis** | Quickly find what's causing performance problems |
-| **Capacity Planning** | Understand resource usage for scaling decisions |
-| **SLA Compliance** | Monitor and report on service level agreements |
-| **User Experience** | Ensure fast, responsive applications |
+| Component | Description |
+|-----------|-------------|
+| **Agent** | Software installed on your app that collects metrics |
+| **Backend** | Central server that receives and stores metrics |
+| **Dashboard** | UI for visualizing metrics and traces |
+| **Alerting** | System for notifying about performance issues |
 
 ---
 
@@ -64,48 +71,39 @@ Application Performance Monitoring (APM) is the practice of monitoring software 
 The time it takes for a request to complete.
 
 ```typescript
-// Measure response time
-import { performance } from 'perf_hooks';
+// response-time.ts
+import express from 'express';
 
-async function handleRequest(req, res) {
-  const start = performance.now();
+const app = express();
 
-  try {
-    // ... process request ...
-    const result = await processOrder(req.body);
-    res.json(result);
-  } finally {
-    const duration = performance.now() - start;
-    metrics.record('response_time', duration, {
-      route: req.path,
-      method: req.method,
-    });
-  }
-}
+app.use((req, res, next) => {
+  const start = Date.now();
+
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`${req.method} ${req.path} - ${duration}ms`);
+  });
+
+  next();
+});
 ```
 
 ```python
+# response_time.py
+from flask import Flask, request, g
 import time
-import prometheus_client
 
-response_time = prometheus_client.Histogram(
-    'response_time_seconds',
-    'Response time',
-    ['route', 'method']
-)
+app = Flask(__name__)
 
-def handle_request(request):
-    start = time.time()
-    try:
-        # ... process request ...
-        result = process_order(request.data)
-        return jsonify(result)
-    finally:
-        duration = time.time() - start
-        response_time.labels(
-            route=request.path,
-            method=request.method
-        ).observe(duration)
+@app.before_request
+def before_request():
+    g.start_time = time.time()
+
+@app.after_request
+def after_request(response):
+    duration = (time.time() - g.start_time) * 1000
+    print(f"{request.method} {request.path} - {duration}ms")
+    return response
 ```
 
 ### Throughput
@@ -113,17 +111,39 @@ def handle_request(request):
 The number of requests processed per unit of time.
 
 ```typescript
-// Track throughput
-const requestCounter = new Counter({
-  name: 'requests_total',
-  help: 'Total requests',
-  labelNames: ['route', 'method'],
-});
+// throughput.ts
+let requestCount = 0;
+
+setInterval(() => {
+  console.log(`Throughput: ${requestCount} requests/sec`);
+  requestCount = 0;
+}, 1000);
 
 app.use((req, res, next) => {
-  requestCounter.inc({ route: req.path, method: req.method });
+  requestCount++;
   next();
 });
+```
+
+```python
+# throughput.py
+import time
+from collections import defaultdict
+
+request_counts = defaultdict(int)
+
+@app.before_request
+def before_request():
+    request_counts[request.path] += 1
+
+def print_throughput():
+    while True:
+        time.sleep(1)
+        print(f"Throughput: {sum(request_counts.values())} requests/sec")
+
+import threading
+thread = threading.Thread(target=print_throughput, daemon=True)
+thread.start()
 ```
 
 ### Error Rate
@@ -131,47 +151,127 @@ app.use((req, res, next) => {
 The percentage of requests that result in errors.
 
 ```typescript
-// Calculate error rate
-const errorRate = new Gauge({
-  name: 'error_rate',
-  help: 'Error rate',
-  labelNames: ['route'],
+// error-rate.ts
+let totalRequests = 0;
+let errorRequests = 0;
+
+app.use((req, res, next) => {
+  totalRequests++;
+
+  res.on('finish', () => {
+    if (res.statusCode >= 400) {
+      errorRequests++;
+    }
+  });
+
+  next();
 });
 
 setInterval(() => {
-  const errors = errorCounter.getValue();
-  const total = requestCounter.getValue();
-  const rate = errors / total;
-  errorRate.set({ route: 'api' }, rate);
-}, 60000);
+  const errorRate = (errorRequests / totalRequests) * 100;
+  console.log(`Error rate: ${errorRate.toFixed(2)}%`);
+}, 10000);
+```
+
+```python
+# error_rate.py
+from flask import Flask, request, g
+import time
+
+app = Flask(__name__)
+
+total_requests = 0
+error_requests = 0
+
+@app.before_request
+def before_request():
+    global total_requests
+    total_requests += 1
+
+@app.after_request
+def after_request(response):
+    global error_requests
+    if response.status_code >= 400:
+        error_requests += 1
+    return response
+
+def print_error_rate():
+    while True:
+        time.sleep(10)
+        error_rate = (error_requests / total_requests) * 100
+        print(f"Error rate: {error_rate:.2f}%")
+
+import threading
+thread = threading.Thread(target=print_error_rate, daemon=True)
+thread.start()
 ```
 
 ### Apdex Score
 
-Application Performance Index - a measure of user satisfaction.
-
-```
-Apdex = (Satisfied + (Tolerating / 2)) / Total
-
-Where:
-- Satisfied: Response time ≤ T (threshold)
-- Tolerating: T < Response time ≤ 4T
-- Frustrated: Response time > 4T
-
-Example:
-- T = 500ms
-- 100 requests: 80 satisfied, 15 tolerating, 5 frustrated
-- Apdex = (80 + 15/2) / 100 = 0.875 (87.5%)
-```
+Application Performance Index measures user satisfaction based on response times.
 
 ```typescript
-function calculateApdex(responses: number[], threshold: number): number {
-  const satisfied = responses.filter(r => r <= threshold).length;
-  const tolerating = responses.filter(r => r > threshold && r <= threshold * 4).length;
-  const total = responses.length;
+// apdex.ts
+interface ApdexConfig {
+  threshold: number; // Response time threshold (seconds)
+  samples: number[];
+}
 
+function calculateApdex(config: ApdexConfig): number {
+  const { threshold, samples } = config;
+
+  let satisfied = 0;
+  let tolerating = 0;
+  let frustrated = 0;
+
+  for (const sample of samples) {
+    if (sample <= threshold) {
+      satisfied++;
+    } else if (sample <= threshold * 4) {
+      tolerating++;
+    } else {
+      frustrated++;
+    }
+  }
+
+  const total = samples.length;
   return (satisfied + tolerating / 2) / total;
 }
+
+// Usage
+const responseTimes = [0.1, 0.2, 0.15, 0.8, 0.3, 2.5, 0.4];
+const apdex = calculateApdex({ threshold: 0.5, samples: responseTimes });
+
+console.log(`Apdex: ${apdex.toFixed(3)}`); // 0.714
+// 0.714 = 71.4% user satisfaction
+```
+
+```python
+# apdex.py
+from typing import List
+
+def calculate_apdex(threshold: float, samples: List[float]) -> float:
+    """Calculate Apdex score."""
+    satisfied = 0
+    tolerating = 0
+    frustrated = 0
+    
+    for sample in samples:
+        if sample <= threshold:
+            satisfied += 1
+        elif sample <= threshold * 4:
+            tolerating += 1
+        else:
+            frustrated += 1
+    
+    total = len(samples)
+    return (satisfied + tolerating / 2) / total
+
+# Usage
+response_times = [0.1, 0.2, 0.15, 0.8, 0.3, 2.5, 0.4]
+apdex = calculate_apdex(0.5, response_times)
+
+print(f"Apdex: {apdex:.3f}")  # 0.714
 ```
 
 ---
@@ -180,100 +280,167 @@ function calculateApdex(responses: number[], threshold: number): number {
 
 ### New Relic
 
-```typescript
-// Installation
+```bash
 npm install newrelic
+```
 
-// newrelic.js
-exports.config = {
-  app_name: ['My Application'],
-  license_key: process.env.NEW_RELIC_LICENSE_KEY,
-  logging: {
-    level: 'info',
-  },
-  application_logging: {
-    enabled: true,
-  },
-  distributed_tracing: {
-    enabled: true,
-  },
-};
-
-// main.ts
+```typescript
+// newrelic.ts
 import newrelic from 'newrelic';
 
 // Automatic instrumentation
-// No code changes required for Express, MongoDB, etc.
+// No code changes needed for HTTP, database, etc.
+
+// Custom instrumentation
+newrelic.startSegment('customOperation', () => {
+  // Your code here
+});
+
+// Record custom metrics
+newrelic.recordMetric('Custom/Metric', 42);
+
+// Record custom events
+newrelic.recordCustomEvent('CustomEvent', {
+  attribute1: 'value1',
+  attribute2: 'value2',
+});
+```
+
+```python
+# newrelic.py
+import newrelic.agent
+
+# Automatic instrumentation
+# No code changes needed for Flask, Django, etc.
+
+# Custom instrumentation
+@newrelic.agent.function_trace()
+def custom_operation():
+    # Your code here
+    pass
+
+# Record custom metrics
+newrelic.agent.record_custom_metric('Custom/Metric', 42)
+
+# Record custom events
+newrelic.agent.record_custom_event('CustomEvent', {
+    'attribute1': 'value1',
+    'attribute2': 'value2'
+})
 ```
 
 ### DataDog APM
 
-```typescript
-// Installation
+```bash
 npm install dd-trace
+```
 
-// Initialize
+```typescript
+// datadog.ts
 import tracer from 'dd-trace';
 
 tracer.init({
-  service: 'api-server',
-  env: process.env.NODE_ENV,
+  service: 'my-service',
+  env: 'production',
   logInjection: true,
-  analytics: true,
 });
 
-// Manual instrumentation
-import tracer from 'dd-trace';
-
-async function processOrder(orderId: string) {
-  const span = tracer.startSpan('processOrder', {
-    tags: {
-      'order.id': orderId,
-    },
-  });
-
-  try {
-    const result = await validateOrder(orderId);
-    span.setTag('order.valid', true);
-    return result;
-  } catch (error) {
-    span.setTag('error', error.message);
-    throw error;
-  } finally {
-    span.finish();
-  }
+// Custom span
+const span = tracer.startSpan('customOperation');
+try {
+  // Your code here
+} finally {
+  span.finish();
 }
+
+// Record custom metrics
+tracer.recordMetric('custom.metric', 42);
+
+// Record custom events
+tracer.recordEvent('CustomEvent', {
+  attribute1: 'value1',
+  attribute2: 'value2',
+});
+```
+
+```python
+# datadog.py
+from ddtrace import tracer, patch_all
+
+# Patch all supported libraries
+patch_all()
+
+# Custom span
+@tracer.wrap('custom', 'operation')
+def custom_operation():
+    # Your code here
+    pass
+
+# Record custom metrics
+tracer.metric('custom.metric', 42)
+
+# Record custom events
+tracer.event('CustomEvent', {
+    'attribute1': 'value1',
+    'attribute2': 'value2'
+})
 ```
 
 ### Elastic APM
 
-```typescript
-// Installation
+```bash
 npm install elastic-apm-node
+```
 
-// Initialize
+```typescript
+// elastic-apm.ts
 import apm from 'elastic-apm-node';
 
 apm.start({
-  serviceName: 'api-server',
-  serverUrl: process.env.ELASTIC_APM_SERVER_URL,
-  secretToken: process.env.ELASTIC_APM_SECRET_TOKEN,
-  environment: process.env.NODE_ENV,
+  serviceName: 'my-service',
+  serverUrl: 'http://apm-server:8200',
+  environment: 'production',
 });
 
-// Manual transaction
-async function handleRequest(req, res) {
-  const transaction = apm.startTransaction('handleRequest', 'request');
-
-  try {
-    const result = await processOrder(req.body);
-    res.json(result);
-    transaction.end('success');
-  } catch (error) {
-    transaction.end('error');
-    throw error;
-  }
+// Custom span
+const span = apm.startSpan('customOperation');
+try {
+  // Your code here
+} finally {
+  span.end();
 }
+
+// Record custom metrics
+apm.setCustomContext({
+  customMetric: 42,
+});
+
+// Record custom events
+apm.captureError(new Error('Custom error'));
+```
+
+```python
+# elastic_apm.py
+from elasticapm import Client
+
+apm = Client(
+    service_name='my-service',
+    server_url='http://apm-server:8200',
+    environment='production'
+)
+
+# Custom span
+with apm.capture_span('custom_operation'):
+    # Your code here
+    pass
+
+# Record custom metrics
+apm.set_custom_context({
+    'custom_metric': 42
+})
+
+# Record custom events
+apm.capture_exception(Exception('Custom error'))
 ```
 
 ---
@@ -283,215 +450,179 @@ async function handleRequest(req, res) {
 ### Query Duration Tracking
 
 ```typescript
-import { performance } from 'perf_hooks';
+// db-monitoring.ts
+import { PrismaClient } from '@prisma/client';
 
-async function queryDatabase<T>(sql: string, params: any[]): Promise<T> {
-  const start = performance.now();
+const prisma = new PrismaClient();
+
+prisma.$use(async (params, next) => {
+  const start = Date.now();
+  let result;
 
   try {
-    const result = await db.query(sql, params);
-    const duration = performance.now() - start;
-
-    metrics.record('db_query_duration', duration, {
-      operation: sql.split(' ')[0].toUpperCase(),
-      table: extractTable(sql),
-    });
-
-    return result;
+    result = await next(params);
   } catch (error) {
-    metrics.increment('db_query_errors', {
-      operation: sql.split(' ')[0].toUpperCase(),
-    });
+    const duration = Date.now() - start;
+    console.log(`DB Query: ${params.action} on ${params.model} - ${duration}ms`);
     throw error;
   }
-}
+
+  const duration = Date.now() - start;
+  console.log(`DB Query: ${params.action} on ${params.model} - ${duration}ms`);
+
+  return result;
+});
 ```
 
 ```python
+# db_monitoring.py
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 import time
-import prometheus_client
 
-db_query_duration = prometheus_client.Histogram(
-    'db_query_duration_seconds',
-    'Database query duration',
-    ['operation', 'table']
-)
+@event.listens_for(Engine, "before_cursor_execute")
+def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+    context._query_start_time = time.time()
 
-async def query_database(sql: str, params: list):
-    start = time.time()
-    try:
-        result = await db.execute(sql, params)
-        duration = time.time() - start
-
-        operation = sql.split()[0].upper()
-        table = extract_table(sql)
-
-        db_query_duration.labels(
-            operation=operation,
-            table=table
-        ).observe(duration)
-
-        return result
-    except Exception as error:
-        # Track errors
-        pass
-        raise
+@event.listens_for(Engine, "after_cursor_execute")
+def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+    total = time.time() - context._query_start_time
+    print(f"DB Query: {statement} - {total * 1000:.2f}ms")
 ```
 
-### Slow Query Logging
+### Slow Query Detection
 
 ```typescript
+// slow-query.ts
 const SLOW_QUERY_THRESHOLD = 1000; // 1 second
 
-async function queryDatabase<T>(sql: string, params: any[]): Promise<T> {
-  const start = performance.now();
+prisma.$use(async (params, next) => {
+  const start = Date.now();
 
   try {
-    const result = await db.query(sql, params);
-    const duration = performance.now() - start;
+    return await next(params);
+  } finally {
+    const duration = Date.now() - start;
 
     if (duration > SLOW_QUERY_THRESHOLD) {
-      logger.warn('Slow query detected', {
-        sql,
-        params: sanitizeParams(params),
-        duration,
-      });
+      console.warn(`SLOW QUERY: ${params.action} on ${params.model} - ${duration}ms`);
     }
-
-    return result;
-  } catch (error) {
-    throw error;
   }
-}
+});
 ```
 
-### Query Frequency Tracking
+```python
+# slow_query.py
+SLOW_QUERY_THRESHOLD = 1.0  # 1 second
 
-```typescript
-const queryFrequency = new Map<string, number>();
-
-function trackQuery(sql: string) {
-  const normalized = normalizeSQL(sql);
-  queryFrequency.set(normalized, (queryFrequency.get(normalized) || 0) + 1);
-
-  if (queryFrequency.get(normalized) > 100) {
-    logger.warn('High frequency query detected', {
-      sql: normalized,
-      frequency: queryFrequency.get(normalized),
-    });
-  }
-}
+@event.listens_for(Engine, "after_cursor_execute")
+def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+    total = time.time() - context._query_start_time
+    
+    if total > SLOW_QUERY_THRESHOLD:
+        print(f"SLOW QUERY: {statement} - {total:.2f}s")
 ```
 
 ---
 
 ## N+1 Query Detection
 
-### What is N+1 Query Problem?
-
-```
-N+1 Query Problem:
-- 1 query to fetch N records
-- N queries to fetch related data for each record
-
-Example:
-1. SELECT * FROM users (N=10 users)
-2. SELECT * FROM posts WHERE user_id = 1
-3. SELECT * FROM posts WHERE user_id = 2
-...
-11. SELECT * FROM posts WHERE user_id = 10
-
-Total: 11 queries (1 + N)
-```
-
-### Detection with APM
+### Detect N+1 Queries
 
 ```typescript
-// Detect N+1 queries
-const queryCount = new Map<string, number>();
+// n-plus-one.ts
+const queryCounts = new Map<string, number>();
 
-async function detectNPlusOne() {
-  queryCount.clear();
+prisma.$use(async (params, next) => {
+  const key = `${params.action}:${params.model}`;
+  const count = queryCounts.get(key) || 0;
+  queryCounts.set(key, count + 1);
 
-  // Run operation
-  await fetchUsersWithPosts();
+  const result = await next(params);
 
-  // Check for patterns
-  for (const [query, count] of queryCount.entries()) {
-    if (count > 10) {
-      logger.warn('Potential N+1 query detected', {
-        query,
-        count,
-      });
-    }
+  // Check for N+1 queries
+  if (count > 10) {
+    console.warn(`Potential N+1 query detected: ${key} - ${count + 1} queries`);
   }
-}
 
-// Wrap database client
-const originalQuery = db.query.bind(db);
-db.query = function(sql: string, params: any[]) {
-  const key = normalizeSQL(sql);
-  queryCount.set(key, (queryCount.get(key) || 0) + 1);
-  return originalQuery(sql, params);
-};
+  // Reset counter after request
+  setTimeout(() => {
+    queryCounts.set(key, 0);
+  }, 0);
+
+  return result;
+});
 ```
 
-### Prevention with Eager Loading
+```python
+# n_plus_one.py
+from collections import defaultdict
+
+query_counts = defaultdict(int)
+
+def check_n_plus_one(action: str, model: str):
+    """Check for N+1 queries."""
+    key = f"{action}:{model}"
+    query_counts[key] += 1
+    
+    if query_counts[key] > 10:
+        print(f"Potential N+1 query detected: {key} - {query_counts[key]} queries")
+    
+    # Reset counter after request
+    import threading
+    timer = threading.Timer(0, lambda: query_counts.__setitem__(key, 0))
+    timer.start()
+```
+
+### Fix N+1 Queries
 
 ```typescript
-// ❌ BAD - N+1 queries
-async function getUsersWithPosts() {
-  const users = await db.query('SELECT * FROM users');
+// fix-n-plus-one.ts
+// Bad: N+1 queries
+async function getUsersWithPostsBad() {
+  const users = await prisma.user.findMany();
 
   for (const user of users) {
-    user.posts = await db.query(
-      'SELECT * FROM posts WHERE user_id = ?',
-      [user.id]
-    );
+    const posts = await prisma.post.findMany({
+      where: { userId: user.id },
+    });
+    user.posts = posts;
   }
 
   return users;
 }
 
-// ✅ GOOD - Single query with JOIN
-async function getUsersWithPosts() {
-  return await db.query(`
-    SELECT
-      users.*,
-      posts.id as post_id,
-      posts.title as post_title
-    FROM users
-    LEFT JOIN posts ON users.id = posts.user_id
-  `);
-}
-
-// ✅ GOOD - Using ORM eager loading
-async function getUsersWithPosts() {
-  return await User.findAll({
-    include: [Post],
+// Good: Single query with includes
+async function getUsersWithPostsGood() {
+  return prisma.user.findMany({
+    include: {
+      posts: true,
+    },
   });
 }
 ```
 
-### Prevention with DataLoader
+```python
+# fix_n_plus_one.py
+# Bad: N+1 queries
+async def get_users_with_posts_bad():
+    users = await prisma.user.find_many()
+    
+    for user in users:
+        posts = await prisma.post.find_many(
+            where={'user_id': user.id}
+        )
+        user.posts = posts
+    
+    return users
 
-```typescript
-import DataLoader from 'dataloader';
-
-const postsLoader = new DataLoader(async (userIds: readonly string[]) => {
-  const posts = await db.query(
-    'SELECT * FROM posts WHERE user_id IN (?)',
-    [userIds]
-  );
-
-  return userIds.map(id =>
-    posts.filter(post => post.user_id === id)
-  );
-});
-
-async function getUserPosts(userId: string) {
-  return await postsLoader.load(userId);
-}
+# Good: Single query with includes
+async def get_users_with_posts_good():
+    return await prisma.user.find_many(
+        include={
+            'posts': True
+        }
+    )
 ```
 
 ---
@@ -501,85 +632,73 @@ async function getUserPosts(userId: string) {
 ### Node.js Memory Profiling
 
 ```typescript
-// Get memory usage
-function getMemoryUsage() {
-  const usage = process.memoryUsage();
-  return {
-    rss: usage.rss / 1024 / 1024, // MB
-    heapTotal: usage.heapTotal / 1024 / 1024,
-    heapUsed: usage.heapUsed / 1024 / 1024,
-    external: usage.external / 1024 / 1024,
-  };
+// memory-profiling.ts
+import v8 from 'v8';
+
+// Get heap statistics
+function getHeapStats() {
+  const stats = v8.getHeapStatistics();
+
+  console.log('Heap Statistics:');
+  console.log(`  Total heap size: ${(stats.total_heap_size / 1024 / 1024).toFixed(2)} MB`);
+  console.log(`  Used heap size: ${(stats.used_heap_size / 1024 / 1024).toFixed(2)} MB`);
+  console.log(`  Heap size limit: ${(stats.heap_size_limit / 1024 / 1024).toFixed(2)} MB`);
+  console.log(`  Malloced memory: ${(stats.malloced_memory / 1024 / 1024).toFixed(2)} MB`);
 }
 
-// Track memory over time
-setInterval(() => {
-  const usage = getMemoryUsage();
-  metrics.record('memory_usage', usage.heapUsed, {
-    type: 'heap_used',
-  });
-}, 60000);
-
-// Detect memory leaks
-let previousUsage = getMemoryUsage();
-setInterval(() => {
-  const currentUsage = getMemoryUsage();
-  const increase = currentUsage.heapUsed - previousUsage.heapUsed;
-
-  if (increase > 100) { // 100 MB increase
-    logger.warn('Potential memory leak detected', {
-      increase: `${increase} MB`,
-      current: currentUsage,
-    });
-  }
-
-  previousUsage = currentUsage;
-}, 300000); // Check every 5 minutes
-```
-
-### Heap Snapshot Analysis
-
-```typescript
-import { writeHeapSnapshot } from 'v8';
-
-// Take heap snapshot
-function takeHeapSnapshot() {
-  const filename = `heap-${Date.now()}.heapsnapshot`;
-  writeHeapSnapshot(filename);
-  logger.info(`Heap snapshot saved: ${filename}`);
+// Get heap snapshot
+function getHeapSnapshot() {
+  const snapshot = v8.getHeapSnapshot();
+  return snapshot;
 }
 
-// Schedule snapshots
-setInterval(takeHeapSnapshot, 3600000); // Every hour
+// Monitor memory usage
+setInterval(() => {
+  const used = process.memoryUsage();
+  console.log(`Memory Usage:`);
+  console.log(`  RSS: ${(used.rss / 1024 / 1024).toFixed(2)} MB`);
+  console.log(`  Heap Total: ${(used.heapTotal / 1024 / 1024).toFixed(2)} MB`);
+  console.log(`  Heap Used: ${(used.heapUsed / 1024 / 1024).toFixed(2)} MB`);
+  console.log(`  External: ${(used.external / 1024 / 1024).toFixed(2)} MB`);
+}, 60000); // Every minute
 ```
 
 ### Python Memory Profiling
 
 ```python
+# memory_profiling.py
 import psutil
-import prometheus_client
+import gc
+import time
 
-memory_usage = prometheus_client.Gauge(
-    'memory_usage_bytes',
-    'Memory usage',
-    ['type']
-)
-
-def track_memory():
+def get_memory_stats():
+    """Get memory statistics."""
     process = psutil.Process()
-    memory_info = process.memory_info()
+    mem_info = process.memory_info()
+    
+    print('Memory Usage:')
+    print(f'  RSS: {mem_info.rss / 1024 / 1024:.2f} MB')
+    print(f'  VMS: {mem_info.vms / 1024 / 1024:.2f} MB')
+    print(f'  Heap: {process.memory_info().rss / 1024 / 1024:.2f} MB')
 
-    memory_usage.labels(type='rss').set(memory_info.rss)
-    memory_usage.labels(type='vms').set(memory_info.vms)
+def get_object_stats():
+    """Get Python object statistics."""
+    gc.collect()
+    
+    print('Object Statistics:')
+    print(f'  Total objects: {len(gc.get_objects())}')
+    print(f'  Unreachable objects: {len(gc.garbage)}')
 
-# Track memory over time
-import threading
-def memory_tracker():
+def monitor_memory():
+    """Monitor memory usage."""
     while True:
-        track_memory()
-        time.sleep(60)
+        get_memory_stats()
+        get_object_stats()
+        time.sleep(60)  # Every minute
 
-threading.Thread(target=memory_tracker, daemon=True).start()
+import threading
+thread = threading.Thread(target=monitor_memory, daemon=True)
+thread.start()
 ```
 
 ---
@@ -589,453 +708,299 @@ threading.Thread(target=memory_tracker, daemon=True).start()
 ### Node.js CPU Profiling
 
 ```typescript
+// cpu-profiling.ts
 import { Profiler } from 'v8';
 
-// Start CPU profiler
 const profiler = new Profiler();
-profiler.startProfiling('cpu-profile', true);
 
-// ... run application for some time ...
+// Start profiling
+profiler.startProfiling('cpu-profile', 1, 1000);
 
-// Stop and save profile
+// Run your code
+// ...
+
+// Stop profiling
 const profile = profiler.stopProfiling('cpu-profile');
-profile.export((error, result) => {
-  if (!error) {
-    fs.writeFileSync('cpu-profile.cpuprofile', result);
-  }
-});
 
-// Load in Chrome DevTools
-// chrome://inspect -> Profiler -> Load
+// Save profile
+const fs = require('fs');
+fs.writeFileSync('cpu-profile.cpuprofile', JSON.stringify(profile));
 ```
 
 ### Python CPU Profiling
 
 ```python
+# cpu_profiling.py
 import cProfile
 import pstats
-from io import StringIO
+import io
 
-def profile_function(func, *args, **kwargs):
-    pr = cProfile.Profile()
-    pr.enable()
-
-    result = func(*args, **kwargs)
-
-    pr.disable()
-
-    # Print stats
-    s = StringIO()
-    ps = pstats.Stats(pr, stream=s).sort_stats('cumulative')
-    ps.print_stats()
-    print(s.getvalue())
-
-    return result
+def profile_function(func):
+    """Decorator to profile a function."""
+    def wrapper(*args, **kwargs):
+        profiler = cProfile.Profile()
+        profiler.enable()
+        
+        result = func(*args, **kwargs)
+        
+        profiler.disable()
+        
+        # Print stats
+        s = io.StringIO()
+        ps = pstats.Stats(profiler, stream=s).sort_stats('cumulative')
+        ps.print_stats()
+        print(s.getvalue())
+        
+        return result
+    
+    return wrapper
 
 # Usage
+@profile_function
 def my_function():
-    # ... code ...
+    # Your code here
     pass
-
-profile_function(my_function)
-```
-
-### Flame Graphs
-
-```bash
-# Install flamegraph
-npm install -g 0x
-
-# Run with flamegraph
-0x --output-dir profiles node server.js
-
-# View flamegraph
-# Open profiles/flamegraph.html in browser
 ```
 
 ---
 
 ## Bottleneck Identification
 
-### Response Time Breakdown
+### Identify Slow Endpoints
 
 ```typescript
-// Track each step of request processing
-async function handleRequest(req, res) {
-  const steps: Record<string, number> = {};
+// slow-endpoints.ts
+import express from 'express';
 
+const app = express();
+const endpointStats = new Map<string, { count: number; totalTime: number }>();
+
+app.use((req, res, next) => {
   const start = Date.now();
+  const endpoint = `${req.method} ${req.path}`;
 
-  // Authentication
-  const authStart = Date.now();
-  await authenticate(req);
-  steps.authentication = Date.now() - authStart;
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    const stats = endpointStats.get(endpoint) || { count: 0, totalTime: 0 };
+    stats.count++;
+    stats.totalTime += duration;
+    endpointStats.set(endpoint, stats);
 
-  // Authorization
-  const authzStart = Date.now();
-  await authorize(req);
-  steps.authorization = Date.now() - authzStart;
-
-  // Business logic
-  const logicStart = Date.now();
-  const result = await processRequest(req);
-  steps.business_logic = Date.now() - logicStart;
-
-  // Response
-  steps.total = Date.now() - start;
-
-  // Log breakdown
-  logger.info('Request breakdown', steps);
-
-  // Identify bottleneck
-  const bottleneck = Object.entries(steps)
-    .filter(([key]) => key !== 'total')
-    .sort(([, a], [, b]) => b - a)[0];
-
-  if (bottleneck[1] > steps.total * 0.5) {
-    logger.warn('Bottleneck detected', {
-      step: bottleneck[0],
-      duration: bottleneck[1],
-      percentage: (bottleneck[1] / steps.total * 100).toFixed(2),
-    });
-  }
-
-  res.json(result);
-}
-```
-
-### Database Bottleneck Detection
-
-```typescript
-// Track database time vs total time
-async function handleRequest(req, res) {
-  const totalStart = Date.now();
-  let dbTime = 0;
-
-  const dbQuery = async (sql: string, params: any[]) => {
-    const start = Date.now();
-    const result = await db.query(sql, params);
-    dbTime += Date.now() - start;
-    return result;
-  };
-
-  // Use dbQuery instead of db.query
-  const users = await dbQuery('SELECT * FROM users', []);
-  const posts = await dbQuery('SELECT * FROM posts', []);
-
-  const totalTime = Date.now() - totalStart;
-  const dbPercentage = (dbTime / totalTime) * 100;
-
-  if (dbPercentage > 50) {
-    logger.warn('Database bottleneck detected', {
-      dbTime,
-      totalTime,
-      percentage: dbPercentage.toFixed(2),
-    });
-  }
-
-  res.json({ users, posts });
-}
-```
-
-### External API Bottleneck Detection
-
-```typescript
-async function callExternalAPI(url: string) {
-  const start = Date.now();
-  const response = await fetch(url);
-  const duration = Date.now() - start;
-
-  metrics.record('external_api_duration', duration, {
-    url,
-    status: response.status,
+    const avgTime = stats.totalTime / stats.count;
+    console.log(`${endpoint} - ${duration}ms (avg: ${avgTime.toFixed(0)}ms)`);
   });
 
-  if (duration > 5000) {
-    logger.warn('Slow external API call', {
-      url,
-      duration,
-    });
+  next();
+});
+
+// Print slow endpoints
+setInterval(() => {
+  console.log('\nSlow Endpoints:');
+  const sorted = Array.from(endpointStats.entries())
+    .sort((a, b) => b[1].totalTime / b[1].count - a[1].totalTime / a[1].count);
+
+  for (const [endpoint, stats] of sorted.slice(0, 10)) {
+    const avgTime = stats.totalTime / stats.count;
+    console.log(`  ${endpoint} - ${avgTime.toFixed(0)}ms (${stats.count} requests)`);
+  }
+}, 60000);
+```
+
+### Identify Memory Leaks
+
+```typescript
+// memory-leaks.ts
+import v8 from 'v8';
+
+const heapSnapshots: any[] = [];
+
+function takeHeapSnapshot() {
+  const snapshot = v8.getHeapSnapshot();
+  heapSnapshots.push({
+    timestamp: Date.now(),
+    snapshot,
+  });
+
+  // Keep only last 10 snapshots
+  if (heapSnapshots.length > 10) {
+    heapSnapshots.shift();
   }
 
-  return response;
+  // Check for memory leak
+  if (heapSnapshots.length >= 2) {
+    const current = heapSnapshots[heapSnapshots.length - 1];
+    const previous = heapSnapshots[heapSnapshots.length - 2];
+
+    const currentSize = current.snapshot.getHeapStatistics().used_heap_size;
+    const previousSize = previous.snapshot.getHeapStatistics().used_heap_size;
+    const growth = currentSize - previousSize;
+
+    if (growth > 10 * 1024 * 1024) { // 10MB growth
+      console.warn(`Memory leak detected: ${(growth / 1024 / 1024).toFixed(2)} MB growth`);
+    }
+  }
 }
+
+// Take snapshot every minute
+setInterval(takeHeapSnapshot, 60000);
 ```
 
 ---
 
 ## Performance Budgets
 
-### Setting Performance Budgets
+### Define Performance Budgets
 
 ```typescript
+// performance-budgets.ts
 interface PerformanceBudget {
-  responseTime: number; // ms
-  databaseTime: number; // ms
-  externalAPICall: number; // ms
-  memoryUsage: number; // MB
-  cpuUsage: number; // percentage
+  name: string;
+  budget: number;
+  actual: number;
+  threshold: number; // Percentage of budget
 }
 
-const budgets: Record<string, PerformanceBudget> = {
-  api: {
-    responseTime: 200,
-    databaseTime: 50,
-    externalAPICall: 100,
-    memoryUsage: 512,
-    cpuUsage: 50,
+const budgets: PerformanceBudget[] = [
+  {
+    name: 'First Contentful Paint (FCP)',
+    budget: 1800, // 1.8 seconds
+    actual: 0,
+    threshold: 0.8, // 80% of budget
   },
-  worker: {
-    responseTime: 5000,
-    databaseTime: 1000,
-    externalAPICall: 2000,
-    memoryUsage: 1024,
-    cpuUsage: 80,
+  {
+    name: 'Largest Contentful Paint (LCP)',
+    budget: 2500, // 2.5 seconds
+    actual: 0,
+    threshold: 0.75, // 75% of budget
   },
-};
+  {
+    name: 'Time to Interactive (TTI)',
+    budget: 3800, // 3.8 seconds
+    actual: 0,
+    threshold: 0.8, // 80% of budget
+  },
+  {
+    name: 'Total Blocking Time (TBT)',
+    budget: 300, // 300ms
+    actual: 0,
+    threshold: 0.8, // 80% of budget
+  },
+];
 
-function checkBudget(operation: string, metric: keyof PerformanceBudget, value: number) {
-  const budget = budgets[operation];
-  if (!budget) return;
+function checkBudgets(): void {
+  let failed = false;
 
-  if (value > budget[metric]) {
-    logger.warn('Performance budget exceeded', {
-      operation,
-      metric,
-      value,
-      budget: budget[metric],
-      exceedBy: value - budget[metric],
-    });
+  for (const budget of budgets) {
+    const threshold = budget.budget * budget.threshold;
+
+    if (budget.actual > threshold) {
+      console.error(`Budget exceeded: ${budget.name}`);
+      console.error(`  Budget: ${budget.budget}ms`);
+      console.error(`  Actual: ${budget.actual}ms`);
+      console.error(`  Threshold: ${threshold}ms`);
+      failed = true;
+    }
   }
-}
 
-// Usage
-async function handleAPIRequest(req, res) {
-  const start = Date.now();
-
-  try {
-    const result = await processRequest(req);
-    const duration = Date.now() - start;
-
-    checkBudget('api', 'responseTime', duration);
-
-    res.json(result);
-  } catch (error) {
-    const duration = Date.now() - start;
-    checkBudget('api', 'responseTime', duration);
-    throw error;
+  if (!failed) {
+    console.log('All budgets within threshold');
   }
 }
 ```
 
-### Web Vitals Budgets
+### Web Vitals Monitoring
 
-```typescript
-// Core Web Vitals
-const webVitalsBudgets = {
-  LCP: 2500, // Largest Contentful Paint
-  FID: 100, // First Input Delay
-  CLS: 0.1, // Cumulative Layout Shift
-  FCP: 1800, // First Contentful Paint
-  TTI: 3800, // Time to Interactive
-};
+```tsx
+// web-vitals.tsx
+import { onCLS, onFID, onFCP, onLCP, onTTFB } from 'web-vitals';
 
-function checkWebVitals(name: string, value: number) {
-  const budget = webVitalsBudgets[name as keyof typeof webVitalsBudgets];
-  if (!budget) return;
-
-  if (value > budget) {
-    logger.warn('Web vital budget exceeded', {
-      metric: name,
-      value,
-      budget,
-      exceedBy: value - budget,
-    });
-  }
+function sendToAnalytics(metric: any) {
+  // Send to your analytics service
+  console.log(metric);
 }
 
-// Usage with web-vitals library
-import { getCLS, getFID, getFCP, getLCP, getTTI } from 'web-vitals';
-
-getCLS((metric) => checkWebVitals('CLS', metric.value));
-getFID((metric) => checkWebVitals('FID', metric.value));
-getFCP((metric) => checkWebVitals('FCP', metric.value));
-getLCP((metric) => checkWebVitals('LCP', metric.value));
-getTTI((metric) => checkWebVitals('TTI', metric.value));
+onCLS(sendToAnalytics);
+onFID(sendToAnalytics);
+onFCP(sendToAnalytics);
+onLCP(sendToAnalytics);
+onTTFB(sendToAnalytics);
 ```
 
 ---
 
 ## Best Practices
 
-### 1. Monitor Early and Often
+### 1. Monitor Key Metrics
 
 ```typescript
-// Start monitoring from development
-if (process.env.NODE_ENV === 'development') {
-  const profiler = new Profiler();
-  profiler.startProfiling();
+// key-metrics.ts
+// Monitor these metrics:
+// - Response time
+// - Throughput
+// - Error rate
+// - Apdex score
+// - Memory usage
+// - CPU usage
+// - Database query time
+```
+
+### 2. Set Alerts
+
+```typescript
+// alerts.ts
+// Alert when:
+// - Response time > threshold
+// - Error rate > threshold
+// - Memory usage > threshold
+// - CPU usage > threshold
+// - Database query time > threshold
+```
+
+### 3. Profile Regularly
+
+```typescript
+// profiling.ts
+// Profile your application:
+// - Before major releases
+// - When performance issues are reported
+// - Regularly (e.g., weekly)
+```
+
+### 4. Use Sampling
+
+```typescript
+// sampling.ts
+// Sample expensive operations to reduce overhead
+const shouldSample = Math.random() < 0.1; // 10% sampling
+
+if (shouldSample) {
+  // Profile or trace this operation
 }
 ```
 
-### 2. Set Meaningful Alerts
+### 5. Correlate Metrics
 
 ```typescript
-// Alert on degraded performance
-if (averageResponseTime > 500) {
-  alert('High response time detected');
-}
-
-if (errorRate > 0.01) {
-  alert('High error rate detected');
-}
-
-if (memoryUsage > 90) {
-  alert('High memory usage detected');
-}
-```
-
-### 3. Track User Experience
-
-```typescript
-// Track user-facing metrics
-import { onCLS, onFID, onLCP } from 'web-vitals';
-
-onCLS((metric) => {
-  metrics.record('web_vital', metric.value, {
-    name: 'CLS',
-    rating: metric.rating,
-  });
-});
-
-onFID((metric) => {
-  metrics.record('web_vital', metric.value, {
-    name: 'FID',
-    rating: metric.rating,
-  });
-});
-
-onLCP((metric) => {
-  metrics.record('web_vital', metric.value, {
-    name: 'LCP',
-    rating: metric.rating,
-  });
-});
-```
-
-### 4. Profile Regularly
-
-```typescript
-// Schedule regular profiling
-setInterval(() => {
-  takeHeapSnapshot();
-}, 3600000); // Every hour
-
-setInterval(() => {
-  takeCPUProfile();
-}, 86400000); // Every day
-```
-
-### 5. Analyze Trends
-
-```typescript
-// Track performance over time
-const performanceHistory: Array<{ timestamp: number; metrics: any }> = [];
-
-function recordPerformance(metrics: any) {
-  performanceHistory.push({
-    timestamp: Date.now(),
-    metrics,
-  });
-
-  // Keep last 30 days
-  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
-  while (performanceHistory[0]?.timestamp < thirtyDaysAgo) {
-    performanceHistory.shift();
-  }
-}
-
-// Analyze trends
-function analyzeTrends() {
-  const recent = performanceHistory.slice(-100);
-  const older = performanceHistory.slice(-200, -100);
-
-  const recentAvg = calculateAverage(recent.map(r => r.metrics.responseTime));
-  const olderAvg = calculateAverage(older.map(o => o.metrics.responseTime));
-
-  const trend = ((recentAvg - olderAvg) / olderAvg) * 100;
-
-  logger.info('Performance trend', {
-    recentAvg,
-    olderAvg,
-    trend: `${trend.toFixed(2)}%`,
-  });
-
-  if (trend > 10) {
-    logger.warn('Performance degrading', { trend });
-  }
-}
-```
-
-### 6. Use Sampling in Production
-
-```typescript
-// Sample transactions to reduce overhead
-const SAMPLE_RATE = 0.1; // 10%
-
-async function handleRequest(req, res) {
-  const shouldSample = Math.random() < SAMPLE_RATE;
-
-  if (shouldSample) {
-    const transaction = startTransaction('handleRequest');
-    // ... process request ...
-    transaction.finish();
-  } else {
-    // ... process request without tracing ...
-  }
-}
-```
-
-### 7. Correlate Metrics
-
-```typescript
-// Correlate errors with performance
-const errorsByPerformance = {
-  fast: 0,
-  medium: 0,
-  slow: 0,
-};
-
-function recordError(duration: number) {
-  if (duration < 100) {
-    errorsByPerformance.fast++;
-  } else if (duration < 500) {
-    errorsByPerformance.medium++;
-  } else {
-    errorsByPerformance.slow++;
-  }
-}
-
-// Analyze correlation
-function analyzeErrorCorrelation() {
-  const total = errorsByPerformance.fast +
-                errorsByPerformance.medium +
-                errorsByPerformance.slow;
-
-  logger.info('Error correlation', {
-    fast: (errorsByPerformance.fast / total * 100).toFixed(2) + '%',
-    medium: (errorsByPerformance.medium / total * 100).toFixed(2) + '%',
-    slow: (errorsByPerformance.slow / total * 100).toFixed(2) + '%',
-  });
-}
+// correlate.ts
+// Correlate metrics to find patterns:
+// - High response time with high CPU usage
+// - High error rate with database issues
+// - Memory leaks with specific operations
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [New Relic Documentation](https://docs.newrelic.com/)
-- [DataDog APM Documentation](https://docs.datadoghq.com/tracing/)
-- [Elastic APM Documentation](https://www.elastic.co/guide/en/apm/index.html)
-- [Web Vitals](https://web.dev/vitals/)
-- [Node.js Performance](https://nodejs.org/en/docs/guides/simple-profiling/)
+This skill covers comprehensive performance monitoring implementation including:
+
+- **APM Concepts**: What is APM and architecture
+- **Key Metrics**: Response time, throughput, error rate, Apdex score
+- **Tools**: New Relic, DataDog APM, Elastic APM
+- **Database Query Monitoring**: Query duration tracking and slow query detection
+- **N+1 Query Detection**: Detecting and fixing N+1 queries
+- **Memory Profiling**: Node.js and Python memory profiling
+- **CPU Profiling**: Node.js and Python CPU profiling
+- **Bottleneck Identification**: Slow endpoints and memory leaks
+- **Performance Budgets**: Defining and checking budgets
+- **Best Practices**: Monitoring, alerts, profiling, sampling, correlation

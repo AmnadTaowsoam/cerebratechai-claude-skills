@@ -1,6 +1,8 @@
 # Kubernetes Deployment
 
-A comprehensive guide to Kubernetes deployment and orchestration.
+## Overview
+
+Kubernetes is a container orchestration platform that automates deployment, scaling, and management of containerized applications. This skill covers K8s concepts, resources, and best practices.
 
 ## Table of Contents
 
@@ -24,37 +26,26 @@ A comprehensive guide to Kubernetes deployment and orchestration.
 ### Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Control Plane                            │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐      │
-│  │   API       │  │  Scheduler  │  │ Controller  │      │
-│  │   Server    │  │             │  │   Manager   │      │
-│  └─────────────┘  └─────────────┘  └─────────────┘      │
-│  ┌─────────────┐  ┌─────────────┐                         │
-│  │   etcd     │  │ Cloud       │                         │
-│  │  (Storage) │  │ Controller  │                         │
-│  └─────────────┘  └─────────────┘                         │
-└─────────────────────────────────────────────────────────────┘
-                           │
-                           │
-┌─────────────────────────────────────────────────────────────┐
-│                      Worker Nodes                         │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │ Node 1                                           │   │
-│  │  ┌─────────┐ ┌─────────┐ ┌─────────┐            │   │
-│  │  │  Pod 1  │ │  Pod 2  │ │  Pod 3  │            │   │
-│  │  └─────────┘ └─────────┘ └─────────┘            │   │
-│  │  ┌─────────┐ ┌─────────┐                         │   │
-│  │  │ Kubelet │ │Proxy    │                         │   │
-│  │  └─────────┘ └─────────┘                         │   │
-│  └─────────────────────────────────────────────────────┘   │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │ Node 2                                           │   │
-│  │  ┌─────────┐ ┌─────────┐                         │   │
-│  │  │  Pod 4  │ │  Pod 5  │                         │   │
-│  │  └─────────┘ └─────────┘                         │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────┐
+│            Kubernetes Cluster           │
+├─────────────────────────────────────────────┤
+│  ┌──────────────┐  ┌──────────────┐ │
+│  │  Master Node  │  │  Worker Node 1│ │
+│  │              │  │              │ │
+│  │  API Server   │  │  ┌──────────┐ │ │
+│  │  Scheduler   │  │  │  Pod 1   │ │ │
+│  │  Controller  │  │  └──────────┘ │ │
+│  │  etcd        │  │  ┌──────────┐ │ │
+│  └──────────────┘  │  │  Pod 2   │ │ │
+│                   │  └──────────┘ │ │
+│  ┌──────────────┐  ┌──────────────┐ │
+│  │  Worker Node 2│  │  Worker Node 3│ │
+│  │              │  │              │ │
+│  │  ┌──────────┐ │  │  ┌──────────┐ │ │
+│  │  │  Pod 3   │ │  │  │  Pod 4   │ │ │
+│  │  └──────────┘ │  │  └──────────┘ │ │
+│  └──────────────┘  └──────────────┘ │
+└─────────────────────────────────────────────┘
 ```
 
 ### Key Concepts
@@ -62,15 +53,13 @@ A comprehensive guide to Kubernetes deployment and orchestration.
 | Concept | Description |
 |---------|-------------|
 | **Pod** | Smallest deployable unit, contains one or more containers |
-| **Deployment** | Manages replica sets and rolling updates |
+| **Deployment** | Manages replicated pods |
 | **Service** | Stable network endpoint for pods |
 | **ConfigMap** | Configuration data |
 | **Secret** | Sensitive data |
-| **Ingress** | HTTP/HTTPS routing |
+| **Ingress** | HTTP/HTTPS routing to services |
 | **PersistentVolume** | Storage resource |
 | **PersistentVolumeClaim** | Request for storage |
-| **Namespace** | Virtual cluster |
-| **HPA** | Horizontal Pod Autoscaler |
 
 ---
 
@@ -79,6 +68,7 @@ A comprehensive guide to Kubernetes deployment and orchestration.
 ### Pod
 
 ```yaml
+# pod.yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -88,42 +78,38 @@ metadata:
     version: v1
 spec:
   containers:
-  - name: myapp
-    image: myapp:1.0.0
-    ports:
-    - containerPort: 3000
-    env:
-    - name: NODE_ENV
-      value: production
-    - name: DATABASE_URL
-      valueFrom:
-        secretKeyRef:
-          name: db-secret
-          key: url
-    resources:
-      requests:
-        memory: "256Mi"
-        cpu: "250m"
-      limits:
-        memory: "512Mi"
-        cpu: "500m"
-    livenessProbe:
-      httpGet:
-        path: /health
-        port: 3000
-      initialDelaySeconds: 30
-      periodSeconds: 10
-    readinessProbe:
-      httpGet:
-        path: /ready
-        port: 3000
-      initialDelaySeconds: 5
-      periodSeconds: 5
+    - name: myapp
+      image: myapp:1.0.0
+      ports:
+        - containerPort: 3000
+      env:
+        - name: NODE_ENV
+          value: production
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "250m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 3000
+        initialDelaySeconds: 30
+        periodSeconds: 10
+      readinessProbe:
+        httpGet:
+          path: /ready
+          port: 3000
+        initialDelaySeconds: 5
+        periodSeconds: 5
 ```
 
 ### Deployment
 
 ```yaml
+# deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -135,11 +121,6 @@ spec:
   selector:
     matchLabels:
       app: myapp
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
   template:
     metadata:
       labels:
@@ -147,35 +128,38 @@ spec:
         version: v1
     spec:
       containers:
-      - name: myapp
-        image: myapp:1.0.0
-        ports:
-        - containerPort: 3000
-        env:
-        - name: NODE_ENV
-          value: production
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 30
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 3000
-          initialDelaySeconds: 5
+        - name: myapp
+          image: myapp:1.0.0
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: production
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
 ```
 
 ### Service
 
 ```yaml
+# service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -185,69 +169,101 @@ spec:
   selector:
     app: myapp
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 3000
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  sessionAffinity: None
+```
+
+### LoadBalancer Service
+
+```yaml
+# loadbalancer.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-lb
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+spec:
+  type: LoadBalancer
+  selector:
+    app: myapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
 ```
 
 ### ConfigMap
 
 ```yaml
+# configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: myapp-config
 data:
-  NODE_ENV: production
-  PORT: "3000"
-  LOG_LEVEL: info
-  config.yaml: |
-    server:
-      port: 3000
-    database:
-      host: db-service
-      port: 5432
+  app.properties: |
+    server.port=3000
+    database.url=postgresql://db:5432/mydb
+  config.json: |
+    {
+      "server": {
+        "port": 3000
+      },
+      "database": {
+        "url": "postgresql://db:5432/mydb"
+      }
+    }
 ```
 
 ### Secret
 
 ```yaml
+# secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
   name: myapp-secret
 type: Opaque
-data:
-  DATABASE_URL: cG9zdGdyZXNxbDovL3VzZXI6cGFzc3dvcmRAZGItc2VydmljZTo1NDMyL2FwcA==
-  API_KEY: YXBpLWtleS12YWx1ZQ==
+stringData:
+  database-password: mysecretpassword
+  api-key: myapikey
 ```
 
 ### Ingress
 
 ```yaml
+# ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: myapp-ingress
   annotations:
-    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  ingressClassName: nginx
   tls:
-  - hosts:
-    - myapp.example.com
-    secretName: myapp-tls
+    - hosts:
+        - myapp.example.com
+      secretName: myapp-tls
   rules:
-  - host: myapp.example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: myapp-service
-            port:
-              number: 80
+    - host: myapp.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: myapp-service
+                port:
+                  number: 80
 ```
 
 ---
@@ -257,6 +273,7 @@ spec:
 ### Rolling Update
 
 ```yaml
+# rolling-update.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -266,18 +283,25 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 1        # Max additional pods during update
-      maxUnavailable: 0   # Max unavailable pods during update
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: myapp
   template:
+    metadata:
+      labels:
+        app: myapp
     spec:
       containers:
-      - name: myapp
-        image: myapp:1.0.0
+        - name: myapp
+          image: myapp:1.0.0
 ```
 
 ### Recreate
 
 ```yaml
+# recreate.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -285,18 +309,24 @@ metadata:
 spec:
   replicas: 3
   strategy:
-    type: Recreate  # Kill all pods before creating new ones
+    type: Recreate
+  selector:
+    matchLabels:
+      app: myapp
   template:
+    metadata:
+      labels:
+        app: myapp
     spec:
       containers:
-      - name: myapp
-        image: myapp:1.0.0
+        - name: myapp
+          image: myapp:1.0.0
 ```
 
-### Blue/Green Deployment
+### Blue-Green Deployment
 
 ```yaml
-# Blue deployment (current)
+# blue-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -314,11 +344,12 @@ spec:
         version: blue
     spec:
       containers:
-      - name: myapp
-        image: myapp:1.0.0
+        - name: myapp
+          image: myapp:1.0.0
+```
 
----
-# Green deployment (new)
+```yaml
+# green-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -336,50 +367,14 @@ spec:
         version: green
     spec:
       containers:
-      - name: myapp
-        image: myapp:2.0.0
-
----
-# Service pointing to blue or green
-apiVersion: v1
-kind: Service
-metadata:
-  name: myapp-service
-spec:
-  selector:
-    app: myapp
-    version: blue  # Change to green to switch
-  ports:
-  - port: 80
-    targetPort: 3000
+        - name: myapp
+          image: myapp:2.0.0
 ```
 
 ### Canary Deployment
 
 ```yaml
-# Main deployment
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: myapp-main
-spec:
-  replicas: 9
-  selector:
-    matchLabels:
-      app: myapp
-      track: stable
-  template:
-    metadata:
-      labels:
-        app: myapp
-        track: stable
-    spec:
-      containers:
-      - name: myapp
-        image: myapp:1.0.0
-
----
-# Canary deployment
+# canary.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -397,46 +392,43 @@ spec:
         track: canary
     spec:
       containers:
-      - name: myapp
-        image: myapp:2.0.0
+        - name: myapp
+          image: myapp:2.0.0
 ```
 
 ---
 
 ## Rolling Updates
 
-### Update Deployment
+### Update Image
 
 ```bash
-# Update image
+# Update deployment image
 kubectl set image deployment/myapp-deployment myapp=myapp:2.0.0
 
 # Or edit deployment
 kubectl edit deployment myapp-deployment
-
-# Apply new manifest
-kubectl apply -f deployment.yaml
 ```
 
 ### Rollback
 
 ```bash
-# View rollout history
-kubectl rollout history deployment/myapp-deployment
-
 # Rollback to previous version
 kubectl rollout undo deployment/myapp-deployment
 
 # Rollback to specific revision
 kubectl rollout undo deployment/myapp-deployment --to-revision=2
 
-# Check rollout status
-kubectl rollout status deployment/myapp-deployment
+# View rollout history
+kubectl rollout history deployment/myapp-deployment
 ```
 
-### Pause/Resume Rollout
+### Rollback Status
 
 ```bash
+# Check rollout status
+kubectl rollout status deployment/myapp-deployment
+
 # Pause rollout
 kubectl rollout pause deployment/myapp-deployment
 
@@ -451,95 +443,114 @@ kubectl rollout resume deployment/myapp-deployment
 ### Liveness Probe
 
 ```yaml
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: myapp-deployment
+  name: myapp-pod
 spec:
-  template:
-    spec:
-      containers:
-      - name: myapp
-        image: myapp:1.0.0
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          successThreshold: 1
-          failureThreshold: 3
+  containers:
+    - name: myapp
+      image: myapp:1.0.0
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 3000
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        timeoutSeconds: 5
+        successThreshold: 1
+        failureThreshold: 3
 ```
 
 ### Readiness Probe
 
 ```yaml
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: myapp-deployment
+  name: myapp-pod
 spec:
-  template:
-    spec:
-      containers:
-      - name: myapp
-        image: myapp:1.0.0
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          timeoutSeconds: 3
-          successThreshold: 1
-          failureThreshold: 3
+  containers:
+    - name: myapp
+      image: myapp:1.0.0
+      readinessProbe:
+        httpGet:
+          path: /ready
+          port: 3000
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        timeoutSeconds: 3
+        successThreshold: 1
+        failureThreshold: 3
 ```
 
 ### Startup Probe
 
 ```yaml
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: myapp-deployment
+  name: myapp-pod
 spec:
-  template:
-    spec:
-      containers:
-      - name: myapp
-        image: myapp:1.0.0
-        startupProbe:
-          httpGet:
-            path: /startup
-            port: 3000
-          initialDelaySeconds: 0
-          periodSeconds: 5
-          timeoutSeconds: 3
-          successThreshold: 1
-          failureThreshold: 30
+  containers:
+    - name: myapp
+      image: myapp:1.0.0
+      startupProbe:
+        httpGet:
+          path: /health
+          port: 3000
+        initialDelaySeconds: 0
+        periodSeconds: 10
+        timeoutSeconds: 5
+        successThreshold: 1
+        failureThreshold: 30
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 3000
+        initialDelaySeconds: 0
+        periodSeconds: 10
+        timeoutSeconds: 5
+        successThreshold: 1
+        failureThreshold: 3
 ```
 
 ### TCP Probe
 
 ```yaml
-readinessProbe:
-  tcpSocket:
-    port: 3000
-  initialDelaySeconds: 5
-  periodSeconds: 10
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+spec:
+  containers:
+    - name: myapp
+      image: myapp:1.0.0
+      livenessProbe:
+        tcpSocket:
+          port: 3000
+        initialDelaySeconds: 30
+        periodSeconds: 10
 ```
 
-### Exec Probe
+### Command Probe
 
 ```yaml
-livenessProbe:
-  exec:
-    command:
-    - cat
-    - /tmp/healthy
-  initialDelaySeconds: 5
-  periodSeconds: 5
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+spec:
+  containers:
+    - name: myapp
+      image: myapp:1.0.0
+      livenessProbe:
+        exec:
+          command:
+            - cat
+            - /tmp/healthy
+        initialDelaySeconds: 30
+        periodSeconds: 10
 ```
 
 ---
@@ -549,56 +560,59 @@ livenessProbe:
 ### Requests and Limits
 
 ```yaml
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: myapp-deployment
+  name: myapp-pod
 spec:
-  template:
-    spec:
-      containers:
-      - name: myapp
-        image: myapp:1.0.0
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
+  containers:
+    - name: myapp
+      image: myapp:1.0.0
+      resources:
+        requests:
+          memory: "256Mi"
+          cpu: "250m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
 ```
 
 ### Resource Quotas
 
 ```yaml
+# resourcequota.yaml
 apiVersion: v1
 kind: ResourceQuota
 metadata:
   name: compute-resources
-  namespace: production
+  namespace: mynamespace
 spec:
   hard:
     requests.cpu: "4"
     requests.memory: 8Gi
     limits.cpu: "8"
     limits.memory: 16Gi
+    persistentvolumeclaims: 4
 ```
 
-### Limit Ranges
+### Limit Range
 
 ```yaml
+# limitrange.yaml
 apiVersion: v1
 kind: LimitRange
 metadata:
-  name: cpu-limit-range
-  namespace: production
+  name: default-limits
+  namespace: mynamespace
 spec:
   limits:
-  - default:
-      cpu: 1
-    defaultRequest:
-      cpu: 0.5
-    type: Container
+    - default:
+        cpu: "500m"
+        memory: "512Mi"
+      defaultRequest:
+        cpu: "250m"
+        memory: "256Mi"
+      type: Container
 ```
 
 ---
@@ -608,6 +622,7 @@ spec:
 ### Horizontal Pod Autoscaler
 
 ```yaml
+# hpa.yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -620,23 +635,37 @@ spec:
   minReplicas: 2
   maxReplicas: 10
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
 ```
 
 ### Custom Metrics HPA
 
 ```yaml
+# hpa-custom.yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -649,29 +678,13 @@ spec:
   minReplicas: 2
   maxReplicas: 10
   metrics:
-  - type: Pods
-    pods:
-      metric:
-        name: http_requests_per_second
-      target:
-        type: AverageValue
-        averageValue: 100
-```
-
-### HPA Commands
-
-```bash
-# Create HPA
-kubectl autoscale deployment myapp-deployment --cpu-percent=70 --min=2 --max=10
-
-# Get HPA
-kubectl get hpa
-
-# Describe HPA
-kubectl describe hpa myapp-hpa
-
-# Delete HPA
-kubectl delete hpa myapp-hpa
+    - type: Pods
+      pods:
+        metric:
+          name: requests_per_second
+        target:
+          type: AverageValue
+          averageValue: 100
 ```
 
 ---
@@ -681,17 +694,19 @@ kubectl delete hpa myapp-hpa
 ### PersistentVolume
 
 ```yaml
+# pv.yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-1
+  name: myapp-pv
 spec:
   capacity:
     storage: 10Gi
+  volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: manual
+  storageClassName: standard
   hostPath:
     path: /mnt/data
 ```
@@ -699,52 +714,35 @@ spec:
 ### PersistentVolumeClaim
 
 ```yaml
+# pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pvc-1
+  name: myapp-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 5Gi
-  storageClassName: manual
+  storageClassName: standard
 ```
 
-### Using PVC in Pod
+### Storage Class
 
 ```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: myapp-pod
-spec:
-  containers:
-  - name: myapp
-    image: myapp:1.0.0
-    volumeMounts:
-    - mountPath: /data
-      name: data-volume
-  volumes:
-  - name: data-volume
-    persistentVolumeClaim:
-      claimName: pvc-1
-```
-
-### StorageClass
-
-```yaml
+# storageclass.yaml
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: fast-ssd
+  name: standard
 provisioner: kubernetes.io/aws-ebs
 parameters:
   type: gp2
-  iopsPerGB: "10"
+  fsType: ext4
 reclaimPolicy: Delete
 volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
 ```
 
 ---
@@ -754,110 +752,149 @@ volumeBindingMode: WaitForFirstConsumer
 ### Create Namespace
 
 ```yaml
+# namespace.yaml
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: production
+  name: mynamespace
   labels:
-    name: production
-    environment: production
+    name: mynamespace
 ```
 
 ### Resource Quota per Namespace
 
 ```yaml
+# namespace-quota.yaml
 apiVersion: v1
 kind: ResourceQuota
 metadata:
   name: compute-resources
-  namespace: production
+  namespace: mynamespace
 spec:
   hard:
     requests.cpu: "4"
     requests.memory: 8Gi
     limits.cpu: "8"
     limits.memory: 16Gi
-    persistentvolumeclaims: "4"
+    persistentvolumeclaims: 4
 ```
 
 ### Network Policy
 
 ```yaml
+# networkpolicy.yaml
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: deny-all
-  namespace: production
+  name: myapp-network-policy
+  namespace: mynamespace
 spec:
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      app: myapp
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: frontend-namespace
+      ports:
+        - protocol: TCP
+          port: 3000
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: database-namespace
+      ports:
+        - protocol: TCP
+          port: 5432
 ```
 
 ---
 
 ## RBAC
 
+### Service Account
+
+```yaml
+# serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: myapp-sa
+  namespace: mynamespace
+```
+
 ### Role
 
 ```yaml
+# role.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: pod-reader
-  namespace: production
+  name: myapp-role
+  namespace: mynamespace
 rules:
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["get", "watch", "list"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["myapp-secret"]
+    verbs: ["get"]
 ```
 
 ### RoleBinding
 
 ```yaml
+# rolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: read-pods
-  namespace: production
+  name: myapp-rolebinding
+  namespace: mynamespace
 subjects:
-- kind: User
-  name: jane
-  apiGroup: rbac.authorization.k8s.io
+  - kind: ServiceAccount
+    name: myapp-sa
+    namespace: mynamespace
 roleRef:
   kind: Role
-  name: pod-reader
+  name: myapp-role
   apiGroup: rbac.authorization.k8s.io
 ```
 
 ### ClusterRole
 
 ```yaml
+# clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: cluster-admin
+  name: myapp-clusterrole
 rules:
-- apiGroups: ["*"]
-  resources: ["*"]
-  verbs: ["*"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
 ```
 
 ### ClusterRoleBinding
 
 ```yaml
+# clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: cluster-admin-binding
+  name: myapp-clusterrolebinding
 subjects:
-- kind: ServiceAccount
-  name: cluster-admin-sa
-  namespace: kube-system
+  - kind: ServiceAccount
+    name: myapp-sa
+    namespace: mynamespace
 roleRef:
   kind: ClusterRole
-  name: cluster-admin
+  name: myapp-clusterrole
   apiGroup: rbac.authorization.k8s.io
 ```
 
@@ -865,17 +902,15 @@ roleRef:
 
 ## Production Setup
 
-### Production Deployment
+### High Availability Deployment
 
 ```yaml
+# production-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: myapp-deployment
   namespace: production
-  labels:
-    app: myapp
-    environment: production
 spec:
   replicas: 3
   strategy:
@@ -891,106 +926,92 @@ spec:
       labels:
         app: myapp
         version: v1
-        environment: production
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
     spec:
       serviceAccountName: myapp-sa
       containers:
-      - name: myapp
-        image: registry.example.com/myapp:1.0.0
-        ports:
-        - containerPort: 3000
-          name: http
-        env:
-        - name: NODE_ENV
-          value: production
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: db-secret
-              key: url
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          failureThreshold: 3
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 1000
-          readOnlyRootFilesystem: true
-          allowPrivilegeEscalation: false
+        - name: myapp
+          image: myapp:1.0.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: myapp-secret
+                  key: database-url
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - myapp
+                topologyKey: kubernetes.io/hostname
 ```
 
 ### Production Service
 
 ```yaml
+# production-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: myapp-service
   namespace: production
-  labels:
-    app: myapp
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: myapp
   ports:
-  - name: http
-    port: 80
-    targetPort: http
-    protocol: TCP
-```
-
-### Production Ingress
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: myapp-ingress
-  namespace: production
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/rate-limit: "100"
-spec:
-  tls:
-  - hosts:
-    - myapp.example.com
-    secretName: myapp-tls
-  rules:
-  - host: myapp.example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: myapp-service
-            port:
-              number: 80
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
 ```
 
 ### Production HPA
 
 ```yaml
+# production-hpa.yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -1004,38 +1025,38 @@ spec:
   minReplicas: 3
   maxReplicas: 10
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 300
       policies:
-      - type: Percent
-        value: 50
-        periodSeconds: 60
+        - type: Percent
+          value: 50
+          periodSeconds: 60
     scaleUp:
-      stabilizationWindowSeconds: 0
+      stabilizationWindowSeconds: 60
       policies:
-      - type: Percent
-        value: 100
-        periodSeconds: 15
+        - type: Percent
+          value: 100
+          periodSeconds: 15
 ```
 
 ---
 
 ## Best Practices
 
-### 1. Use Labels and Selectors
+### 1. Use Labels and Annotations
 
 ```yaml
 metadata:
@@ -1043,6 +1064,9 @@ metadata:
     app: myapp
     version: v1
     environment: production
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3000"
 ```
 
 ### 2. Set Resource Limits
@@ -1064,88 +1088,48 @@ livenessProbe:
   httpGet:
     path: /health
     port: 3000
-readinessProbe:
-  httpGet:
-    path: /ready
-    port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 10
 ```
 
-### 4. Use Secrets for Sensitive Data
+### 4. Use Namespaces
+
+```yaml
+metadata:
+  namespace: production
+```
+
+### 5. Use ConfigMaps and Secrets
 
 ```yaml
 env:
-- name: DATABASE_URL
-  valueFrom:
-    secretKeyRef:
-      name: db-secret
-      key: url
-```
-
-### 5. Use Namespaces
-
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: production
-```
-
-### 6. Use Rolling Updates
-
-```yaml
-strategy:
-  type: RollingUpdate
-  rollingUpdate:
-    maxSurge: 1
-    maxUnavailable: 0
-```
-
-### 7. Use HPA for Auto-Scaling
-
-```yaml
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-spec:
-  minReplicas: 2
-  maxReplicas: 10
-```
-
-### 8. Use ConfigMaps and Secrets
-
-```yaml
-envFrom:
-- configMapRef:
-    name: myapp-config
-- secretRef:
-    name: myapp-secret
-```
-
-### 9. Use Security Contexts
-
-```yaml
-securityContext:
-  runAsNonRoot: true
-  runAsUser: 1000
-  readOnlyRootFilesystem: true
-```
-
-### 10. Use Network Policies
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-spec:
-  podSelector: {}
-  policyTypes:
-  - Ingress
-  - Egress
+  - name: NODE_ENV
+    valueFrom:
+      configMapKeyRef:
+        name: myapp-config
+        key: node-env
+  - name: DATABASE_URL
+    valueFrom:
+      secretKeyRef:
+        name: myapp-secret
+        key: database-url
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [Kubernetes Documentation](https://kubernetes.io/docs/)
-- [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
-- [Deployment Guide](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
-- [Services Guide](https://kubernetes.io/docs/concepts/services-networking/service/)
+This skill covers comprehensive Kubernetes deployment implementation including:
+
+- **Kubernetes Concepts**: Architecture and key concepts
+- **Resources**: Pod, Deployment, Service, ConfigMap, Secret, Ingress
+- **Deployment Strategies**: Rolling update, recreate, blue-green, canary
+- **Rolling Updates**: Update image, rollback, rollback status
+- **Health Checks**: Liveness, readiness, startup, TCP, command probes
+- **Resource Limits**: Requests/limits, resource quotas, limit ranges
+- **Auto-Scaling (HPA)**: Resource-based and custom metrics HPA
+- **Persistent Volumes**: PV, PVC, storage class
+- **Namespaces**: Create namespace, resource quota, network policy
+- **RBAC**: Service account, role, role binding, cluster role, cluster role binding
+- **Production Setup**: HA deployment, service, HPA
+- **Best Practices**: Labels/annotations, resource limits, health checks, namespaces, configmaps/secrets

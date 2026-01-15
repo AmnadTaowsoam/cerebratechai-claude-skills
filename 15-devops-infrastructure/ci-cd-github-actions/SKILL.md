@@ -1,6 +1,8 @@
-# CI/CD with GitHub Actions
+# CI/CD GitHub Actions
 
-A comprehensive guide to CI/CD pipelines using GitHub Actions.
+## Overview
+
+GitHub Actions is a CI/CD platform that automates your build, test, and deployment workflows. This skill covers workflow syntax, common patterns, and production configurations.
 
 ## Table of Contents
 
@@ -21,213 +23,151 @@ A comprehensive guide to CI/CD pipelines using GitHub Actions.
 
 ## GitHub Actions Basics
 
-### Key Concepts
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                   GitHub Actions Workflow                   │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐      │
-│  │   Trigger   │──>│   Jobs     │──>│   Actions   │      │
-│  │  (push/PR)  │  │  (steps)   │  │  (deploy)  │      │
-│  └─────────────┘  └─────────────┘  └─────────────┘      │
-│                                                             │
-│  Workflow = YAML file in .github/workflows/              │
-│  Job = Collection of steps                                │
-│  Step = Individual command or action                       │
-│  Runner = Server that executes the workflow               │
-└─────────────────────────────────────────────────────────────┘
-```
-
 ### Workflow File Location
 
 ```
-myapp/
-├── .github/
-│   └── workflows/
-│       ├── ci.yml
-│       ├── cd.yml
-│       └── deploy.yml
-├── src/
-└── package.json
+.github/
+└── workflows/
+    ├── ci.yml
+    ├── deploy.yml
+    └── release.yml
 ```
 
-### Basic Workflow Structure
+### Trigger Events
 
 ```yaml
-name: CI/CD Pipeline
+name: CI
 
+# Trigger on push
 on:
   push:
     branches: [main, develop]
+
+# Trigger on pull request
+on:
   pull_request:
     branches: [main]
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run tests
-        run: npm test
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build application
-        run: npm run build
-```
-
----
-
-## Workflow Syntax
-
-### Triggers
-
-```yaml
-# Push to specific branches
-on:
-  push:
-    branches:
-      - main
-      - develop
-      - 'feature/**'
-
-# Pull request to main
-on:
-  pull_request:
-    branches:
-      - main
-
-# Manual trigger
-on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy'
-        required: true
-        type: choice
-        options:
-          - staging
-          - production
-
-# Schedule (cron)
+# Trigger on schedule
 on:
   schedule:
     - cron: '0 0 * * *'  # Daily at midnight
+
+# Trigger on manual dispatch
+on:
+  workflow_dispatch:
 
 # Multiple triggers
 on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
   workflow_dispatch:
-
-# Tag push
-on:
-  push:
-    tags:
-      - 'v*'
-
-# Release
-on:
-  release:
-    types: [published]
 ```
 
-### Jobs
+### Jobs and Steps
 
 ```yaml
-jobs:
-  # Single job
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: npm test
+name: CI
 
-  # Job with dependencies
+on: push
+
+jobs:
   build:
-    needs: test
     runs-on: ubuntu-latest
     steps:
-      - run: npm run build
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-  # Job with conditions
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - run: npm run deploy
-
-  # Job with matrix
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [16, 18, 20]
-        os: [ubuntu-latest, windows-latest]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: npm test
-```
-
-### Steps
-
-```yaml
-jobs:
-  example:
-    runs-on: ubuntu-latest
-    steps:
-      # Checkout code
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # Set up Node.js
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
 
-      # Install dependencies
       - name: Install dependencies
         run: npm ci
 
-      # Run tests
       - name: Run tests
         run: npm test
+```
 
-      # Run custom script
-      - name: Run custom script
-        run: |
-          echo "Running custom script"
-          npm run custom:script
+---
 
-      # Use environment variables
-      - name: Use environment
-        env:
-          MY_VAR: ${{ secrets.MY_SECRET }}
-        run: echo $MY_VAR
+## Workflow Syntax
 
-      # Conditional step
-      - name: Conditional step
-        if: github.event_name == 'pull_request'
-        run: echo "This is a PR"
+### Basic Structure
 
-      # Continue on error
-      - name: Continue on error
-        continue-on-error: true
-        run: npm run lint
+```yaml
+name: My Workflow
+
+on: push
+
+permissions:
+  contents: read
+
+env:
+  NODE_ENV: production
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo "Hello World"
+```
+
+### Job Dependencies
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm run build
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm test
+```
+
+### Job Outputs
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - id: version
+        run: echo "version=$(node -p 'require(\"./package.json\").version')" >> $GITHUB_OUTPUT
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Deploying version ${{ needs.build.outputs.version }}"
+```
+
+### Conditional Steps
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy
+        if: github.ref == 'refs/heads/main'
+        run: npm run deploy
 ```
 
 ---
@@ -241,35 +181,30 @@ name: Test
 
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        node-version: [16, 18, 20]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Run linter
-        run: npm run lint
 
       - name: Run tests
         run: npm test
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage/lcov.info
 ```
 
 ### Build and Deploy
@@ -284,44 +219,43 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build application
+      - name: Build
         run: npm run build
 
-      - name: Upload build artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: build
+          name: dist
           path: dist/
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    environment: production
-
     steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v3
         with:
-          name: build
+          name: dist
 
-      - name: Deploy to production
-        run: |
-          # Your deployment commands
-          echo "Deploying to production"
+      - name: Deploy to S3
+        uses: jakejarvis/s3-deploy-action@v0.0.5
+        with:
+          args: --acl public-read --delete
+          source: dist
+          region: ${{ secrets.AWS_REGION }}
+          bucket: ${{ secrets.AWS_S3_BUCKET }}
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 ```
 
 ### Docker Build and Push
@@ -332,57 +266,52 @@ name: Docker Build and Push
 on:
   push:
     branches: [main]
-    tags:
-      - 'v*'
+    tags: ['v*']
 
 jobs:
-  docker:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v2
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Extract metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v4
         with:
-          images: myapp/myapp
+          images: myorg/myapp
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v4
         with:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 ```
 
 ---
 
 ## Matrix Builds
 
-### Node.js Version Matrix
+### Node.js Matrix
 
 ```yaml
 name: Test Matrix
 
-on: [push, pull_request]
+on: push
 
 jobs:
   test:
@@ -391,19 +320,13 @@ jobs:
       matrix:
         node-version: [16, 18, 20]
         os: [ubuntu-latest, windows-latest, macos-latest]
-        exclude:
-          - os: macos-latest
-            node-version: 16
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -412,12 +335,12 @@ jobs:
         run: npm test
 ```
 
-### Python Version Matrix
+### Python Matrix
 
 ```yaml
 name: Test Matrix
 
-on: [push, pull_request]
+on: push
 
 jobs:
   test:
@@ -425,84 +348,58 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.9', '3.10', '3.11']
-        django-version: ['4.1', '4.2']
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
 
       - name: Install dependencies
-        run: |
-          pip install django==${{ matrix.django-version }}
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
       - name: Run tests
         run: pytest
 ```
 
-### Fail-Fast Strategy
+### Exclude Matrix Values
 
 ```yaml
+name: Test Matrix
+
+on: push
+
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false  # Continue even if one job fails
       matrix:
         node-version: [16, 18, 20]
-
+        os: [ubuntu-latest, windows-latest]
+        exclude:
+          - os: windows-latest
+            node-version: 16
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Run tests
-        run: npm test
+      - run: npm test
 ```
 
 ---
 
 ## Caching
 
-### NPM Cache
+### Node.js Dependencies Cache
 
 ```yaml
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'  # Automatic caching
-
-      - name: Install dependencies
-        run: npm ci
-```
-
-### Custom Cache
-
-```yaml
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Cache node modules
         uses: actions/cache@v3
@@ -516,45 +413,53 @@ jobs:
         run: npm ci
 ```
 
-### Docker Layer Cache
-
-```yaml
-jobs:
-  docker:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build with cache
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-```
-
-### Python Cache
+### Python Dependencies Cache
 
 ```yaml
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Cache pip
+        uses: actions/cache@v3
         with:
-          python-version: '3.11'
-          cache: 'pip'  # Automatic caching
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+```
+
+### Docker Layer Cache
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
 ```
 
 ---
@@ -568,83 +473,65 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Use secret
+      - name: Deploy
         env:
-          MY_SECRET: ${{ secrets.MY_SECRET }}
-        run: echo "Secret is $MY_SECRET"
-
-      - name: Deploy with secret
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          # Deployment commands
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          API_KEY: ${{ secrets.API_KEY }}
+        run: npm run deploy
 ```
 
 ### Encrypted Secrets
 
 ```bash
 # Encrypt secret
-echo "my-secret-value" | gpg --symmetric --cipher-algo AES256
+gpg --symmetric --cipher-algo AES256 secret.txt > secret.txt.gpg
 
-# Decrypt in workflow
-- name: Decrypt secret
-  run: |
-    echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --passphrase-fd 0 --import
-    gpg --decrypt secret.txt.gpg > secret.txt
+# Add to repository
+git add secret.txt.gpg
+git commit -m "Add encrypted secret"
+git push
 ```
-
-### Environment Secrets
 
 ```yaml
 jobs:
   deploy:
-    environment: production
     runs-on: ubuntu-latest
     steps:
-      - name: Use environment secret
-        env:
-          API_KEY: ${{ secrets.API_KEY }}
-        run: echo "Deploying with API key"
+      - uses: actions/checkout@v3
+
+      - name: Decrypt secret
+        run: |
+          gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.GPG_PASSPHRASE }}" \
+            secret.txt.gpg > secret.txt
+
+      - name: Use secret
+        run: cat secret.txt
 ```
 
 ---
 
 ## Environments
 
-### Define Environments
+### Environment Protection Rules
 
 ```yaml
-jobs:
-  deploy-staging:
-    environment:
-      name: staging
-      url: https://staging.example.com
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to staging
-        run: echo "Deploying to staging"
+name: Deploy
 
-  deploy-production:
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
     environment:
       name: production
       url: https://example.com
-    runs-on: ubuntu-latest
     steps:
-      - name: Deploy to production
-        run: echo "Deploying to production"
-```
-
-### Environment Protection Rules
-
-```
-Settings > Environments > Production > Protection rules:
-- Required reviewers: @team-leads
-- Wait timer: 30 minutes
-- Restrict who can deploy: @deploy-team
+      - uses: actions/checkout@v3
+      - run: npm run deploy
 ```
 
 ### Environment Secrets
@@ -652,96 +539,67 @@ Settings > Environments > Production > Protection rules:
 ```yaml
 jobs:
   deploy:
-    environment: production
     runs-on: ubuntu-latest
+    environment: production
     steps:
-      - name: Use environment-specific secret
+      - uses: actions/checkout@v3
+      - name: Deploy
         env:
           PRODUCTION_API_KEY: ${{ secrets.PRODUCTION_API_KEY }}
-        run: echo "Deploying to production"
+        run: npm run deploy
 ```
 
 ---
 
 ## Deployment Strategies
 
-### Rolling Deployment
+### Blue-Green Deployment
 
 ```yaml
+name: Blue-Green Deploy
+
+on:
+  push:
+    branches: [main]
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to Kubernetes
-        uses: azure/k8s-deploy@v4
-        with:
-          manifests: |
-            k8s/deployment.yaml
-            k8s/service.yaml
-          images: |
-            myapp:${{ github.sha }}
-          kubectl-version: 'latest'
-```
-
-### Blue/Green Deployment
-
-```yaml
-jobs:
-  deploy-blue:
-    runs-on: ubuntu-latest
     environment:
-      name: production-blue
-      url: https://blue.example.com
+      name: production
     steps:
-      - name: Deploy blue
-        run: |
-          kubectl apply -f k8s/blue-deployment.yaml
+      - uses: actions/checkout@v3
 
-  deploy-green:
-    needs: deploy-blue
-    runs-on: ubuntu-latest
-    environment:
-      name: production-green
-      url: https://green.example.com
-    steps:
-      - name: Deploy green
+      - name: Deploy to green
         run: |
-          kubectl apply -f k8s/green-deployment.yaml
+          kubectl apply -f k8s-green.yaml
+          kubectl wait --for=condition=available --timeout=60s deployment/myapp-green
 
-  switch-traffic:
-    needs: deploy-green
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Switch traffic to green
-        run: |
-          kubectl patch service myapp -p '{"spec":{"selector":{"version":"green"}}}'
+      - name: Switch traffic
+        run: kubectl patch service myapp -p '{"spec":{"selector":{"version":"green"}}}'
 ```
 
 ### Canary Deployment
 
 ```yaml
-jobs:
-  deploy-main:
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Deploy main version
-        run: |
-          kubectl set image deployment/myapp myapp=myapp:1.0.0
+name: Canary Deploy
 
-  deploy-canary:
-    needs: deploy-main
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
     runs-on: ubuntu-latest
-    environment: production-canary
+    environment:
+      name: production-canary
     steps:
-      - name: Deploy canary version
+      - uses: actions/checkout@v3
+
+      - name: Deploy canary
         run: |
-          kubectl apply -f k8s/canary-deployment.yaml
+          kubectl apply -f k8s-canary.yaml
+          kubectl wait --for=condition=available --timeout=60s deployment/myapp-canary
 ```
 
 ---
@@ -758,29 +616,23 @@ on:
     branches: [main]
 
 jobs:
-  frontend:
+  test:
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.modified, 'frontend/')
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Build frontend
+      - name: Detect changed packages
+        id: changes
         run: |
-          cd frontend
-          npm run build
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} > changed.txt
+          echo "packages=$(cat changed.txt | grep '^packages/' | cut -d'/' -f2 | sort -u | tr '\n' ',')" >> $GITHUB_OUTPUT
 
-  backend:
-    runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.modified, 'backend/')
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Build backend
+      - name: Test changed packages
         run: |
-          cd backend
-          npm run build
+          for pkg in ${{ steps.changes.outputs.packages }}; do
+            cd packages/$pkg
+            npm test
+          done
 ```
 
 ### Turborepo
@@ -796,49 +648,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      - name: Install Turborepo
-        run: npm install -g turbo
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Run Turborepo
-        run: turbo run build --filter=[HEAD~1]
-```
-
-### Nx
-
-```yaml
-name: Nx CI
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install Nx
-        run: npm install -g nx
-
-      - name: Run affected
-        run: nx affected --target=build --base=HEAD~1
+      - name: Build
+        run: npx turbo run build --filter=...^main
 ```
 
 ---
@@ -848,8 +669,8 @@ jobs:
 ### Create Reusable Workflow
 
 ```yaml
-# .github/workflows/reusable-deploy.yml
-name: Reusable Deploy
+# .github/workflows/deploy.yml
+name: Deploy
 
 on:
   workflow_call:
@@ -874,50 +695,32 @@ jobs:
 ### Call Reusable Workflow
 
 ```yaml
-name: Deploy to Staging
+# .github/workflows/ci.yml
+name: CI
 
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy-staging:
-    uses: ./.github/workflows/reusable-deploy.yml
-    with:
-      environment: staging
-      image: myapp:${{ github.sha }}
-    secrets: inherit
-```
-
-### Reusable Workflow with Secrets
-
-```yaml
-# .github/workflows/reusable-deploy.yml
-name: Reusable Deploy
-
-on:
-  workflow_call:
-    inputs:
-      environment:
-        required: true
-        type: string
-    secrets:
-      AWS_ACCESS_KEY_ID:
-        required: true
-      AWS_SECRET_ACCESS_KEY:
-        required: true
+on: push
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
     steps:
-      - name: Deploy
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          echo "Deploying to ${{ inputs.environment }}"
+      - uses: actions/checkout@v3
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to staging
+        uses: ./.github/workflows/deploy.yml
+        with:
+          environment: staging
+          image: myapp:latest
+
+      - name: Deploy to production
+        if: github.ref == 'refs/heads/main'
+        uses: ./.github/workflows/deploy.yml
+        with:
+          environment: production
+          image: myapp:latest
 ```
 
 ---
@@ -927,14 +730,16 @@ jobs:
 ### Pin Action Versions
 
 ```yaml
-# ❌ BAD: Using @latest
-- uses: actions/checkout@latest
+# Good: Pin specific versions
+- uses: actions/checkout@v3
+- uses: actions/setup-node@v3
 
-# ✅ GOOD: Using specific version
-- uses: actions/checkout@v4
+# Bad: Use @latest
+- uses: actions/checkout@latest
+- uses: actions/setup-node@latest
 ```
 
-### Use OIDC for Authentication
+### Use OIDC for AWS
 
 ```yaml
 jobs:
@@ -944,15 +749,16 @@ jobs:
       id-token: write
       contents: read
     steps:
+      - uses: actions/checkout@v3
+
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
-      - name: Deploy
-        run: |
-          # Deployment commands
+      - name: Deploy to S3
+        run: aws s3 sync dist/ s3://my-bucket/
 ```
 
 ### Scan for Vulnerabilities
@@ -962,10 +768,9 @@ jobs:
   security:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Run Trivy
+      - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
@@ -973,197 +778,105 @@ jobs:
           format: 'sarif'
           output: 'trivy-results.sarif'
 
-      - name: Upload Trivy results
+      - name: Upload Trivy results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'trivy-results.sarif'
-```
-
-### CodeQL Analysis
-
-```yaml
-name: CodeQL
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
-jobs:
-  analyze:
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: ['javascript']
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: ${{ matrix.language }}
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
 ```
 
 ---
 
 ## Production Examples
 
-### Complete CI/CD Pipeline
+### Production Deployment
 
 ```yaml
-name: CI/CD Pipeline
+name: Production Deploy
 
 on:
   push:
-    branches: [main, develop]
-  pull_request:
     branches: [main]
-  release:
-    types: [published]
-
-env:
-  NODE_VERSION: '18'
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+    tags: ['v*']
 
 jobs:
   test:
-    name: Test
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          node-version: '18'
 
       - name: Install dependencies
         run: npm ci
 
+      - name: Run tests
+        run: npm test
+
       - name: Run linter
         run: npm run lint
 
-      - name: Run tests
-        run: npm test -- --coverage
+      - name: Build
+        run: npm run build
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage/lcov.info
-
-  build:
-    name: Build Docker Image
+  deploy:
     needs: test
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+    environment:
+      name: production
+      url: https://example.com
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to Container Registry
-        uses: docker/login-action@v3
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          name: dist
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
+      - name: Deploy to AWS
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
 
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Deploy to S3
+        run: aws s3 sync dist/ s3://my-bucket/ --delete
 
-  deploy-staging:
-    name: Deploy to Staging
-    needs: build
-    if: github.ref == 'refs/heads/develop'
-    runs-on: ubuntu-latest
-    environment: staging
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Configure kubectl
-        uses: azure/k8s-set-context@v3
-        with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.KUBE_CONFIG }}
-
-      - name: Deploy to staging
+      - name: Invalidate CloudFront
         run: |
-          kubectl set image deployment/myapp \
-            myapp=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:develop \
-            -n staging
+          DISTRIBUTION_ID=${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+          aws cloudfront create-invalidation \
+            --distribution-id $DISTRIBUTION_ID \
+            --paths "/*"
 
-  deploy-production:
-    name: Deploy to Production
-    needs: build
-    if: github.event_name == 'release'
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Configure kubectl
-        uses: azure/k8s-set-context@v3
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1.24.0
         with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.KUBE_CONFIG }}
-
-      - name: Deploy to production
-        run: |
-          kubectl set image deployment/myapp \
-            myapp=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.release.tag_name }} \
-            -n production
-
-      - name: Verify deployment
-        run: |
-          kubectl rollout status deployment/myapp -n production
+          payload: |
+            {
+              "text": "Production deployment successful!"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [Workflow Syntax](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions)
-- [Marketplace](https://github.com/marketplace?type=actions)
-- [Starter Workflows](https://github.com/actions/starter-workflows)
+This skill covers comprehensive CI/CD with GitHub Actions including:
+
+- **GitHub Actions Basics**: Workflow file location, trigger events, jobs and steps
+- **Workflow Syntax**: Basic structure, job dependencies, job outputs, conditional steps
+- **Common Workflows**: Test on PR, build and deploy, Docker build and push
+- **Matrix Builds**: Node.js matrix, Python matrix, exclude matrix values
+- **Caching**: Node.js dependencies, Python dependencies, Docker layer cache
+- **Secrets Management**: Using secrets, encrypted secrets
+- **Environments**: Environment protection rules, environment secrets
+- **Deployment Strategies**: Blue-green deployment, canary deployment
+- **Monorepo Support**: Path filtering, Turborepo
+- **Reusable Workflows**: Create and call reusable workflows
+- **Security Best Practices**: Pin action versions, OIDC for AWS, vulnerability scanning
+- **Production Examples**: Production deployment with testing, AWS S3, CloudFront, Slack notifications

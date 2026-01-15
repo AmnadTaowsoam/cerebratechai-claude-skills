@@ -1,6 +1,8 @@
 # Helm Charts
 
-A comprehensive guide to Helm charts for Kubernetes package management.
+## Overview
+
+Helm is a package manager for Kubernetes that helps you manage Kubernetes applications. This skill covers Helm concepts, chart structure, templates, and best practices.
 
 ## Table of Contents
 
@@ -20,24 +22,24 @@ A comprehensive guide to Helm charts for Kubernetes package management.
 
 ## Helm Concepts
 
-### What is Helm?
-
-Helm is a package manager for Kubernetes that helps you manage Kubernetes applications.
+### Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      Helm Architecture                     │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│   ┌──────────┐       ┌──────────┐       ┌──────────┐    │
-│   │   Helm   │──────>│  Chart   │──────>│ Kubernetes│   │
-│   │  Client  │       │          │       │ Cluster  │    │
-│   └──────────┘       └──────────┘       └──────────┘    │
-│                                                             │
-│   Chart = Templates + Values + Metadata                      │
-│   Release = Instance of a Chart                              │
-│   Repository = Collection of Charts                          │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────┐
+│   Helm CLI  │
+└──────┬──────┘
+       │ Install/Upgrade
+       ↓
+┌─────────────┐
+│   Tiller    │ (Helm 2)
+│  (Server)    │
+└──────┬──────┘
+       │
+       ↓
+┌─────────────┐
+│ Kubernetes  │
+│  Cluster    │
+└─────────────┘
 ```
 
 ### Key Concepts
@@ -45,75 +47,67 @@ Helm is a package manager for Kubernetes that helps you manage Kubernetes applic
 | Concept | Description |
 |---------|-------------|
 | **Chart** | A package of pre-configured Kubernetes resources |
-| **Release** | A specific instance of a chart deployed to a cluster |
-| **Repository** | A collection of charts available for download |
-| **Template** | A Go template file that generates Kubernetes manifests |
-| **Values** | Configuration values that override defaults in templates |
-| **Hook** | A special annotation that allows actions at specific points |
-| **Chart.yaml** | Metadata about the chart |
-| **requirements.yaml** | Chart dependencies |
+| **Release** | An instance of a chart running in a cluster |
+| **Repository** | A collection of charts |
+| **Values** | Configuration values for a chart |
+| **Template** | Go template files that generate Kubernetes manifests |
+| **Hooks** | Actions that run at specific points in the release lifecycle |
 
 ---
 
 ## Chart Structure
 
-### Standard Chart Structure
+### Basic Chart Structure
 
 ```
-myapp/
-├── Chart.yaml              # Chart metadata
-├── values.yaml            # Default configuration values
-├── values.schema.json     # Values schema validation
-├── .helmignore            # Files to ignore when packaging
-├── charts/                # Chart dependencies
-├── templates/             # Template files
+mychart/
+├── Chart.yaml          # Chart metadata
+├── values.yaml         # Default configuration values
+├── values.schema.json  # Values schema validation
+├── templates/          # Template files
 │   ├── deployment.yaml
 │   ├── service.yaml
 │   ├── ingress.yaml
 │   ├── configmap.yaml
 │   ├── secret.yaml
-│   ├── hpa.yaml
-│   ├── _helpers.tpl       # Template helpers
-│   └── NOTES.txt         # Post-install notes
-└── templates/tests/       # Test templates
-    └── test-connection.yaml
+│   ├── _helpers.tpl    # Helper templates
+│   └── NOTES.txt       # Post-install notes
+├── charts/             # Chart dependencies
+└── README.md           # Chart documentation
 ```
 
 ### Chart.yaml
 
 ```yaml
+# Chart.yaml
 apiVersion: v2
-name: myapp
+name: mychart
 description: A Helm chart for my application
 type: application
-version: 0.1.0
+version: 1.0.0
 appVersion: "1.0.0"
 keywords:
   - myapp
-  - web
+  - application
 maintainers:
-  - name: John Doe
-    email: john@example.com
+  - name: My Name
+    email: myemail@example.com
+    url: https://github.com/myorg/mychart
 icon: https://example.com/icon.png
-home: https://example.com
-sources:
-  - https://github.com/example/myapp
-dependencies:
-  - name: postgresql
-    version: 12.x.x
-    repository: https://charts.bitnami.com/bitnami
+annotations:
+  category: Application
 ```
 
 ### values.yaml
 
 ```yaml
-# Default values for myapp
-replicaCount: 3
+# values.yaml
+replicaCount: 1
 
 image:
   repository: myapp
   pullPolicy: IfNotPresent
-  tag: "1.0.0"
+  tag: ""
 
 imagePullSecrets: []
 
@@ -131,13 +125,14 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 80
+  targetPort: 3000
 
 ingress:
   enabled: false
   className: ""
   annotations: {}
   hosts:
-    - host: chart-example.local
+    - host: myapp.example.com
       paths:
         - path: /
           pathType: Prefix
@@ -147,8 +142,8 @@ resources: {}
 
 autoscaling:
   enabled: false
-  minReplicas: 2
-  maxReplicas: 10
+  minReplicas: 1
+  maxReplicas: 100
   targetCPUUtilizationPercentage: 80
   targetMemoryUtilizationPercentage: 80
 
@@ -157,97 +152,72 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+config: {}
 ```
 
 ---
 
 ## Templates
 
-### Template Syntax
-
-```yaml
-# Variables
-{{ .Values.replicaCount }}
-
-# Conditional
-{{ if .Values.ingress.enabled }}
-# ... content ...
-{{ end }}
-
-# Loop
-{{ range .Values.hosts }}
-# ... content ...
-{{ end }}
-
-# With
-{{ with .Values.service }}
-# ... use . to refer to service ...
-{{ end }}
-
-# Include
-{{ include "myapp.fullname" . }}
-
-# Default
-{{ .Values.someValue | default "default-value" }}
-
-# Quote
-{{ .Values.someValue | quote }}
-
-# ToYaml
-{{ .Values.someConfig | toYaml }}
-```
-
 ### Deployment Template
 
 ```yaml
+# templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "myapp.fullname" . }}
+  name: {{ include "mychart.fullname" . }}
   labels:
-    {{- include "myapp.labels" . | nindent 4 }}
+    {{- include "mychart.labels" . | nindent 4 }}
 spec:
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
-      {{- include "myapp.selectorLabels" . | nindent 6 }}
+      {{- include "mychart.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      {{- with .Values.podAnnotations }}
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-        {{- end }}
+      {{- end }}
       labels:
-        {{- include "myapp.selectorLabels" . | nindent 8 }}
+        {{- include "mychart.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "myapp.serviceAccountName" . }}
+      serviceAccountName: {{ include "mychart.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-      - name: {{ .Chart.Name }}
-        securityContext:
-          {{- toYaml .Values.securityContext | nindent 10 }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        ports:
-        - name: http
-          containerPort: {{ .Values.service.port }}
-          protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /
-            port: http
-        readinessProbe:
-          httpGet:
-            path: /
-            port: http
-        resources:
-          {{- toYaml .Values.resources | nindent 10 }}
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            {{- range $key, $value := .Values.config }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -265,12 +235,13 @@ spec:
 ### Service Template
 
 ```yaml
+# templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "myapp.fullname" . }}
+  name: {{ include "mychart.fullname" . }}
   labels:
-    {{- include "myapp.labels" . | nindent 4 }}
+    {{- include "mychart.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -279,26 +250,27 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "myapp.selectorLabels" . | nindent 4 }}
+    {{- include "mychart.selectorLabels" . | nindent 4 }}
 ```
 
 ### Ingress Template
 
 ```yaml
+# templates/ingress.yaml
 {{- if .Values.ingress.enabled -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "myapp.fullname" . }}
+  name: {{ include "mychart.fullname" . }}
   labels:
-    {{- include "myapp.labels" . | nindent 4 }}
+    {{- include "mychart.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if .Values.ingress.className }}
-  ingressClassName: {{ .Values.ingress.className }}
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
   {{- end }}
   {{- if .Values.ingress.tls }}
   tls:
@@ -320,7 +292,7 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
-                name: {{ include "myapp.fullname" $ }}
+                name: {{ include "mychart.fullname" $ }}
                 port:
                   number: {{ $.Values.service.port }}
           {{- end }}
@@ -331,48 +303,57 @@ spec:
 ### ConfigMap Template
 
 ```yaml
+# templates/configmap.yaml
+{{- if .Values.config }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "myapp.fullname" . }}
+  name: {{ include "mychart.fullname" . }}-config
   labels:
-    {{- include "myapp.labels" . | nindent 4 }}
+    {{- include "mychart.labels" . | nindent 4 }}
 data:
-  config.yaml: |
-    {{- toYaml .Values.config | nindent 4 }}
+  app.properties: |
+    {{- range $key, $value := .Values.config }}
+    {{ $key }}={{ $value }}
+    {{- end }}
+{{- end }}
 ```
 
 ### Secret Template
 
 ```yaml
+# templates/secret.yaml
+{{- if .Values.secret }}
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ include "myapp.fullname" . }}
+  name: {{ include "mychart.fullname" . }}-secret
   labels:
-    {{- include "myapp.labels" . | nindent 4 }}
+    {{- include "mychart.labels" . | nindent 4 }}
 type: Opaque
-data:
-  {{- range $key, $value := .Values.secrets }}
-  {{ $key }}: {{ $value | b64enc }}
+stringData:
+  {{- range $key, $value := .Values.secret }}
+  {{ $key }}: {{ $value | quote }}
   {{- end }}
+{{- end }}
 ```
 
 ### HPA Template
 
 ```yaml
+# templates/hpa.yaml
 {{- if .Values.autoscaling.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "myapp.fullname" . }}
+  name: {{ include "mychart.fullname" . }}
   labels:
-    {{- include "myapp.labels" . | nindent 4 }}
+    {{- include "mychart.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "myapp.fullname" . }}
+    name: {{ include "mychart.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
@@ -395,20 +376,21 @@ spec:
 {{- end }}
 ```
 
-### Helper Templates (_helpers.tpl)
+### Helper Templates
 
 ```yaml
+# templates/_helpers.tpl
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "myapp.name" -}}
+{{- define "mychart.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
 */}}
-{{- define "myapp.fullname" -}}
+{{- define "mychart.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -424,16 +406,16 @@ Create a default fully qualified app name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "myapp.chart" -}}
+{{- define "mychart.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "myapp.labels" -}}
-helm.sh/chart: {{ include "myapp.chart" . }}
-{{ include "myapp.selectorLabels" . }}
+{{- define "mychart.labels" -}}
+helm.sh/chart: {{ include "mychart.chart" . }}
+{{ include "mychart.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -443,20 +425,52 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "myapp.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "myapp.name" . }}
+{{- define "mychart.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "mychart.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "myapp.serviceAccountName" -}}
+{{- define "mychart.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "myapp.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "mychart.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
+{{- end }}
+```
+
+### NOTES.txt
+
+```yaml
+# templates/NOTES.txt
+{{- /*
+Thanks for installing {{ .Chart.Name }}!
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+*/}}
+
+{{- if .Values.ingress.enabled }}
+{{- else if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "mychart.fullname" . }})
+  echo "Visit http://127.0.0.1:$NODE_PORT to use your application"
+{{- else if contains "LoadBalancer" .Values.service.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+        You can watch the status by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "mychart.fullname' . }}'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "mychart.fullname" . }} --template "{{"{{ (index .status.loadBalancer.ingress 0).ip }}" }}")
+  echo "Visit http://$SERVICE_IP:{{ .Values.service.port }} to use your application"
+{{- else if contains "ClusterIP" .Values.service.type }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "mychart.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
 {{- end }}
 ```
 
@@ -468,37 +482,23 @@ Create the name of the service account to use
 
 ```yaml
 # values-production.yaml
-replicaCount: 5
+replicaCount: 3
 
 image:
-  repository: registry.example.com/myapp
+  repository: myapp
   pullPolicy: Always
   tag: "1.0.0"
 
-imagePullSecrets:
-  - name: registry-credentials
-
-resources:
-  limits:
-    cpu: 1000m
-    memory: 1Gi
-  requests:
-    cpu: 500m
-    memory: 512Mi
-
-autoscaling:
-  enabled: true
-  minReplicas: 5
-  maxReplicas: 20
-  targetCPUUtilizationPercentage: 70
-  targetMemoryUtilizationPercentage: 80
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 3000
 
 ingress:
   enabled: true
   className: nginx
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/rate-limit: "100"
   hosts:
     - host: myapp.example.com
       paths:
@@ -509,56 +509,24 @@ ingress:
       hosts:
         - myapp.example.com
 
-nodeSelector:
-  node.kubernetes.io/instance-type: m5.large
-
-tolerations:
-  - key: "dedicated"
-    operator: "Equal"
-    value: "app"
-    effect: "NoSchedule"
-```
-
-### Staging Values
-
-```yaml
-# values-staging.yaml
-replicaCount: 2
-
-image:
-  repository: registry.example.com/myapp
-  pullPolicy: Always
-  tag: "1.0.0-staging"
-
 resources:
   limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
     cpu: 500m
     memory: 512Mi
-  requests:
-    cpu: 250m
-    memory: 256Mi
 
 autoscaling:
   enabled: true
-  minReplicas: 2
-  maxReplicas: 5
-  targetCPUUtilizationPercentage: 80
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
   targetMemoryUtilizationPercentage: 80
 
-ingress:
-  enabled: true
-  className: nginx
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-staging
-  hosts:
-    - host: myapp-staging.example.com
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - secretName: myapp-staging-tls
-      hosts:
-        - myapp-staging.example.com
+config:
+  NODE_ENV: production
+  LOG_LEVEL: info
 ```
 
 ### Development Values
@@ -569,90 +537,78 @@ replicaCount: 1
 
 image:
   repository: myapp
-  pullPolicy: Never
+  pullPolicy: IfNotPresent
   tag: "dev"
+
+service:
+  type: NodePort
+  port: 80
+  targetPort: 3000
+
+ingress:
+  enabled: false
 
 resources:
   limits:
     cpu: 500m
     memory: 512Mi
   requests:
-    cpu: 100m
-    memory: 128Mi
+    cpu: 250m
+    memory: 256Mi
 
 autoscaling:
   enabled: false
 
-ingress:
-  enabled: false
+config:
+  NODE_ENV: development
+  LOG_LEVEL: debug
 ```
 
 ---
 
 ## Chart Dependencies
 
-### requirements.yaml (Helm 2)
+### Chart.yaml with Dependencies
 
 ```yaml
-dependencies:
-  - name: postgresql
-    version: 12.x.x
-    repository: https://charts.bitnami.com/bitnami
-    condition: postgresql.enabled
-    tags:
-      - database
-
-  - name: redis
-    version: 17.x.x
-    repository: https://charts.bitnami.com/bitnami
-    condition: redis.enabled
-    tags:
-      - cache
-```
-
-### Chart.yaml (Helm 3)
-
-```yaml
+# Chart.yaml
 apiVersion: v2
-name: myapp
-version: 0.1.0
+name: mychart
+description: A Helm chart for my application
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
 
 dependencies:
   - name: postgresql
     version: 12.x.x
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
-
   - name: redis
     version: 17.x.x
     repository: https://charts.bitnami.com/bitnami
     condition: redis.enabled
 ```
 
-### Using Dependencies
+### Values with Dependencies
 
 ```yaml
-# In values.yaml
+# values.yaml
 postgresql:
   enabled: true
   auth:
-    postgresPassword: secret
-    database: myapp
+    postgresPassword: secretpassword
+  primary:
+    persistence:
+      enabled: true
 
 redis:
   enabled: true
   auth:
-    enabled: false
-```
-
-### Aliasing Dependencies
-
-```yaml
-dependencies:
-  - name: postgresql
-    version: 12.x.x
-    repository: https://charts.bitnami.com/bitnami
-    alias: db
+    password: secretpassword
+  master:
+    persistence:
+      enabled: true
 ```
 
 ---
@@ -662,294 +618,220 @@ dependencies:
 ### Pre-Install Hook
 
 ```yaml
+# templates/pre-install-job.yaml
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "myapp.fullname" . }}-pre-install
+  name: {{ include "mychart.fullname" . }}-pre-install
   annotations:
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "-5"
-    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   template:
+    metadata:
+      name: {{ include "mychart.fullname" . }}-pre-install
     spec:
-      containers:
-      - name: pre-install
-        image: busybox
-        command: ["/bin/sh", "-c", "echo Pre-install hook"]
       restartPolicy: OnFailure
+      containers:
+        - name: pre-install
+          image: busybox
+          command: ["sh", "-c", "echo 'Pre-install hook executed'"]
 ```
 
 ### Post-Install Hook
 
 ```yaml
+# templates/post-install-job.yaml
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "myapp.fullname" . }}-post-install
+  name: {{ include "mychart.fullname" . }}-post-install
   annotations:
     "helm.sh/hook": post-install
     "helm.sh/hook-weight": "5"
     "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   template:
+    metadata:
+      name: {{ include "mychart.fullname" . }}-post-install
     spec:
-      containers:
-      - name: post-install
-        image: busybox
-        command: ["/bin/sh", "-c", "echo Post-install hook"]
       restartPolicy: OnFailure
+      containers:
+        - name: post-install
+          image: busybox
+          command: ["sh", "-c", "echo 'Post-install hook executed'"]
 ```
 
 ### Pre-Upgrade Hook
 
 ```yaml
+# templates/pre-upgrade-job.yaml
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "myapp.fullname" . }}-pre-upgrade
+  name: {{ include "mychart.fullname" . }}-pre-upgrade
   annotations:
     "helm.sh/hook": pre-upgrade
-    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   template:
+    metadata:
+      name: {{ include "mychart.fullname" . }}-pre-upgrade
     spec:
-      containers:
-      - name: pre-upgrade
-        image: busybox
-        command: ["/bin/sh", "-c", "echo Pre-upgrade hook"]
       restartPolicy: OnFailure
+      containers:
+        - name: pre-upgrade
+          image: busybox
+          command: ["sh", "-c", "echo 'Pre-upgrade hook executed'"]
 ```
 
 ### Post-Upgrade Hook
 
 ```yaml
+# templates/post-upgrade-job.yaml
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "myapp.fullname" . }}-post-upgrade
+  name: {{ include "mychart.fullname" . }}-post-upgrade
   annotations:
     "helm.sh/hook": post-upgrade
+    "helm.sh/hook-weight": "5"
     "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   template:
+    metadata:
+      name: {{ include "mychart.fullname" . }}-post-upgrade
     spec:
-      containers:
-      - name: post-upgrade
-        image: busybox
-        command: ["/bin/sh", "-c", "echo Post-upgrade hook"]
       restartPolicy: OnFailure
-```
-
-### Pre-Delete Hook
-
-```yaml
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: {{ include "myapp.fullname" . }}-pre-delete
-  annotations:
-    "helm.sh/hook": pre-delete
-    "helm.sh/hook-delete-policy": before-hook-creation
-spec:
-  template:
-    spec:
       containers:
-      - name: pre-delete
-        image: busybox
-        command: ["/bin/sh", "-c", "echo Pre-delete hook"]
-      restartPolicy: OnFailure
+        - name: post-upgrade
+          image: busybox
+          command: ["sh", "-c", "echo 'Post-upgrade hook executed'"]
 ```
 
 ---
 
 ## Chart Testing
 
-### Test Template
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: {{ include "myapp.fullname" . }}-test-connection
-  annotations:
-    "helm.sh/hook": test
-spec:
-  containers:
-  - name: wget
-    image: busybox
-    command: ["/bin/sh", "-c", "wget --no-verbose --tries=1 --spider http://{{ include "myapp.fullname" . }}:{{ .Values.service.port }}/health"]
-  restartPolicy: Never
-```
-
-### Running Tests
+### Lint Chart
 
 ```bash
 # Lint chart
-helm lint ./myapp
+helm lint ./mychart
 
-# Template chart
-helm template ./myapp
-
-# Dry run
-helm install myapp ./myapp --dry-run --debug
-
-# Run tests
-helm test myapp
+# Lint with values
+helm lint ./mychart --values values-production.yaml
 ```
 
-### Automated Testing
+### Template Rendering
 
-```yaml
-# .github/workflows/helm-test.yml
-name: Helm Chart CI
+```bash
+# Render templates
+helm template myapp ./mychart
 
-on:
-  push:
-    paths:
-      - 'charts/**'
-    branches:
-      - main
+# Render with values
+helm template myapp ./mychart --values values-production.yaml
 
-jobs:
-  lint-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Helm
-        uses: azure/setup-helm@v3
-        with:
-          version: 'v3.12.0'
-      - name: Run helm lint
-        run: |
-          helm lint ./charts/myapp
-      - name: Run helm template
-        run: |
-          helm template ./charts/myapp
+# Render with release name and namespace
+helm template myapp ./mychart --values values-production.yaml --release myapp --namespace production
+```
+
+### Dry Run
+
+```bash
+# Dry run install
+helm install myapp ./mychart --dry-run --debug
+
+# Dry run upgrade
+helm upgrade myapp ./mychart --dry-run --debug
 ```
 
 ---
 
 ## Chart Repository
 
-### Creating a Chart Repository
+### Create Chart Repository
 
 ```bash
-# Create index.yaml
-helm repo index .
-
-# Serve with GitHub Pages
-# Upload charts to gh-pages branch
-```
-
-### index.yaml
-
-```yaml
-apiVersion: v1
-entries:
-  myapp:
-    - apiVersion: v2
-      appVersion: 1.0.0
-      created: "2024-01-01T00:00:00.000Z"
-      description: A Helm chart for my application
-      digest: abc123def456...
-      name: myapp
-      urls:
-        - https://example.com/charts/myapp-0.1.0.tgz
-      version: 0.1.0
-generated: "2024-01-01T00:00:00.000Z"
-```
-
-### Publishing Charts
-
-```bash
-# Package chart
-helm package ./myapp
-
-# Update index
-helm repo index .
-
-# Upload to GitHub
-git add myapp-0.1.0.tgz index.yaml
-git commit -m "Release myapp-0.1.0"
-git push
-```
-
-### Adding Repository
-
-```bash
-# Add repository
-helm repo add myrepo https://example.com/charts
+# Create chart repository
+helm repo add myrepo https://charts.example.com
 
 # Update repository
 helm repo update
 
-# Search charts
+# List charts
 helm search repo myrepo
+```
 
-# Install from repository
-helm install myapp myrepo/myapp
+### Package Chart
+
+```bash
+# Package chart
+helm package ./mychart
+
+# Package with version
+helm package ./mychart --version 1.0.0
+```
+
+### Index Chart Repository
+
+```bash
+# Create index
+helm repo index .
+
+# Upload to repository
+# Using GitHub Pages, S3, etc.
 ```
 
 ---
 
 ## Release Management
 
-### Install Release
+### Install Chart
 
 ```bash
-# Install with default values
-helm install myapp ./myapp
+# Install chart
+helm install myapp ./mychart
 
-# Install with custom values
-helm install myapp ./myapp -f values-production.yaml
+# Install with values
+helm install myapp ./mychart --values values-production.yaml
 
-# Install with set values
-helm install myapp ./myapp --set replicaCount=5 --set image.tag=1.0.0
-
-# Install in specific namespace
-helm install myapp ./myapp -n production
-
-# Install with create namespace
-helm install myapp ./myapp -n production --create-namespace
+# Install with release name and namespace
+helm install myapp ./mychart --values values-production.yaml --namespace production
 ```
 
-### Upgrade Release
+### Upgrade Chart
 
 ```bash
-# Upgrade with new values
-helm upgrade myapp ./myapp -f values-production.yaml
+# Upgrade chart
+helm upgrade myapp ./mychart
 
-# Upgrade with new image
-helm upgrade myapp ./myapp --set image.tag=2.0.0
+# Upgrade with values
+helm upgrade myapp ./mychart --values values-production.yaml
 
-# Upgrade with reuse values
-helm upgrade myapp ./myapp --reuse-values
-
-# Dry run upgrade
-helm upgrade myapp ./myapp --dry-run --debug
+# Upgrade with new version
+helm upgrade myapp ./mychart --version 2.0.0
 ```
 
-### Rollback Release
+### Rollback
 
 ```bash
-# List revisions
-helm history myapp
-
-# Rollback to previous revision
+# Rollback to previous version
 helm rollback myapp
 
 # Rollback to specific revision
 helm rollback myapp 2
 
-# Rollback with timeout
-helm rollback myapp --timeout 5m
+# List revisions
+helm history myapp
 ```
 
-### Uninstall Release
+### Uninstall Chart
 
 ```bash
-# Uninstall release
+# Uninstall chart
 helm uninstall myapp
 
 # Uninstall with keep history
@@ -959,22 +841,6 @@ helm uninstall myapp --keep-history
 helm uninstall myapp --timeout 5m
 ```
 
-### List Releases
-
-```bash
-# List all releases
-helm list
-
-# List releases in all namespaces
-helm list -A
-
-# List releases with filter
-helm list -l app=myapp
-
-# List releases in specific namespace
-helm list -n production
-```
-
 ---
 
 ## Production Patterns
@@ -982,50 +848,38 @@ helm list -n production
 ### Production Deployment
 
 ```bash
-# Install production release
-helm install myapp ./myapp \
-  -n production \
+# Install with production values
+helm install myapp ./mychart \
+  --values values-production.yaml \
+  --namespace production \
   --create-namespace \
-  -f values-production.yaml \
   --wait \
   --timeout 10m
 ```
 
-### Blue/Green Deployment
+### Upgrade Strategy
 
 ```bash
-# Install blue release
-helm install myapp-blue ./myapp \
-  -n production \
-  -f values-production.yaml \
-  --set ingress.hosts[0].host=myapp-blue.example.com
-
-# Install green release
-helm install myapp-green ./myapp \
-  -n production \
-  -f values-production.yaml \
-  --set image.tag=2.0.0 \
-  --set ingress.hosts[0].host=myapp-green.example.com
-
-# Switch traffic to green
-# Update ingress to point to green service
+# Upgrade with production values
+helm upgrade myapp ./mychart \
+  --values values-production.yaml \
+  --namespace production \
+  --wait \
+  --timeout 10m \
+  --atomic
 ```
 
-### Canary Deployment
+### Rollback Strategy
 
 ```bash
-# Install main release
-helm install myapp ./myapp \
-  -n production \
-  -f values-production.yaml \
-  --set replicaCount=9
-
-# Install canary release
-helm install myapp-canary ./myapp \
-  -n production \
-  -f values-production.yaml \
-  --set image.tag=2.0.0 \
-  --set replicaCount=1
+# Rollback on failure
+helm upgrade myapp ./mychart \
+  --values values-production.yaml \
+  --namespace production \
+  --wait \
+  --timeout 10m \
+  --atomic \
+  --rollback-on-error
 ```
 
 ---
@@ -1035,111 +889,94 @@ helm install myapp-canary ./myapp \
 ### 1. Use Semantic Versioning
 
 ```yaml
-# Chart version
+# Chart.yaml
 version: 1.0.0
-
-# App version
 appVersion: "1.0.0"
 ```
 
-### 2. Use Values Files
+### 2. Document Your Chart
+
+```markdown
+# README.md
+# My Chart
+
+## Installation
 
 ```bash
-# Use separate values files per environment
-helm install myapp ./myapp -f values-production.yaml
+helm install myapp ./mychart
 ```
 
-### 3. Use Labels and Annotations
+## Configuration
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `replicaCount` | Number of replicas | `1` |
+| `image.tag` | Image tag | `""` |
+```
+
+### 3. Use Values Schema
+
+```json
+// values.schema.json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "replicaCount": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "image": {
+      "type": "object",
+      "properties": {
+        "repository": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        }
+      },
+      "required": ["repository"]
+    }
+  },
+  "required": ["replicaCount", "image"]
+}
+```
+
+### 4. Use Helper Templates
+
+```yaml
+# templates/_helpers.tpl
+{{- define "mychart.labels" -}}
+helm.sh/chart: {{ include "mychart.chart" . }}
+{{ include "mychart.selectorLabels" . }}
+{{- end }}
+```
+
+### 5. Use Hooks Carefully
 
 ```yaml
 metadata:
-  labels:
-    {{- include "myapp.labels" . | nindent 4 }}
   annotations:
-    checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-```
-
-### 4. Use Hooks for Initialization
-
-```yaml
-annotations:
-  "helm.sh/hook": pre-install
-```
-
-### 5. Use Tests
-
-```yaml
-annotations:
-  "helm.sh/hook": test
-```
-
-### 6. Use Secrets for Sensitive Data
-
-```yaml
-data:
-  password: {{ .Values.password | b64enc }}
-```
-
-### 7. Use Resource Limits
-
-```yaml
-resources:
-  limits:
-    cpu: 1000m
-    memory: 1Gi
-  requests:
-    cpu: 500m
-    memory: 512Mi
-```
-
-### 8. Use Health Checks
-
-```yaml
-livenessProbe:
-  httpGet:
-    path: /health
-    port: http
-readinessProbe:
-  httpGet:
-    path: /ready
-    port: http
-```
-
-### 9. Use Notes.txt
-
-```yaml
-# templates/NOTES.txt
-Thank you for installing {{ .Chart.Name }}!
-
-Your release is named {{ .Release.Name }}.
-
-To learn more about the release, try:
-
-  $ helm status {{ .Release.Name }}
-  $ helm get all {{ .Release.Name }}
-```
-
-### 10. Document Your Chart
-
-```yaml
-# Chart.yaml
-description: A Helm chart for my application
-home: https://example.com
-sources:
-  - https://github.com/example/myapp
-keywords:
-  - myapp
-  - web
-maintainers:
-  - name: John Doe
-    email: john@example.com
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": hook-succeeded
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [Helm Documentation](https://helm.sh/docs/)
-- [Helm Best Practices](https://helm.sh/docs/chart_best_practices/)
-- [Helm Charts](https://helm.sh/docs/topics/charts/)
-- [Helm Template Guide](https://helm.sh/docs/chart_template_guide/)
+This skill covers comprehensive Helm charts implementation including:
+
+- **Helm Concepts**: Architecture and key concepts
+- **Chart Structure**: Basic chart structure, Chart.yaml, values.yaml
+- **Templates**: Deployment, service, ingress, configmap, secret, HPA, helper templates, NOTES.txt
+- **Values Files**: Production and development values
+- **Chart Dependencies**: Chart.yaml with dependencies and values
+- **Hooks**: Pre-install, post-install, pre-upgrade, post-upgrade hooks
+- **Chart Testing**: Lint, template rendering, dry run
+- **Chart Repository**: Create repo, package chart, index repo
+- **Release Management**: Install, upgrade, rollback, uninstall
+- **Production Patterns**: Production deployment, upgrade strategy, rollback strategy
+- **Best Practices**: Semantic versioning, documentation, values schema, helper templates, hooks

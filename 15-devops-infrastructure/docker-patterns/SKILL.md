@@ -1,6 +1,8 @@
 # Docker Patterns
 
-A comprehensive guide to Docker containerization patterns and best practices.
+## Overview
+
+Docker containerization provides consistent environments across development, testing, and production. This skill covers Dockerfile best practices, multi-stage builds, and production-ready patterns.
 
 ## Table of Contents
 
@@ -20,45 +22,92 @@ A comprehensive guide to Docker containerization patterns and best practices.
 
 ## Dockerfile Best Practices
 
-### General Guidelines
-
-| Practice | Why | Example |
-|----------|-----|---------|
-| Use specific base image | Smaller, more predictable | `node:18-alpine` vs `node:18` |
-| Minimize layers | Faster builds, smaller images | Combine RUN commands |
-| Order instructions strategically | Better cache utilization | Copy package files before source |
-| Use .dockerignore | Exclude unnecessary files | `node_modules`, `.git` |
-| Don't run as root | Security best practice | Create non-root user |
-| Use build args for versioning | Reproducible builds | `ARG VERSION=1.0.0` |
-
-### Basic Dockerfile Structure
+### Use Official Base Images
 
 ```dockerfile
-# 1. Base image
-FROM node:18-alpine AS base
+# Good: Use official images
+FROM node:18-alpine
+FROM python:3.11-slim
+FROM golang:1.21-alpine
 
-# 2. Set working directory
+# Bad: Use unofficial images
+FROM someuser/node:latest
+FROM random/python:3.11
+```
+
+### Use Specific Versions
+
+```dockerfile
+# Good: Use specific versions
+FROM node:18.17.0-alpine
+FROM python:3.11.4-slim
+FROM golang:1.21.6-alpine
+
+# Bad: Use latest tag
+FROM node:latest
+FROM python:latest
+FROM golang:latest
+```
+
+### Minimize Layers
+
+```dockerfile
+# Bad: Multiple RUN commands create multiple layers
+FROM node:18-alpine
+RUN apk add --no-cache git
+RUN apk add --no-cache curl
+RUN apk add --no-cache build-base
+
+# Good: Combine RUN commands
+FROM node:18-alpine
+RUN apk add --no-cache git curl build-base
+```
+
+### Clean Up After Install
+
+```dockerfile
+# Good: Clean up after package installation
+FROM node:18-alpine
+RUN apk add --no-cache --virtual .build-deps \
+    gcc \
+    g++ \
+    make \
+    && npm install \
+    && apk del .build-deps
+```
+
+### Use .dockerignore
+
+```dockerfile
+# .dockerignore
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+Dockerfile
+docker-compose.yml
+README.md
+*.md
+.vscode
+.idea
+```
+
+### Order Instructions by Frequency
+
+```dockerfile
+# Good: Order instructions by frequency of change
+FROM node:18-alpine
+
+# 1. Dependencies (change infrequently)
 WORKDIR /app
-
-# 3. Install dependencies
 COPY package*.json ./
 RUN npm ci --only=production
 
-# 4. Copy application code
+# 2. Application code (changes frequently)
 COPY . .
 
-# 5. Set environment variables
-ENV NODE_ENV=production
-
-# 6. Expose ports
-EXPOSE 3000
-
-# 7. Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
-USER nodejs
-
-# 8. Define entrypoint
+# 3. Start command (rarely changes)
 CMD ["node", "index.js"]
 ```
 
@@ -66,76 +115,29 @@ CMD ["node", "index.js"]
 
 ## Multi-Stage Builds
 
-### Why Multi-Stage Builds?
-
-```
-Single Stage Build:
-┌─────────────────────────────────────┐
-│  Base Image (Node + npm + tools)   │  ~500MB
-│  + Dependencies                     │  ~200MB
-│  + Dev Dependencies                 │  ~100MB  ← Not needed in prod!
-│  + Source Code                      │  ~50MB
-│  + Build Artifacts                  │  ~100MB  ← Not needed in prod!
-└─────────────────────────────────────┘
-Total: ~950MB
-
-Multi-Stage Build:
-┌──────────────────────┐    ┌──────────────────────────┐
-│  Build Stage         │    │  Runtime Stage           │
-│  Base + Dev Deps     │    │  Base + Runtime Deps    │  ~700MB
-│  + Source Code       │    │  + Compiled Assets       │  ~50MB
-│  + Build             │    │                          │
-└──────────────────────┘    └──────────────────────────┘
-        ↓ Copy only artifacts
-Total: ~750MB (21% smaller)
-```
-
 ### Node.js Multi-Stage Build
 
 ```dockerfile
 # Build stage
 FROM node:18-alpine AS builder
-
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
-
-# Install all dependencies (including dev)
 RUN npm ci
 
-# Copy source code
 COPY . .
-
-# Build application
 RUN npm run build
 
 # Production stage
 FROM node:18-alpine AS production
-
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install only production dependencies
-RUN npm ci --only=production
-
-# Copy built assets from builder
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./
 
-# Set environment
 ENV NODE_ENV=production
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
-USER nodejs
-
-# Expose port
-EXPOSE 3000
-
-# Start application
 CMD ["node", "dist/index.js"]
 ```
 
@@ -144,59 +146,83 @@ CMD ["node", "dist/index.js"]
 ```dockerfile
 # Build stage
 FROM python:3.11-slim AS builder
-
 WORKDIR /app
 
-# Install build dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        gcc \
-        g++ \
-        && rm -rf /var/lib/apt/lists/*
-
-# Copy requirements
 COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Python dependencies
-RUN pip install --user --no-cache-dir -r requirements.txt
+COPY . .
+RUN pip install .
 
 # Production stage
 FROM python:3.11-slim AS production
-
 WORKDIR /app
 
-# Copy installed packages from builder
-COPY --from=builder /root/.local /root/.local
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /app .
 
-# Copy application code
+CMD ["python", "app.py"]
+```
+
+### Go Multi-Stage Build
+
+```dockerfile
+# Build stage
+FROM golang:1.21-alpine AS builder
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o app .
 
-# Make sure scripts in .local are usable
-ENV PATH=/root/.local/bin:$PATH
+# Production stage
+FROM alpine:3.18
+WORKDIR /app
 
-# Create non-root user
-RUN useradd -m -u 1000 appuser
-USER appuser
+COPY --from=builder /app/app .
 
-# Expose port
-EXPOSE 8000
+CMD ["./app"]
+```
 
-# Start application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+### React Multi-Stage Build
+
+```dockerfile
+# Build stage
+FROM node:18-alpine AS builder
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+# Production stage (serve with nginx)
+FROM nginx:alpine
+COPY --from=builder /app/build /usr/share/nginx/html
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
 ```
 
 ### Next.js Multi-Stage Build
 
 ```dockerfile
-# Dependencies stage
+# Build stage
 FROM node:18-alpine AS deps
 WORKDIR /app
+
 COPY package*.json ./
 RUN npm ci
 
-# Builder stage
 FROM node:18-alpine AS builder
 WORKDIR /app
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
@@ -205,20 +231,13 @@ RUN npm run build
 FROM node:18-alpine AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+ENV NODE_ENV=production
 
 COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
 EXPOSE 3000
-
-ENV PORT 3000
 
 CMD ["node", "server.js"]
 ```
@@ -227,58 +246,37 @@ CMD ["node", "server.js"]
 
 ## Layer Caching Optimization
 
-### Docker Layer Caching
-
-```
-Docker builds images in layers. Each instruction creates a new layer.
-
-Layer 1: FROM node:18-alpine          ← Cached if base image unchanged
-Layer 2: WORKDIR /app                  ← Always cached
-Layer 3: COPY package*.json ./         ← Cached if package files unchanged
-Layer 4: RUN npm ci                     ← Cached if package.json unchanged
-Layer 5: COPY . .                      ← Invalidated if any file changes
-Layer 6: RUN npm run build             ← Rebuild every time source changes
-
-Optimization:
-- Copy package files BEFORE source code
-- Separate dependency installation from app copy
-```
-
-### Optimized Dockerfile
+### Cache Dependencies
 
 ```dockerfile
+# Good: Copy dependencies first
 FROM node:18-alpine
-
 WORKDIR /app
 
-# ✅ GOOD: Copy package files first
+# Copy only package files
 COPY package*.json ./
 
-# ✅ GOOD: Install dependencies (cached if package.json unchanged)
-RUN npm ci --only=production
+# Install dependencies (cached if package.json unchanged)
+RUN npm ci
 
-# ✅ GOOD: Copy source code after dependencies
+# Copy application code
 COPY . .
 
-# ✅ GOOD: Build after source copy
+# Build application
 RUN npm run build
-
-# ❌ BAD: This would invalidate cache on any source change
-# COPY . .
-# RUN npm install
 ```
 
-### Advanced Caching with BuildKit
+### Use BuildKit Cache
 
 ```dockerfile
-# syntax=docker/dockerfile:1.4
-
+# Good: Use BuildKit cache mounts
 FROM node:18-alpine
-
 WORKDIR /app
 
-# Use cache mount for node_modules
-RUN --mount=type=cache,target=/app/node_modules \
+COPY package*.json ./
+
+# Use cache mount for npm
+RUN --mount=type=cache,target=/root/.npm \
     npm ci
 
 COPY . .
@@ -286,128 +284,74 @@ COPY . .
 RUN npm run build
 ```
 
+### Cache Go Modules
+
+```dockerfile
+# Good: Cache Go modules
+FROM golang:1.21-alpine AS builder
+WORKDIR /app
+
+COPY go.mod go.sum ./
+
+# Use cache mount for Go modules
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
+
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o app .
+```
+
+### Cache Python Packages
+
+```dockerfile
+# Good: Cache Python packages
+FROM python:3.11-slim AS builder
+WORKDIR /app
+
+COPY requirements.txt .
+
+# Use cache mount for pip
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+RUN pip install .
+```
+
 ---
 
 ## .dockerignore
 
-### Why .dockerignore?
+### Common Patterns
 
-```
-Without .dockerignore:
-- Copies entire context to build daemon
-- Includes node_modules (huge!)
-- Includes .git (huge!)
-- Includes .env (security risk!)
-- Includes test files (not needed in prod!)
-
-With .dockerignore:
-- Only copies necessary files
-- Smaller build context
-- Faster builds
-- Better security
-```
-
-### Example .dockerignore
-
-```dockerignore
-# Dependencies
+```dockerfile
+# .dockerignore
 node_modules
 npm-debug.log
 yarn-error.log
+yarn-debug.log
+.pnpm-debug.log
 
-# Testing
-coverage
-.nyc_output
-*.test.js
-*.spec.js
-__tests__
+# Git
+.git
+.gitignore
+.gitattributes
 
 # Environment
 .env
 .env.local
 .env.*.local
 
-# Git
-.git
-.gitignore
-
-# Docker
-Dockerfile
-.dockerignore
-docker-compose.yml
-
 # IDE
 .vscode
 .idea
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Build artifacts
-dist
-build
-.next
-
-# Documentation
-README.md
-docs
-*.md
-
-# Misc
-*.log
-```
-
-### Python .dockerignore
-
-```dockerignore
-# Python
-__pycache__
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-.mypy_cache/
-
-# IDE
-.vscode
-.idea
-*.swp
-
-# Git
-.git
-.gitignore
-
-# Environment
-.env
-.env.local
-.venv
 
 # Docker
 Dockerfile
@@ -416,297 +360,256 @@ docker-compose.yml
 
 # Documentation
 README.md
+*.md
 docs/
+
+# Tests
+__tests__
+tests/
+*.test.js
+*.spec.js
+coverage/
+.nyc_output/
+
+# Build artifacts
+dist/
+build/
+.next/
+out/
+
+# Misc
+*.log
+.cache
+```
+
+### Language-Specific .dockerignore
+
+```dockerfile
+# Node.js
+node_modules
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+.eggs
+.pytest_cache
+.coverage
+htmlcov
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
 ```
 
 ---
 
 ## Environment Variables
 
-### Using ENV Instruction
+### Using ARG and ENV
 
 ```dockerfile
-# Set environment variable
-ENV NODE_ENV=production
-ENV PORT=3000
-
-# Multiple variables
-ENV NODE_ENV=production \
-    PORT=3000 \
-    HOST=0.0.0.0
-
-# Using environment variables in subsequent instructions
-ENV PATH="/app/bin:${PATH}"
-```
-
-### Using ARG Instruction
-
-```dockerfile
-# Build-time variable (not available at runtime)
+# ARG: Build-time variable
 ARG NODE_VERSION=18
-ARG APP_VERSION=1.0.0
+ARG APP_ENV=production
 
+# ENV: Runtime variable
+ENV NODE_ENV=${APP_ENV}
+ENV NODE_OPTIONS=--max-old-space-size=4096
+
+# Use ARG in FROM
 FROM node:${NODE_VERSION}-alpine
-
-# Use ARG in ENV
-ENV APP_VERSION=${APP_VERSION}
-
-# ARG is not available after FROM unless redeclared
-ARG APP_VERSION
-ENV VERSION=${APP_VERSION}
 ```
 
-### Runtime Environment Variables
+### Environment Files
 
 ```dockerfile
+# Copy environment file
 FROM node:18-alpine
-
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm ci --only=production
+COPY .env.production .env
 
-COPY . .
-
-# Set default values (can be overridden at runtime)
-ENV NODE_ENV=production
-ENV PORT=3000
-ENV DATABASE_URL=postgresql://localhost:5432/db
-
-EXPOSE 3000
-
-CMD ["node", "index.js"]
+# Or use docker-compose for environment
 ```
 
-### Override at Runtime
+### Docker Compose Environment
 
-```bash
-# Override environment variables
-docker run -e NODE_ENV=development -e PORT=8080 myapp
+```yaml
+# docker-compose.yml
+version: '3.8'
 
-# Use .env file
-docker run --env-file .env myapp
-
-# Docker Compose
 services:
   app:
+    build: .
     environment:
       - NODE_ENV=production
-      - PORT=3000
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
     env_file:
-      - .env
+      - .env.production
 ```
 
 ---
 
 ## Health Checks
 
-### Basic Health Check
+### HTTP Health Check
 
 ```dockerfile
+# HTTP health check
 FROM node:18-alpine
-
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
+COPY . .
+RUN npm run build
 
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+CMD ["node", "dist/index.js"]
+```
+
+### TCP Health Check
+
+```dockerfile
+# TCP health check
+FROM node:18-alpine
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
 COPY . .
 
-EXPOSE 3000
-
-# Add health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node healthcheck.js || exit 1
+    CMD nc -z localhost 3000
 
 CMD ["node", "index.js"]
 ```
 
-### Health Check Script
-
-```javascript
-// healthcheck.js
-const http = require('http');
-
-const options = {
-  host: 'localhost',
-  port: process.env.PORT || 3000,
-  path: '/health',
-  timeout: 2000,
-};
-
-const request = http.request(options, (res) => {
-  console.log(`Health check: ${res.statusCode}`);
-  if (res.statusCode === 200) {
-    process.exit(0);
-  } else {
-    process.exit(1);
-  }
-});
-
-request.on('error', () => {
-  process.exit(1);
-});
-
-request.end();
-```
-
-### Python Health Check
+### Script Health Check
 
 ```dockerfile
-FROM python:3.11-slim
-
+# Script health check
+FROM node:18-alpine
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
+COPY package*.json ./
+RUN npm ci
 COPY . .
 
-EXPOSE 8000
+# Create health check script
+RUN echo '#!/bin/sh\nnode -e "require(\"./health-check.js\")"' > /health-check.sh && \
+    chmod +x /health-check.sh
 
-# Health check using curl
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
+    CMD /health-check.sh
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-### Docker Compose Health Check
-
-```yaml
-version: '3.8'
-services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    healthcheck:
-      test: ["CMD", "node", "healthcheck.js"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-      start_period: 5s
-    depends_on:
-      db:
-        condition: service_healthy
-
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_PASSWORD: password
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+CMD ["node", "index.js"]
 ```
 
 ---
 
 ## Security Scanning
 
-### Docker Scout
+### Trivy Scan
 
 ```bash
-# Scan image for vulnerabilities
-docker scout quickimage myapp:latest
-
-# Scan with detailed output
-docker scout cves myapp:latest
-
-# Scan during build
-docker build --security-opt=scan=true .
-```
-
-### Trivy
-
-```bash
-# Install Trivy
-brew install trivy
-
-# Scan image
+# Scan Docker image
 trivy image myapp:latest
+
+# Scan Dockerfile
+trivy config Dockerfile
 
 # Scan with severity threshold
 trivy image --severity HIGH,CRITICAL myapp:latest
-
-# Scan filesystem
-trivy fs .
 ```
 
-### Snyk
+### Docker Scout
 
 ```bash
-# Install Snyk
-npm install -g snyk
-
-# Scan image
-snyk container test myapp:latest
+# Scan Docker image
+docker scout quickstart
 
 # Scan Dockerfile
-snyk container test --file=Dockerfile
+docker scout quickstart Dockerfile
 
-# Scan and monitor
-snyk monitor --docker myapp:latest
+# Scan with CVE database
+docker scout cves myapp:latest
 ```
 
-### Docker Bench Security
+### Snyk Scan
 
 ```bash
-# Run Docker Bench Security
-docker run --rm --net host --pid host --userns host --cap-add SYS_ADMIN \
-  --volume /var/lib/docker:/var/lib/docker \
-  --volume /var/run/docker.sock:/var/run/docker.sock \
-  docker/docker-bench-security
+# Scan Docker image
+snyk container test myapp:latest --file=Dockerfile
+
+# Scan Dockerfile
+snyk iac test Dockerfile
 ```
 
 ---
 
 ## Image Optimization
 
-### Use Alpine Linux
+### Use Alpine Images
 
 ```dockerfile
-# ❌ BAD: Standard image ~900MB
-FROM node:18
-
-# ✅ GOOD: Alpine image ~100MB
+# Good: Use Alpine (smaller size)
 FROM node:18-alpine
+FROM python:3.11-alpine
+FROM golang:1.21-alpine
 
-# ✅ EVEN BETTER: Distroless ~80MB
+# Bad: Use standard images (larger size)
+FROM node:18
+FROM python:3.11
+FROM golang:1.21
+```
+
+### Use Distroless Images
+
+```dockerfile
+# Good: Use distroless (minimal attack surface)
 FROM gcr.io/distroless/nodejs18-debian11
+FROM gcr.io/distroless/python3-debian11
+FROM gcr.io/distroless/base-debian11
 ```
 
-### Minimize Layers
+### Remove Unnecessary Files
 
 ```dockerfile
-# ❌ BAD: Multiple layers
-RUN apt-get update
-RUN apt-get install -y curl
-RUN apt-get install -y git
-RUN rm -rf /var/lib/apt/lists/*
+# Good: Remove unnecessary files
+FROM node:18-alpine
+WORKDIR /app
 
-# ✅ GOOD: Single layer
-RUN apt-get update && \
-    apt-get install -y curl git && \
-    rm -rf /var/lib/apt/lists/*
-```
-
-### Clean Up After Install
-
-```dockerfile
-# ❌ BAD: Leaves cache files
-RUN npm install
-
-# ✅ GOOD: Cleans up cache
+COPY package*.json ./
 RUN npm ci --only=production && \
     npm cache clean --force
 
-# ✅ GOOD: Cleans up apt cache
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl && \
-    rm -rf /var/lib/apt/lists/*
+COPY . .
+RUN npm run build && \
+    rm -rf /app/src /app/test
+
+CMD ["node", "dist/index.js"]
 ```
 
 ### Use .dockerignore
@@ -714,157 +617,74 @@ RUN apt-get update && \
 ```dockerfile
 # .dockerignore
 node_modules
+npm-debug.log
 .git
 .env
-*.log
-
-# This prevents copying unnecessary files
-COPY . .
-```
-
-### Multi-Stage Builds
-
-```dockerfile
-# Build stage includes dev dependencies
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-# Production stage only includes runtime dependencies
-FROM node:18-alpine AS production
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY --from=builder /app/dist ./dist
-CMD ["node", "dist/index.js"]
+Dockerfile
+docker-compose.yml
+README.md
 ```
 
 ---
 
 ## Common Patterns
 
-### Node.js Application
+### Node.js App
 
 ```dockerfile
 FROM node:18-alpine
-
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
-
-# Install dependencies
 RUN npm ci --only=production
 
-# Copy application code
 COPY . .
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
-USER nodejs
-
-# Expose port
-EXPOSE 3000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+ENV NODE_ENV=production
 
 CMD ["node", "index.js"]
 ```
 
-### Python Application
+### Python App
 
 ```dockerfile
 FROM python:3.11-slim
-
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc && \
-    rm -rf /var/lib/apt/lists/*
-
-# Copy requirements
 COPY requirements.txt .
-
-# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
 COPY . .
 
-# Create non-root user
-RUN useradd -m -u 1000 appuser
-USER appuser
+ENV PYTHONUNBUFFERED=1
 
-# Expose port
-EXPOSE 8000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "app.py"]
 ```
 
-### Next.js Application
+### Go App
 
 ```dockerfile
-# syntax=docker/dockerfile:1.4
-
-FROM node:18-alpine AS base
-
-# Install dependencies only when needed
-FROM base AS deps
+FROM golang:1.21-alpine AS builder
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY . .
-RUN npm run build
+RUN CGO_ENABLED=0 GOOS=linux go build -o app .
 
-# Production image, copy all the files and run next
-FROM base AS runner
+FROM alpine:3.18
 WORKDIR /app
 
-ENV NODE_ENV production
+COPY --from=builder /app/app .
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-COPY --from=builder /app/public ./public
-
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Automatically leverage output traces to reduce image size
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
-
-EXPOSE 3000
-
-ENV PORT 3000
-
-CMD ["node", "server.js"]
+CMD ["./app"]
 ```
 
-### Static Site
+### React App
 
 ```dockerfile
 FROM node:18-alpine AS builder
-
 WORKDIR /app
 
 COPY package*.json ./
@@ -874,240 +694,258 @@ COPY . .
 RUN npm run build
 
 FROM nginx:alpine
+COPY --from=builder /app/build /usr/share/nginx/html
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
+### Next.js App
+
+```dockerfile
+FROM node:18-alpine AS deps
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+FROM node:18-alpine AS builder
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build
+
+FROM node:18-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]
+```
+
 ---
 
 ## Production Dockerfile Examples
 
-### Production Node.js Dockerfile
+### Node.js API
 
 ```dockerfile
-# syntax=docker/dockerfile:1.4
-
 # Build stage
 FROM node:18-alpine AS builder
-
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
+RUN npm ci --only=production
 
-# Install all dependencies
-RUN npm ci
-
-# Copy source code
 COPY . .
-
-# Run tests
-RUN npm test
-
-# Build application
 RUN npm run build
 
 # Production stage
 FROM node:18-alpine AS production
-
 WORKDIR /app
 
-# Set environment
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./
+
 ENV NODE_ENV=production
 
-# Copy package files
-COPY package*.json ./
+USER node
 
-# Install only production dependencies
-RUN npm ci --only=production && \
-    npm cache clean --force
-
-# Copy built assets from builder
-COPY --from=builder /app/dist ./dist
-
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
-USER nodejs
-
-# Expose port
 EXPOSE 3000
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+    CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
-# Start application
 CMD ["node", "dist/index.js"]
 ```
 
-### Production Python Dockerfile
+### Python API
 
 ```dockerfile
-# syntax=docker/dockerfile:1.4
-
 # Build stage
 FROM python:3.11-slim AS builder
-
 WORKDIR /app
 
-# Install build dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        gcc \
-        g++ \
-        && rm -rf /var/lib/apt/lists/*
-
-# Copy requirements
 COPY requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
 
-# Install Python dependencies
-RUN pip install --user --no-cache-dir -r requirements.txt
-
-# Copy source code
 COPY . .
-
-# Run tests
-RUN pytest
+RUN pip install --user .
 
 # Production stage
 FROM python:3.11-slim AS production
-
 WORKDIR /app
 
-# Copy installed packages from builder
 COPY --from=builder /root/.local /root/.local
+COPY --from=builder /app .
 
-# Copy application code
-COPY . .
-
-# Make sure scripts in .local are usable
 ENV PATH=/root/.local/bin:$PATH
+ENV PYTHONUNBUFFERED=1
 
-# Create non-root user
-RUN useradd -m -u 1000 appuser
-USER appuser
+USER nobody
 
-# Expose port
 EXPOSE 8000
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
 
-# Start application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "app.py"]
+```
+
+### Go API
+
+```dockerfile
+# Build stage
+FROM golang:1.21-alpine AS builder
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o app .
+
+# Production stage
+FROM alpine:3.18
+WORKDIR /app
+
+COPY --from=builder /app/app .
+
+RUN apk add --no-cache ca-certificates
+
+USER nobody
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+
+CMD ["./app"]
+```
+
+### React SPA
+
+```dockerfile
+# Build stage
+FROM node:18-alpine AS builder
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+# Production stage
+FROM nginx:alpine
+WORKDIR /usr/share/nginx/html
+
+COPY --from=builder /app/build .
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+RUN chown -R nginx:nginx /usr/share/nginx/html
+
+USER nginx
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]
 ```
 
 ---
 
 ## Best Practices
 
-### 1. Use Specific Base Image Tags
+### 1. Use Specific Versions
 
 ```dockerfile
-# ❌ BAD: Latest tag
-FROM node:latest
-
-# ✅ GOOD: Specific version
+# Good
 FROM node:18.17.0-alpine
+
+# Bad
+FROM node:latest
 ```
 
 ### 2. Minimize Layers
 
 ```dockerfile
-# ❌ BAD: Multiple RUN commands
-RUN apt-get update
-RUN apt-get install -y curl
-RUN apt-get install -y git
+# Good
+RUN apk add --no-cache git curl make && \
+    npm ci && \
+    npm run build
 
-# ✅ GOOD: Combined RUN
-RUN apt-get update && \
-    apt-get install -y curl git && \
-    rm -rf /var/lib/apt/lists/*
-```
-
-### 3. Leverage Build Cache
-
-```dockerfile
-# ✅ GOOD: Copy package files before source code
-COPY package*.json ./
+# Bad
+RUN apk add --no-cache git
+RUN apk add --no-cache curl
 RUN npm ci
-COPY . .
+RUN npm run build
 ```
 
-### 4. Use Multi-Stage Builds
+### 3. Use Multi-Stage Builds
 
 ```dockerfile
-# ✅ GOOD: Separate build and runtime stages
+# Good: Multi-stage build
 FROM node:18-alpine AS builder
-# ... build steps ...
+RUN npm run build
 
-FROM node:18-alpine AS production
+FROM node:18-alpine
 COPY --from=builder /app/dist ./dist
+
+# Bad: Single stage
+FROM node:18-alpine
+RUN npm install && npm run build
 ```
 
-### 5. Don't Run as Root
-
-```dockerfile
-# ✅ GOOD: Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
-USER nodejs
-```
-
-### 6. Use .dockerignore
+### 4. Use .dockerignore
 
 ```dockerfile
 # .dockerignore
 node_modules
+npm-debug.log
 .git
 .env
-*.log
 ```
 
-### 7. Add Health Checks
+### 5. Run as Non-Root User
 
 ```dockerfile
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
-```
+# Good
+USER node
+USER nobody
 
-### 8. Scan for Vulnerabilities
-
-```bash
-docker scout quickimage myapp:latest
-trivy image myapp:latest
-```
-
-### 9. Use Build Arguments for Versioning
-
-```dockerfile
-ARG VERSION=1.0.0
-ENV APP_VERSION=${VERSION}
-```
-
-### 10. Document Your Dockerfile
-
-```dockerfile
-# Multi-stage build for Node.js application
-# Stage 1: Builder - Installs dependencies and builds
-# Stage 2: Production - Copies only runtime dependencies and built assets
-
-FROM node:18-alpine AS builder
-# ...
+# Bad
+# Runs as root by default
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [Docker Documentation](https://docs.docker.com/)
-- [Dockerfile Best Practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
-- [Multi-Stage Builds](https://docs.docker.com/build/building/multi-stage/)
-- [Docker Scout](https://docs.docker.com/scout/)
-- [Trivy](https://aquasecurity.github.io/trivy/)
+This skill covers comprehensive Docker containerization patterns including:
+
+- **Dockerfile Best Practices**: Official images, specific versions, minimize layers
+- **Multi-Stage Builds**: Node.js, Python, Go, React, Next.js
+- **Layer Caching Optimization**: Cache dependencies, BuildKit cache
+- **.dockerignore**: Common patterns and language-specific files
+- **Environment Variables**: ARG, ENV, environment files
+- **Health Checks**: HTTP, TCP, script-based health checks
+- **Security Scanning**: Trivy, Docker Scout, Snyk
+- **Image Optimization**: Alpine, distroless, remove unnecessary files
+- **Common Patterns**: Node.js, Python, Go, React, Next.js
+- **Production Dockerfile Examples**: Node.js API, Python API, Go API, React SPA
+- **Best Practices**: Specific versions, minimize layers, multi-stage builds, .dockerignore, non-root user

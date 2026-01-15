@@ -1,6 +1,8 @@
 # ELK Stack
 
-A comprehensive guide to the ELK (Elasticsearch, Logstash, Kibana) stack for log management and analytics.
+## Overview
+
+The ELK Stack (Elasticsearch, Logstash, Kibana) is a powerful set of tools for searching, analyzing, and visualizing data in real-time. This skill covers ELK stack setup, configuration, and best practices.
 
 ## Table of Contents
 
@@ -21,31 +23,47 @@ A comprehensive guide to the ELK (Elasticsearch, Logstash, Kibana) stack for log
 
 ## ELK Stack Overview
 
+### Architecture
+
+```
+┌─────────────┐
+│   Sources   │
+│  (Apps)     │
+└──────┬──────┘
+       │ Logs
+       ↓
+┌─────────────┐
+│  Filebeat   │
+│  (Ship)     │
+└──────┬──────┘
+       │
+       ↓
+┌─────────────┐
+│  Logstash   │
+│  (Process)  │
+└──────┬──────┘
+       │
+       ↓
+┌─────────────┐
+│Elasticsearch│
+│  (Store)    │
+└──────┬──────┘
+       │
+       ↓
+┌─────────────┐
+│   Kibana    │
+│  (Visual)   │
+└─────────────┘
+```
+
 ### Components
 
-```
-┌─────────────┐    Logs    ┌─────────────┐    Processed    ┌─────────────┐
-│ Applications│────────────>│  Logstash   │────────────────>│Elasticsearch│
-│             │             │  (Optional) │                 │             │
-└─────────────┘             └─────────────┘                 └──────┬──────┘
-                                                                  │
-                                                                  │ Query
-                                                                  ▼
-                                                           ┌─────────────┐
-                                                           │   Kibana    │
-                                                           │  Dashboard  │
-                                                           └─────────────┘
-```
-
-### Component Responsibilities
-
-| Component | Purpose | Key Features |
-|-----------|---------|--------------|
-| Elasticsearch | Search and analytics engine | Distributed, RESTful, JSON |
-| Logstash | Data processing pipeline | Input/Filter/Output plugins |
-| Kibana | Visualization platform | Dashboards, Discover, Canvas |
-| Filebeat | Log shipper | Lightweight, reliable |
-| Beats | Data shippers | Metricbeat, Packetbeat, etc. |
+| Component | Description |
+|-----------|-------------|
+| **Elasticsearch** | Distributed search and analytics engine |
+| **Logstash** | Server-side data processing pipeline |
+| **Kibana** | Visualization and exploration interface |
+| **Beats** | Lightweight data shippers (Filebeat, Metricbeat, etc.) |
 
 ---
 
@@ -54,20 +72,22 @@ A comprehensive guide to the ELK (Elasticsearch, Logstash, Kibana) stack for log
 ### Docker Compose
 
 ```yaml
+# docker-compose.yml
 version: '3.8'
+
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=false
     ports:
       - "9200:9200"
       - "9300:9300"
     volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
+      - es_data:/usr/share/elasticsearch/data
     networks:
       - elk
 
@@ -99,93 +119,92 @@ services:
       - elasticsearch
 
 volumes:
-  elasticsearch-data:
+  es_data:
 
 networks:
   elk:
     driver: bridge
 ```
 
-### Kubernetes Deployment
+### Index Template
 
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: elasticsearch-config
-  namespace: logging
-data:
-  elasticsearch.yml: |
-    cluster.name: "k8s-logs"
-    network.host: 0.0.0.0
-    discovery.type: single-node
-    xpack.security.enabled: false
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: elasticsearch
-  namespace: logging
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: elasticsearch
-  template:
-    metadata:
-      labels:
-        app: elasticsearch
-    spec:
-      containers:
-      - name: elasticsearch
-        image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
-        ports:
-        - containerPort: 9200
-        env:
-        - name: discovery.type
-          value: single-node
-        - name: ES_JAVA_OPTS
-          value: "-Xms1g -Xmx1g"
-        volumeMounts:
-        - name: data
-          mountPath: /usr/share/elasticsearch/data
-      volumes:
-      - name: data
-        emptyDir: {}
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: elasticsearch
-  namespace: logging
-spec:
-  selector:
-    app: elasticsearch
-  ports:
-  - port: 9200
-    targetPort: 9200
+```json
+{
+  "index_patterns": ["logs-*"],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 1,
+      "index.lifecycle.name": "logs-policy",
+      "index.lifecycle.rollover_alias": "logs"
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
+        "level": {
+          "type": "keyword"
+        },
+        "message": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        },
+        "service": {
+          "type": "keyword"
+        },
+        "environment": {
+          "type": "keyword"
+        },
+        "host": {
+          "type": "keyword"
+        },
+        "tags": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}
 ```
 
-### Basic Configuration
+### Index Lifecycle Policy
 
-```yaml
-# elasticsearch.yml
-cluster.name: production-cluster
-node.name: node-1
-network.host: 0.0.0.0
-http.port: 9200
-discovery.seed_hosts: ["node-1", "node-2"]
-cluster.initial_master_nodes: ["node-1", "node-2"]
-
-# Index settings
-index.number_of_shards: 3
-index.number_of_replicas: 1
-
-# Security
-xpack.security.enabled: true
-xpack.security.transport.ssl.enabled: true
+```json
+{
+  "policy": "logs-policy",
+  "phases": {
+    "hot": {
+      "actions": {
+        "rollover": {
+          "max_size": "50GB",
+          "max_age": "30d"
+        }
+      }
+    },
+    "warm": {
+      "min_age": "30d",
+      "actions": {
+        "shrink": {
+          "number_of_shards": 1
+        },
+        "forcemerge": {
+          "max_num_segments": 1
+        }
+      }
+    },
+    "delete": {
+      "min_age": "90d",
+      "actions": {
+        "delete": {}
+      }
+    }
+  }
+}
 ```
 
 ---
@@ -195,7 +214,7 @@ xpack.security.transport.ssl.enabled: true
 ### Basic Pipeline
 
 ```conf
-# pipeline.conf
+# logstash/pipeline/logstash.conf
 input {
   beats {
     port => 5044
@@ -204,8 +223,10 @@ input {
 
 filter {
   # Parse JSON logs
-  json {
-    source => "message"
+  if [message] =~ /^\{.*\}$/ {
+    json {
+      source => "message"
+    }
   }
 
   # Add timestamp
@@ -213,79 +234,48 @@ filter {
     match => ["timestamp", "ISO8601"]
   }
 
-  # Add environment tag
+  # Add environment
   mutate {
-    add_field => { "environment" => "production" }
+    add_field => {
+      "environment" => "${ENVIRONMENT:production}"
+    }
+  }
+
+  # Add host info
+  mutate {
+    add_field => {
+      "host" => "${HOSTNAME:unknown}"
+    }
   }
 }
 
 output {
   elasticsearch {
-    hosts => ["http://elasticsearch:9200"]
+    hosts => ["elasticsearch:9200"]
     index => "logs-%{+YYYY.MM.dd}"
   }
+
+  # Debug output
+  stdout { codec => rubydebug }
 }
 ```
 
-### Multi-Pipeline Setup
+### Advanced Pipeline
 
 ```conf
-# pipelines.yml
-- pipeline.id: main
-  path.config: "/usr/share/logstash/pipeline/main.conf"
-
-- pipeline.id: nginx
-  path.config: "/usr/share/logstash/pipeline/nginx.conf"
-
-- pipeline.id: application
-  path.config: "/usr/share/logstash/pipeline/application.conf"
-```
-
-### Nginx Log Pipeline
-
-```conf
-# nginx.conf
+# logstash/pipeline/advanced.conf
 input {
-  file {
-    path => "/var/log/nginx/access.log"
-    start_position => "beginning"
-    type => "nginx-access"
+  beats {
+    port => 5044
   }
-}
 
-filter {
-  if [type] == "nginx-access" {
-    grok {
-      match => {
-        "message" => '%{IPORHOST:remote_addr} - %{DATA:remote_user} \[%{HTTPDATE:time_local}\] "%{WORD:method} %{DATA:request} HTTP/%{NUMBER:http_version}" %{NUMBER:status} %{NUMBER:body_bytes_sent} "%{DATA:http_referer}" "%{DATA:http_user_agent}"'
-      }
-    }
-
-    geoip {
-      source => "remote_addr"
-      target => "geoip"
-    }
-
-    useragent {
-      source => "http_user_agent"
-      target => "ua"
-    }
+  # HTTP input
+  http {
+    port => 8080
+    codec => json
   }
-}
 
-output {
-  elasticsearch {
-    hosts => ["http://elasticsearch:9200"]
-    index => "nginx-access-%{+YYYY.MM.dd}"
-  }
-}
-```
-
-### Application Log Pipeline
-
-```conf
-# application.conf
-input {
+  # TCP input
   tcp {
     port => 5000
     codec => json_lines
@@ -293,29 +283,132 @@ input {
 }
 
 filter {
-  # Add application name
-  mutate {
-    add_field => { "application" => "api-server" }
-  }
-
-  # Parse error stack traces
-  if [level] == "error" {
-    multiline {
-      pattern => "^\\s"
-      what => "previous"
+  # Parse different log formats
+  if [type] == "nginx" {
+    grok {
+      match => {
+        "message" => '%{IPORHOST:remote_addr} - %{DATA:remote_user} \[%{HTTPDATE:time_local}\] "%{WORD:method} %{DATA:request} HTTP/%{NUMBER:http_version}" %{NUMBER:status} %{NUMBER:body_bytes_sent} "%{DATA:http_referer}" "%{DATA:http_user_agent}"'
+      }
     }
   }
 
-  # Remove sensitive data
-  mutate {
-    remove_field => ["password", "token", "secret"]
+  if [type] == "application" {
+    json {
+      source => "message"
+    }
+
+    # Add application-specific fields
+    mutate {
+      add_field => {
+        "service" => "api"
+        "app_version" => "%{[version]}"
+      }
+    }
+  }
+
+  # Parse user agent
+  if [http_user_agent] {
+    useragent {
+      source => "http_user_agent"
+      target => "ua"
+    }
+  }
+
+  # GeoIP lookup
+  if [remote_addr] {
+    geoip {
+      source => "remote_addr"
+      target => "geoip"
+    }
+  }
+
+  # Drop debug logs in production
+  if [level] == "debug" and [environment] == "production" {
+    drop {}
+  }
+
+  # Add tags
+  if [status] >= 400 {
+    mutate {
+      add_tag => ["error"]
+    }
+  }
+
+  if [status] >= 500 {
+    mutate {
+      add_tag => ["server_error"]
+    }
   }
 }
 
 output {
+  # Elasticsearch output
   elasticsearch {
-    hosts => ["http://elasticsearch:9200"]
-    index => "application-%{application}-%{+YYYY.MM.dd}"
+    hosts => ["elasticsearch:9200"]
+    index => "logs-%{[service]}-%{+YYYY.MM.dd}"
+    template => "/etc/logstash/templates/logstash-template.json"
+    template_name => "logstash"
+  }
+
+  # Conditional output
+  if "error" in [tags] {
+    # Send errors to Slack
+    http {
+      url => "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+      http_method => "post"
+      format => "json"
+      mapping => {
+        "text" => "%{message}"
+      }
+    }
+  }
+}
+```
+
+### Conditional Routing
+
+```conf
+# logstash/pipeline/routing.conf
+input {
+  beats {
+    port => 5044
+  }
+}
+
+filter {
+  # Add service field based on path
+  if [log][file][path] =~ /api/ {
+    mutate {
+      add_field => { "service" => "api" }
+    }
+  } else if [log][file][path] =~ /worker/ {
+    mutate {
+      add_field => { "service" => "worker" }
+    }
+  } else if [log][file][path] =~ /frontend/ {
+    mutate {
+      add_field => { "service" => "frontend" }
+    }
+  }
+}
+
+output {
+  # Route to different indices
+  if [service] == "api" {
+    elasticsearch {
+      hosts => ["elasticsearch:9200"]
+      index => "logs-api-%{+YYYY.MM.dd}"
+    }
+  } else if [service] == "worker" {
+    elasticsearch {
+      hosts => ["elasticsearch:9200"]
+      index => "logs-worker-%{+YYYY.MM.dd}"
+    }
+  } else if [service] == "frontend" {
+    elasticsearch {
+      hosts => ["elasticsearch:9200"]
+      index => "logs-frontend-%{+YYYY.MM.dd}"
+    }
   }
 }
 ```
@@ -324,7 +417,7 @@ output {
 
 ## Kibana Configuration
 
-### Basic Configuration
+### kibana.yml
 
 ```yaml
 # kibana.yml
@@ -334,24 +427,29 @@ server.port: 5601
 
 elasticsearch.hosts: ["http://elasticsearch:9200"]
 
-# Security
-xpack.security.enabled: true
-xpack.encryptedSavedObjects.encryptionKey: "something_at_least_32_characters"
-
 # Logging
 logging.dest: stdout
 logging.verbose: false
+
+# Security (if enabled)
+# elasticsearch.username: "kibana"
+# elasticsearch.password: "changeme"
+
+# Default app
+kibana.defaultAppId: "discover"
+
+# Timezone
+i18n.locale: "en"
 ```
 
-### Index Pattern Creation
+### Index Pattern
 
 ```json
-POST /api/saved_objects/index-pattern/logs-*
 {
   "attributes": {
     "title": "logs-*",
     "timeFieldName": "@timestamp",
-    "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"level\",\"type\":\"string\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"message\",\"type\":\"text\",\"searchable\":true,\"aggregatable\":false}]"
+    "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"level\",\"type\":\"keyword\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"message\",\"type\":\"text\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"service\",\"type\":\"keyword\",\"searchable\":true,\"aggregatable\":true}]"
   }
 }
 ```
@@ -368,174 +466,95 @@ filebeat.inputs:
   - type: log
     enabled: true
     paths:
-      - /var/log/*.log
+      - /var/log/application/*.log
     fields:
-      app: myapp
+      service: api
       environment: production
     fields_under_root: true
+    multiline.pattern: '^\['
+    multiline.negate: true
+    multiline.match: after
 
   - type: log
     enabled: true
     paths:
       - /var/log/nginx/*.log
     fields:
-      app: nginx
+      service: nginx
+      environment: production
     fields_under_root: true
 
 output.logstash:
   hosts: ["logstash:5044"]
 
-# Or direct to Elasticsearch
-# output.elasticsearch:
-#   hosts: ["elasticsearch:9200"]
-#   index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
-
+# Processors
 processors:
-  - add_host_metadata:
-      when.not.contains.tags: forwarded
+  - add_host_metadata: ~
   - add_cloud_metadata: ~
   - add_docker_metadata: ~
-  - add_kubernetes_metadata: ~
 ```
 
-### Kubernetes Log Shipping
-
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: filebeat-config
-  namespace: logging
-data:
-  filebeat.yml: |-
-    filebeat.inputs:
-    - type: container
-      paths:
-        - /var/log/containers/*.log
-      processors:
-        - add_kubernetes_metadata:
-            host: ${NODE_NAME}
-            matchers:
-            - logs_path:
-                logs_path: "/var/log/containers/"
-
-    output.elasticsearch:
-      hosts: ["elasticsearch:9200"]
-      indices:
-        - index: "kubernetes-%{[kubernetes.namespace]}-%{+yyyy.MM.dd}"
-
-    setup.kibana:
-      host: "kibana:5601"
-
----
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: filebeat
-  namespace: logging
-spec:
-  selector:
-    matchLabels:
-      app: filebeat
-  template:
-    metadata:
-      labels:
-        app: filebeat
-    spec:
-      serviceAccountName: filebeat
-      containers:
-      - name: filebeat
-        image: docker.elastic.co/beats/filebeat:8.11.0
-        args:
-        - "-c"
-        - "/etc/filebeat.yml"
-        - "-e"
-        volumeMounts:
-        - name: config
-          mountPath: /etc/filebeat.yml
-          subPath: filebeat.yml
-        - name: varlog
-          mountPath: /var/log
-          readOnly: true
-        - name: varlibdockercontainers
-          mountPath: /var/lib/docker/containers
-          readOnly: true
-      volumes:
-      - name: config
-        configMap:
-          name: filebeat-config
-      - name: varlog
-        hostPath:
-          path: /var/log
-      - name: varlibdockercontainers
-        hostPath:
-          path: /var/lib/docker/containers
-```
-
-### Application Log Shipping (Node.js)
+### Application Logs (Node.js)
 
 ```typescript
-import winston from 'winston';
-import { ElasticsearchTransport } from 'winston-elasticsearch';
+// logging.ts
+import pino from 'pino';
 
-const esTransport = new ElasticsearchTransport({
-  level: 'info',
-  clientOpts: {
-    node: 'http://elasticsearch:9200',
+const logger = pino({
+  level: process.env.LOG_LEVEL || 'info',
+  formatters: {
+    level: (label) => {
+      return { level: label };
+    },
   },
-  index: 'application-logs',
-});
-
-const logger = winston.createLogger({
-  transports: [
-    new winston.transports.Console(),
-    esTransport,
-  ],
+  timestamp: pino.stdTimeFunctions.isoTime,
 });
 
 // Usage
-logger.info('User logged in', {
-  userId: '123',
-  ip: '192.168.1.1',
-  userAgent: 'Mozilla/5.0...',
-});
+logger.info({ service: 'api', userId: '123' }, 'User logged in');
+logger.error({ service: 'api', error: 'Database connection failed' }, 'Error occurred');
 ```
 
-### Application Log Shipping (Python)
+### Application Logs (Python)
 
 ```python
+# logging.py
 import logging
-from logstash_async.handler import AsynchronousLogstashHandler
+import json
+from pythonjsonlogger import jsonlogger
 
-logger = logging.getLogger('myapp')
+# Configure JSON logging
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-logstash_handler = AsynchronousLogstashHandler(
-    host='logstash',
-    port=5959,
-    database_path=None,
-    transport='logstash_async.transport.TcpTransport'
+handler = logging.StreamHandler()
+formatter = jsonlogger.JsonFormatter(
+    '%(asctime)s %(name)s %(levelname)s %(message)s'
 )
-
-logger.addHandler(logstash_handler)
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 # Usage
-logger.info('User logged in', extra={
-    'user_id': '123',
-    'ip': '192.168.1.1',
-    'user_agent': 'Mozilla/5.0...'
-})
+logger.info({
+    'service': 'api',
+    'user_id': '123'
+}, 'User logged in')
+
+logger.error({
+    'service': 'api',
+    'error': 'Database connection failed'
+}, 'Error occurred')
 ```
 
 ---
 
 ## Index Patterns
 
-### Creating Index Patterns via API
+### Create Index Pattern
 
 ```bash
-# Create index pattern
-curl -X POST "localhost:5601/api/saved_objects/index-pattern/logs-*" \
+# Using API
+curl -X POST "kibana:5601/api/saved_objects/index-pattern/logs-*" \
   -H 'kbn-xsrf: true' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -544,44 +563,16 @@ curl -X POST "localhost:5601/api/saved_objects/index-pattern/logs-*" \
       "timeFieldName": "@timestamp"
     }
   }'
-
-# Get index patterns
-curl -X GET "localhost:5601/api/saved_objects/_find?type=index-pattern"
 ```
 
-### Index Lifecycle Management
+### Index Pattern with Fields
 
 ```json
-PUT _ilm/policy/logs_policy
 {
-  "policy": {
-    "phases": {
-      "hot": {
-        "actions": {
-          "rollover": {
-            "max_size": "50GB",
-            "max_age": "30d"
-          }
-        }
-      },
-      "warm": {
-        "min_age": "30d",
-        "actions": {
-          "shrink": {
-            "number_of_shards": 1
-          },
-          "force_merge": {
-            "max_num_segments": 1
-          }
-        }
-      },
-      "delete": {
-        "min_age": "90d",
-        "actions": {
-          "delete": {}
-        }
-      }
-    }
+  "attributes": {
+    "title": "logs-*",
+    "timeFieldName": "@timestamp",
+    "fields": "[{\"name\":\"@timestamp\",\"type\":\"date\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"level\",\"type\":\"keyword\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"message\",\"type\":\"text\",\"searchable\":true,\"aggregatable\":false},{\"name\":\"service\",\"type\":\"keyword\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"environment\",\"type\":\"keyword\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"host\",\"type\":\"keyword\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"tags\",\"type\":\"keyword\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"status\",\"type\":\"keyword\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"method\",\"type\":\"keyword\",\"searchable\":true,\"aggregatable\":true},{\"name\":\"path\",\"type\":\"keyword\",\"searchable\":true,\"aggregatable\":true}]"
   }
 }
 ```
@@ -590,131 +581,97 @@ PUT _ilm/policy/logs_policy
 
 ## Queries and Filters
 
-### Basic Queries
+### Query DSL
 
 ```json
-// Match all
-GET logs-*/_search
 {
   "query": {
-    "match_all": {}
-  }
-}
-
-// Match text
-GET logs-*/_search
-{
-  "query": {
-    "match": {
-      "message": "error"
-    }
-  }
-}
-
-// Term query
-GET logs-*/_search
-{
-  "query": {
-    "term": {
-      "level": "error"
-    }
-  }
-}
-
-// Range query
-GET logs-*/_search
-{
-  "query": {
-    "range": {
-      "@timestamp": {
-        "gte": "now-1h",
-        "lte": "now"
-      }
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "message": "error"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "now-1h"
+            }
+          }
+        },
+        {
+          "term": {
+            "level": "error"
+          }
+        }
+      ]
     }
   }
 }
 ```
 
-### Boolean Queries
+### KQL (Kibana Query Language)
 
-```json
-// AND query
-GET logs-*/_search
-{
-  "query": {
-    "bool": {
-      "must": [
-        { "match": { "level": "error" } },
-        { "match": { "service": "api" } }
-      ]
-    }
-  }
-}
+```
+# Simple query
+message: "error"
 
-// OR query
-GET logs-*/_search
-{
-  "query": {
-    "bool": {
-      "should": [
-        { "match": { "level": "error" } },
-        { "match": { "level": "warning" } }
-      ]
-    }
-  }
-}
+# Field query
+level: "error"
 
-// NOT query
-GET logs-*/_search
-{
-  "query": {
-    "bool": {
-      "must_not": [
-        { "match": { "level": "debug" } }
-      ]
-    }
-  }
-}
+# Range query
+@timestamp: [now-1h TO now]
+
+# Boolean query
+level: "error" AND service: "api"
+
+# Wildcard
+message: "database*"
+
+# Exists
+_exists_: "userId"
+
+# Nested
+service: "api" AND (level: "error" OR level: "warning")
 ```
 
 ### Aggregations
 
 ```json
-// Terms aggregation
-GET logs-*/_search
 {
   "size": 0,
   "aggs": {
     "by_level": {
       "terms": {
-        "field": "level"
+        "field": "level",
+        "size": 10
       }
-    }
-  }
-}
-
-// Date histogram
-GET logs-*/_search
-{
-  "size": 0,
-  "aggs": {
-    "over_time": {
+    },
+    "by_service": {
+      "terms": {
+        "field": "service",
+        "size": 10
+      }
+    },
+    "by_time": {
       "date_histogram": {
         "field": "@timestamp",
-        "interval": "1h"
+        "calendar_interval": "1h"
       }
-    }
-  }
-}
-
-// Stats aggregation
-GET logs-*/_search
-{
-  "size": 0,
-  "aggs": {
-    "response_time_stats": {
-      "stats": {
+    },
+    "avg_response_time": {
+      "avg": {
         "field": "response_time"
+      }
+    },
+    "error_rate": {
+      "filter": {
+        "term": {
+          "level": "error"
+        }
       }
     }
   }
@@ -728,11 +685,43 @@ GET logs-*/_search
 ### Line Chart
 
 ```json
-POST /api/saved_objects/visualization
 {
-  "attributes": {
-    "title": "Request Rate Over Time",
-    "visState": "{\"title\":\"Request Rate Over Time\",\"type\":\"line\",\"params\":{\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radius\":2,\"lines\":{\"show\":true,\"fill\":0.5,\"width\":2,\"smooth\":false},\"circles\":{\"show\":true,\"radius\":2}}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
+  "type": "line",
+  "title": "Request Rate Over Time",
+  "params": {
+    "grid": {
+      "categoryLines": false,
+      "style": {
+        "color": "#eee"
+      }
+    },
+    "legendPosition": "right",
+    "seriesParams": [
+      {
+        "data": {
+          "id": "1",
+          "label": "Count"
+        },
+        "drawLinesBetweenPoints": true,
+        "show": "true",
+        "showPoints": "auto",
+        "type": "line"
+      }
+    ],
+    "timeRange": {
+      "mode": "entire_time_range"
+    },
+    "valueAxes": [
+      {
+        "id": "ValueAxis-1",
+        "name": "LeftAxis-1",
+        "position": "left",
+        "scale": {
+          "type": "linear"
+        },
+        "style": {}
+      }
+    ]
   }
 }
 ```
@@ -740,23 +729,60 @@ POST /api/saved_objects/visualization
 ### Pie Chart
 
 ```json
-POST /api/saved_objects/visualization
 {
-  "attributes": {
-    "title": "Logs by Level",
-    "visState": "{\"title\":\"Logs by Level\",\"type\":\"pie\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":false,\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"level\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}]}"
+  "type": "pie",
+  "title": "Errors by Service",
+  "params": {
+    "addTooltip": true,
+    "addLegend": true,
+    "isDonut": false,
+    "legendPosition": "right",
+    "sliceLabels": {
+      "show": false
+    }
   }
 }
 ```
 
-### Data Table
+### Bar Chart
 
 ```json
-POST /api/saved_objects/visualization
 {
-  "attributes": {
-    "title": "Top 10 Error Messages",
-    "visState": "{\"title\":\"Top 10 Error Messages\",\"type\":\"table\",\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":false,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"message\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}]}"
+  "type": "bar",
+  "title": "Top Error Messages",
+  "params": {
+    "addLegend": false,
+    "addTooltip": true,
+    "grid": {
+      "categoryLines": false,
+      "style": {
+        "color": "#eee"
+      }
+    },
+    "legendPosition": "right",
+    "seriesParams": [
+      {
+        "data": {
+          "id": "1",
+          "label": "Count"
+        },
+        "drawLinesBetweenPoints": true,
+        "show": "true",
+        "showPoints": "auto",
+        "type": "bar"
+      }
+    ],
+    "valueAxes": [
+      {
+        "id": "ValueAxis-1",
+        "name": "LeftAxis-1",
+        "position": "left",
+        "scale": {
+          "type": "linear"
+        },
+        "style": {}
+      }
+    ]
   }
 }
 ```
@@ -765,115 +791,59 @@ POST /api/saved_objects/visualization
 
 ## Dashboards
 
-### Creating Dashboard via API
+### Dashboard JSON
 
-```bash
-# Create dashboard
-curl -X POST "localhost:5601/api/saved_objects/dashboard" \
-  -H 'kbn-xsrf: true' \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "attributes": {
-      "title": "Application Logs Dashboard",
-      "panelsJSON": "[{\"gridData\":{\"x\":0,\"y\":0,\"w\":24,\"h\":15},\"panelIndex\":\"1\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_0\",\"version\":\"8.11.0\",\"type\":\"visualization\",\"state\":{\"type\":\"visualization\",\"filters\":[]}}]",
-      "optionsJSON": "{\"useMargins\":true,\"syncColors\":false,\"syncCursor\":true,\"syncTooltips\":false}",
-      "version": "8.11.0"
-    }
-  }'
-```
-
-### Dashboard Export/Import
-
-```bash
-# Export dashboard
-curl -X GET "localhost:5601/api/saved_objects/_export" \
-  -H 'kbn-xsrf: true' \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "type": ["dashboard"],
-    "exportType": "export"
-  }' > dashboard-export.ndjson
-
-# Import dashboard
-curl -X POST "localhost:5601/api/saved_objects/_import" \
-  -H 'kbn-xsrf: true' \
-  --form file=@dashboard-export.ndjson
+```json
+{
+  "title": "Application Logs",
+  "panelsJSON": "[{\"gridData\":{\"h\":6,\"i\":\"1\",\"w\":12,\"x\":0,\"y\":0},\"id\":\"1\",\"panelIndex\":\"1\",\"type\":\"metric\",\"version\":\"7.15.0\"},{\"gridData\":{\"h\":6,\"i\":\"2\",\"w\":12,\"x\":12,\"y\":0},\"id\":\"2\",\"panelIndex\":\"2\",\"type\":\"metric\",\"version\":\"7.15.0\"},{\"gridData\":{\"h\":12,\"i\":\"3\",\"w\":24,\"x\":0,\"y\":6},\"id\":\"3\",\"panelIndex\":\"3\",\"type\":\"line\",\"version\":\"7.15.0\"}]",
+  "optionsJSON": "{\"darkTheme\":true,\"hidePanelTitles\":false,\"useMargins\":true}",
+  "timeRestore": true,
+  "timeTo": "now",
+  "timeFrom": "now-1h"
+}
 ```
 
 ---
 
 ## Alerts
 
-### Creating Alert via API
+### Alert Rule
 
 ```json
-POST /api/alerting/rule
 {
   "name": "High Error Rate",
-  "consumer": "alerts",
-  "enabled": true,
-  "rule_type_id": ".es-query",
-  "schedule": {
-    "interval": "1m"
-  },
-  "actions": [],
+  "type": "threshold",
+  "throttle": "1m",
   "params": {
-    "size": 100,
-    "timeWindowSize": 1,
-    "timeWindowUnit": "m",
-    "thresholdComparator": "gt",
-    "threshold": [10],
     "index": ["logs-*"],
     "timeField": "@timestamp",
-    "esQuery": "{\"query\":{\"bool\":{\"must\":[{\"match\":{\"level\":\"error\"}}]}}}"
-  },
-  "throttle": "1m"
-}
-```
-
-### Kibana Alerting
-
-```yaml
-# Kibana Watcher (deprecated, use Alerting instead)
-PUT _watcher/watch/error_rate_watch
-{
-  "trigger": {
-    "schedule": {
-      "interval": "1m"
-    }
-  },
-  "input": {
-    "search": {
-      "request": {
-        "indices": ["logs-*"],
-        "body": {
-          "query": {
-            "bool": {
-              "must": [
-                { "match": { "level": "error" } }
-              ]
-            }
+    "timeWindowSize": 5,
+    "timeWindowUnit": "m",
+    "thresholdComparator": ">",
+    "threshold": [100],
+    "aggType": "count",
+    "groupby": "service",
+    "termSize": 10,
+    "termField": "level.keyword",
+    "termDirection": "desc",
+    "filter": [
+      {
+        "query": {
+          "query_string": {
+            "query": "level: error"
           }
         }
       }
-    }
+    ]
   },
-  "condition": {
-    "compare": {
-      "ctx.payload.hits.total": {
-        "gt": 10
-      }
+  "actions": [
+    {
+      "id": "email-action",
+      "type": "email",
+      "email": ["alerts@example.com"]
     }
-  },
-  "actions": {
-    "email_admin": {
-      "email": {
-        "to": "admin@example.com",
-        "subject": "High Error Rate Detected",
-        "body": "Found {{ctx.payload.hits.total}} error logs in the last minute."
-      }
-    }
-  }
+  ]
 }
 ```
 
@@ -881,74 +851,10 @@ PUT _watcher/watch/error_rate_watch
 
 ## Production Setup
 
-### High Availability Setup
+### Security
 
 ```yaml
-# elasticsearch-cluster.yml
-version: '3.8'
-services:
-  elasticsearch1:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
-    container_name: elasticsearch1
-    environment:
-      - cluster.name=production-cluster
-      - node.name=elasticsearch1
-      - discovery.seed_hosts=elasticsearch2,elasticsearch3
-      - cluster.initial_master_nodes=elasticsearch1,elasticsearch2,elasticsearch3
-      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
-    ports:
-      - "9200:9200"
-    volumes:
-      - es1-data:/usr/share/elasticsearch/data
-    networks:
-      - elk
-
-  elasticsearch2:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
-    container_name: elasticsearch2
-    environment:
-      - cluster.name=production-cluster
-      - node.name=elasticsearch2
-      - discovery.seed_hosts=elasticsearch1,elasticsearch3
-      - cluster.initial_master_nodes=elasticsearch1,elasticsearch2,elasticsearch3
-      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
-    ports:
-      - "9201:9200"
-    volumes:
-      - es2-data:/usr/share/elasticsearch/data
-    networks:
-      - elk
-
-  elasticsearch3:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
-    container_name: elasticsearch3
-    environment:
-      - cluster.name=production-cluster
-      - node.name=elasticsearch3
-      - discovery.seed_hosts=elasticsearch1,elasticsearch2
-      - cluster.initial_master_nodes=elasticsearch1,elasticsearch2,elasticsearch3
-      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
-    ports:
-      - "9202:9200"
-    volumes:
-      - es3-data:/usr/share/elasticsearch/data
-    networks:
-      - elk
-
-volumes:
-  es1-data:
-  es2-data:
-  es3-data:
-
-networks:
-  elk:
-    driver: bridge
-```
-
-### Security Configuration
-
-```yaml
-# Enable security
+# elasticsearch.yml
 xpack.security.enabled: true
 xpack.security.transport.ssl.enabled: true
 xpack.security.transport.ssl.verification_mode: certificate
@@ -956,64 +862,134 @@ xpack.security.transport.ssl.keystore.path: elastic-certificates.p12
 xpack.security.transport.ssl.truststore.path: elastic-certificates.p12
 xpack.security.http.ssl.enabled: true
 xpack.security.http.ssl.keystore.path: elastic-certificates.p12
+xpack.security.http.ssl.truststore.path: elastic-certificates.p12
+```
+
+### High Availability
+
+```yaml
+# docker-compose-ha.yml
+version: '3.8'
+
+services:
+  elasticsearch1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: elasticsearch1
+    environment:
+      - cluster.name=elasticsearch
+      - node.name=elasticsearch1
+      - discovery.seed_hosts=elasticsearch2,elasticsearch3
+      - cluster.initial_master_nodes=elasticsearch1,elasticsearch2,elasticsearch3
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data1:/usr/share/elasticsearch/data
+    networks:
+      - elk
+
+  elasticsearch2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: elasticsearch2
+    environment:
+      - cluster.name=elasticsearch
+      - node.name=elasticsearch2
+      - discovery.seed_hosts=elasticsearch1,elasticsearch3
+      - cluster.initial_master_nodes=elasticsearch1,elasticsearch2,elasticsearch3
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+    ports:
+      - "9201:9200"
+    volumes:
+      - es_data2:/usr/share/elasticsearch/data
+    networks:
+      - elk
+
+  elasticsearch3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: elasticsearch3
+    environment:
+      - cluster.name=elasticsearch
+      - node.name=elasticsearch3
+      - discovery.seed_hosts=elasticsearch1,elasticsearch2
+      - cluster.initial_master_nodes=elasticsearch1,elasticsearch2,elasticsearch3
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+    ports:
+      - "9202:9200"
+    volumes:
+      - es_data3:/usr/share/elasticsearch/data
+    networks:
+      - elk
+
+volumes:
+  es_data1:
+  es_data2:
+  es_data3:
+
+networks:
+  elk:
+    driver: bridge
 ```
 
 ---
 
 ## Performance Tuning
 
-### Heap Size Configuration
+### Elasticsearch Settings
 
-```bash
-# Set heap size to 50% of available RAM, max 31GB
-ES_JAVA_OPTS="-Xms16g -Xmx16g"
+```yaml
+# elasticsearch.yml
+# JVM Heap Size (should be 50% of available RAM, max 30GB)
+"ES_JAVA_OPTS=-Xms8g -Xmx8g"
+
+# Thread pool
+thread_pool:
+  write:
+    queue_size: 1000
+
+# Index settings
+index:
+  refresh_interval: "5s"
+  translog:
+    flush_threshold_size: "512mb"
+    sync_interval: "5s"
+
+# Cluster settings
+cluster:
+  routing:
+    allocation:
+      disk:
+        watermark:
+          low: "85%"
+          high: "90%"
+          flood_stage: "95%"
 ```
 
-### Index Settings
+### Logstash Settings
 
-```json
-PUT /logs-*/_settings
-{
-  "index": {
-    "refresh_interval": "30s",
-    "number_of_replicas": "1",
-    "translog.durability": "async"
-  }
-}
-```
-
-### Query Optimization
-
-```json
-// Use filter instead of query for exact matches
-GET logs-*/_search
-{
-  "query": {
-    "bool": {
-      "filter": [
-        { "term": { "level": "error" } },
-        { "range": { "@timestamp": { "gte": "now-1h" } } }
-      ]
-    }
-  }
-}
-```
-
-### Caching
-
-```json
-// Enable query cache
-PUT /logs-*/_settings
-{
-  "index.queries.cache.enabled": true
-}
+```yaml
+# logstash.yml
+pipeline.workers: 4
+pipeline.batch.size: 125
+pipeline.batch.delay: 50
+queue.type: persisted
+queue.max_bytes: 1gb
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [Elasticsearch Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
-- [Logstash Documentation](https://www.elastic.co/guide/en/logstash/current/index.html)
-- [Kibana Documentation](https://www.elastic.co/guide/en/kibana/current/index.html)
-- [Filebeat Documentation](https://www.elastic.co/guide/en/beats/filebeat/current/index.html)
+This skill covers comprehensive ELK stack implementation including:
+
+- **ELK Stack Overview**: Architecture and components
+- **Elasticsearch Setup**: Docker Compose, index templates, lifecycle policies
+- **Logstash Pipelines**: Basic, advanced, and conditional routing
+- **Kibana Configuration**: Settings and index patterns
+- **Log Shipping**: Filebeat, Node.js, and Python logging
+- **Index Patterns**: Creating and configuring index patterns
+- **Queries and Filters**: Query DSL, KQL, and aggregations
+- **Visualizations**: Line, pie, and bar charts
+- **Dashboards**: Dashboard JSON configuration
+- **Alerts**: Alert rule configuration
+- **Production Setup**: Security and high availability
+- **Performance Tuning**: Elasticsearch and Logstash settings

@@ -1,11 +1,13 @@
 # Integration Testing
 
-A comprehensive guide to integration testing patterns for applications.
+## Overview
+
+Integration testing verifies that different parts of your application work together correctly. This skill covers integration testing patterns, test containers, database testing, API testing, and best practices.
 
 ## Table of Contents
 
 1. [Integration Testing Concepts](#integration-testing-concepts)
-2. [Test Containers](#test-containers)
+2. [Test Containers (Testcontainers)](#test-containers)
 3. [Database Testing](#database-testing)
 4. [API Testing](#api-testing)
 5. [Message Queue Testing](#message-queue-testing)
@@ -19,362 +21,301 @@ A comprehensive guide to integration testing patterns for applications.
 
 ## Integration Testing Concepts
 
-### What is Integration Testing?
+### Why Integration Testing?
 
-Integration testing verifies that different modules or services work together correctly.
+1. **Verify component interactions**
+2. **Test data flow between services**
+3. **Validate external integrations**
+4. **Catch integration bugs early**
+5. **Ensure system reliability**
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                   Integration Test Flow                    │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐              │
-│  │   API    │──>│ Database │──>│  Redis   │              │
-│  │ Service │  │          │  │         │              │
-│  └─────────┘  └─────────┘  └─────────┘              │
-│                                                             │
-│  Tests verify:                                              │
-│  - API can connect to database                              │
-│  - API can read/write from Redis                             │
-│  - Database transactions work correctly                         │
-│  - Caching works as expected                                 │
-└─────────────────────────────────────────────────────────────┘
-```
+### Integration vs Unit Tests
 
-### Integration vs Unit Testing
-
-| Aspect | Unit Testing | Integration Testing |
-|---------|---------------|----------------------|
-| Scope | Single function/class | Multiple components/services |
-| Dependencies | Mocked | Real or test containers |
+| Aspect | Unit Tests | Integration Tests |
+|--------|-----------|------------------|
+| Scope | Single component | Multiple components |
 | Speed | Fast | Slower |
-| Isolation | High | Lower |
-| Purpose | Verify logic | Verify integration |
+| Isolation | Isolated | Real dependencies |
+| Environment | Mocked | Real infrastructure |
+| Cost | Low | Higher |
 
 ---
 
-## Test Containers
+## Test Containers (Testcontainers)
 
-### Setup with Testcontainers (Node.js)
+### Node.js with Testcontainers
+
+```bash
+npm install -D testcontainers
+```
 
 ```typescript
-import { GenericContainer, StartedTestContainer } from 'testcontainers';
+// test/integration/database.test.ts
+import { describe, it, beforeEach, afterEach } from '@jest/globals';
+import { PostgreSqlContainer, StartedPostgreSqlContainer } from 'testcontainers';
 
-describe('Integration Tests', () => {
-  let postgresContainer: StartedTestContainer;
-  let redisContainer: StartedTestContainer;
+describe('Database Integration', () => {
+  let container: StartedPostgreSqlContainer;
+  let connection: any;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     // Start PostgreSQL container
-    postgresContainer = await new GenericContainer('postgres:15')
-      .withExposedPorts(5432)
-      .withEnvironment({
-        POSTGRES_USER: 'test',
-        POSTGRES_PASSWORD: 'test',
-        POSTGRES_DB: 'testdb',
-      })
-      .start();
-
-    // Start Redis container
-    redisContainer = await new GenericContainer('redis:7-alpine')
-      .withExposedPorts(6379)
-      .start();
+    container = await new PostgreSqlContainer('postgres:15-alpine').start();
+    
+    // Get connection string
+    connection = await container.getConnectionString();
   });
 
-  afterAll(async () => {
-    await postgresContainer.stop();
-    await redisContainer.stop();
+  afterEach(async () => {
+    // Stop container
+    await container.stop();
   });
 
-  it('should connect to PostgreSQL', async () => {
-    const port = postgresContainer.getMappedPort(5432);
-    const client = new Client({
-      host: 'localhost',
-      port,
-      user: 'test',
-      password: 'test',
-      database: 'testdb',
-    });
-
+  it('should connect to database', async () => {
+    const { Client } = require('pg');
+    const client = new Client({ connectionString: connection });
     await client.connect();
+    
     const result = await client.query('SELECT NOW()');
-    expect(result.rows.length).toBe(1);
+    expect(result.rows.length).toBeGreaterThan(0);
+    
     await client.end();
   });
 });
 ```
 
-### Setup with Testcontainers (Python)
-
-```python
-import pytest
-from testcontainers.postgres import PostgresContainer
-from testcontainers.redis import RedisContainer
-
-@pytest.fixture(scope="session")
-def postgres_container():
-    with PostgresContainer("postgres:15") as postgres:
-        postgres.with_exposed_ports(5432)
-        postgres.with_env("POSTGRES_USER", "test")
-        postgres.with_env("POSTGRES_PASSWORD", "test")
-        postgres.with_env("POSTGRES_DB", "testdb")
-        postgres.start()
-        yield postgres
-
-@pytest.fixture(scope="session")
-def redis_container():
-    with RedisContainer("redis:7-alpine") as redis:
-        redis.with_exposed_ports(6379)
-        redis.start()
-        yield redis
-
-def test_postgres_connection(postgres_container):
-    port = postgres_container.get_exposed_port(5432)
-    conn = psycopg2.connect(
-        host="localhost",
-        port=port,
-        user="test",
-        password="test",
-        dbname="testdb"
-    )
-    cursor = conn.cursor()
-    cursor.execute("SELECT NOW()")
-    result = cursor.fetchone()
-    assert result is not None
-    conn.close()
-```
-
-### Docker Compose for Tests
-
-```yaml
-# docker-compose.test.yml
-version: '3.8'
-services:
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
-      POSTGRES_DB: testdb
-    ports:
-      - "5432:5432"
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-```
+### Python with Testcontainers
 
 ```bash
-# Start test containers
-docker-compose -f docker-compose.test.yml up -d
+pip install testcontainers
+```
 
-# Run tests
-npm test
+```python
+# test/integration/database_test.py
+import pytest
+from testcontainers.postgres import PostgresContainer
 
-# Stop test containers
-docker-compose -f docker-compose.test.yml down
+def test_database_connection():
+    """Test database connection with testcontainers."""
+    with PostgresContainer('postgres:15-alpine') as postgres:
+        connection_string = postgres.get_connection_url()
+        
+        import psycopg2
+        conn = psycopg2.connect(connection_string)
+        
+        cursor = conn.cursor()
+        cursor.execute('SELECT NOW()')
+        result = cursor.fetchone()
+        
+        assert result is not None
+        assert result[0] is not None
+        
+        cursor.close()
+        conn.close()
+```
+
+### Redis Container
+
+```typescript
+// test/integration/redis.test.ts
+import { describe, it, beforeEach, afterEach } from '@jest/globals';
+import { GenericContainer } from 'testcontainers';
+
+describe('Redis Integration', () => {
+  let container: GenericContainer;
+
+  beforeEach(async () => {
+    container = await new GenericContainer('redis:7-alpine').start();
+  });
+
+  afterEach(async () => {
+    await container.stop();
+  });
+
+  it('should connect to Redis', async () => {    const { createClient } = require('redis');
+    const client = createClient({ url: `redis://localhost:${container.getMappedPort(6379)}` });
+    
+    await client.connect();
+    await client.set('test', 'value');
+    const result = await client.get('test');
+    
+    expect(result).toBe('value');
+    
+    await client.quit();
+  });
+});
+```
+
+### MongoDB Container
+
+```typescript
+// test/integration/mongodb.test.ts
+import { describe, it, beforeEach, afterEach } from '@jest/globals';
+import { MongoContainer } from 'testcontainers';
+
+describe('MongoDB Integration', () => {
+  let container: MongoContainer;
+
+  beforeEach(async () => {
+    container = await new MongoContainer('mongo:6').start();
+  });
+
+  afterEach(async () => {
+    await container.stop();
+  });
+
+  it('should connect to MongoDB', async () => {
+    const { MongoClient } = require('mongodb');
+    const url = `mongodb://localhost:${container.getMappedPort(27017)}`;
+    
+    const client = new MongoClient(url);
+    await client.connect();
+    
+    const db = client.db('testdb');
+    const result = await db.collection('users').insertOne({ name: 'Test User' });
+    
+    expect(result.insertedId).toBeDefined();
+    
+    await client.close();
+  });
+});
 ```
 
 ---
 
 ## Database Testing
 
-### PostgreSQL Testing (Node.js)
+### PostgreSQL Integration
 
 ```typescript
-import { Pool } from 'pg';
-import { GenericContainer, StartedTestContainer } from 'testcontainers';
+// test/integration/postgres.test.ts
+import { describe, it, beforeEach, afterEach } from '@jest/globals';
+import { PostgreSqlContainer, StartedPostgreSqlContainer } from 'testcontainers';
+import { Client } from 'pg';
 
-describe('Database Integration', () => {
-  let container: StartedTestContainer;
-  let pool: Pool;
+describe('PostgreSQL Integration', () => {
+  let container: StartedPostgreSqlContainer;
+  let client: Client;
 
-  beforeAll(async () => {
-    container = await new GenericContainer('postgres:15')
-      .withExposedPorts(5432)
-      .withEnvironment({
-        POSTGRES_USER: 'test',
-        POSTGRES_PASSWORD: 'test',
-        POSTGRES_DB: 'testdb',
-      })
-      .start();
-
-    const port = container.getMappedPort(5432);
-    pool = new Pool({
-      host: 'localhost',
-      port,
-      user: 'test',
-      password: 'test',
-      database: 'testdb',
-    });
+  beforeEach(async () => {
+    container = await new PostgreSqlContainer('postgres:15-alpine').start();
+    const connectionString = await container.getConnectionString();
+    client = new Client({ connectionString });
+    await client.connect();
   });
 
-  afterAll(async () => {
-    await pool.end();
+  afterEach(async () => {
+    await client.end();
     await container.stop();
   });
 
-  beforeEach(async () => {
-    // Clean database before each test
-    await pool.query('TRUNCATE TABLE users CASCADE');
-  });
-
-  it('should create user', async () => {
-    await pool.query(
-      'INSERT INTO users (name, email) VALUES ($1, $2)',
+  it('should create and retrieve user', async () => {
+    const result = await client.query(
+      'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id, name, email',
       ['John Doe', 'john@example.com']
     );
-
-    const result = await pool.query('SELECT * FROM users');
+    
     expect(result.rows.length).toBe(1);
+    expect(result.rows[0].id).toBeDefined();
     expect(result.rows[0].name).toBe('John Doe');
+    expect(result.rows[0].email).toBe('john@example.com');
   });
 
   it('should update user', async () => {
-    await pool.query(
-      'INSERT INTO users (name, email) VALUES ($1, $2)',
-      ['John Doe', 'john@example.com']
+    await client.query(
+      'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id, name, email',
+      ['Jane Doe', 'jane@example.com']
     );
-
-    await pool.query(
-      'UPDATE users SET name = $1 WHERE email = $2',
-      ['Jane Doe', 'john@example.com']
-    );
-
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', ['john@example.com']);
-    expect(result.rows[0].name).toBe('Jane Doe');
+    
+    const { rows } = await client.query('UPDATE users SET name = $1 WHERE id = $2', ['Updated Name', 1]);
+    
+    expect(rows[0].name).toBe('Updated Name');
   });
 
   it('should delete user', async () => {
-    await pool.query(
-      'INSERT INTO users (name, email) VALUES ($1, $2)',
-      ['John Doe', 'john@example.com']
-    );
-
-    await pool.query('DELETE FROM users WHERE email = $1', ['john@example.com']);
-
-    const result = await pool.query('SELECT * FROM users');
-    expect(result.rows.length).toBe(0);
+    await client.query('INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id', ['John Doe', 'john@example.com']);
+    const { rows } = await client.query('SELECT id FROM users WHERE email = $1', ['john@example.com']);
+    const userId = rows[0].id;
+    
+    await client.query('DELETE FROM users WHERE id = $1', [userId]);
+    
+    const result = await client.query('SELECT COUNT(*) FROM users WHERE email = $1', ['john@example.com']);
+    expect(result.rows[0].count).toBe(0);
   });
 });
 ```
 
-### PostgreSQL Testing (Python)
-
-```python
-import pytest
-import psycopg2
-from testcontainers.postgres import PostgresContainer
-
-@pytest.fixture(scope="session")
-def db_connection():
-    with PostgresContainer("postgres:15") as postgres:
-        postgres.with_exposed_ports(5432)
-        postgres.with_env("POSTGRES_USER", "test")
-        postgres.with_env("POSTGRES_PASSWORD", "test")
-        postgres.with_env("POSTGRES_DB", "testdb")
-        postgres.start()
-
-        port = postgres.get_exposed_port(5432)
-        conn = psycopg2.connect(
-            host="localhost",
-            port=port,
-            user="test",
-            password="test",
-            dbname="testdb"
-        )
-        yield conn
-        conn.close()
-
-@pytest.fixture(autouse=True)
-def clean_database(db_connection):
-    yield
-    cursor = db_connection.cursor()
-    cursor.execute("TRUNCATE TABLE users CASCADE")
-    db_connection.commit()
-
-def test_create_user(db_connection):
-    cursor = db_connection.cursor()
-    cursor.execute(
-        "INSERT INTO users (name, email) VALUES (%s, %s)",
-        ("John Doe", "john@example.com")
-    )
-    db_connection.commit()
-
-    cursor.execute("SELECT * FROM users")
-    result = cursor.fetchall()
-    assert len(result) == 1
-    assert result[0][1] == "John Doe"
-
-def test_update_user(db_connection):
-    cursor = db_connection.cursor()
-    cursor.execute(
-        "INSERT INTO users (name, email) VALUES (%s, %s)",
-        ("John Doe", "john@example.com")
-    )
-    db_connection.commit()
-
-    cursor.execute(
-        "UPDATE users SET name = %s WHERE email = %s",
-        ("Jane Doe", "john@example.com")
-    )
-    db_connection.commit()
-
-    cursor.execute("SELECT * FROM users WHERE email = %s", ("john@example.com",))
-    result = cursor.fetchone()
-    assert result[1] == "Jane Doe"
-```
-
-### MongoDB Testing
+### MongoDB Integration
 
 ```typescript
-import { MongoClient, Db } from 'mongodb';
-import { GenericContainer, StartedTestContainer } from 'testcontainers';
+// test/integration/mongodb.test.ts
+import { describe, it, beforeEach, afterEach } from '@jest/globals';
+import { MongoContainer } from 'testcontainers';
+import { MongoClient } from 'mongodb';
 
 describe('MongoDB Integration', () => {
-  let container: StartedTestContainer;
+  let container: MongoContainer;
   let client: MongoClient;
-  let db: Db;
 
-  beforeAll(async () => {
-    container = await new GenericContainer('mongo:6')
-      .withExposedPorts(27017)
-      .start();
-
-    const port = container.getMappedPort(27017);
-    client = new MongoClient(`mongodb://localhost:${port}`);
+  beforeEach(async () => {
+    container = await new MongoContainer('mongo:6').start();
+    const url = `mongodb://localhost:${container.getMappedPort(27017)}`;
+    client = new MongoClient(url);
     await client.connect();
-    db = client.db('testdb');
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await client.close();
     await container.stop();
   });
 
-  beforeEach(async () => {
-    await db.collection('users').deleteMany({});
+  it('should create and retrieve document', async () => {
+    const db = client.db('testdb');
+    
+    const result = await db.collection('users').insertOne({
+      name: 'Test User',
+      email: 'test@example.com',
+    age: 30,
+    });
+    
+    expect(result.insertedId).toBeDefined();
+    
+    const user = await db.collection('users').findOne({ email: 'test@example.com' });
+    expect(user).not.toBeNull();
+    expect(user.name).toBe('Test User');
   });
 
-  it('should create user', async () => {
+  it('should update document', async () => {
+    const db = client.db('testdb');
+    
     await db.collection('users').insertOne({
-      name: 'John Doe',
-      email: 'john@example.com',
+      name: 'Test User',
+      email: 'test@example.com',
+      age: 30,
     });
-
-    const count = await db.collection('users').countDocuments();
-    expect(count).toBe(1);
+    
+    await db.collection('users').updateOne(
+      { email: 'test@example.com' },
+      { $set: { age: 31 } }
+    );
+    
+    const user = await db.collection('users').findOne({ email: 'test@example.com' });
+    expect(user.age).toBe(31);
   });
 
-  it('should find user', async () => {
+  it('should delete document', async () => {
+    const db = client.db('testdb');
+    
     await db.collection('users').insertOne({
-      name: 'John Doe',
-      email: 'john@example.com',
+      name: 'Test User',
+      email: 'test@example.com',
+      age: 30,
     });
-
-    const user = await db.collection('users').findOne({ email: 'john@example.com' });
-    expect(user?.name).toBe('John Doe');
+    
+    await db.collection('users').deleteOne({ email: 'test@example.com' });
+    
+    const user = await db.collection('users').findOne({ email: 'test@example.com' });
+    expect(user).toBeNull();
   });
 });
 ```
@@ -385,11 +326,27 @@ describe('MongoDB Integration', () => {
 
 ### Supertest (Node.js)
 
+```bash
+npm install --save-dev supertest
+```
+
 ```typescript
+// test/integration/api.test.ts
 import request from 'supertest';
-import { app } from '../app';
+import { describe, it, beforeAll, afterAll } from '@jest/globals';
+import app from '../src/app';
 
 describe('API Integration', () => {
+  let server: any;
+
+  beforeAll(async () => {
+    server = app.listen(3000);
+  });
+
+  afterAll(async () => {
+    server.close();
+  });
+
   it('should create user', async () => {
     const response = await request(app)
       .post('/api/users')
@@ -399,206 +356,270 @@ describe('API Integration', () => {
       })
       .expect(201)
       .expect('Content-Type', /json/);
-
+    
     expect(response.body).toHaveProperty('id');
     expect(response.body.name).toBe('John Doe');
   });
 
   it('should get user', async () => {
+    // First create a user
     const createResponse = await request(app)
       .post('/api/users')
       .send({
-        name: 'John Doe',
-        email: 'john@example.com',
+        name: 'Jane Doe',
+        email: 'jane@example.com',
       })
       .expect(201);
+    
+    const userId = createResponse.body.id;
 
     const response = await request(app)
-      .get(`/api/users/${createResponse.body.id}`)
+      .get(`/api/users/${userId}`)
       .expect(200)
       .expect('Content-Type', /json/);
-
-    expect(response.body.name).toBe('John Doe');
+    
+    expect(response.body.id).toBe(userId);
+    expect(response.body.name).toBe('Jane Doe');
   });
 
-  it('should return 404 for non-existent user', async () => {
-    const response = await request(app)
-      .get('/api/users/999')
-      .expect(404);
+  it('should update user', async () => {
+    // First create a user
+    const createResponse = await request(app)
+      .post('/api/users')
+      .send({
+        name: 'Test User',
+        email: 'test@example.com',
+      })
+      .expect(201);
+    
+    const userId = createResponse.body.id;
 
-    expect(response.body).toHaveProperty('error');
+    const response = await request(app)
+      .put(`/api/users/${userId}`)
+      .send({
+        name: 'Updated User',
+      })
+      .expect(200)
+      .expect('Content-Type', /json/);
+    
+    expect(response.body.name).toBe('Updated User');
+  });
+
+  it('should delete user', async () => {
+    // First create a user
+    const createResponse = await request(app)
+      .post('/api/users')
+      .send({
+        name: 'Test User',
+        email: 'test@example.com',
+      })
+      .expect(201);
+    
+    const userId = createResponse.body.id;
+
+    const response = await request(app)
+      .delete(`/api/users/${userId}`)
+      .expect(200);
+    
+    expect(response.body.message).toBe('User deleted');
   });
 });
 ```
 
-### HTTPX (Python)
+### httpx (Python)
+
+```bash
+pip install httpx pytest
+```
 
 ```python
+# test/integration/api_test.py
 import pytest
 from httpx import AsyncClient
-from myapp.main import app
+import asyncio
+
+from src.main import app
 
 @pytest.fixture
 async def client():
-    async with AsyncClient(app=app, base_url="http://test") as client:
-        yield client
+    """Async HTTP client for testing."""
+    async with AsyncClient(app=app, base_url='http://localhost:8000') as ac:
+        yield ac
 
-@pytest.mark.asyncio
 async def test_create_user(client):
+    """Test user creation endpoint."""
     response = await client.post(
-        "/api/users",
+        '/api/users',
         json={
-            "name": "John Doe",
-            "email": "john@example.com"
+            'name': 'John Doe',
+            'email': 'john@example.com'
         }
     )
-
     assert response.status_code == 201
-    assert "id" in response.json()
-    assert response.json()["name"] == "John Doe"
+    assert 'id' in response.json()
+    assert response.json()['name'] == 'John Doe'
 
-@pytest.mark.asyncio
 async def test_get_user(client):
+    """Test getting a user."""
+    # First create a user
     create_response = await client.post(
-        "/api/users",
+        '/api/users',
         json={
-            "name": "John Doe",
-            "email": "john@example.com"
+            'name': 'Jane Doe',
+            'email': 'jane@example.com'
         }
     )
-
-    response = await client.get(f"/api/users/{create_response.json()['id']}")
-
+    user_id = create_response.json()['id']
+    
+    response = await client.get(f'/api/users/{user_id}')
     assert response.status_code == 200
-    assert response.json()["name"] == "John Doe"
+    assert response.json()['id'] == user_id
+    assert response.json()['name'] == 'Jane Doe'
 
-@pytest.mark.asyncio
-async def test_not_found(client):
-    response = await client.get("/api/users/999")
-    assert response.status_code == 404
+async def test_update_user(client):
+    """Test updating a user."""
+    # First create a user
+    create_response = await client.post(
+        '/api/users',
+        json={
+            'name': 'Test User',
+            'email': 'test@example.com'
+        }
+    )
+    user_id = create_response.json()['id']
+    
+    response = await client.put(
+        f'/api/users/{user_id}',
+        json={'name': 'Updated User'}
+    )
+    assert response.status_code == 200
+    assert response.json()['name'] == 'Updated User'
+
+async def test_delete_user(client):
+    """Test deleting a user."""
+    # First create a user
+    create_response = await client.post(
+        '/api/users',
+        json={
+            'name': 'Test User',
+            'email': 'test@example.com'
+        }
+    )
+    user_id = create_response.json()['id']
+    
+    response = await client.delete(f'/api/users/{user_id}')
+    assert response.status_code == 200
+    assert 'message' in response.json()
 ```
-
-### Authentication Testing
-
-```typescript
-import request from 'supertest';
-import { app } from '../app';
-
-describe('Authentication Integration', () => {
-  let authToken: string;
-
-  it('should login', async () => {
-    const response = await request(app)
-      .post('/api/auth/login')
-      .send({
-        email: 'user@example.com',
-        password: 'password',
-      })
-      .expect(200);
-
-    expect(response.body).toHaveProperty('token');
-    authToken = response.body.token;
-  });
-
-  it('should access protected endpoint', async () => {
-    const response = await request(app)
-      .get('/api/protected')
-      .set('Authorization', `Bearer ${authToken}`)
-      .expect(200);
-
-    expect(response.body).toHaveProperty('data');
-  });
-
-  it('should reject without token', async () => {
-    const response = await request(app)
-      .get('/api/protected')
-      .expect(401);
-  });
-});
 ```
 
 ---
 
 ## Message Queue Testing
 
-### Redis Queue Testing
+### Redis Pub/Sub
 
 ```typescript
-import { createClient } from 'redis';
-import { GenericContainer, StartedTestContainer } from 'testcontainers';
+// test/integration/redis-pubsub.test.ts
+import { describe, it, beforeEach, afterEach } from '@jest/globals';
+import { GenericContainer } from 'testcontainers';
 
-describe('Redis Queue Integration', () => {
-  let container: StartedTestContainer;
-  let client: ReturnType<typeof createClient>;
+describe('Redis Pub/Sub Integration', () => {
+  let container: GenericContainer;
+  let client: any;
 
-  beforeAll(async () => {
-    container = await new GenericContainer('redis:7-alpine')
-      .withExposedPorts(6379)
-      .start();
-
-    const port = container.getMappedPort(6379);
-    client = createClient({ url: `redis://localhost:${port}` });
+  beforeEach(async () => {
+    container = await new GenericContainer('redis:7-alpine').start();
+    const { createClient } = require('redis');
+    client = createClient({ url: `redis://localhost:${container.getMappedPort(6379)}` });
     await client.connect();
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await client.quit();
     await container.stop();
   });
 
-  it('should enqueue and dequeue', async () => {
-    await client.lPush('queue', JSON.stringify({ id: 1, task: 'process' }));
+  it('should publish and subscribe to channel', async () => {
+    const subscriber = client.duplicate();
+    
+    const messages: string[] = [];
+    
+    subscriber.subscribe('test-channel', (message) => {
+      messages.push(message);
+    });
+    
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await client.publish('test-channel', 'message 1');
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await client.publish('test-channel', 'message 2');
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    expect(messages).toEqual(['message 1', 'message 2']);
+    
+    subscriber.quit();
+  });
 
-    const item = await client.rPop('queue');
-    const data = JSON.parse(item!);
-
-    expect(data.id).toBe(1);
-    expect(data.task).toBe('process');
+  it('should handle large messages', async () => {
+    const subscriber = client.duplicate();
+    
+    const largeMessage = 'x'.repeat(10000); // 10KB message
+    
+    subscriber.subscribe('large-channel', (message) => {
+      expect(message).toBe(largeMessage);
+    });
+    
+    await client.publish('large-channel', largeMessage);
+    
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    subscriber.quit();
   });
 });
 ```
 
-### RabbitMQ Testing
+### RabbitMQ Integration
 
 ```typescript
-import { connect, Channel, Connection } from 'amqplib';
-import { GenericContainer, StartedTestContainer } from 'testcontainers';
+// test/integration/rabbitmq.test.ts
+import { describe, it, beforeEach, afterEach } from '@jest/globals';
+import { RabbitMQContainer } from 'testcontainers';
 
 describe('RabbitMQ Integration', () => {
-  let container: StartedTestContainer;
-  let connection: Connection;
-  let channel: Channel;
+  let container: RabbitMQContainer;
+  let channel: any;
 
-  beforeAll(async () => {
-    container = await new GenericContainer('rabbitmq:3-management')
-      .withExposedPorts(5672, 15672)
-      .start();
-
-    const port = container.getMappedPort(5672);
-    connection = await connect(`amqp://localhost:${port}`);
+  beforeEach(async () => {
+    container = await new RabbitMQContainer('rabbitmq:3-management-alpine').start();
+    const amqplib = require('amqplib');
+    
+    const connection = await amqplib.connect(`amqp://guest:guest@localhost:${container.getMappedPort(5672)}`);
     channel = await connection.createChannel();
     await channel.assertQueue('test-queue');
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await channel.close();
-    await connection.close();
     await container.stop();
   });
 
   it('should publish and consume message', async () => {
-    const message = { id: 1, data: 'test' };
-
-    await channel.sendToQueue('test-queue', Buffer.from(JSON.stringify(message)));
-
-    await new Promise((resolve) => {
-      channel.consume('test-queue', (msg) => {
-        const data = JSON.parse(msg.content.toString());
-        expect(data.id).toBe(1);
-        expect(data.data).toBe('test');
-        resolve(null);
-      });
-    });
+    const messages: string[] = [];
+    
+    await channel.consume('test-queue', (msg) => {
+      messages.push(msg.content.toString());
+  });
+    
+    await channel.sendToQueue('test-queue', 'message 1');
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await channel.sendToQueue('test-queue', 'message 2');
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    expect(messages).toEqual(['message 1', 'message 2']);
   });
 });
 ```
@@ -607,192 +628,346 @@ describe('RabbitMQ Integration', () => {
 
 ## External Service Mocking
 
-### Mocking External API (Node.js)
+### Mocking External API
 
 ```typescript
-import { setupServer } from 'msw/node';
-import { rest } from 'msw';
-import request from 'supertest';
-import { app } from '../app';
+// test/integration/external-api-mock.test.ts
+import { describe, it, beforeEach, afterEach } from '@jest/globals';
+import nock from 'nock';
 
-const server = setupServer();
-
-describe('External API Integration', () => {
-  beforeAll(() => {
-    server.use(
-      rest.get('https://api.example.com/users/:id', (req, res, ctx) => {
-        return res(
-          ctx.json({
-            id: req.params.id,
-            name: 'John Doe',
-            email: 'john@example.com',
-          })
-        );
-      })
-    );
+describe('External API Mock', () => {
+  beforeEach(() => {
+    nock.cleanAll();
   });
 
-  afterAll(() => server.close());
+  afterEach(() => {
+    nock.cleanAll();
+  });
 
-  it('should fetch user from external API', async () => {
-    const response = await request(app)
-      .get('/api/users/1')
-      .expect(200);
+  it('should mock external API call', async () => {
+    nock('https://api.example.com/users')
+      .get('/1')
+      .reply(200, {
+        id: 1,
+        name: 'Test User',
+        email: 'test@example.com',
+      })
+      .times(1);
 
-    expect(response.body).toHaveProperty('name', 'John Doe');
+    const response = await fetch('https://api.example.com/users/1');
+    const data = await response.json();
+
+    expect(data.id).toBe(1);
+    expect(data.name).toBe('Test User');
+  });
+
+  it('should handle API errors', async () => {
+    nock('https://api.example.com/users')
+      .get('/999')
+      .reply(404, {
+        error: 'User not found',
+      })
+      .times(1);
+
+    try {
+      await fetch('https://api.example.com/users/999');
+      expect(true).toBe(false);
+    } catch (error) {
+      expect(error.message).toContain('404');
+    }
   });
 });
 ```
 
-### Mocking External API (Python)
+### Mocking Database
 
-```python
-import pytest
-from unittest.mock import patch
-from myapp.services import external_api_service
+```typescript
+// test/integration/database-mock.test.ts
+import { describe, it, beforeEach, afterEach } from '@jest/globals';
 
-@pytest.mark.asyncio
-async def test_fetch_user_from_external_api():
-    mock_response = {
-        "id": 1,
-        "name": "John Doe",
-        "email": "john@example.com"
-    }
+describe('Database Mock', () => {
+  const mockDb = {
+    users: [],
+    
+    create: async (userData: any) => {
+      const user = { id: mockDb.users.length + 1, ...userData };
+      mockDb.users.push(user);
+      return user;
+    },
+    
+    getById: async (id: number) => {
+      return mockDb.users.find(u => u.id === id);
+    },
+    
+    getAll: async () => {
+      return [...mockDb.users];
+    },
+    
+    update: async (id: number, updates: any) => {
+      const user = mockDb.users.find(u => u.id === id);
+      if (!user) throw new Error('User not found');
+      Object.assign(user, updates);
+      return user;
+    },
+    
+    delete: async (id: number) => {
+      const index = mockDb.users.findIndex(u => u.id === id);
+      if (index === -1) throw new Error('User not found');
+      mockDb.users.splice(index, 1);
+    },
+  };
 
-    with patch("myapp.services.external_api_service.requests.get") as mock_get:
-        mock_get.return_value.json.return_value = mock_response
+  beforeEach(() => {
+    mockDb.users = [];
+  });
 
-        user = await external_api_service.fetch_user(1)
+  afterEach(() => {
+    mockDb.users = [];
+  });
 
-        assert user["name"] == "John Doe"
-        assert user["email"] == "john@example.com"
+  it('should create and retrieve user', async () => {
+    const user = await mockDb.create({
+      name: 'John Doe',
+      email: 'john@example.com',
+    });
+    
+    expect(user.id).toBe(1);
+    
+    const retrieved = await mockDb.getById(user.id);
+    expect(retrieved).toEqual(user);
+  });
+
+  it('should update user', async () => {
+    const user = await mockDb.create({
+      name: 'Jane Doe',
+      email: 'jane@example.com',
+    });
+    
+    const updated = await mockDb.update(user.id, { name: 'Updated Name' });
+    expect(updated.name).toBe('Updated Name');
+    
+    const retrieved = await mockDb.getById(user.id);
+    expect(retrieved.name).toBe('Updated Name');
+  });
+
+  it('should delete user', async () => {
+    const user = await mockDb.create({
+      name: 'Test User',
+      email: 'test@example.com',
+    });
+    
+    await mockDb.delete(user.id);
+    
+    const retrieved = await mockDb.getById(user.id);
+    expect(retrieved).toBeNull();
+  });
+});
 ```
 
 ---
 
 ## Test Data Management
 
-### Seeding Test Data
+### Factory Pattern
 
 ```typescript
-import { Pool } from 'pg';
+// test/factories/user.factory.ts
+export class UserFactory {
+  static create(overrides: Partial<User> = {}): User {
+    return {
+      id: Math.floor(Math.random() * 1000),
+      name: 'Test User',
+      email: `test${Math.floor(Math.random() * 1000)}@example.com`,
+      createdAt: new Date(),
+      ...overrides,
+    };
+}
 
-describe('Test Data Management', () => {
-  let pool: Pool;
+static createMany(count: number, overrides: Partial<User> = {}): User[] {
+  return Array.from({ length: count }, () => this.create(overrides));
+}
+}
 
-  beforeAll(async () => {
-    pool = new Pool({ /* config */ });
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  createdAt: Date;
+}
+```
+
+```typescript
+// test/integration/user.test.ts
+import { UserFactory } from '../factories/user.factory';
+
+describe('User Factory', () => {
+  it('should create user with defaults', () => {
+    const user = UserFactory.create();
+    
+    expect(user.id).toBeDefined();
+    expect(user.name).toBe('Test User');
+    expect(user.email).toContain('@example.com');
   });
 
-  beforeEach(async () => {
-    // Clean database
-    await pool.query('TRUNCATE TABLE users CASCADE');
-
-    // Seed test data
-    await pool.query(`
-      INSERT INTO users (name, email) VALUES
-        ('John Doe', 'john@example.com'),
-        ('Jane Doe', 'jane@example.com')
-    `);
+  it('should create user with overrides', () => {
+    const user = UserFactory.create({
+      name: 'Custom Name',
+      email: 'custom@example.com',
+    });
+    
+    expect(user.name).toBe('Custom Name');
+    expect(user.email).toBe('custom@example.com');
   });
 
-  it('should find all users', async () => {
-    const result = await pool.query('SELECT * FROM users');
-    expect(result.rows.length).toBe(2);
+  it('should create multiple users', () => {
+    const users = UserFactory.createMany(5);
+    
+    expect(users).toHaveLength(5);
+    expect(users.every(u => u.email.includes('@example.com'));
   });
 });
 ```
 
-### Factory Pattern
+### Faker Integration
 
 ```typescript
-// factories/userFactory.ts
-export class UserFactory {
-  static create(overrides = {}) {
+// test/factories/faker.factory.ts
+import { faker } from '@faker-js/faker';
+
+export class DataFactory {
+  static user() {
     return {
-      name: 'John Doe',
-      email: 'john@example.com',
-      ...overrides,
+      id: faker.number.int(),
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      phone: faker.phone.number(),
+      address: {
+        street: faker.location.streetAddress(),
+        city: faker.location.city(),
+        state: faker.location.state({ abbreviated: true }),
+        zipCode: faker.location.zipCode('#####'),
+      },
     };
   }
+
+  static product() {
+    return {
+      id: faker.number.int(),
+      name: faker.commerce.productName(),
+      price: parseFloat(faker.commerce.price()),
+      description: faker.commerce.productDescription(),
+      stock: faker.number.int({ min: 0, max: 100 }),
+    };
+  }
+
+  static order() {
+    const user = this.user();
+    const products = this.products(faker.number.int({ min: 1, max: 5 }));
+    
+    return {
+      id: faker.number.int(),
+      userId: user.id,
+      total: products.reduce((sum, p) => sum + p.price, 0),
+      status: faker.helpers.arrayElement(['pending', 'processing', 'shipped', 'delivered', 'cancelled']),
+      createdAt: faker.date.past(),
+    items: products.map(p => ({
+      productId: p.id,
+      quantity: faker.number.int({ min: 1, max: 10 }),
+      price: p.price,
+    })),
+    };
+  }
+
+  static products(count: number) {
+    return Array.from({ length: count }, () => this.product());
+  }
 }
-
-// Usage in tests
-import { UserFactory } from '../factories/userFactory';
-
-describe('User Factory', () => {
-  it('should use default values', () => {
-    const user = UserFactory.create();
-    expect(user.name).toBe('John Doe');
-    expect(user.email).toBe('john@example.com');
-  });
-
-  it('should override values', () => {
-    const user = UserFactory.create({ name: 'Jane Doe' });
-    expect(user.name).toBe('Jane Doe');
-    expect(user.email).toBe('john@example.com');
-  });
-});
 ```
 
 ---
 
 ## Setup and Teardown
 
-### Setup and Teardown (Node.js)
+### Database Setup and Teardown
 
 ```typescript
-describe('Setup and Teardown', () => {
-  let pool: Pool;
-  let client: RedisClient;
+// test/integration/database-setup.test.ts
+import { describe, beforeAll, afterAll } from '@jest/globals';
+import { Client } from 'pg';
+
+describe('Database Integration', () => {
+  let client: Client;
 
   beforeAll(async () => {
-    // Setup once before all tests
-    pool = new Pool({ /* config */ });
-    client = createClient();
+    client = new Client({
+      host: 'localhost',
+      port: 5432,
+      database: 'testdb',
+      user: 'postgres',
+      password: 'postgres',
+    });
     await client.connect();
+    
+    // Setup test data
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
   });
 
   afterAll(async () => {
-    // Cleanup once after all tests
-    await pool.end();
-    await client.quit();
-  });
-
-  beforeEach(async () => {
-    // Setup before each test
-    await pool.query('TRUNCATE TABLE users CASCADE');
-    await client.flushDb();
-  });
-
-  afterEach(async () => {
-    // Cleanup after each test
-    // Additional cleanup if needed
+    // Cleanup test data
+    await client.query('DROP TABLE IF EXISTS users CASCADE');
+    await client.end();
   });
 });
 ```
 
-### Setup and Teardown (Python)
+### API Setup and Teardown
 
-```python
-import pytest
+```typescript
+// test/integration/api-setup.test.ts
+import { describe, beforeAll, afterAll } from '@jest/globals';
+import request from 'supertest';
+import app from '../src/app';
 
-@pytest.fixture(scope="session")
-def session_resources():
-    # Setup once before all tests
-    db = Database()
-    db.connect()
-    yield db
-    # Cleanup once after all tests
-    db.disconnect()
+describe('API Integration', () => {
+  let server: any;
 
-@pytest.fixture(autouse=True)
-def clean_database(session_resources):
-    # Setup before each test
-    session_resources.execute("TRUNCATE TABLE users CASCADE")
-    yield
-    # Cleanup after each test
-    pass
+  beforeAll(async () => {
+    server = app.listen(3000);
+  });
+
+  afterAll(async () => {
+    server.close();
+  });
+});
+```
+
+### Container Setup and Teardown
+
+```typescript
+// test/integration/container-setup.test.ts
+import { describe, beforeEach, afterEach } from '@jest/globals';
+import { PostgreSqlContainer } from 'testcontainers';
+
+describe('Container Integration', () => {
+  let container: StartedPostgreSqlContainer;
+  let connection: any;
+
+  beforeEach(async () => {
+    container = await new PostgreSqlContainer('postgres:15-alpine').start();
+    connection = await container.getConnectionString();
+  });
+
+  afterEach(async () => {
+    await container.stop();
+  });
+});
 ```
 
 ---
@@ -802,69 +977,55 @@ def clean_database(session_resources):
 ### GitHub Actions
 
 ```yaml
+# .github/workflows/integration-tests.yml
 name: Integration Tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
     services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: testdb
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-
+      - postgres
+      - redis
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: '18'
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run integration tests
-        run: npm run test:integration
-        env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/testdb
-          REDIS_URL: redis://localhost:6379
+        run: npm test -- testPathPattern='integration/**/*.test.ts'
+
+      - name: Upload coverage
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
 ```
 
 ### GitLab CI
 
 ```yaml
-integration-test:
+# .gitlab-ci.yml
+stages:
+  test:
   stage: test
-  services:
-    - postgres:15
-    - redis:7-alpine
-
-  variables:
-    POSTGRES_USER: test
-    POSTGRES_PASSWORD: test
-    POSTGRES_DB: testdb
-    DATABASE_URL: postgresql://test:test@postgres:5432/testdb
-    REDIS_URL: redis://redis:6379
-
-  script:
-    - npm ci
-    - npm run test:integration
+    services:
+      - postgres
+      - redis
+    script:
+      - npm ci
+      - npm test -- testPathPattern='integration/**/*.test.ts'
+    coverage: '/coverage/'
 ```
 
 ---
@@ -874,98 +1035,124 @@ integration-test:
 ### 1. Use Test Containers
 
 ```typescript
-// Use test containers for real dependencies
-const container = await new GenericContainer('postgres:15')
-  .withExposedPorts(5432)
-  .start();
-```
+// Good: Use testcontainers for real infrastructure
+import { PostgreSqlContainer } from 'testcontainers';
 
-### 2. Clean Database Between Tests
+test('database integration', async () => {
+  const container = await new PostgreSqlContainer('postgres:15-alpine').start();
+  const connection = await container.getConnectionString();
+  // Use real database
+});
 
-```typescript
-beforeEach(async () => {
-  await pool.query('TRUNCATE TABLE users CASCADE');
+// Bad: Use mocks for infrastructure
+test('database integration', async () => {
+  const mockDb = { users: [] };
+  // Use mocked database
 });
 ```
 
-### 3. Use Factories for Test Data
+### 2. Isolate Tests
 
 ```typescript
-const user = UserFactory.create({ name: 'Jane Doe' });
-```
-
-### 4. Test Real Integrations
-
-```typescript
-// Test real API endpoints
-await request(app).post('/api/users').send({ name: 'John Doe' });
-```
-
-### 5. Mock External Services
-
-```typescript
-// Mock external APIs
-server.use(
-  rest.get('https://api.example.com/users/:id', (req, res, ctx) => {
-    return res(ctx.json({ id: req.params.id, name: 'John Doe' }));
-  })
-);
-```
-
-### 6. Use Proper Setup/Teardown
-
-```typescript
-beforeAll(async () => {
-  // Setup
+// Good: Each test is independent
+test('test 1', async () => {
+  const user = await createTestUser();
+  expect(user.id).toBeDefined();
 });
 
-afterAll(async () => {
-  // Teardown
+test('test 2', async () => {
+  const user = await createTestUser();
+  expect(user.id).toBeDefined();
+});
+
+// Bad: Tests depend on each other
+let userId: number;
+
+test('setup user', async () => {
+  userId = await createTestUser();
+});
+
+test('get user', async () => {
+  const user = await getUser(userId);
+  expect(user.id).toBe(userId);
+});
+
+test('delete user', async () => {
+  await deleteUser(userId);
 });
 ```
 
-### 7. Test Error Cases
+### 3. Clean Up After Tests
 
 ```typescript
-it('should return 404 for non-existent user', async () => {
-  await request(app).get('/api/users/999').expect(404);
+// Good: Clean up after each test
+test('user lifecycle', async () => {
+  const user = await createTestUser();
+  
+  try {
+    const retrieved = await getUser(user.id);
+    expect(retrieved).toEqual(user);
+  } finally {
+    await deleteUser(user.id);
+  }
+});
+
+// Bad: No cleanup
+test('user lifecycle', async () => {
+  const user = await createTestUser();
+  const retrieved = await getUser(user.id);
+  expect(retrieved).toEqual(user);
+});
 });
 ```
 
-### 8. Use Descriptive Test Names
+### 4. Use Descriptive Test Names
 
 ```typescript
-it('should create user with valid data', async () => {
-  // ...
+// Good: Descriptive test names
+test('should create user with valid email', async () => {
+  const user = await createTestUser('john@example.com');
+  expect(user.id).toBeDefined();
+});
+
+// Bad: Non-descriptive test names
+test('user creation', async () => {
+  const user = await createTestUser();
+  expect(user.id).toBeDefined();
 });
 ```
 
-### 9. Keep Tests Independent
+### 5. Use Factories for Test Data
 
 ```typescript
-// Each test should be able to run independently
-it('test 1', async () => {
-  // ...
+// Good: Use factories for test data
+import { UserFactory } from '../factories/user.factory';
+
+test('should create user', async () => {
+  const user = UserFactory.create();
+  expect(user.email).toContain('@example.com');
 });
 
-it('test 2', async () => {
-  // ...
+// Bad: Hardcode test data
+test('should create user', async () => {
+  const user = await createTestUser('test@example.com');
+  expect(user.email).toContain('@example.com');
 });
-```
-
-### 10. Run in CI
-
-```yaml
-# Run integration tests in CI
-- name: Run integration tests
-  run: npm run test:integration
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [Testcontainers Documentation](https://www.testcontainers.org/)
-- [Supertest Documentation](https://github.com/visionmedia/supertest)
-- [HTTPX Documentation](https://www.python-httpx.org/)
-- [MSW Documentation](https://mswjs.io/)
+This skill covers comprehensive integration testing patterns including:
+
+- **Integration Testing Concepts**: Why integration testing, comparison with unit tests
+- **Test Containers**: PostgreSQL, Redis, MongoDB with Testcontainers
+- **Database Testing**: PostgreSQL and MongoDB integration tests
+- **API Testing**: Supertest (Node.js) and httpx (Python)
+- **Message Queue Testing**: Redis pub/sub and RabbitMQ integration
+- **External Service Mocking**: Mocking external APIs and databases
+- **Test Data Management**: Factory pattern and Faker integration
+- **Setup and Teardown**: Database, API, and container setup
+- **CI/CD Integration**: GitHub Actions and GitLab CI configurations
+- **Best Practices**: Test containers, isolate tests, clean up, descriptive names, factories

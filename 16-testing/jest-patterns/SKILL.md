@@ -1,6 +1,8 @@
 # Jest Patterns
 
-A comprehensive guide to Jest testing patterns for JavaScript/TypeScript applications.
+## Overview
+
+Jest is a JavaScript testing framework that focuses on simplicity. This skill covers Jest setup, test structure, mocking, and best practices.
 
 ## Table of Contents
 
@@ -20,77 +22,77 @@ A comprehensive guide to Jest testing patterns for JavaScript/TypeScript applica
 
 ## Jest Setup
 
-### Installation
+### Basic Setup
 
 ```bash
-# Install Jest
-npm install --save-dev jest
-
-# Install TypeScript support
-npm install --save-dev ts-jest @types/jest
-
-# Install React testing utilities
-npm install --save-dev @testing-library/react @testing-library/jest-dom
-
-# Install additional matchers
-npm install --save-dev @testing-library/jest-dom
+npm install --save-dev jest @types/jest
 ```
-
-### Configuration
-
-```javascript
-// jest.config.js
-module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-  },
-  collectCoverageFrom: [
-    'src/**/*.{js,jsx,ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/**/*.stories.{js,jsx,ts,tsx}',
-  ],
-  coverageThreshold: {
-    global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80,
-    },
-  },
-};
-```
-
-```javascript
-// jest.setup.js
-import '@testing-library/jest-dom';
-
-// Global mocks
-global.matchMedia = jest.fn().mockImplementation((query) => ({
-  matches: false,
-  media: query,
-  onchange: null,
-  addListener: jest.fn(),
-  removeListener: jest.fn(),
-  addEventListener: jest.fn(),
-  removeEventListener: jest.fn(),
-  dispatchEvent: jest.fn(),
-}));
-```
-
-### Package.json Scripts
 
 ```json
+// package.json
 {
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:ci": "jest --ci"
+    "test:coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "ts-node": "^29.0.0"
   }
 }
+```
+
+### TypeScript Configuration
+
+```json
+// jest.config.js
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  roots: ['<rootDir>/src'],
+  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
+  collectCoverageFrom: [
+    'src/**/*.{js,ts}',
+  ],
+  coverageDirectory: 'coverage',
+  collectCoverage: true,
+};
+```
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "types": ["node", "jest"]
+  }
+}
+```
+
+### React Testing Setup
+
+```bash
+npm install --save-dev jest @testing-library/react @testing-library/jest-dom @testing-library/user-event jest-environment-jsdom
+```
+
+```json
+// jest.config.js
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/node_modules/@$1',
+  },
+  testMatch: ['**/__tests__/**/*.test.tsx', '**/?(*.)+(spec|test).test.tsx'],
+};
+```
+
+```typescript
+// src/setupTests.ts
+import '@testing-library/jest-dom';
 ```
 
 ---
@@ -100,52 +102,59 @@ global.matchMedia = jest.fn().mockImplementation((query) => ({
 ### Basic Test Structure
 
 ```typescript
-describe('MyComponent', () => {
-  it('should render correctly', () => {
-    // Test implementation
+// math.test.ts
+describe('Math operations', () => {
+  describe('addition', () => {
+    it('should add two numbers', () => {
+      expect(add(2, 3)).toBe(5);
+    });
+
+    it('should handle negative numbers', () => {
+      expect(add(-2, 3)).toBe(1);
+    });
   });
 
-  test('should handle user interaction', () => {
-    // Test implementation
+  describe('subtraction', () => {
+    it('should subtract two numbers', () => {
+      expect(subtract(5, 3)).toBe(2);
+    });
   });
 });
 ```
 
-### Nested Describe Blocks
+### Nested Describes
 
 ```typescript
-describe('UserService', () => {
-  describe('getUser', () => {
-    it('should return user when found', () => {
-      // Test implementation
+// user.test.ts
+describe('User', () => {
+  describe('constructor', () => {
+    it('should create a user with name', () => {
+      const user = new User('John');
+      expect(user.name).toBe('John');
     });
 
-    it('should throw error when not found', () => {
-      // Test implementation
+    it('should create a user with email', () => {
+      const user = new User('John', 'john@example.com');
+      expect(user.email).toBe('john@example.com');
     });
   });
 
-  describe('createUser', () => {
-    it('should create user with valid data', () => {
-      // Test implementation
+  describe('methods', () => {
+    let user: User;
+
+    beforeEach(() => {
+      user = new User('John', 'john@example.com');
+    });
+
+    it('should get full name', () => {
+      expect(user.getFullName()).toBe('John');
+    });
+
+    it('should validate email', () => {
+      expect(user.validateEmail()).toBe(true);
     });
   });
 });
-```
-
-### Test File Organization
-
-```
-src/
-├── components/
-│   ├── Button.tsx
-│   └── Button.test.tsx
-├── services/
-│   ├── UserService.ts
-│   └── UserService.test.ts
-└── utils/
-    ├── format.ts
-    └── format.test.ts
 ```
 
 ---
@@ -155,76 +164,181 @@ src/
 ### Common Matchers
 
 ```typescript
-// Equality
-expect(value).toBe(expected);
-expect(value).toEqual(expected);
-expect(value).toStrictEqual(expected);
+// matchers.test.ts
+describe('Common matchers', () => {
+  describe('toBe', () => {
+    it('should check exact equality', () => {
+      expect(2 + 2).toBe(4);
+    });
+  });
 
-// Truthiness
-expect(value).toBeTruthy();
-expect(value).toBeFalsy();
-expect(value).toBeNull();
-expect(value).toBeUndefined();
-expect(value).toBeDefined();
+  describe('toEqual', () => {
+    it('should check deep equality', () => {
+      const obj1 = { a: 1, b: 2 };
+      const obj2 = { a: 1, b: 2 };
+      expect(obj1).toEqual(obj2);
+    });
+  });
 
-// Numbers
-expect(value).toBeGreaterThan(10);
-expect(value).toBeGreaterThanOrEqual(10);
-expect(value).toBeLessThan(20);
-expect(value).toBeLessThanOrEqual(20);
-expect(value).toBeCloseTo(0.3, 2);
+  describe('toStrictEqual', () => {
+    it('should check strict equality', () => {
+      const obj1 = { a: 1, b: 2 };
+      const obj2 = { a: 1, b: 2 };
+      expect(obj1).toStrictEqual(obj2);
+    });
+  });
 
-// Strings
-expect(value).toMatch(/pattern/);
-expect(value).toContain('substring');
-expect(value).toHaveLength(10);
+  describe('toBeNull', () => {
+    it('should check for null', () => {
+      expect(null).toBeNull();
+    });
+  });
 
-// Arrays
-expect(array).toContain(item);
-expect(array).toHaveLength(5);
-expect(array).toEqual(expectedArray);
-expect(array).toContainEqual(expectedItem);
+  describe('toBeUndefined', () => {
+    it('should check for undefined', () => {
+      expect(undefined).toBeUndefined();
+    });
+  });
 
-// Objects
-expect(object).toHaveProperty('key');
-expect(object).toHaveProperty('key', value);
-expect(object).toMatchObject(expected);
+  describe('toBeDefined', () => {
+    it('should check if defined', () => {
+      const value = 'hello';
+      expect(value).toBeDefined();
+    });
+  });
 
-// Exceptions
-expect(() => {
-  throw new Error('message');
-}).toThrow('message');
-expect(() => {
-  throw new Error('message');
-}).toThrowError(Error);
+  describe('toBeTruthy', () => {
+    it('should check for truthy', () => {
+      expect(true).toBeTruthy();
+      expect(1).toBeTruthy();
+      expect('hello').toBeTruthy();
+      expect({}).toBeTruthy();
+    });
+  });
+
+  describe('toBeFalsy', () => {
+    it('should check for falsy', () => {
+      expect(false).toBeFalsy();
+      expect(0).toBeFalsy();
+      expect('').toBeFalsy();
+      expect(null).toBeFalsy();
+      expect(undefined).toBeFalsy();
+    });
+  });
+
+  describe('toContain', () => {
+    it('should check if array contains item', () => {
+      const array = [1, 2, 3, 4, 5];
+      expect(array).toContain(3);
+    });
+  });
+
+  describe('toHaveLength', () => {
+    it('should check array length', () => {
+      const array = [1, 2, 3];
+      expect(array).toHaveLength(3);
+    });
+  });
+
+  describe('toThrow', () => {
+    it('should check if function throws', () => {
+      expect(() => {
+        throw new Error('Test error');
+      }).toThrow('Test error');
+    });
+
+    it('should check if function throws any error', () => {
+      expect(() => {
+        throw new Error('Test error');
+      }).toThrow();
+    });
+  });
+});
 ```
 
-### Custom Matchers
+### String Matchers
 
 ```typescript
-// jest.setup.js
-expect.extend({
-  toBeWithinRange(received, floor, ceiling) {
-    const pass = received >= floor && received <= ceiling;
-    if (pass) {
-      return {
-        message: () =>
-          `expected ${received} not to be within range ${floor} - ${ceiling}`,
-        pass: true,
-      };
-    } else {
-      return {
-        message: () =>
-          `expected ${received} to be within range ${floor} - ${ceiling}`,
-        pass: false,
-      };
-    }
-  },
-});
+// string-matchers.test.ts
+describe('String matchers', () => {
+  describe('toMatch', () => {
+    it('should match string', () => {
+      expect('hello world').toMatch(/world/);
+    });
+  });
 
-// Usage
-test('number is within range', () => {
-  expect(5).toBeWithinRange(1, 10);
+  describe('toContain', () => {
+    it('should contain substring', () => {
+      expect('hello world').toContain('world');
+    });
+  });
+
+  describe('toHaveLength', () => {
+    it('should have length', () => {
+      expect('hello').toHaveLength(5);
+    });
+  });
+
+  describe('toStartWith', () => {
+    it('should start with', () => {
+      expect('hello world').toStartWith('hello');
+    });
+  });
+
+  describe('toEndWith', () => {
+    it('should end with', () => {
+      expect('hello world').toEndWith('world');
+    });
+  });
+});
+```
+
+### Number Matchers
+
+```typescript
+// number-matchers.test.ts
+describe('Number matchers', () => {
+  describe('toBeGreaterThan', () => {
+    it('should be greater than', () => {
+      expect(5).toBeGreaterThan(3);
+    });
+  });
+
+  describe('toBeGreaterThanOrEqual', () => {
+    it('should be greater than or equal', () => {
+      expect(5).toBeGreaterThanOrEqual(5);
+    });
+  });
+
+  describe('toBeLessThan', () => {
+    it('should be less than', () => {
+      expect(3).toBeLessThan(5);
+    });
+  });
+
+  describe('toBeLessThanOrEqual', () => {
+    it('should be less than or equal', () => {
+      expect(3).toBeLessThanOrEqual(3);
+    });
+  });
+
+  describe('toBeCloseTo', () => {
+    it('should be close to', () => {
+      expect(0.1 + 0.2).toBeCloseTo(0.3, 5);
+    });
+  });
+
+  describe('toBeFinite', () => {
+    it('should be finite', () => {
+      expect(42).toBeFinite();
+    });
+  });
+
+  describe('toBeNaN', () => {
+    it('should be NaN', () => {
+      expect(NaN).toBeNaN();
+    });
+  });
 });
 ```
 
@@ -232,102 +346,70 @@ test('number is within range', () => {
 
 ## Mocking
 
-### Function Mocking
+### Mocking Functions
 
 ```typescript
-// Mock a function
-const mockFn = jest.fn();
+// function-mock.test.ts
+describe('Function mocking', () => {
+  it('should mock a function', () => {
+    const mockFn = jest.fn();
+    mockFn('hello', 'world');
 
-// Mock implementation
-mockFn.mockReturnValue(42);
-mockFn.mockResolvedValue({ id: 1 });
-mockFn.mockRejectedValue(new Error('Failed'));
+    expect(mockFn).toHaveBeenCalledWith('hello', 'world');
+    expect(mockFn).toHaveBeenCalledTimes(1);
+  });
 
-// Mock implementation with function
-mockFn.mockImplementation((a, b) => a + b);
+  it('should return a value', () => {
+    const mockFn = jest.fn().mockReturnValue(42);
+    expect(mockFn()).toBe(42);
+  });
 
-// Mock implementation once
-mockFn.mockImplementationOnce((a, b) => a + b);
-mockFn.mockImplementationOnce((a, b) => a * b);
+  it('should resolve a promise', async () => {
+    const mockFn = jest.fn().mockResolvedValue(42);
+    const result = await mockFn();
+    expect(result).toBe(42);
+  });
 
-// Reset mock
-mockFn.mockReset();
-mockFn.mockClear();
-mockFn.mockRestore();
-
-// Get mock calls
-expect(mockFn).toHaveBeenCalled();
-expect(mockFn).toHaveBeenCalledTimes(2);
-expect(mockFn).toHaveBeenCalledWith('arg1', 'arg2');
-expect(mockFn).toHaveBeenLastCalledWith('arg1', 'arg2');
-
-// Get mock return values
-mockFn.mock.results;
-mockFn.mock.calls;
-```
-
-### Module Mocking
-
-```typescript
-// Mock entire module
-jest.mock('./myModule');
-
-// Mock specific function
-jest.mock('./myModule', () => ({
-  myFunction: jest.fn().mockReturnValue(42),
-}));
-
-// Mock with partial implementation
-jest.mock('./myModule', () => ({
-  ...jest.requireActual('./myModule'),
-  myFunction: jest.fn().mockReturnValue(42),
-}));
-
-// Mock in specific test
-import { myFunction } from './myModule';
-
-jest.mock('./myModule');
-
-test('uses mocked function', () => {
-  myFunction();
-  expect(myFunction).toHaveBeenCalled();
+  it('should reject a promise', async () => {
+    const mockFn = jest.fn().mockRejectedValue(new Error('Test error'));
+    await expect(mockFn()).rejects.toThrow('Test error');
+  });
 });
 ```
 
-### Async Function Mocking
+### Mocking Modules
 
 ```typescript
-// Mock resolved promise
-const mockFn = jest.fn().mockResolvedValue({ id: 1 });
+// module-mock.test.ts
+import { fetchData } from './api';
 
-// Mock rejected promise
-const mockErrorFn = jest.fn().mockRejectedValue(new Error('Failed'));
+jest.mock('./api');
 
-// Mock async implementation
-const mockAsyncFn = jest.fn().mockImplementation(async (id) => {
-  return { id, name: 'User' };
-});
-
-// Usage
-test('async function', async () => {
-  const result = await mockAsyncFn(1);
-  expect(result).toEqual({ id: 1, name: 'User' });
+describe('Module mocking', () => {
+  it('should mock module', async () => {
+    const mockFetchData = jest.mocked(fetchData).mockResolvedValue({ data: 'test' });
+    const result = await mockFetchData();
+    expect(result).toEqual({ data: 'test' });
+  });
 });
 ```
 
-### Class Mocking
+### Mocking Implementations
 
 ```typescript
-// Mock class
-jest.mock('./MyClass');
+// implementation-mock.test.ts
+import { UserService } from './services';
 
-import { MyClass } from './MyClass';
+jest.mock('./services');
 
-test('mocks class', () => {
-  const mockInstance = new MyClass();
-  mockInstance.method.mockReturnValue(42);
+describe('Implementation mocking', () => {
+  it('should mock class methods', async () => {
+    const mockUserService = jest.mocked(UserService);
+    mockUserService.getUser.mockResolvedValue({ id: 1, name: 'John' });
 
-  expect(mockInstance.method()).toBe(42);
+    const user = await mockUserService.getUser(1);
+    expect(user).toEqual({ id: 1, name: 'John' });
+  });
 });
 ```
 
@@ -338,24 +420,26 @@ test('mocks class', () => {
 ### Promise Testing
 
 ```typescript
-test('async promise', async () => {
-  const result = await asyncFunction();
-  expect(result).toBe('value');
-});
+// promise.test.ts
+describe('Promise testing', () => {
+  it('should resolve promise', async () => {
+    const promise = Promise.resolve(42);
+    await expect(promise).resolves.toBe(42);
+  });
 
-test('async promise with error', async () => {
-  await expect(asyncFunction()).rejects.toThrow('Error message');
-});
-```
+  it('should reject promise', async () => {
+    const promise = Promise.reject(new Error('Test error'));
+    await expect(promise).rejects.toThrow('Test error');
+  });
 
-### Callback Testing
-
-```typescript
-test('async callback', (done) => {
-  asyncCallback((error, result) => {
-    expect(error).toBeNull();
-    expect(result).toBe('value');
-    done();
+  it('should handle multiple promises', async () => {
+    const promises = [
+      Promise.resolve(1),
+      Promise.resolve(2),
+      Promise.resolve(3),
+    ];
+    const result = await Promise.all(promises);
+    expect(result).toEqual([1, 2, 3]);
   });
 });
 ```
@@ -363,30 +447,39 @@ test('async callback', (done) => {
 ### Async/Await Testing
 
 ```typescript
-test('async/await', async () => {
-  await expect(asyncFunction()).resolves.toBe('value');
-  await expect(asyncFunction()).rejects.toThrow('Error');
+// async-await.test.ts
+describe('Async/await testing', () => {
+  it('should handle async function', async () => {
+    const result = await asyncFunction();
+    expect(result).toBe('test');
+  });
+
+  it('should handle async error', async () => {
+    await expect(asyncFunction()).rejects.toThrow('Test error');
+  });
 });
+
+async function asyncFunction(): Promise<string> {
+  return 'test';
+}
 ```
 
-### Timer Testing
+### Callback Testing
 
 ```typescript
-jest.useFakeTimers();
-
-test('timer', () => {
-  const callback = jest.fn();
-
-  setTimeout(callback, 1000);
-
-  jest.advanceTimersByTime(1000);
-
-  expect(callback).toHaveBeenCalled();
+// callback.test.ts
+describe('Callback testing', () => {
+  it('should handle callback', (done) => {
+    functionWithCallback((result: string) => {
+      expect(result).toBe('test');
+      done();
+    });
+  });
 });
 
-afterEach(() => {
-  jest.useRealTimers();
-});
+function functionWithCallback(callback: (result: string) => void): void {
+  callback('test');
+}
 ```
 
 ---
@@ -396,42 +489,38 @@ afterEach(() => {
 ### Basic Snapshot
 
 ```typescript
-test('snapshot', () => {
-  const tree = renderer.create(<MyComponent />).toJSON();
-  expect(tree).toMatchSnapshot();
+// component.test.tsx
+import { render } from '@testing-library/react';
+import Component from './Component';
+
+describe('Component snapshot', () => {
+  it('should match snapshot', () => {
+    const { asFragment } = render(<Component />);
+    expect(asFragment()).toMatchSnapshot();
+  });
 });
 ```
 
 ### Inline Snapshot
 
 ```typescript
-test('inline snapshot', () => {
-  const tree = renderer.create(<MyComponent />).toJSON();
-  expect(tree).toMatchInlineSnapshot(`
-    <div>
-      <span>Content</span>
-    </div>
-  `);
+// inline-snapshot.test.tsx
+describe('Inline snapshot', () => {
+  it('should match inline snapshot', () => {
+    const data = {
+      name: 'John',
+      age: 30,
+      email: 'john@example.com',
+    };
+    expect(data).toMatchInlineSnapshot(`
+      Object {
+        "name": "John",
+        "age": 30,
+        "email": "john@example.com"
+      }
+    `);
+  });
 });
-```
-
-### Snapshot with Properties
-
-```typescript
-test('snapshot with props', () => {
-  const tree = renderer.create(<MyComponent title="Hello" />).toJSON();
-  expect(tree).toMatchSnapshot();
-});
-```
-
-### Updating Snapshots
-
-```bash
-# Update all snapshots
-npm test -- -u
-
-# Update specific snapshot
-npm test -- -t "MyComponent" -u
 ```
 
 ---
@@ -440,14 +529,11 @@ npm test -- -t "MyComponent" -u
 
 ### Coverage Configuration
 
-```javascript
+```json
 // jest.config.js
 module.exports = {
-  collectCoverage: true,
   collectCoverageFrom: [
-    'src/**/*.{js,jsx,ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/**/*.stories.{js,jsx,ts,tsx}',
+    'src/**/*.{js,ts}',
   ],
   coverageThreshold: {
     global: {
@@ -457,37 +543,28 @@ module.exports = {
       statements: 80,
     },
     './src/components/': {
-      branches: 90,
-      functions: 90,
-      lines: 90,
-      statements: 90,
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
     },
   },
-  coverageReporters: ['text', 'lcov', 'html'],
 };
-```
-
-### Running Coverage
-
-```bash
-# Generate coverage report
-npm run test:coverage
-
-# Generate coverage for specific files
-npm test -- --coverage --collectCoverageFrom='src/utils/**/*.{ts,tsx}'
 ```
 
 ### Coverage Exclusions
 
-```javascript
+```json
 // jest.config.js
 module.exports = {
   collectCoverageFrom: [
-    'src/**/*.{js,jsx,ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/**/*.stories.{js,jsx,ts,tsx}',
-    '!src/index.ts',
-    '!src/types/**',
+    'src/**/*.{js,ts}',
+  ],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/coverage/',
+    '/src/types/',
   ],
 };
 ```
@@ -496,46 +573,52 @@ module.exports = {
 
 ## Setup and Teardown
 
-### beforeEach/afterEach
+### beforeEach and afterEach
 
 ```typescript
-describe('MyComponent', () => {
-  let component;
+// setup-teardown.test.ts
+describe('Setup and teardown', () => {
+  let counter: number;
 
   beforeEach(() => {
-    // Setup before each test
-    component = render(<MyComponent />);
+    counter = 0;
   });
 
   afterEach(() => {
-    // Cleanup after each test
-    component.unmount();
+    counter = 0;
   });
 
-  it('should render', () => {
-    // Test implementation
+  it('should increment counter', () => {
+    counter++;
+    expect(counter).toBe(1);
+  });
+
+  it('should reset counter', () => {
+    counter++;
+    expect(counter).toBe(1);
   });
 });
 ```
 
-### beforeAll/afterAll
+### beforeAll and afterAll
 
 ```typescript
-describe('Database Tests', () => {
-  let db;
+// setup-teardown-all.test.ts
+describe('Setup and teardown all', () => {
+  let database: Database;
 
   beforeAll(async () => {
-    // Setup before all tests
-    db = await connectDatabase();
+    database = new Database();
+    await database.connect();
   });
 
   afterAll(async () => {
-    // Cleanup after all tests
-    await db.disconnect();
+    await database.disconnect();
   });
 
   it('should query database', async () => {
-    // Test implementation
+    const result = await database.query('SELECT * FROM users');
+    expect(result).toBeDefined();
   });
 });
 ```
@@ -547,93 +630,91 @@ describe('Database Tests', () => {
 ### Basic Component Test
 
 ```typescript
+// Button.test.tsx
 import { render, screen } from '@testing-library/react';
-import { Button } from './Button';
+import Button from './Button';
 
 describe('Button', () => {
-  it('should render button text', () => {
+  it('should render button', () => {
     render(<Button>Click me</Button>);
-    expect(screen.getByText('Click me')).toBeInTheDocument();
+    const button = screen.getByRole('button');
+    expect(button).toBeInTheDocument();
   });
 
+  it('should render button text', () => {
+    render(<Button>Click me</Button>);
+    const button = screen.getByRole('button');
+    expect(button).toHaveTextContent('Click me');
+  });
+});
+```
+
+### Event Testing
+
+```typescript
+// Button-event.test.tsx
+import { render, screen, fireEvent } from '@testing-library/react';
+import Button from './Button';
+
+describe('Button events', () => {
   it('should call onClick handler', () => {
     const handleClick = jest.fn();
     render(<Button onClick={handleClick}>Click me</Button>);
-
-    fireEvent.click(screen.getByText('Click me'));
+    const button = screen.getByRole('button');
+    fireEvent.click(button);
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 });
 ```
 
-### Component with Props
+### Props Testing
 
 ```typescript
-describe('Button', () => {
-  it('should render with variant prop', () => {
-    render(<Button variant="primary">Click me</Button>);
-    expect(screen.getByRole('button')).toHaveClass('btn-primary');
+// Button-props.test.tsx
+import { render, screen } from '@testing-library/react';
+import Button from './Button';
+
+describe('Button props', () => {
+  it('should render with custom className', () => {
+    render(<Button className="custom-class">Click me</Button>);
+    const button = screen.getByRole('button');
+    expect(button).toHaveClass('custom-class');
   });
 
-  it('should be disabled when disabled prop is true', () => {
+  it('should render with disabled state', () => {
     render(<Button disabled>Click me</Button>);
-    expect(screen.getByRole('button')).toBeDisabled();
+    const button = screen.getByRole('button');
+    expect(button).toBeDisabled();
   });
 });
 ```
 
-### Component with State
+### Form Testing
 
 ```typescript
-describe('Counter', () => {
-  it('should increment count on button click', () => {
-    render(<Counter />);
-    const button = screen.getByRole('button', { name: 'Increment' });
+// Form.test.tsx
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import Form from './Form';
 
-    expect(screen.getByText('Count: 0')).toBeInTheDocument();
+describe('Form', () => {
+  it('should submit form', async () => {
+    const handleSubmit = jest.fn();
+    render(<Form onSubmit={handleSubmit} />);
 
-    fireEvent.click(button);
+    const nameInput = screen.getByLabelText('Name');
+    const emailInput = screen.getByLabelText('Email');
+    const submitButton = screen.getByRole('button', { name: 'submit' });
 
-    expect(screen.getByText('Count: 1')).toBeInTheDocument();
-  });
-});
-```
-
-### Component with Async Data
-
-```typescript
-import { waitFor } from '@testing-library/react';
-
-describe('UserProfile', () => {
-  it('should display user data after loading', async () => {
-    render(<UserProfile userId={1} />);
-
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    fireEvent.change(nameInput, { target: { value: 'John' } });
+    fireEvent.change(emailInput, { target: { value: 'john@example.com' } });
+    fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(handleSubmit).toHaveBeenCalledWith({
+        name: 'John',
+        email: 'john@example.com',
+      });
     });
-  });
-});
-```
-
-### Component with Hooks
-
-```typescript
-import { renderHook, act } from '@testing-library/react';
-import { useCounter } from './useCounter';
-
-describe('useCounter', () => {
-  it('should increment count', () => {
-    const { result } = renderHook(() => useCounter());
-
-    expect(result.current.count).toBe(0);
-
-    act(() => {
-      result.current.increment();
-    });
-
-    expect(result.current.count).toBe(1);
   });
 });
 ```
@@ -642,54 +723,62 @@ describe('useCounter', () => {
 
 ## Testing API Calls
 
-### Mocking Fetch
+### Mocking API Calls
 
 ```typescript
+// api.test.ts
 import { fetchUser } from './api';
+import { fetchUser as mockFetchUser } from './api';
 
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    json: () => Promise.resolve({ id: 1, name: 'John Doe' }),
-  })
-) as jest.Mock;
+jest.mock('./api');
 
-describe('fetchUser', () => {
-  it('should fetch user data', async () => {
+describe('API calls', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should fetch user', async () => {
+    const mockUser = { id: 1, name: 'John' };
+    mockFetchUser.mockResolvedValue(mockUser);
+
     const user = await fetchUser(1);
-    expect(user).toEqual({ id: 1, name: 'John Doe' });
-    expect(fetch).toHaveBeenCalledWith('/api/users/1');
+    expect(user).toEqual(mockUser);
+    expect(mockFetchUser).toHaveBeenCalledWith(1);
+  });
+
+  it('should handle API error', async () => {
+    mockFetchUser.mockRejectedValue(new Error('Not found'));
+
+    await expect(fetchUser(999)).rejects.toThrow('Not found');
   });
 });
 ```
 
-### Mocking Axios
+### Testing with MSW
 
 ```typescript
-import axios from 'axios';
+// api-msw.test.ts
+import { rest } from 'msw';
 import { fetchUser } from './api';
 
-jest.mock('axios');
+describe('API with MSW', () => {
+  beforeAll(() => {
+    server.listen();
+  });
 
-describe('fetchUser', () => {
-  it('should fetch user data', async () => {
-    const mockData = { id: 1, name: 'John Doe' };
-    (axios.get as jest.Mock).mockResolvedValue({ data: mockData });
+  afterAll(() => {
+    server.close();
+  });
+
+  it('should fetch user', async () => {
+    server.use(
+      rest.get('https://api.example.com/users/:id', (req, res, ctx) => {
+        res(ctx.json({ id: 1, name: 'John' }));
+      })
+    );
 
     const user = await fetchUser(1);
-    expect(user).toEqual(mockData);
-    expect(axios.get).toHaveBeenCalledWith('/api/users/1');
-  });
-});
-```
-
-### Testing Error Handling
-
-```typescript
-describe('fetchUser', () => {
-  it('should handle errors', async () => {
-    (axios.get as jest.Mock).mockRejectedValue(new Error('Network error'));
-
-    await expect(fetchUser(1)).rejects.toThrow('Network error');
+    expect(user).toEqual({ id: 1, name: 'John' });
   });
 });
 ```
@@ -698,138 +787,143 @@ describe('fetchUser', () => {
 
 ## Best Practices
 
-### 1. Arrange, Act, Assert (AAA)
+### 1. Write Descriptive Tests
 
 ```typescript
-test('user service', () => {
-  // Arrange
-  const userId = 1;
-  const expectedUser = { id: 1, name: 'John Doe' };
+// Good
+describe('UserService', () => {
+  describe('getUser', () => {
+    it('should return user when user exists', async () => {
+      const user = await userService.getUser(1);
+      expect(user).toBeDefined();
+    });
+  });
+});
 
-  // Act
-  const user = userService.getUser(userId);
-
-  // Assert
-  expect(user).toEqual(expectedUser);
+// Bad
+describe('UserService', () => {
+  it('test 1', async () => {
+    const user = await userService.getUser(1);
+    expect(user).toBeDefined();
+  });
 });
 ```
 
-### 2. Test One Thing
+### 2. Test One Thing Per Test
 
 ```typescript
-// ❌ BAD: Testing multiple things
-test('user service', () => {
-  const user = userService.getUser(1);
-  expect(user.id).toBe(1);
-  expect(user.name).toBe('John Doe');
-  expect(user.email).toBe('john@example.com');
+// Good
+it('should return user when user exists', async () => {
+  const user = await userService.getUser(1);
+  expect(user).toBeDefined();
 });
 
-// ✅ GOOD: Testing one thing
-test('should return user with correct id', () => {
-  const user = userService.getUser(1);
-  expect(user.id).toBe(1);
+it('should return null when user does not exist', async () => {
+  const user = await userService.getUser(999);
+  expect(user).toBeNull();
 });
 
-test('should return user with correct name', () => {
-  const user = userService.getUser(1);
-  expect(user.name).toBe('John Doe');
+// Bad
+it('should handle user existence', async () => {
+  const user1 = await userService.getUser(1);
+  expect(user1).toBeDefined();
+
+  const user2 = await userService.getUser(999);
+  expect(user2).toBeNull();
 });
 ```
 
-### 3. Use Descriptive Test Names
+### 3. Use Arrange-Act-Assert Pattern
 
 ```typescript
-// ❌ BAD: Vague test name
-test('user', () => {
-  // ...
-});
+describe('Arrange-Act-Assert', () => {
+  it('should add two numbers', () => {
+    // Arrange
+    const a = 2;
+    const b = 3;
 
-// ✅ GOOD: Descriptive test name
-test('should return user when id exists', () => {
-  // ...
-});
+    // Act
+    const result = add(a, b);
 
-test('should throw error when id does not exist', () => {
-  // ...
+    // Assert
+    expect(result).toBe(5);
+  });
 });
 ```
 
-### 4. Use Testing Library Queries
+### 4. Use Test Helpers
 
 ```typescript
-// ❌ BAD: Implementation details
-expect(container.querySelector('.btn-primary')).toBeInTheDocument();
+// test-helpers.ts
+export const createMockUser = (overrides: Partial<User> = {}): User => ({
+  id: 1,
+  name: 'John',
+  email: 'john@example.com',
+  ...overrides,
+});
 
-// ✅ GOOD: User-centric queries
-expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument();
-```
+export const createMockUsers = (count: number): User[] => {
+  return Array.from({ length: count }, (_, i) => createMockUser({ id: i + 1 }));
+};
 
-### 5. Mock External Dependencies
+// test.ts
+import { createMockUser } from './test-helpers';
 
-```typescript
-jest.mock('./api', () => ({
-  fetchUser: jest.fn().mockResolvedValue({ id: 1, name: 'John Doe' }),
-}));
-```
-
-### 6. Clean Up After Tests
-
-```typescript
-afterEach(() => {
-  jest.clearAllMocks();
+describe('With helpers', () => {
+  it('should use mock user', () => {
+    const user = createMockUser({ name: 'Jane' });
+    expect(user.name).toBe('Jane');
+  });
 });
 ```
 
-### 7. Test Edge Cases
+### 5. Keep Tests Independent
 
 ```typescript
-test('should handle empty input', () => {
-  expect(() => validateUser({})).toThrow('Name is required');
+// Good
+describe('Independent tests', () => {
+  it('should create user', () => {
+    const user = new User('John');
+    expect(user.name).toBe('John');
+  });
+
+  it('should update user', () => {
+    const user = new User('Jane');
+    user.name = 'Updated';
+    expect(user.name).toBe('Updated');
+  });
 });
 
-test('should handle null input', () => {
-  expect(() => validateUser(null)).toThrow('User is required');
-});
-```
+// Bad - tests depend on each other
+describe('Dependent tests', () => {
+  let user: User;
 
-### 8. Use Coverage Thresholds
+  it('should create user', () => {
+    user = new User('John');
+    expect(user.name).toBe('John');
+  });
 
-```javascript
-coverageThreshold: {
-  global: {
-    branches: 80,
-    functions: 80,
-    lines: 80,
-    statements: 80,
-  },
-}
-```
-
-### 9. Run Tests in Watch Mode During Development
-
-```bash
-npm run test:watch
-```
-
-### 10. Keep Tests Independent
-
-```typescript
-// Each test should be able to run independently
-test('test 1', () => {
-  // Should not depend on test 2
-});
-
-test('test 2', () => {
-  // Should not depend on test 1
+  it('should update user', () => {
+    user.name = 'Updated';
+    expect(user.name).toBe('Updated');
+  });
 });
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [Jest Documentation](https://jestjs.io/docs/getting-started)
-- [Testing Library](https://testing-library.com/docs/react-testing-library/intro)
-- [Jest Matchers](https://jestjs.io/docs/expect)
-- [Jest Mock Functions](https://jestjs.io/docs/mock-functions)
+This skill covers comprehensive Jest testing patterns including:
+
+- **Jest Setup**: Basic setup, TypeScript configuration, React testing setup
+- **Test Structure**: Basic and nested describe blocks
+- **Assertions and Matchers**: Common, string, and number matchers
+- **Mocking**: Functions, modules, and implementations
+- **Async Testing**: Promises, async/await, and callbacks
+- **Snapshot Testing**: Basic and inline snapshots
+- **Coverage**: Configuration and exclusions
+- **Setup and Teardown**: beforeEach, afterEach, beforeAll, afterAll
+- **Testing React Components**: Basic component, events, props, and form testing
+- **Testing API Calls**: Mocking API calls and MSW
+- **Best Practices**: Descriptive tests, one thing per test, AAA pattern, helpers, independent tests

@@ -1,6 +1,8 @@
 # API Versioning
 
-A comprehensive guide to API versioning strategies.
+## Overview
+
+API versioning allows you to evolve your API while maintaining backward compatibility. This skill covers versioning approaches (URL path, header, query parameter), implementation patterns, version negotiation, deprecation strategy, migration guides, backward compatibility, documentation, testing multiple versions, sunset headers, and best practices.
 
 ## Table of Contents
 
@@ -21,318 +23,318 @@ A comprehensive guide to API versioning strategies.
 
 ### URL Path Versioning
 
-```
-Version in URL path:
-- https://api.example.com/v1/users
-- https://api.example.com/v2/users
-- https://api.example.com/v3/users
+```typescript
+// src/routes/v1/user.routes.ts
+import express from 'express';
 
-Pros:
-- Clear version in URL
-- Easy to cache by version
-- Simple to implement
+const router = express.Router();
 
-Cons:
-- URL changes when versioning
-- Breaks existing clients
+router.get('/users', async (req, res) => {
+  const users = await User.findAll();
+  res.json(users);
+});
+
+router.get('/users/:id', async (req, res) => {
+  const user = await User.findById(req.params.id);
+  res.json(user);
+});
+
+router.post('/users', async (req, res) => {
+  const user = await User.create(req.body);
+  res.status(201).json(user);
+});
+
+export default router;
 ```
 
 ```typescript
-// Express - URL path versioning
+// src/routes/v2/user.routes.ts
 import express from 'express';
 
-const v1Router = express.Router();
-v1Router.get('/users', (req, res) => {
-  res.json({ version: 'v1', users: [] });
+const router = express.Router();
+
+router.get('/users', async (req, res) => {
+  const users = await User.findAll();
+  res.json(users);
 });
 
-const v2Router = express.Router();
-v2Router.get('/users', (req, res) => {
-  res.json({ version: 'v2', users: [], meta: { total: 0 } });
+router.get('/users/:id', async (req, res) => {
+  const user = await User.findById(req.params.id);
+  res.json(user);
 });
 
-const app = express();
-app.use('/v1', v1Router);
-app.use('/v2', v2Router);
+router.post('/users', async (req, res) => {
+  const user = await User.create(req.body);
+  res.status(201).json(user);
+});
+
+export default router;
 ```
 
-```python
-# FastAPI - URL path versioning
-from fastapi import FastAPI
+```typescript
+// src/app.ts
+import express from 'express';
+import v1Routes from './routes/v1/user.routes';
+import v2Routes from './routes/v2/user.routes';
 
-app = FastAPI()
+const app = express();
 
-@app.get("/v1/users")
-async def get_users_v1():
-    return {"version": "v1", "users": []}
+// Mount v1 routes
+app.use('/api/v1', v1Routes);
 
-@app.get("/v2/users")
-async def get_users_v2():
-    return {"version": "v2", "users": [], "meta": {"total": 0}}
+// Mount v2 routes
+app.use('/api/v2', v2Routes);
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
 ```
 
 ### Header Versioning
 
-```
-Version in HTTP header:
-- GET /users HTTP/1.1
-  Host: api.example.com
-  Accept: application/json
-  API-Version: v2
+```typescript
+// src/middleware/version.middleware.ts
+import { Request, Response, NextFunction } from 'express';
 
-Pros:
-- URL doesn't change
-- Backward compatible
-- Clean URLs
-
-Cons:
-- Less discoverable
-- Requires header handling
+export function versionMiddleware(req: Request, res: Response, next: NextFunction) {
+  const version = req.headers['api-version'] as string || 'v1';
+  
+  if (!['v1', 'v2'].includes(version)) {
+    return res.status(400).json({
+      error: 'Invalid API version',
+      supported: ['v1', 'v2'],
+    });
+  }
+  
+  req.apiVersion = version;
+  next();
+}
 ```
 
 ```typescript
-// Express - Header versioning
-import express from 'express';
+// src/controllers/user.controller.ts
+import { Request, Response } from 'express';
 
-const app = express();
-
-app.get('/users', (req, res) => {
-  const version = req.headers['api-version'] || 'v1';
-
-  if (version === 'v2') {
-    return res.json({ version: 'v2', users: [], meta: { total: 0 } });
+export class UserController {
+  async getUsers(req: Request, res: Response) {
+    const version = req.apiVersion || 'v1';
+    
+    let users;
+    if (version === 'v1') {
+      users = await User.findAll();
+    } else if (version === 'v2') {
+      users = await User.findAllWithRelations();
+    }
+    
+    res.json(users);
   }
 
-  return res.json({ version: 'v1', users: [] });
-});
+  async getUser(req: Request, res: Response) {
+    const version = req.apiVersion || 'v1';
+    
+    let user;
+    if (version === 'v1') {
+      user = await User.findById(req.params.id);
+    } else if (version === 'v2') {
+      user = await User.findByIdWithRelations(req.params.id);
+    }
+    
+    res.json(user);
+  }
+}
 ```
 
-```python
-# FastAPI - Header versioning
-from fastapi import FastAPI, Header
+```typescript
+// src/app.ts
+import express from 'express';
+import { versionMiddleware } from './middleware/version.middleware';
+import { UserController } from './controllers/user.controller';
 
-app = FastAPI()
+const app = express();
+const userController = new UserController();
 
-@app.get("/users")
-async def get_users(api_version: str = Header("API-Version", "v1")):
-    if api_version == "v2":
-        return {"version": "v2", "users": [], "meta": {"total": 0}}
-    return {"version": "v1", "users": []}
+app.use(versionMiddleware);
+
+app.get('/users', userController.getUsers.bind(userController));
+app.get('/users/:id', userController.getUser.bind(userController));
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
 ```
 
 ### Query Parameter Versioning
 
-```
-Version in query parameter:
-- https://api.example.com/users?version=v2
-- https://api.example.com/users?version=v1
+```typescript
+// src/middleware/query-version.middleware.ts
+import { Request, Response, NextFunction } from 'express';
 
-Pros:
-- Simple to implement
-- Backward compatible
-- Easy to test
-
-Cons:
-- Pollutes URL
-- Not standard
+export function queryVersionMiddleware(req: Request, res: Response, next: NextFunction) {
+  const version = req.query.version as string || 'v1';
+  
+  if (!['v1', 'v2'].includes(version)) {
+    return res.status(400).json({
+      error: 'Invalid API version',
+      supported: ['v1', 'v2'],
+    });
+  }
+  
+  req.apiVersion = version;
+  next();
+}
 ```
 
 ```typescript
-// Express - Query parameter versioning
+// src/app.ts
 import express from 'express';
+import { queryVersionMiddleware } from './middleware/query-version.middleware';
+import { UserController } from './controllers/user.controller';
 
 const app = express();
+const userController = new UserController();
 
-app.get('/users', (req, res) => {
-  const version = req.query.version || 'v1';
+app.use(queryVersionMiddleware);
 
-  if (version === 'v2') {
-    return res.json({ version: 'v2', users: [], meta: { total: 0 } });
-  }
+app.get('/users', userController.getUsers.bind(userController));
+app.get('/users/:id', userController.getUser.bind(userController));
 
-  return res.json({ version: 'v1', users: [] });
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
 });
-```
-
-```python
-# FastAPI - Query parameter versioning
-from fastapi import FastAPI, Query
-
-app = FastAPI()
-
-@app.get("/users")
-async def get_users(version: str = Query("v1")):
-    if version == "v2":
-        return {"version": "v2", "users": [], "meta": {"total": 0}}
-    return {"version": "v1", "users": []}
 ```
 
 ---
 
 ## Implementation Patterns
 
-### Versioned Router
+### Versioned Controllers
 
 ```typescript
-// routers/v1/users.ts
-import express, { Request, Response } from 'express';
+// src/controllers/v1/user.controller.ts
+import { Request, Response } from 'express';
 
-const router = express.Router();
+export class V1UserController {
+  async getUsers(req: Request, res: Response) {
+    const users = await User.findAll();
+    res.json(users);
+  }
 
-router.get('/', (req: Request, res: Response) => {
-  res.json({
-    version: 'v1',
-    users: [
-      { id: 1, name: 'John Doe', email: 'john@example.com' },
-    ],
-  });
-});
+  async getUser(req: Request, res: Response) {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  }
 
-router.get('/:id', (req: Request, res: Response) => {
-  const { id } = req.params;
-  res.json({
-    version: 'v1',
-    user: { id, name: 'John Doe', email: 'john@example.com' },
-  });
-});
+  async createUser(req: Request, res: Response) {
+    const user = await User.create(req.body);
+    res.status(201).json(user);
+  }
 
-router.post('/', (req: Request, res: Response) => {
-  const { name, email } = req.body;
-  res.json({
-    version: 'v1',
-    user: { id: 1, name, email },
-  });
-});
+  async updateUser(req: Request, res: Response) {
+    const user = await User.update(req.params.id, req.body);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  }
 
-export default router;
-```
-
-```typescript
-// routers/v2/users.ts
-import express, { Request, Response } from 'express';
-
-const router = express.Router();
-
-router.get('/', (req: Request, res: Response) => {
-  res.json({
-    version: 'v2',
-    users: [
-      { id: 1, name: 'John Doe', email: 'john@example.com', createdAt: '2024-01-01T00:00:00Z' },
-    ],
-    meta: {
-      total: 1,
-      page: 1,
-      pageSize: 10,
-    },
-  });
-});
-
-router.get('/:id', (req: Request, res: Response) => {
-  const { id } = req.params;
-  res.json({
-    version: 'v2',
-    user: { id, name: 'John Doe', email: 'john@example.com', createdAt: '2024-01-01T00:00:00Z' },
-  });
-});
-
-router.post('/', (req: Request, res: Response) => {
-  const { name, email } = req.body;
-  res.json({
-    version: 'v2',
-    user: { id: 1, name, email, createdAt: new Date().toISOString() },
-  });
-});
-
-export default router;
+  async deleteUser(req: Request, res: Response) {
+    await User.delete(req.params.id);
+    res.status(204).send();
+  }
+}
 ```
 
 ```typescript
-// app.ts
-import express from 'express';
-import v1UsersRouter from './routers/v1/users';
-import v2UsersRouter from './routers/v2/users';
+// src/controllers/v2/user.controller.ts
+import { Request, Response } from 'express';
 
-const app = express();
+export class V2UserController {
+  async getUsers(req: Request, res: Response) {
+    const users = await User.findAllWithRelations();
+    res.json(users);
+  }
 
-app.use('/v1/users', v1UsersRouter);
-app.use('/v2/users', v2UsersRouter);
+  async getUser(req: Request, res: Response) {
+    const user = await User.findByIdWithRelations(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  }
 
-export default app;
+  async createUser(req: Request, res: Response) {
+    const user = await User.createWithRelations(req.body);
+    res.status(201).json(user);
+  }
+
+  async updateUser(req: Request, res: Response) {
+    const user = await User.updateWithRelations(req.params.id, req.body);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  }
+
+  async deleteUser(req: Request, res: Response) {
+    await User.deleteWithRelations(req.params.id);
+    res.status(204).send();
+  }
+}
 ```
 
-### Versioned Controller
+### Versioned Services
 
-```python
-# controllers/v1/users.py
-from fastapi import APIRouter
+```typescript
+// src/services/v1/user.service.ts
+export class V1UserService {
+  async findAll(): Promise<User[]> {
+    return User.findAll();
+  }
 
-router = APIRouter(prefix="/v1/users")
+  async findById(id: string): Promise<User | null> {
+    return User.findById(id);
+  }
 
-@router.get("")
-async def get_users():
-    return {
-        "version": "v1",
-        "users": [
-            {"id": 1, "name": "John Doe", "email": "john@example.com"}
-        ]
-    }
+  async create(data: CreateUserData): Promise<User> {
+    return User.create(data);
+  }
 
-@router.get("/{user_id}")
-async def get_user(user_id: int):
-    return {
-        "version": "v1",
-        "user": {"id": user_id, "name": "John Doe", "email": "john@example.com"}
-    }
+  async update(id: string, data: UpdateUserData): Promise<User | null> {
+    return User.update(id, data);
+  }
 
-@router.post("")
-async def create_user(user: dict):
-    return {
-        "version": "v1",
-        "user": {"id": 1, **user}
-    }
+  async delete(id: string): Promise<void> {
+    return User.delete(id);
+  }
+}
 ```
 
-```python
-# controllers/v2/users.py
-from fastapi import APIRouter
+```typescript
+// src/services/v2/user.service.ts
+export class V2UserService {
+  async findAll(): Promise<UserWithRelations[]> {
+    return User.findAllWithRelations();
+  }
 
-router = APIRouter(prefix="/v2/users")
+  async findById(id: string): Promise<UserWithRelations | null> {
+    return User.findByIdWithRelations(id);
+  }
 
-@router.get("")
-async def get_users():
-    return {
-        "version": "v2",
-        "users": [
-            {"id": 1, "name": "John Doe", "email": "john@example.com", "created_at": "2024-01-01T00:00:00Z"}
-        ],
-        "meta": {"total": 1, "page": 1, "page_size": 10}
-    }
+  async create(data: CreateUserData): Promise<UserWithRelations> {
+    return User.createWithRelations(data);
+  }
 
-@router.get("/{user_id}")
-async def get_user(user_id: int):
-    return {
-        "version": "v2",
-        "user": {"id": user_id, "name": "John Doe", "email": "john@example.com", "created_at": "2024-01-01T00:00:00Z"}
-    }
+  async update(id: string, data: UpdateUserData): Promise<UserWithRelations | null> {
+    return User.updateWithRelations(id, data);
+  }
 
-@router.post("")
-async def create_user(user: dict):
-    return {
-        "version": "v2",
-        "user": {"id": 1, **user, "created_at": "2024-01-01T00:00:00Z"}
-    }
-```
-
-```python
-# app.py
-from fastapi import FastAPI
-from controllers.v1 import users as v1_users
-from controllers.v2 import users as v2_users
-
-app = FastAPI()
-
-app.include_router(v1_users.router)
-app.include_router(v2_users.router)
+  async delete(id: string): Promise<void> {
+    return User.deleteWithRelations(id);
+  }
+}
 ```
 
 ---
@@ -342,203 +344,151 @@ app.include_router(v2_users.router)
 ### Content Negotiation
 
 ```typescript
-// Express - Content negotiation
-import express from 'express';
+// src/middleware/content-negotiation.middleware.ts
+import { Request, Response, NextFunction } from 'express';
 
-const app = express();
-
-app.get('/users', (req, res) => {
-  const accept = req.headers['accept'];
-
-  if (accept?.includes('application/vnd.api.v2+json')) {
-    return res.json({ version: 'v2', users: [], meta: { total: 0 } });
+export function contentNegotiationMiddleware(req: Request, res: Response, next: NextFunction) {
+  const accept = req.headers.accept || 'application/json';
+  const version = req.headers['api-version'] as string || 'v1';
+  
+  // Check if requested version is supported
+  if (!['v1', 'v2'].includes(version)) {
+    return res.status(400).json({
+      error: 'Unsupported API version',
+      supported: ['v1', 'v2'],
+    });
   }
-
-  return res.json({ version: 'v1', users: [] });
-});
+  
+  // Check if requested content type is supported
+  if (!accept.includes('application/json')) {
+    return res.status(406).json({
+      error: 'Unsupported content type',
+      supported: ['application/json'],
+    });
+  }
+  
+  req.apiVersion = version;
+  req.contentType = accept;
+  next();
+}
 ```
 
-```python
-# FastAPI - Content negotiation
-from fastapi import FastAPI, Header
-
-app = FastAPI()
-
-@app.get("/users")
-async def get_users(accept: str = Header("Accept", "application/json")):
-    if "application/vnd.api.v2+json" in accept:
-        return {"version": "v2", "users": [], "meta": {"total": 0}}
-    return {"version": "v1", "users": []}
-```
-
-### Version Selection Logic
+### Version Routing
 
 ```typescript
-// Version selection based on header
-function getApiVersion(headers: any, defaultVersion = 'v1'): string {
-  const apiVersion = headers['api-version'];
-  const accept = headers['accept'];
+// src/middleware/version-routing.middleware.ts
+import { Request, Response, NextFunction } from 'express';
+import { V1UserController } from '../controllers/v1/user.controller';
+import { V2UserController } from '../controllers/v2/user.controller';
 
-  // Priority: API-Version header > Accept header > default
-  if (apiVersion) {
-    return apiVersion;
+const v1Controller = new V1UserController();
+const v2Controller = new V2UserController();
+
+export function versionRoutingMiddleware(req: Request, res: Response, next: NextFunction) {
+  const version = req.apiVersion || 'v1';
+  
+  // Route to appropriate controller based on version
+  if (version === 'v1') {
+    req.userController = v1Controller;
+  } else if (version === 'v2') {
+    req.userController = v2Controller;
   }
-
-  if (accept?.includes('application/vnd.api.v2+json')) {
-    return 'v2';
-  }
-
-  if (accept?.includes('application/vnd.api.v3+json')) {
-    return 'v3';
-  }
-
-  return defaultVersion;
-}
-
-// Express middleware
-import express from 'express';
-
-const app = express();
-
-app.use((req, res, next) => {
-  req.apiVersion = getApiVersion(req.headers);
+  
   next();
-});
-
-app.get('/users', (req, res) => {
-  const version = req.apiVersion;
-  res.json({ version, users: [] });
-});
-```
-
-```python
-# Version selection based on header
-def get_api_version(headers: dict, default_version: str = "v1") -> str:
-    api_version = headers.get("api-version")
-    accept = headers.get("accept", "")
-
-    # Priority: API-Version header > Accept header > default
-    if api_version:
-        return api_version
-
-    if "application/vnd.api.v2+json" in accept:
-        return "v2"
-
-    if "application/vnd.api.v3+json" in accept:
-        return "v3"
-
-    return default_version
-
-# FastAPI dependency
-from fastapi import FastAPI, Header, Depends
-
-def get_version(headers: dict = Header()) -> str:
-    return get_api_version(headers)
-
-app = FastAPI(dependencies=[get_version])
-
-@app.get("/users")
-async def get_users(version: str = Depends(get_version)):
-    return {"version": version, "users": []}
+}
 ```
 
 ---
 
 ## Deprecation Strategy
 
-### Sunset Headers
+### Deprecation Middleware
 
 ```typescript
-// Express - Sunset headers
-import express from 'express';
+// src/middleware/deprecation.middleware.ts
+import { Request, Response, NextFunction } from 'express';
 
-const app = express();
-
-app.get('/v1/users', (req, res) => {
-  res.setHeader('Sunset', 'Wed, 01 Jan 2025 00:00:00 GMT');
-  res.setHeader('Link', '<https://api.example.com/docs/migration>; rel="deprecation"; type="text/html"');
-  res.setHeader('Deprecation', 'true');
-  res.setHeader('Warning', '299 - "Deprecated API"');
-
-  res.json({
-    version: 'v1',
-    users: [],
-    deprecation: {
-      message: 'This API is deprecated. Please use v2.',
-      sunsetDate: '2025-01-01',
-      migrationGuide: 'https://api.example.com/docs/migration',
-    },
-  });
-});
-```
-
-```python
-# FastAPI - Sunset headers
-from fastapi import FastAPI, Response
-from fastapi.responses import JSONResponse
-
-app = FastAPI()
-
-@app.get("/v1/users")
-async def get_users():
-    return JSONResponse(
-        {
-            "version": "v1",
-            "users": [],
-            "deprecation": {
-                "message": "This API is deprecated. Please use v2.",
-                "sunset_date": "2025-01-01T00:00:00Z",
-                "migration_guide": "https://api.example.com/docs/migration"
-            }
-        },
-        headers={
-            "Sunset": "Wed, 01 Jan 2025 00:00:00 GMT",
-            "Link": '<https://api.example.com/docs/migration>; rel="deprecation"; type="text/html"',
-            "Deprecation": "true",
-            "Warning": '299 - "Deprecated API"'
-        }
-    )
-```
-
-### Deprecation Warning
-
-```typescript
-// Add deprecation warning to response
-interface ApiResponse<T> {
+interface DeprecationConfig {
   version: string;
-  data: T;
-  deprecation?: {
-    message: string;
-    sunsetDate: string;
-    migrationGuide: string;
-  };
+  deprecationDate: Date;
+  sunsetDate: Date;
+  recommendedVersion: string;
+  migrationGuide: string;
 }
 
-function createResponse<T>(
-  version: string,
-  data: T,
-  deprecation?: ApiResponse<T>['deprecation']
-): ApiResponse<T> {
-  const response: ApiResponse<T> = { version, data };
+const deprecationConfigs: Map<string, DeprecationConfig> = new Map([
+  ['v1', {
+    version: 'v1',
+    deprecationDate: new Date('2024-01-01'),
+    sunsetDate: new Date('2024-06-01'),
+    recommendedVersion: 'v2',
+    migrationGuide: 'https://docs.example.com/migration/v1-to-v2',
+  }],
+]);
 
-  if (deprecation) {
-    response.deprecation = deprecation;
+export function deprecationMiddleware(req: Request, res: Response, next: NextFunction) {
+  const version = req.apiVersion || 'v1';
+  const config = deprecationConfigs.get(version);
+  
+  if (config) {
+    const now = new Date();
+    
+    // Add deprecation headers
+    res.setHeader('Deprecation', `true; version="${config.version}"; date="${config.deprecationDate.toISOString()}"`);
+    res.setHeader('Sunset', config.sunsetDate.toISOString());
+    res.setHeader('Link', `<${config.migrationGuide}>; rel="deprecation"; type="text/html"`);
+    
+    // Check if version is sunset
+    if (now >= config.sunsetDate) {
+      return res.status(410).json({
+        error: 'API version sunset',
+        message: `Version ${config.version} is no longer supported`,
+        recommendedVersion: config.recommendedVersion,
+        migrationGuide: config.migrationGuide,
+      });
+    }
+    
+    // Add warning header if deprecated
+    if (now >= config.deprecationDate) {
+      res.setHeader('Warning', `299 - "Deprecated API version ${config.version}, use ${config.recommendedVersion} instead"`);
+    }
   }
-
-  return response;
+  
+  next();
 }
+```
 
-// Usage
-app.get('/v1/users', (req, res) => {
-  const users = [];
-  const response = createResponse('v1', users, {
-    message: 'This API is deprecated. Please use v2.',
-    sunsetDate: '2025-01-01T00:00:00Z',
-    migrationGuide: 'https://api.example.com/docs/migration',
-  });
+### Deprecation Response
 
-  res.json(response);
-});
+```typescript
+// src/middleware/deprecation-response.middleware.ts
+import { Request, Response, NextFunction } from 'express';
+
+export function deprecationResponseMiddleware(req: Request, res: Response, next: NextFunction) {
+  const version = req.apiVersion || 'v1';
+  
+  // Add deprecation info to response body
+  const originalJson = res.json.bind(res);
+  
+  res.json = function(data: any) {
+    if (version === 'v1') {
+      return originalJson({
+        ...data,
+        _meta: {
+          version,
+          deprecated: true,
+          sunsetDate: '2024-06-01',
+          recommendedVersion: 'v2',
+          migrationGuide: 'https://docs.example.com/migration/v1-to-v2',
+        },
+      });
+    }
+    
+    return originalJson(data);
+  };
+  
+  next();
+}
 ```
 
 ---
@@ -548,24 +498,47 @@ app.get('/v1/users', (req, res) => {
 ### Migration Documentation
 
 ```markdown
-# Migration Guide: v1 to v2
+# API Migration Guide: v1 to v2
 
-## What Changed?
+## Overview
 
-### Breaking Changes
-- `email` field renamed to `email_address`
-- `name` field now includes first and last name
-- Response format changed to include `meta` object
+API v1 will be deprecated on January 1, 2024 and sunset on June 1, 2024. This guide helps you migrate to v2.
 
-### New Features
-- Pagination support
-- Filtering support
-- Sorting support
+## Breaking Changes
 
-## Migration Steps
+### 1. Response Format
 
-### Step 1: Update Request Format
-**Old Format (v1):**
+**v1 Response:**
+```json
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com"
+}
+```
+
+**v2 Response:**
+```json
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "createdAt": "2024-01-01T00:00:00Z",
+  "updatedAt": "2024-01-01T00:00:00Z"
+}
+```
+
+### 2. Endpoint Changes
+
+| v1 Endpoint | v2 Endpoint | Notes |
+|-------------|-------------|--------|
+| GET /api/v1/users | GET /api/v2/users | Added pagination |
+| GET /api/v1/users/:id | GET /api/v2/users/:id | Added relationships |
+| POST /api/v1/users | POST /api/v2/users | Changed request body |
+
+### 3. Request Body Changes
+
+**v1 Request Body:**
 ```json
 {
   "name": "John Doe",
@@ -573,49 +546,49 @@ app.get('/v1/users', (req, res) => {
 }
 ```
 
-**New Format (v2):**
+**v2 Request Body:**
 ```json
 {
-  "first_name": "John",
-  "last_name": "Doe",
-  "email_address": "john@example.com"
-}
-```
-
-### Step 2: Update Response Handling
-**Old Response (v1):**
-```json
-{
-  "users": [...]
-}
-```
-
-**New Response (v2):**
-```json
-{
-  "version": "v2",
-  "users": [...],
-  "meta": {
-    "total": 100,
-    "page": 1,
-    "page_size": 10
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phone": "+1234567890",
+  "address": {
+    "street": "123 Main St",
+    "city": "New York",
+    "state": "NY",
+    "zipCode": "10001"
   }
 }
 ```
 
-### Step 3: Update API Endpoint
-- Change from `/v1/users` to `/v2/users`
-- Update request body format
-- Update response handling
+## Migration Steps
 
-### Step 4: Test
-- Test new endpoint with new format
-- Test backward compatibility
+1. **Update your API version header:**
+   ```javascript
+   headers: {
+     'API-Version': 'v2'
+   }
+   ```
 
-## Timeline
-- **2024-01-01**: v2 released
-- **2024-06-01**: v1 deprecated
-- **2025-01-01**: v1 sunset
+2. **Update request bodies:**
+   - Add new required fields
+   - Update field names if changed
+
+3. **Update response handling:**
+   - Handle new response fields
+   - Update data transformation logic
+
+4. **Test your integration:**
+   - Use our staging environment
+   - Test all endpoints
+   - Verify data integrity
+
+## Support
+
+If you need help with migration, contact us at:
+- Email: support@example.com
+- Documentation: https://docs.example.com
+- Migration Guide: https://docs.example.com/migration/v1-to-v2
 ```
 
 ---
@@ -625,91 +598,78 @@ app.get('/v1/users', (req, res) => {
 ### Adapter Pattern
 
 ```typescript
-// Adapter for v1 to v2
-interface V1User {
-  id: number;
-  name: string;
-  email: string;
+// src/adapters/v1-to-v2.adapter.ts
+export class V1ToV2Adapter {
+  static adaptUser(user: V1User): V2User {
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  }
+
+  static adaptUsers(users: V1User[]): V2User[] {
+    return users.map(user => this.adaptUser(user));
+  }
 }
 
-interface V2User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  emailAddress: string;
+export class V2ToV1Adapter {
+  static adaptUser(user: V2User): V1User {
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
+  }
+
+  static adaptUsers(users: V2User[]): V1User[] {
+    return users.map(user => this.adaptUser(user));
+  }
 }
-
-function v1ToV2Adapter(v1User: V1User): V2User {
-  const [firstName, lastName] = v1User.name.split(' ');
-  return {
-    id: v1User.id,
-    firstName,
-    lastName,
-    emailAddress: v1User.email,
-  };
-}
-
-// Usage
-app.get('/v1/users', (req, res) => {
-  const v1Users: V1User[] = await getV1Users();
-  const v2Users = v1Users.map(v1ToV2Adapter);
-
-  res.json({ version: 'v2', users: v2Users });
-});
 ```
 
-```python
-# Adapter for v1 to v2
-from pydantic import BaseModel
-
-class V1User(BaseModel):
-    id: int
-    name: str
-    email: str
-
-class V2User(BaseModel):
-    id: int
-    first_name: str
-    last_name: str
-    email_address: str
-
-def v1_to_v2_adapter(v1_user: V1User) -> V2User:
-    first_name, last_name = v1_user.name.split(' ', 1)
-    return V2User(
-        id=v1_user.id,
-        first_name=first_name,
-        last_name=last_name,
-        email_address=v1_user.email
-    )
-
-# Usage
-@app.get("/v1/users")
-async def get_users():
-    v1_users = await get_v1_users()
-    v2_users = [v1_to_v2_adapter(user) for user in v1_users]
-    return {"version": "v2", "users": v2_users}
-```
-
-### Version-Specific Controllers
+### Compatibility Layer
 
 ```typescript
-// Keep v1 controller for backward compatibility
-import express, { Request, Response } from 'express';
+// src/middleware/compatibility.middleware.ts
+import { Request, Response, NextFunction } from 'express';
+import { V1ToV2Adapter } from '../adapters/v1-to-v2.adapter';
 
-const v1Router = express.Router();
+export function compatibilityMiddleware(req: Request, res: Response, next: NextFunction) {
+  const version = req.apiVersion || 'v1';
+  
+  // Transform request body if needed
+  if (version === 'v1' && req.body) {
+    req.body = this.transformRequestBody(req.body);
+  }
+  
+  // Transform response if needed
+  const originalJson = res.json.bind(res);
+  
+  res.json = function(data: any) {
+    if (version === 'v1' && data) {
+      data = this.transformResponseBody(data);
+    }
+    return originalJson(data);
+  };
+  
+  next();
+}
 
-v1Router.get('/users', (req: Request, res: Response) => {
-  // v1 implementation
-  res.json({ version: 'v1', users: [] });
-});
+private transformRequestBody(body: any): any {
+  // Transform v1 request to v2 format
+  return body;
+}
 
-v1Router.post('/users', (req: Request, res: Response) => {
-  const { name, email } = req.body;
-  // v1 implementation
-  res.json({ version: 'v1', user: { id: 1, name, email } });
-});
-
-export default v1Router;
+private transformResponseBody(body: any): any {
+  // Transform v2 response to v1 format
+  if (Array.isArray(body)) {
+    return V1ToV2Adapter.adaptUsers(body);
+  }
+  return V1ToV2Adapter.adaptUser(body);
+}
 ```
 
 ---
@@ -724,140 +684,145 @@ openapi: 3.0.0
 info:
   title: My API
   version: 2.0.0
-  description: API with versioning support
-
+  description: API documentation with versioning
 servers:
-  - url: https://api.example.com/v2
-    description: v2 API (current)
   - url: https://api.example.com/v1
-    description: v1 API (deprecated)
+    description: API v1 (Deprecated)
+  - url: https://api.example.com/v2
+    description: API v2 (Current)
 
 paths:
   /users:
     get:
-      summary: Get users
-      description: Retrieve list of users
+      summary: Get all users
+      description: Retrieve a list of users
+      tags:
+        - Users
       responses:
         '200':
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UsersResponse'
-  /users/{userId}:
-    get:
-      summary: Get user by ID
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: integer
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Create a user
+      description: Create a new user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
       responses:
-        '200':
-          description: Successful response
+        '201':
+          description: User created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponse'
+                $ref: '#/components/schemas/User'
 
 components:
   schemas:
-    UserResponse:
+    User:
       type: object
       properties:
         id:
           type: integer
-        first_name:
+        name:
           type: string
-        last_name:
+        email:
           type: string
-        email_address:
+          format: email
+        createdAt:
           type: string
-    UsersResponse:
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateUser:
       type: object
+      required:
+        - name
+        - email
       properties:
-        version:
+        name:
           type: string
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserResponse'
-        meta:
-          type: object
-          properties:
-            total:
-              type: integer
-            page:
-              type: integer
-            page_size:
-              type: integer
+        email:
+          type: string
+          format: email
 ```
 
 ---
 
 ## Testing Multiple Versions
 
-### Version-Specific Tests
+### Version-Aware Tests
 
 ```typescript
-// tests/v1/users.test.ts
+// test/api/versioning.test.ts
+import { describe, it, expect } from '@jest/globals';
 import request from 'supertest';
-import { app } from '../../app';
+import app from '../src/app';
 
-describe('V1 Users API', () => {
-  it('should get users', async () => {
-    const response = await request(app)
-      .get('/v1/users')
-      .expect(200)
-      .expect('Content-Type', /json/);
+describe('API Versioning', () => {
+  describe('v1 API', () => {
+    it('should return v1 response format', async () => {
+      const response = await request(app)
+        .get('/api/v1/users')
+        .expect(200);
 
-    expect(response.body.version).toBe('v1');
-    expect(Array.isArray(response.body.users)).toBe(true);
-  });
+      expect(response.body[0]).toHaveProperty('id');
+      expect(response.body[0]).toHaveProperty('name');
+      expect(response.body[0]).toHaveProperty('email');
+      expect(response.body[0]).not.toHaveProperty('createdAt');
+    });
 
-  it('should create user', async () => {
-    const response = await request(app)
-      .post('/v1/users')
-      .send({ name: 'John Doe', email: 'john@example.com' })
-      .expect(201)
-      .expect('Content-Type', /json/);
+    it('should accept v1 request format', async () => {
+      const response = await request(app)
+        .post('/api/v1/users')
+        .send({
+          name: 'John Doe',
+          email: 'john@example.com',
+        })
+        .expect(201);
 
-    expect(response.body.version).toBe('v1');
-    expect(response.body.user.name).toBe('John Doe');
-  });
-});
-```
-
-```typescript
-// tests/v2/users.test.ts
-import request from 'supertest';
-import { app } from '../../app';
-
-describe('V2 Users API', () => {
-  it('should get users with pagination', async () => {
-    const response = await request(app)
-      .get('/v2/users?page=1&pageSize=10')
-      .expect(200)
-      .expect('Content-Type', /json/);
-
-    expect(response.body.version).toBe('v2');
-    expect(response.body.meta).toEqual({
-      total: expect.any(Number),
-      page: 1,
-      pageSize: 10,
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.name).toBe('John Doe');
     });
   });
 
-  it('should create user with new format', async () => {
-    const response = await request(app)
-      .post('/v2/users')
-      .send({ firstName: 'John', lastName: 'Doe', emailAddress: 'john@example.com' })
-      .expect(201)
-      .expect('Content-Type', /json/);
+  describe('v2 API', () => {
+    it('should return v2 response format', async () => {
+      const response = await request(app)
+        .get('/api/v2/users')
+        .expect(200);
 
-    expect(response.body.version).toBe('v2');
-    expect(response.body.user.firstName).toBe('John');
+      expect(response.body[0]).toHaveProperty('id');
+      expect(response.body[0]).toHaveProperty('name');
+      expect(response.body[0]).toHaveProperty('email');
+      expect(response.body[0]).toHaveProperty('createdAt');
+      expect(response.body[0]).toHaveProperty('updatedAt');
+    });
+
+    it('should accept v2 request format', async () => {
+      const response = await request(app)
+        .post('/api/v2/users')
+        .send({
+          name: 'John Doe',
+          email: 'john@example.com',
+          phone: '+1234567890',
+        })
+        .expect(201);
+
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.name).toBe('John Doe');
+    });
   });
 });
 ```
@@ -866,64 +831,60 @@ describe('V2 Users API', () => {
 
 ## Sunset Headers
 
-### Sunset Header Format
+### Sunset Header Implementation
 
 ```typescript
-// Sunset header format
-function setSunsetHeaders(
-  res: any,
-  sunsetDate: Date,
-  link: string,
-  deprecation: boolean = true
-): void {
-  res.setHeader('Sunset', sunsetDate.toUTCString());
-  res.setHeader('Link', `<${link}>; rel="deprecation"; type="text/html"`);
-  res.setHeader('Deprecation', deprecation.toString());
-  res.setHeader('Warning', '299 - "Deprecated API"');
+// src/middleware/sunset.middleware.ts
+import { Request, Response, NextFunction } from 'express';
+
+interface SunsetConfig {
+  version: string;
+  sunsetDate: Date;
+  recommendedVersion: string;
+  migrationGuide: string;
 }
 
-// Usage
-app.get('/v1/users', (req, res) => {
-  setSunsetHeaders(
-    res,
-    new Date('2025-01-01'),
-    'https://api.example.com/docs/migration',
-    true
-  );
+const sunsetConfigs: Map<string, SunsetConfig> = new Map([
+  ['v1', {
+    version: 'v1',
+    sunsetDate: new Date('2024-06-01'),
+    recommendedVersion: 'v2',
+    migrationGuide: 'https://docs.example.com/migration/v1-to-v2',
+  }],
+]);
 
-  res.json({ version: 'v1', users: [] });
-});
-```
-
-```python
-# Sunset header format
-from fastapi import Response
-from datetime import datetime
-
-def set_sunset_headers(
-    response: Response,
-    sunset_date: datetime,
-    link: str,
-    deprecation: bool = True
-):
-    response.headers["Sunset"] = sunset_date.strftime("%a, %d %b %Y %H:%M:%S GMT")
-    response.headers["Link"] = f'<{link}>; rel="deprecation"; type="text/html"'
-    response.headers["Deprecation"] = str(deprecation)
-    response.headers["Warning"] = '299 - "Deprecated API"'
-
-# Usage
-@app.get("/v1/users")
-async def get_users():
-    response = Response(
-        content={"version": "v1", "users": []},
-        media_type="application/json"
-    )
-    set_sunset_headers(
-        response,
-        datetime(2025, 1, 1),
-        "https://api.example.com/docs/migration"
-    )
-    return response
+export function sunsetMiddleware(req: Request, res: Response, next: NextFunction) {
+  const version = req.apiVersion || 'v1';
+  const config = sunsetConfigs.get(version);
+  
+  if (config) {
+    const now = new Date();
+    const daysUntilSunset = Math.ceil((config.sunsetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Add sunset header
+    res.setHeader('Sunset', config.sunsetDate.toISOString());
+    
+    // Add link header
+    res.setHeader('Link', `<${config.migrationGuide}>; rel="sunset"; type="text/html"`);
+    
+    // Add warning header if close to sunset
+    if (daysUntilSunset <= 30) {
+      res.setHeader('Warning', `299 - "API version ${config.version} will be sunset on ${config.sunsetDate.toISOString()}, migrate to ${config.recommendedVersion}"`);
+    }
+    
+    // Reject requests after sunset
+    if (now >= config.sunsetDate) {
+      return res.status(410).json({
+        error: 'API version sunset',
+        message: `Version ${config.version} is no longer supported`,
+        recommendedVersion: config.recommendedVersion,
+        migrationGuide: config.migrationGuide,
+      });
+    }
+  }
+  
+  next();
+}
 ```
 
 ---
@@ -933,128 +894,116 @@ async def get_users():
 ### 1. Use Semantic Versioning
 
 ```typescript
-// Use semantic versioning
-const API_VERSION = '2.0.0'; // MAJOR.MINOR.PATCH
+// Good: Semantic versioning
+const API_VERSION = '2.1.0'; // MAJOR.MINOR.PATCH
+
+// MAJOR: Incompatible API changes
+// MINOR: Backwards-compatible functionality
+// PATCH: Backwards-compatible bug fixes
+
+// Bad: Arbitrary versioning
+const API_VERSION = 'v2'; // No semantic meaning
 ```
 
-### 2. Document Changes
+### 2. Document Changes Clearly
 
 ```markdown
-# Changelog
+# Good: Clear documentation
 
-## [2.0.0] - 2024-01-01
-### Added
-- Pagination support
-- Filtering support
-- Sorting support
+## Breaking Changes
 
-### Changed
-- `email` field renamed to `email_address`
-- `name` field split into `first_name` and `last_name`
+### User Endpoint
 
-### Deprecated
-- `/v1/users` endpoint
-- Old request format
-
-### Removed
-- None
-
-### Fixed
-- Bug in user creation
+**Before (v1):**
+```json
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com"
+}
 ```
 
-### 3. Use Sunset Headers
-
-```typescript
-// Always set sunset headers for deprecated versions
-res.setHeader('Sunset', '2025-01-01T00:00:00Z');
-res.setHeader('Deprecation', 'true');
+**After (v2):**
+```json
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "createdAt": "2024-01-01T00:00:00Z",
+  "updatedAt": "2024-01-01T00:00:00Z"
+}
 ```
 
-### 4. Provide Migration Guides
+**Migration:** Update your code to handle the new `createdAt` and `updatedAt` fields.
 
-```typescript
-// Link to migration guide
-res.setHeader('Link', '<https://api.example.com/docs/migration>; rel="deprecation"; type="text/html"');
+# Bad: No documentation
 ```
 
-### 5. Test Multiple Versions
+### 3. Provide Deprecation Warnings
 
 ```typescript
-// Test both v1 and v2
-describe('API Versioning', () => {
-  describe('V1', () => {
-    // v1 tests
-  });
+// Good: Deprecation warnings
+res.setHeader('Deprecation', 'true; version="v1"; date="2024-01-01"');
+res.setHeader('Sunset', '2024-06-01');
+res.setHeader('Warning', '299 - "Deprecated API version v1, use v2 instead"');
 
-  describe('V2', () => {
-    // v2 tests
-  });
-});
+// Bad: No warnings
+// No headers
 ```
 
-### 6. Use Version in Response
+### 4. Maintain Backward Compatibility
 
 ```typescript
-// Always include version in response
-res.json({
-  version: 'v2',
-  data: {},
-});
-```
-
-### 7. Support Multiple Versions
-
-```typescript
-// Keep old versions for backward compatibility
-app.use('/v1', v1Router);
-app.use('/v2', v2Router);
-app.use('/v3', v3Router);
-```
-
-### 8. Monitor Version Usage
-
-```typescript
-// Track which versions are being used
-app.use((req, res, next) => {
-  const version = req.apiVersion;
-  metrics.record('api_version_usage', 1, { version });
-  next();
-});
-```
-
-### 9. Communicate Changes Early
-
-```typescript
-// Communicate changes early
-res.setHeader('Deprecation', 'true');
-res.setHeader('Warning', '299 - "This API will be deprecated on 2025-01-01"');
-```
-
-### 10. Use Version-Specific Errors
-
-```typescript
-// Version-specific error codes
-class ApiVersionError extends Error {
-  constructor(
-    public version: string,
-    public code: string,
-    public message: string
-  ) {
-    super(message);
-    this.name = 'ApiVersionError';
-  }
+// Good: Backward compatibility
+if (version === 'v1') {
+  return v1Response;
+} else if (version === 'v2') {
+  return v2Response;
 }
 
-// Usage
-throw new ApiVersionError('v1', 'DEPRECATED', 'This API is deprecated');
+// Bad: Breaking changes without notice
+// Only v2 response, v1 clients break
+```
+
+### 5. Test All Versions
+
+```typescript
+// Good: Test all versions
+describe('API Versioning', () => {
+  describe('v1 API', () => {
+    it('should work correctly', async () => {
+      // Test v1
+    });
+  });
+
+  describe('v2 API', () => {
+    it('should work correctly', async () => {
+      // Test v2
+    });
+  });
+});
+
+// Bad: Only test latest version
+describe('API', () => {
+  it('should work correctly', async () => {
+    // Only test v2
+  });
+});
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [API Versioning Best Practices](https://restfulapi.net/versioning/)
-- [HTTP API Versioning](https://www.vinaysahni.com/api-versioning/)
-- [OpenAPI Specification](https://swagger.io/specification/)
-- [REST API Design](https://restfulapi.net/)
+This skill covers comprehensive API versioning patterns including:
+
+- **Versioning Approaches**: URL path, header, query parameter versioning
+- **Implementation Patterns**: Versioned controllers, versioned services
+- **Version Negotiation**: Content negotiation, version routing
+- **Deprecation Strategy**: Deprecation middleware, deprecation responses
+- **Migration Guides**: Documentation, breaking changes, migration steps
+- **Backward Compatibility**: Adapter pattern, compatibility layer
+- **Documentation**: OpenAPI specification
+- **Testing Multiple Versions**: Version-aware tests
+- **Sunset Headers**: Sunset header implementation
+- **Best Practices**: Semantic versioning, clear documentation, deprecation warnings, backward compatibility, testing

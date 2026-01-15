@@ -1,6 +1,8 @@
 # Secrets Management
 
-A comprehensive guide to secrets management patterns for secure application deployment.
+## Overview
+
+Secrets management is critical for securing sensitive data like passwords, API keys, and certificates. This skill covers tools, patterns, and best practices.
 
 ## Table of Contents
 
@@ -19,35 +21,36 @@ A comprehensive guide to secrets management patterns for secure application depl
 
 ## Secrets Management Principles
 
-### Why Secrets Management Matters
-
-```
-Without Proper Secrets Management:
-- Secrets in code → exposed in Git history
-- Secrets in environment → accessible to all
-- Secrets in config files → accidentally committed
-- No rotation → compromised credentials stay active
-- No audit → can't track who accessed what
-
-With Proper Secrets Management:
-- Secrets encrypted at rest
-- Secrets encrypted in transit
-- Fine-grained access control
-- Automatic rotation
-- Complete audit trail
-```
-
 ### Core Principles
 
-| Principle | Description |
-|-----------|-------------|
-| **Least Privilege** | Only grant necessary access |
-| **Encryption** | Encrypt at rest and in transit |
-| **Rotation** | Regularly rotate secrets |
-| **Audit** | Log all secret access |
-| **Isolation** | Separate secrets by environment |
-| **Versioning** | Track secret versions |
-| **Revocation** | Ability to revoke secrets |
+1. **Never commit secrets to version control**
+2. **Use environment-specific secrets**
+3. **Rotate secrets regularly**
+4. **Use least privilege access**
+5. **Audit secret access**
+6. **Encrypt secrets at rest**
+7. **Use secure secret storage**
+8. **Implement secret rotation**
+
+### Security Hierarchy
+
+```
+┌─────────────────────────────────────┐
+│   Application Secrets             │
+│   (Database URLs, API Keys)       │
+└──────────┬──────────────────────┘
+           │
+           ↓
+┌─────────────────────────────────────┐
+│   Secret Management Service       │
+│   (Vault, Secrets Manager, etc.)   │
+└──────────┬──────────────────────┘
+           │
+           ↓
+┌─────────────────────────────────────┐
+│   Encryption & Access Control    │
+└─────────────────────────────────────┘
+```
 
 ---
 
@@ -55,161 +58,210 @@ With Proper Secrets Management:
 
 ### HashiCorp Vault
 
-```hcl
-# Vault configuration
-storage "file" {
-  path = "./vault/data"
-}
+#### Docker Compose
 
-listener "tcp" {
-  address     = "0.0.0.0:8200"
-  tls_cert_file = "/etc/vault/tls.crt"
-  tls_key_file  = "/etc/vault/tls.key"
-}
+```yaml
+# docker-compose.yml
+version: '3.8'
 
-ui = true
+services:
+  vault:
+    image: hashicorp/vault:latest
+    container_name: vault
+    ports:
+      - "8200:8200"
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=my-root-token
+      - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - vault_data:/vault/data
+    command: server -dev
+    networks:
+      - vault
+
+networks:
+  vault:
+    driver: bridge
+
+volumes:
+  vault_data:
 ```
 
-```bash
-# Start Vault
-vault server -config=vault.hcl
+#### Terraform
 
-# Initialize Vault
-vault operator init
+```hcl
+# vault.tf
+resource "aws_kms_key" "vault" {
+  description = "KMS key for Vault encryption"
+  enable_key_rotation = true
+}
 
-# Unseal Vault
-vault operator unseal <key1>
-vault operator unseal <key2>
-vault operator unseal <key3>
+resource "aws_iam_role" "vault" {
+  name = "vault-server"
 
-# Login
-vault login <root-token>
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:GenerateDataKey"
+        ]
+        Effect = "Allow"
+        Resource = aws_kms_key.vault.arn
+      }
+    ]
+  })
+}
 
-# Enable KV secrets engine
-vault secrets enable -path=secret kv
+resource "aws_instance" "vault" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.medium"
+  key_name      = aws_key_pair.vault.key_name
+  subnet_id     = module.vpc.private_subnet_ids[0]
+  vpc_security_group_ids = [module.vpc.security_group_id]
 
-# Write secret
-vault kv put secret/myapp database_url="postgresql://user:pass@localhost:5432/db"
+  user_data = filebase64("${path.module}/vault-init.sh")
 
-# Read secret
-vault kv get secret/myapp
-
-# Delete secret
-vault kv delete secret/myapp
+  tags = {
+    Name = "vault-server"
+  }
+}
 ```
 
 ### AWS Secrets Manager
 
+#### Terraform
+
+```hcl
+# secrets-manager.tf
+resource "aws_secretsmanager_secret" "database" {
+  name = "prod/database/url"
+
+  secret_string = jsonencode({
+    host     = "db.example.com"
+    port     = 5432
+    username = "admin"
+    password = "secretpassword"
+    database = "myapp"
+  })
+
+  tags = {
+    Environment = "production"
+    Application = "myapp"
+  }
+}
+
+resource "aws_secretsmanager_secret" "api" {
+  name = "prod/api/key"
+
+  secret_string = "my-api-key-12345"
+
+  tags = {
+    Environment = "production"
+    Application = "myapp"
+  }
+}
+```
+
+#### AWS CLI
+
 ```bash
 # Create secret
 aws secretsmanager create-secret \
-  --name myapp/database \
-  --secret-string '{"username":"admin","password":"secret"}'
+  --name prod/database/url \
+  --secret-string '{"host":"db.example.com","port":5432,"username":"admin","password":"secretpassword","database":"myapp"}'
 
 # Get secret
 aws secretsmanager get-secret-value \
-  --secret-id myapp/database
+  --secret-id prod/database/url \
+  --query SecretString \
+  --output text
 
 # Update secret
 aws secretsmanager put-secret-value \
-  --secret-id myapp/database \
-  --secret-string '{"username":"admin","password":"newsecret"}'
+  --secret-id prod/database/url \
+  --secret-string '{"host":"db.example.com","port":5432,"username":"admin","password":"newpassword","database":"myapp"}'
 
 # Delete secret
 aws secretsmanager delete-secret \
-  --secret-id myapp/database \
-  --force-delete-without-recovery
-```
-
-```python
-# Python integration
-import boto3
-
-client = boto3.client('secretsmanager')
-
-# Get secret
-response = client.get_secret_value(SecretId='myapp/database')
-secret = json.loads(response['SecretString'])
-
-# Use secret
-database_url = f"postgresql://{secret['username']}:{secret['password']}@localhost:5432/db"
-```
-
-```typescript
-// TypeScript integration
-import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-
-const client = new SecretsManagerClient({ region: 'us-east-1' });
-
-async function getSecret(secretId: string) {
-  const command = new GetSecretValueCommand({ SecretId: secretId });
-  const response = await client.send(command);
-  return JSON.parse(response.SecretString!);
-}
-
-// Use secret
-const secret = await getSecret('myapp/database');
-const databaseUrl = `postgresql://${secret.username}:${secret.password}@localhost:5432/db`;
+  --secret-id prod/database/url
 ```
 
 ### Kubernetes Secrets
 
+#### Create Secret
+
 ```yaml
-# Create secret from literal
+# secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
   name: myapp-secret
+  namespace: production
 type: Opaque
-data:
-  database_url: cG9zdGdyZXNxbDovL3VzZXI6cGFzc0Bsb2NhbGhvc3Q6NTQzMi9kYg==
-  api_key: YXBpLWtleS12YWx1ZQ==
+stringData:
+  database-url: postgresql://user:password@db:5432/mydb
+  api-key: my-api-key-12345
 ```
 
 ```bash
-# Create secret from file
+# Create from file
 kubectl create secret generic myapp-secret \
-  --from-file=database_url=./database_url.txt \
-  --from-file=api_key=./api_key.txt
+  --from-env-file=.env.production \
+  --namespace=production
 
-# Create secret from env file
+# Create from literal
 kubectl create secret generic myapp-secret \
-  --from-env-file=.env
-
-# Get secret
-kubectl get secret myapp-secret -o jsonpath='{.data}'
-
-# Decode secret
-kubectl get secret myapp-secret -o jsonpath='{.data.database_url}' | base64 -d
-
-# Delete secret
-kubectl delete secret myapp-secret
+  --from-literal=database-url=postgresql://user:password@db:5432/mydb \
+  --namespace=production
 ```
 
+#### Use Secret in Pod
+
 ```yaml
-# Use secret in pod
+# pod.yaml
 apiVersion: v1
 kind: Pod
 metadata:
   name: myapp-pod
+  namespace: production
 spec:
   containers:
-  - name: myapp
-    image: myapp:latest
-    env:
-    - name: DATABASE_URL
-      valueFrom:
-        secretKeyRef:
-          name: myapp-secret
-          key: database_url
-    - name: API_KEY
-      valueFrom:
-        secretKeyRef:
-          name: myapp-secret
-          key: api_key
+    - name: myapp
+      image: myapp:latest
+      env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: myapp-secret
+              key: database-url
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: myapp-secret
+              key: api-key
 ```
 
 ### Docker Secrets
+
+#### Create Secret
+
+```bash
+# Create secret
+echo "my-secret-password" | docker secret create myapp-secret -
+
+# Create from file
+docker secret create myapp-secret ./secret.txt
+
+# Create from environment
+docker secret create myapp-secret --env-file=.env
+```
+
+#### Use Secret in Compose
 
 ```yaml
 # docker-compose.yml
@@ -224,149 +276,183 @@ services:
 
 secrets:
   database_url:
-    file: ./secrets/database_url.txt
+    file: ./database_url.txt
   api_key:
-    file: ./secrets/api_key.txt
-```
-
-```bash
-# Create secret
-echo "postgresql://user:pass@localhost:5432/db" | docker secret create database_url -
-
-# Use secret in Dockerfile
-# Not directly accessible, use Docker Compose
+    external: true
 ```
 
 ---
 
 ## .env Files (Development)
 
-### Basic .env File
+### Node.js
+
+```javascript
+// config.js
+require('dotenv').config();
+
+module.exports = {
+  database: {
+    url: process.env.DATABASE_URL,
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT || '5432'),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+  },
+  api: {
+    key: process.env.API_KEY,
+    secret: process.env.API_SECRET,
+  },
+};
+```
 
 ```bash
 # .env
-NODE_ENV=development
-PORT=3000
-DATABASE_URL=postgresql://user:pass@localhost:5432/db
-API_KEY=dev-api-key
-SECRET_KEY=dev-secret-key
+DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=user
+DB_PASSWORD=password
+DB_NAME=mydb
+
+API_KEY=my-api-key-12345
+API_SECRET=my-api-secret-67890
 ```
 
-### Multiple Environment Files
+```javascript
+// .env.example
+DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=user
+DB_PASSWORD=password
+DB_NAME=mydb
 
-```bash
-# .env.development
-NODE_ENV=development
-DATABASE_URL=postgresql://dev:devpass@localhost:5432/devdb
-API_KEY=dev-api-key
-
-# .env.staging
-NODE_ENV=staging
-DATABASE_URL=postgresql://staging:stagepass@staging-db:5432/stagedb
-API_KEY=staging-api-key
-
-# .env.production
-NODE_ENV=production
-# DATABASE_URL and API_KEY loaded from secrets manager
+API_KEY=your-api-key-here
+API_SECRET=your-api-secret-here
 ```
 
-### .env Usage (Node.js)
-
-```typescript
-// Install dotenv
-// npm install dotenv
-
-import dotenv from 'dotenv';
-
-// Load .env file
-dotenv.config();
-
-// Access environment variables
-const databaseUrl = process.env.DATABASE_URL;
-const apiKey = process.env.API_KEY;
-```
-
-### .env Usage (Python)
+### Python
 
 ```python
-# Install python-dotenv
-# pip install python-dotenv
-
-from dotenv import load_dotenv
+# config.py
 import os
+from dotenv import load_dotenv
 
-# Load .env file
 load_dotenv()
 
-# Access environment variables
-database_url = os.getenv('DATABASE_URL')
-api_key = os.getenv('API_KEY')
+class Config:
+    DATABASE_URL = os.getenv('DATABASE_URL')
+    DB_HOST = os.getenv('DB_HOST', 'localhost')
+    DB_PORT = int(os.getenv('DB_PORT', '5432'))
+    DB_USERNAME = os.getenv('DB_USERNAME')
+    DB_PASSWORD = os.getenv('DB_PASSWORD')
+    DB_NAME = os.getenv('DB_NAME')
+    
+    API_KEY = os.getenv('API_KEY')
+    API_SECRET = os.getenv('API_SECRET')
+
+config = Config()
+```
+
+```bash
+# .env
+DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=user
+DB_PASSWORD=password
+DB_NAME=mydb
+
+API_KEY=my-api-key-12345
+API_SECRET=my-api-secret-67890
+```
+
+```bash
+# .env.example
+DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=user
+DB_PASSWORD=password
+DB_NAME=mydb
+
+API_KEY=your-api-key-here
+API_SECRET=your-api-secret-here
 ```
 
 ---
 
 ## Secrets Rotation
 
-### Manual Rotation
+### Vault Rotation
 
 ```bash
-# AWS Secrets Manager rotation
-aws secretsmanager rotate-secret \
-  --secret-id myapp/database \
-  --rotation-lambda-arn arn:aws:lambda:us-east-1:123456789012:function:rotate-db-secret
+# Enable rotation
+vault secrets enable -path=database database
+
+vault write database/config/myapp \
+  plugin_name=postgresql-database-plugin \
+  allowed_roles="myapp-role" \
+  connection_url="postgresql://user:pass@db:5432/mydb"
+
+vault write database/roles/myapp-role \
+  db_name=myapp \
+  creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}';" \
+  default_ttl="1h" \
+  max_ttl="24h" \
+  rotation_statements="ALTER ROLE \"{{name}}\" WITH PASSWORD '{{password}}';"
+
+# Rotate credentials
+vault write -f database/rotate-credentials/myapp-role
 ```
 
-### Automatic Rotation (Lambda)
+### AWS Secrets Manager Rotation
 
-```python
-# Lambda function for rotating database credentials
-import boto3
-import json
-import psycopg2
+```hcl
+# rotation.tf
+resource "aws_secretsmanager_secret" "database" {
+  name = "prod/database/credentials"
 
-def lambda_handler(event, context):
-    secret_id = event['SecretId']
-    step = event['Step']
+  secret_string = jsonencode({
+    host     = "db.example.com"
+    port     = 5432
+    username = "admin"
+    password = "secretpassword"
+    database = "myapp"
+  })
 
-    client = boto3.client('secretsmanager')
+  tags = {
+    Environment = "production"
+    Application = "myapp"
+  }
+}
 
-    if step == 'createSecret':
-        # Create new secret
-        new_password = generate_password()
-        client.put_secret_value(
-            SecretId=secret_id,
-            SecretString=json.dumps({
-                'username': 'admin',
-                'password': new_password
-            })
-        )
-    elif step == 'setSecret':
-        # Update database password
-        secret = client.get_secret_value(SecretId=secret_id)
-        creds = json.loads(secret['SecretString'])
-        update_database_password(creds['username'], creds['password'])
+resource "aws_secretsmanager_secret_rotation" "database" {
+  secret_id           = aws_secretsmanager_secret.database.id
+  rotation_lambda_arn = aws_lambda_function.rotation.arn
 
-    return {'Status': 'Success'}
-```
+  rotation_rules {
+    automatically_after_days = 90
+  }
+}
 
-### Kubernetes Secret Rotation
+resource "aws_lambda_function" "rotation" {
+  function_name = "secrets-rotation"
+  runtime       = "python3.9"
+  handler       = "lambda_function.lambda_handler"
+  role          = aws_iam_role.lambda.arn
 
-```yaml
-# Create new secret version
-apiVersion: v1
-kind: Secret
-metadata:
-  name: myapp-secret-v2
-type: Opaque
-data:
-  database_url: cG9zdGdyZXNxbDovL3VzZXI6bmV3cGFzc0Bsb2NhbGhvc3Q6NTQzMi9kYg==
-```
+  environment {
+    SECRET_ID = aws_secretsmanager_secret.database.id
+  }
 
-```bash
-# Update deployment to use new secret
-kubectl set env deployment/myapp \
-  --from=secret/myapp-secret-v2 \
-  --prefix=DATABASE_URL
+  s3_bucket = aws_s3_bucket.lambda_bucket.id
+  s3_key    = "secrets-rotation.zip"
+
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+}
 ```
 
 ---
@@ -376,69 +462,85 @@ kubectl set env deployment/myapp \
 ### Vault Policies
 
 ```hcl
-# policy.hcl
-path "secret/myapp/*" {
-  capabilities = ["create", "read", "update", "delete", "list"]
+# vault-policy.hcl
+path "database/creds/myapp" {
+  capabilities = ["read"]
 }
 
-path "secret/myapp/production/*" {
-  capabilities = ["read"]
+path "database/rotate/myapp" {
+  capabilities = ["update"]
+}
+
+path "sys/leases/renew/database/creds/myapp" {
+  capabilities = ["update"]
 }
 ```
 
 ```bash
 # Create policy
-vault policy write myapp-policy -policy=policy.hcl
+vault policy write myapp-policy vault-policy.hcl
 
-# Create token with policy
-vault token create -policy=myapp-policy
+# Create role with policy
+vault write auth/approle/role/myapp \
+  policies=myapp-policy \
+  token_ttl=1h \
+  token_max_ttl=24h
 ```
 
 ### AWS IAM Policies
 
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "secretsmanager:GetSecretValue",
-        "secretsmanager:DescribeSecret"
-      ],
-      "Resource": "arn:aws:secretsmanager:us-east-1:123456789012:secret:myapp/*"
-    }
-  ]
+```hcl
+# iam.tf
+resource "aws_iam_role" "secrets_reader" {
+  name = "secrets-reader"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Resource = "arn:aws:secretsmanager:us-east-1:123456789012:secret:prod/*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "secrets_reader" {
+  role       = aws_iam_role.secrets_reader.name
+  policy_arn = "arn:aws:iam::aws:policy/SecretsReader"
 }
 ```
 
 ### Kubernetes RBAC
 
 ```yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: myapp-sa
----
+# rbac.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: secret-reader
+  namespace: production
 rules:
-- apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: read-secrets
+  name: secret-reader-binding
+  namespace: production
 subjects:
-- kind: ServiceAccount
-  name: myapp-sa
+  - kind: ServiceAccount
+    name: myapp-sa
 roleRef:
   kind: Role
   name: secret-reader
+  apiGroup: rbac.authorization.k8s.io
 ```
 
 ---
@@ -447,44 +549,45 @@ roleRef:
 
 ### Vault Encryption
 
-```hcl
-# Enable transit secrets engine
+```bash
+# Enable transit engine
 vault secrets enable transit
 
 # Create encryption key
-vault write -f transit/keys/myapp-key
+vault write -f transit/keys/myapp-key \
+  type=aes256-gcm96 \
+  convergent_encryption=true
 
 # Encrypt data
 vault write transit/encrypt/myapp-key \
-  plaintext=$(base64 <<< "my secret data")
+  plaintext=$(echo -n "my-secret-data" | base64)
 
 # Decrypt data
 vault write transit/decrypt/myapp-key \
-  ciphertext=<ciphertext>
+  ciphertext=<encrypted-text>
 ```
 
-### AWS KMS
+### AWS KMS Encryption
 
 ```bash
 # Create KMS key
 aws kms create-key \
-  --description "MyApp encryption key" \
-  --key-usage ENCRYPT_DECRYPT
+  --description "Encryption key for myapp" \
+  --key-usage ENCRYPT_DECRYPT \
+  --origin AWS_KMS
 
 # Encrypt data
 aws kms encrypt \
   --key-id <key-id> \
-  --plaintext fileb://secret.txt \
+  --plaintext fileb://<(echo -n "my-secret-data") \
   --output text \
-  --query CiphertextBlob \
-  --output text > encrypted.txt
+  --query CiphertextBlob
 
 # Decrypt data
 aws kms decrypt \
-  --ciphertext-blob fileb://encrypted.txt \
+  --ciphertext-fileb://<(echo -n "<encrypted-data>") \
   --output text \
-  --query Plaintext \
-  --output text | base64 --decode
+  --query Plaintext
 ```
 
 ---
@@ -494,84 +597,170 @@ aws kms decrypt \
 ### Node.js with Vault
 
 ```typescript
+// vault-client.ts
 import { Vault } from 'node-vault';
 
 const vault = new Vault({
-  endpoint: 'http://vault:8200',
+  endpoint: process.env.VAULT_ADDR || 'http://localhost:8200',
   token: process.env.VAULT_TOKEN,
 });
 
-async function getSecret(path: string) {
+async function getSecret(path: string): Promise<any> {
   const result = await vault.read(path);
-  return result.data.data;
+  return result.data;
+}
+
+async function getDatabaseCredentials(): Promise<{
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  database: string;
+}> {
+  const creds = await getSecret('database/creds/myapp');
+  return creds;
 }
 
 // Usage
-const secret = await getSecret('secret/data/myapp');
-const databaseUrl = secret.database_url;
+const dbCreds = await getDatabaseCredentials();
+console.log('Database credentials:', dbCreds);
 ```
 
 ### Python with Vault
 
 ```python
+# vault_client.py
 import hvac
+import os
 
-client = hvac.Client(
-    url='http://vault:8200',
-    token=os.getenv('VAULT_TOKEN')
-)
-
-def get_secret(path):
-    response = client.secrets.kv.v2.read_secret_version(path=path)
-    return response['data']['data']
+class VaultClient:
+    def __init__(self):
+        self.client = hvac.Client(
+            url=os.getenv('VAULT_ADDR', 'http://localhost:8200'),
+            token=os.getenv('VAULT_TOKEN')
+        )
+    
+    def get_secret(self, path: str) -> dict:
+        """Get secret from Vault."""
+        response = self.client.secrets.kv.v1.read_secret_version(
+            path=path,
+            raise_exception_on_deleted_version=False
+        )
+        return response['data']['data']
+    
+    def get_database_credentials(self) -> dict:
+        """Get database credentials from Vault."""
+        return self.get_secret('database/creds/myapp')
 
 # Usage
-secret = get_secret('secret/data/myapp')
-database_url = secret['database_url']
+vault = VaultClient()
+creds = vault.get_database_credentials()
+print(f"Database credentials: {creds}")
 ```
 
 ### Node.js with AWS Secrets Manager
 
 ```typescript
-import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
+// secrets-manager.ts
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from '@aws-sdk/client-secrets-manager';
 
 const client = new SecretsManagerClient({ region: 'us-east-1' });
 
-async function getSecret(secretId: string) {
-  const command = new GetSecretValueCommand({ SecretId: secretId });
+async function getSecret(secretId: string): Promise<string> {
+  const command = new GetSecretValueCommand({
+    SecretId: secretId,
+  });
+
   const response = await client.send(command);
-  return JSON.parse(response.SecretString!);
+  return response.SecretString || '';
+}
+
+async function getDatabaseUrl(): Promise<string> {
+  const secret = await getSecret('prod/database/url');
+  const dbConfig = JSON.parse(secret);
+  return dbConfig.url;
 }
 
 // Usage
-const secret = await getSecret('myapp/database');
-const databaseUrl = `postgresql://${secret.username}:${secret.password}@localhost:5432/db`;
+const dbUrl = await getDatabaseUrl();
+console.log('Database URL:', dbUrl);
 ```
 
 ### Python with AWS Secrets Manager
 
 ```python
+# secrets_manager.py
 import boto3
+import os
 import json
 
-client = boto3.client('secretsmanager')
-
-def get_secret(secret_id):
-    response = client.get_secret_value(SecretId=secret_id)
-    return json.loads(response['SecretString'])
+class SecretsManagerClient:
+    def __init__(self, region='us-east-1'):
+        self.client = boto3.client('secretsmanager', region_name=region)
+    
+    def get_secret(self, secret_id: str) -> str:
+        """Get secret from AWS Secrets Manager."""
+        response = self.client.get_secret_value(
+            SecretId=secret_id
+        )
+        return response['SecretString']
+    
+    def get_database_url(self) -> str:
+        """Get database URL from AWS Secrets Manager."""
+        secret = self.get_secret('prod/database/url')
+        db_config = json.loads(secret)
+        return db_config['url']
 
 # Usage
-secret = get_secret('myapp/database')
-database_url = f"postgresql://{secret['username']}:{secret['password']}@localhost:5432/db"
+client = SecretsManagerClient()
+db_url = client.get_database_url()
+print(f"Database URL: {db_url}")
 ```
 
 ---
 
 ## CI/CD Integration
 
-### GitHub Actions with Secrets
+### GitHub Actions with Vault
 
 ```yaml
+# .github/workflows/ci.yml
+name: CI
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Vault CLI
+        run: |
+          wget -O- https://releases.hashicorp.com/vault/${{ vault_version }}/vault_${{ vault_version }}_linux_amd64.zip
+          unzip vault_${{ vault_version }}_linux_amd64.zip
+          sudo mv vault /usr/local/bin/
+
+      - name: Get Vault token
+        id: vault-token
+        run: |
+          echo "VAULT_TOKEN=$(vault token create -role=github-actions -ttl=1h)" >> $GITHUB_OUTPUT
+
+      - name: Get secrets
+        env:
+          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+          VAULT_TOKEN: ${{ steps.vault-token.outputs.VAULT_TOKEN }}
+        run: |
+          vault kv get -field=database_url database/creds/myapp
+```
+
+### GitHub Actions with AWS Secrets
+
+```yaml
+# .github/workflows/deploy.yml
 name: Deploy
 
 on:
@@ -582,67 +771,62 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
-      - name: Get secret from AWS Secrets Manager
-        id: secret
+      - name: Get secrets
+        id: secrets
         run: |
-          SECRET=$(aws secretsmanager get-secret-value \
-            --secret-id myapp/database \
-            --query SecretString \
-            --output text)
-          echo "secret=$SECRET" >> $GITHUB_OUTPUT
+          echo "DATABASE_URL=$(aws secretsmanager get-secret-value --secret-id prod/database/url --query SecretString --output text)" >> $GITHUB_OUTPUT
 
       - name: Deploy
         env:
-          DATABASE_URL: ${{ steps.secret.outputs.secret }}
-        run: |
-          # Deployment commands
+          DATABASE_URL: ${{ steps.secrets.outputs.DATABASE_URL }}
+        run: npm run deploy
 ```
 
-### GitLab CI with Secrets
+### Terraform with Vault
 
-```yaml
-deploy:
-  stage: deploy
-  script:
-    - apk add --no-cache aws-cli
-    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-    - aws configure set region us-east-1
-    - SECRET=$(aws secretsmanager get-secret-value --secret-id myapp/database --query SecretString --output text)
-    - export DATABASE_URL=$SECRET
-    - npm run deploy
-  only:
-    - main
-```
-
-### Jenkins with Secrets
-
-```groovy
-pipeline {
-  agent any
-
-  environment {
-    DATABASE_URL = credentials('myapp-database-url')
-    API_KEY = credentials('myapp-api-key')
+```hcl
+# terraform.tf
+terraform {
+  backend "s3" {
+    bucket = "my-terraform-state"
+    key    = "vault/terraform.tfstate"
+    region = "us-east-1"
+    encrypt = true
   }
+}
 
-  stages {
-    stage('Deploy') {
-      steps {
-        sh 'npm run deploy'
-      }
-    }
-  }
+provider "vault" {
+  address = var.vault_addr
+  token   = var.vault_token
+}
+
+variable "vault_addr" {
+  description = "Vault address"
+  type        = string
+  default     = "http://localhost:8200"
+}
+
+variable "vault_token" {
+  description = "Vault token"
+  type        = string
+  sensitive   = true
+}
+
+data "vault_generic_secret" "database" {
+  path = "database/creds/myapp"
+}
+
+output "database_url" {
+  value     = data.vault_generic_secret.database.data["url"]
+  sensitive = true
 }
 ```
 
@@ -650,43 +834,58 @@ pipeline {
 
 ## Audit Logging
 
-### Vault Audit Logging
+### Vault Audit
 
-```hcl
+```bash
 # Enable audit logging
-vault audit enable file file_path=/vault/logs/audit.log
+vault audit enable file file_path=/var/log/vault_audit.log
 
 # View audit logs
-cat /vault/logs/audit.log
+tail -f /var/log/vault_audit.log
 ```
 
 ### AWS CloudTrail
 
-```bash
-# Create trail
-aws cloudtrail create-trail \
-  --name myapp-trail \
-  --s3-bucket-name myapp-logs-bucket
+```hcl
+# cloudtrail.tf
+resource "aws_cloudtrail" "vault" {
+  name                          = "vault-audit-trail"
+  s3_bucket_name               = aws_s3_bucket.cloudtrail.id
+  include_global_service_events = true
 
-# Enable logging
-aws cloudtrail start-logging \
-  --name myapp-trail
+  event_selector {
+    read_write_type           = "All"
+    include_management_events = false
+    data_resource {
+      type = "AWS::SecretsManager::Secret"
+    }
+  }
 
-# View logs
-aws logs tail /aws/cloudtrail/myapp-trail
-```
+  tags = {
+    Name = "vault-audit-trail"
+  }
+}
 
-### Kubernetes Audit Logging
+resource "aws_s3_bucket" "cloudtrail" {
+  bucket = "my-vault-cloudtrail-bucket"
+  acl    = "private"
 
-```yaml
-# Enable audit logging in API server
-apiVersion: audit.k8s.io/v1
-kind: Policy
-rules:
-- level: RequestResponse
-  resources:
-  - group: ""
-    resources: ["secrets"]
+  versioning {
+    enabled = true
+  }
+
+  lifecycle_rule {
+    id      = "expire"
+    enabled = true
+    noncurrent_version_expiration {
+      days = 90
+    }
+  }
+
+  tags = {
+    Name = "vault-cloudtrail-bucket"
+  }
+}
 ```
 
 ---
@@ -695,7 +894,7 @@ rules:
 
 ### 1. Never Commit Secrets
 
-```gitignore
+```bash
 # .gitignore
 .env
 .env.local
@@ -708,108 +907,65 @@ secrets/
 ### 2. Use Environment-Specific Secrets
 
 ```bash
-# .env.development
-DATABASE_URL=postgresql://dev:devpass@localhost:5432/devdb
+# Development
+.env.development
 
-# .env.production
-# Load from secrets manager
+# Staging
+.env.staging
+
+# Production
+.env.production
 ```
 
 ### 3. Rotate Secrets Regularly
 
 ```bash
-# Set up automatic rotation
-aws secretsmanager rotate-secret \
-  --secret-id myapp/database \
-  --rotation-lambda-arn arn:aws:lambda:us-east-1:123456789012:function:rotate-db-secret
+# Rotate database credentials every 90 days
+# Rotate API keys every 30 days
+# Rotate certificates before expiration
 ```
 
 ### 4. Use Least Privilege
 
-```json
-{
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "secretsmanager:GetSecretValue"
-      ],
-      "Resource": "arn:aws:secretsmanager:us-east-1:123456789012:secret:myapp/*"
-    }
-  ]
+```hcl
+# Grant only necessary permissions
+resource "aws_iam_role" "database_reader" {
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Resource = "arn:aws:secretsmanager:us-east-1:123456789012:secret:prod/database/*"
+      }
+    ]
+  })
 }
 ```
 
-### 5. Encrypt Secrets at Rest
+### 5. Audit Secret Access
 
 ```bash
-# Use encryption
-aws kms encrypt \
-  --key-id <key-id> \
-  --plaintext fileb://secret.txt
-```
-
-### 6. Use Secret Scanning
-
-```bash
-# Install gitleaks
-brew install gitleaks
-
-# Scan repository
-gitleaks detect --source .
-```
-
-### 7. Use Secret Injection
-
-```yaml
-# Inject secrets at runtime
-apiVersion: v1
-kind: Pod
-spec:
-  containers:
-  - name: myapp
-    envFrom:
-    - secretRef:
-        name: myapp-secret
-```
-
-### 8. Use Temporary Credentials
-
-```python
-# Use temporary credentials
-sts_client = boto3.client('sts')
-response = sts_client.assume_role(
-    RoleArn='arn:aws:iam::123456789012:role/MyAppRole',
-    RoleSessionName='MyAppSession'
-)
-
-credentials = response['Credentials']
-```
-
-### 9. Monitor Secret Access
-
-```bash
-# Enable CloudTrail
-aws cloudtrail create-trail \
-  --name myapp-trail \
-  --s3-bucket-name myapp-logs-bucket
-```
-
-### 10. Have a Revocation Plan
-
-```bash
-# Quick revocation
-aws secretsmanager delete-secret \
-  --secret-id myapp/database \
-  --force-delete-without-recovery
+# Enable audit logging
+# Review audit logs regularly
+# Alert on suspicious activity
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [HashiCorp Vault Documentation](https://www.vaultproject.io/docs)
-- [AWS Secrets Manager](https://docs.aws.amazon.com/secretsmanager/)
-- [Kubernetes Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)
-- [Docker Secrets](https://docs.docker.com/engine/swarm/secrets/)
-- [Gitleaks](https://github.com/zricethezav/gitleaks)
+This skill covers comprehensive secrets management implementation including:
+
+- **Secrets Management Principles**: Core principles and security hierarchy
+- **Tools**: HashiCorp Vault, AWS Secrets Manager, Kubernetes Secrets, Docker Secrets
+- **.env Files**: Node.js and Python configuration
+- **Secrets Rotation**: Vault and AWS Secrets Manager rotation
+- **Access Control**: Vault policies, AWS IAM policies, Kubernetes RBAC
+- **Encryption at Rest**: Vault transit, AWS KMS encryption
+- **Application Integration**: Node.js and Python with Vault and AWS Secrets Manager
+- **CI/CD Integration**: GitHub Actions with Vault and AWS Secrets, Terraform with Vault
+- **Audit Logging**: Vault audit, AWS CloudTrail
+- **Best Practices**: Never commit secrets, environment-specific secrets, rotation, least privilege, audit access

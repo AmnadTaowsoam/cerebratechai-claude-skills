@@ -1,13 +1,11 @@
-# 🚀 Master README.md for Cerebrate Chai Claude Skills
-
-```markdown
 # 🧠 Cerebrate Chai - Claude Skills Repository
 
 > **Comprehensive skill library for Claude AI to build production-ready applications**
 
-A curated collection of **240+ specialized skills** covering everything from core development to advanced features like AI/ML, blockchain, IoT, and more. Each skill provides detailed implementation guides, best practices, and production-ready code examples.
+A curated collection of **346+ specialized skills** across **58 categories** covering everything from core development to advanced features like AI/ML, blockchain, IoT, system resilience, cost engineering, and more. Each skill provides detailed implementation guides, best practices, and production-ready code examples.
 
-[![Skills](https://img.shields.io/badge/Skills-240+-blue)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
+[![Skills](https://img.shields.io/badge/Skills-346+-blue)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
+[![Categories](https://img.shields.io/badge/Categories-58-purple)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
@@ -39,13 +37,15 @@ This repository contains specialized skills that help Claude understand and impl
 
 ### 🌟 Key Features
 
-- **240+ Skills** covering full-stack development
+- **346+ Skills** covering full-stack development across **58 categories**
 - **Production-Ready** patterns and examples
 - **Language Support**: TypeScript, Python, SQL, and more
 - **Framework Coverage**: Next.js, React, FastAPI, Express, and more
 - **Cloud & DevOps**: AWS, Docker, Kubernetes, CI/CD
-- **AI/ML**: LLM integration, RAG, embeddings, model deployment
+- **AI/ML**: LLM integration, RAG, embeddings, model deployment, AI evaluation
 - **Specialized Domains**: E-commerce, IoT, Blockchain, Gaming, Video Streaming
+- **Enterprise**: System resilience, cost engineering, incident management
+- **Product & Strategy**: Product discovery, portfolio management, investment estimation
 
 ---
 
@@ -95,7 +95,16 @@ Core development standards and practices.
 - [Git Workflow](01-foundations/git-workflow/SKILL.md) - Git branching and commits
 - [API Design](01-foundations/api-design/SKILL.md) - RESTful API principles
 
-### 02. 🎨 Frontend Development (7 skills)
+### 00. 🎯 Meta Skills (5 skills)
+Strategic thinking and architectural practices.
+
+- [Architectural Reviews](00-meta-skills/architectural-reviews/SKILL.md) - Architecture review process
+- [Decision Records](00-meta-skills/decision-records/SKILL.md) - ADR documentation
+- [Risk Assessment](00-meta-skills/risk-assessment/SKILL.md) - Technical risk evaluation
+- [System Thinking](00-meta-skills/system-thinking/SKILL.md) - Holistic system analysis
+- [Technical Debt Management](00-meta-skills/technical-debt-management/SKILL.md) - Managing tech debt
+
+### 02. 🎨 Frontend Development (8 skills)
 Modern frontend frameworks and patterns.
 
 - [Next.js Patterns](02-frontend/nextjs-patterns/SKILL.md) - Next.js 14+ App Router
@@ -105,18 +114,20 @@ Modern frontend frameworks and patterns.
 - [shadcn/ui](02-frontend/shadcn-ui/SKILL.md) - shadcn/ui patterns
 - [Form Handling](02-frontend/form-handling/SKILL.md) - React Hook Form + Zod
 - [State Management](02-frontend/state-management/SKILL.md) - Zustand, Redux, TanStack Query
+- [Animation](02-frontend/animation/SKILL.md) - Framer Motion, CSS animations
 
-### 03. ⚙️ Backend API (6 skills)
+### 03. ⚙️ Backend API (7 skills)
 Backend development patterns.
 
 - [Node.js API](03-backend-api/nodejs-api/SKILL.md) - Node.js REST APIs
 - [FastAPI Patterns](03-backend-api/fastapi-patterns/SKILL.md) - FastAPI Python
 - [Express REST](03-backend-api/express-rest/SKILL.md) - Express.js patterns
+- [Fastify REST API](03-backend-api/fastify-rest-api/SKILL.md) - Fastify patterns
 - [Error Handling](03-backend-api/error-handling/SKILL.md) - Error patterns
 - [Validation](03-backend-api/validation/SKILL.md) - Request validation
 - [Middleware](03-backend-api/middleware/SKILL.md) - Middleware patterns
 
-### 04. 🗄️ Database (6 skills)
+### 04. 🗄️ Database (7 skills)
 Database design and optimization.
 
 - [Prisma Guide](04-database/prisma-guide/SKILL.md) - Prisma ORM
@@ -125,6 +136,7 @@ Database design and optimization.
 - [TimescaleDB](04-database/timescaledb/SKILL.md) - Time-series database
 - [Vector Database](04-database/vector-database/SKILL.md) - Pinecone, Qdrant, Weaviate
 - [Database Optimization](04-database/database-optimization/SKILL.md) - Performance tuning
+- [Database Migrations](04-database/database-migrations/SKILL.md) - Schema migrations
 
 ### 05. 🤖 AI/ML Core (8 skills)
 Machine learning and model development.
@@ -310,20 +322,55 @@ User experience and design.
 - [Wireframing](22-ux-ui-design/wireframing/SKILL.md) - Wireframing
 - [Design Handoff](22-ux-ui-design/design-handoff/SKILL.md) - Design to dev
 
-### 23. 📊 Business Analytics (Placeholder)
+### 23. 📊 Business Analytics (9 skills)
 Business intelligence and KPIs.
 
-### 24. 🔒 Security Practices (Placeholder)
+- [A/B Testing Analysis](23-business-analytics/ab-testing-analysis/SKILL.md) - Experiment analysis
+- [Business Intelligence](23-business-analytics/business-intelligence/SKILL.md) - BI fundamentals
+- [Cohort Analysis](23-business-analytics/cohort-analysis/SKILL.md) - User cohort tracking
+- [Conversion Optimization](23-business-analytics/conversion-optimization/SKILL.md) - Conversion rate improvement
+- [Dashboard Design](23-business-analytics/dashboard-design/SKILL.md) - Analytics dashboards
+- [Data Visualization](23-business-analytics/data-visualization/SKILL.md) - Charts and graphs
+- [Funnel Analysis](23-business-analytics/funnel-analysis/SKILL.md) - Conversion funnels
+- [KPI Metrics](23-business-analytics/kpi-metrics/SKILL.md) - Key performance indicators
+- [SQL for Analytics](23-business-analytics/sql-for-analytics/SKILL.md) - Analytics SQL patterns
+
+### 24. 🔒 Security Practices (6 skills)
 Security best practices.
 
-### 25. 🌍 Internationalization (Placeholder)
+- [Incident Response](24-security-practices/incident-response/SKILL.md) - Security incident handling
+- [OWASP Top 10](24-security-practices/owasp-top-10/SKILL.md) - Common vulnerabilities
+- [Penetration Testing](24-security-practices/penetration-testing/SKILL.md) - Security testing
+- [Secure Coding](24-security-practices/secure-coding/SKILL.md) - Secure development
+- [Security Audit](24-security-practices/security-audit/SKILL.md) - Security assessments
+- [Vulnerability Management](24-security-practices/vulnerability-management/SKILL.md) - Vulnerability tracking
+
+### 25. 🌍 Internationalization (5 skills)
 Multi-language support.
 
-### 26. 🚢 Deployment Strategies (Placeholder)
+- [Currency & Timezone](25-internationalization/currency-timezone/SKILL.md) - Currency and time handling
+- [i18n Setup](25-internationalization/i18n-setup/SKILL.md) - Internationalization setup
+- [Localization](25-internationalization/localization/SKILL.md) - Content localization
+- [Multi-language](25-internationalization/multi-language/SKILL.md) - Multi-language support
+- [RTL Support](25-internationalization/rtl-support/SKILL.md) - Right-to-left languages
+
+### 26. 🚢 Deployment Strategies (5 skills)
 Advanced deployment patterns.
 
-### 27. 👥 Team Collaboration (Placeholder)
+- [Blue-Green Deployment](26-deployment-strategies/blue-green-deployment/SKILL.md) - Zero-downtime deployment
+- [Canary Deployment](26-deployment-strategies/canary-deployment/SKILL.md) - Gradual rollout
+- [Feature Toggles](26-deployment-strategies/feature-toggles/SKILL.md) - Feature flags in deployment
+- [Rollback Strategies](26-deployment-strategies/rollback-strategies/SKILL.md) - Safe rollback patterns
+- [Rolling Deployment](26-deployment-strategies/rolling-deployment/SKILL.md) - Incremental updates
+
+### 27. 👥 Team Collaboration (5 skills)
 Team practices and culture.
+
+- [Code Review Culture](27-team-collaboration/code-review-culture/SKILL.md) - Effective code reviews
+- [Knowledge Sharing](27-team-collaboration/knowledge-sharing/SKILL.md) - Team knowledge management
+- [Onboarding](27-team-collaboration/onboarding/SKILL.md) - Developer onboarding
+- [Pair Programming](27-team-collaboration/pair-programming/SKILL.md) - Collaborative coding
+- [Remote Work](27-team-collaboration/remote-work/SKILL.md) - Remote team practices
 
 ### 28. 📧 Marketing Integration (6 skills)
 Marketing automation and analytics.
@@ -447,6 +494,179 @@ Data engineering and ML ops.
 - [AutoML](39-data-science-ml/automl/SKILL.md) - Automated ML
 - [Model Serving](39-data-science-ml/ml-serving/SKILL.md) - Model deployment
 - [A/B Testing ML](39-data-science-ml/ab-testing-ml/SKILL.md) - Model experiments
+
+### 40. 🛡️ System Resilience (7 skills)
+Building resilient and fault-tolerant systems.
+
+- [Circuit Breaker & Bulkhead](40-system-resilience/circuit-breaker-bulkhead/SKILL.md) - Resilience patterns
+- [Disaster Recovery](40-system-resilience/disaster-recovery/SKILL.md) - DR planning
+- [Failure Modes and Effects](40-system-resilience/failure-modes-and-effects/SKILL.md) - FMEA analysis
+- [Graceful Degradation](40-system-resilience/graceful-degradation/SKILL.md) - Degradation strategies
+- [Idempotency and Dedup](40-system-resilience/idempotency-and-dedup/SKILL.md) - Idempotent operations
+- [Postmortems and RCA](40-system-resilience/postmortems-and-rca/SKILL.md) - Root cause analysis
+- [Retry, Timeout, Backoff](40-system-resilience/retry-timeout-backoff/SKILL.md) - Retry patterns
+
+### 41. 🚨 Incident Management (6 skills)
+Handling production incidents effectively.
+
+- [Communication Templates](41-incident-management/communication-templates/SKILL.md) - Incident communication
+- [Escalation and Ownership](41-incident-management/escalation-and-ownership/SKILL.md) - Escalation paths
+- [Incident Retrospective](41-incident-management/incident-retrospective/SKILL.md) - Learning from incidents
+- [Incident Severity Levels](41-incident-management/incident-severity-levels/SKILL.md) - Severity classification
+- [Runbook Templates](41-incident-management/runbook-templates/SKILL.md) - Operational runbooks
+- [Triage Workflow](41-incident-management/triage-workflow/SKILL.md) - Incident triage
+
+### 42. 💰 Cost Engineering (7 skills)
+Cloud cost optimization and management.
+
+- [Autoscaling and Rightsizing](42-cost-engineering/autoscaling-and-rightsizing/SKILL.md) - Resource optimization
+- [Cost Guardrails](42-cost-engineering/cost-guardrails/SKILL.md) - Budget controls
+- [Cost Modeling](42-cost-engineering/cost-modeling/SKILL.md) - Cost estimation
+- [LLM Token Optimization](42-cost-engineering/llm-token-optimization/SKILL.md) - AI cost management
+- [Pricing and Usage Meters](42-cost-engineering/pricing-and-usage-meters/SKILL.md) - Usage tracking
+- [Storage Egress Optimization](42-cost-engineering/storage-egress-optimization/SKILL.md) - Data transfer costs
+
+### 43. 📊 Data Reliability (5 skills)
+Ensuring data quality and reliability.
+
+- [Data Incident Response](43-data-reliability/data-incident-response/SKILL.md) - Data incident handling
+- [Data Quality Rules](43-data-reliability/data-quality-rules/SKILL.md) - Quality validation
+- [Freshness and Latency SLOs](43-data-reliability/freshness-latency-slos/SKILL.md) - Data SLOs
+- [Lineage and Provenance](43-data-reliability/lineage-and-provenance/SKILL.md) - Data lineage
+- [Schema Drift Handling](43-data-reliability/schema-drift-handling/SKILL.md) - Schema evolution
+
+### 44. 📝 Architecture Decision (5 skills)
+Architecture documentation and decisions.
+
+- [ADR Templates](44-architecture-decision/adr-templates/SKILL.md) - Decision records
+- [Deprecation Policy](44-architecture-decision/deprecation-policy/SKILL.md) - API deprecation
+- [System Boundaries](44-architecture-decision/system-boundaries/SKILL.md) - Boundary definition
+- [Tradeoff Analysis](44-architecture-decision/tradeoff-analysis/SKILL.md) - Technical tradeoffs
+- [Versioning Strategy](44-architecture-decision/versioning-strategy/SKILL.md) - Version management
+
+### 45. 🛠️ Developer Experience (5 skills)
+Improving developer productivity.
+
+- [Commit Conventions](45-developer-experience/commit-conventions/SKILL.md) - Commit standards
+- [Lint, Format, Typecheck](45-developer-experience/lint-format-typecheck/SKILL.md) - Code quality tools
+- [Local Dev Standard](45-developer-experience/local-dev-standard/SKILL.md) - Local development
+- [Release Workflow](45-developer-experience/release-workflow/SKILL.md) - Release management
+- [Repo Automation Scripts](45-developer-experience/repo-automation-scripts/SKILL.md) - Automation
+
+### 46. 🔐 Data Classification (4 skills)
+Data governance and classification.
+
+- [Access Audit and Reviews](46-data-classification/access-audit-and-reviews/SKILL.md) - Access auditing
+- [Logging Redaction](46-data-classification/logging-redaction/SKILL.md) - Log sanitization
+- [PII Detection](46-data-classification/pii-detection/SKILL.md) - Personal data detection
+- [Retention and Deletion](46-data-classification/retention-and-deletion/SKILL.md) - Data lifecycle
+
+### 47. ⚡ Performance Engineering (5 skills)
+Application performance optimization.
+
+- [Caching Strategies](47-performance-engineering/caching-strategies/SKILL.md) - Cache patterns
+- [Concurrency and Throughput](47-performance-engineering/concurrency-and-throughput/SKILL.md) - Concurrency
+- [DB Query Optimization](47-performance-engineering/db-query-optimization/SKILL.md) - Query tuning
+- [Profiling Node & Python](47-performance-engineering/profiling-node-python/SKILL.md) - Performance profiling
+- [SLA, SLO, SLIs](47-performance-engineering/sla-slo-slis/SKILL.md) - Service level objectives
+
+### 48. 🔍 Product Discovery (5 skills)
+Product research and validation.
+
+- [Experiment Design](48-product-discovery/experiment-design/SKILL.md) - Experimentation
+- [Hypothesis Writing](48-product-discovery/hypothesis-writing/SKILL.md) - Product hypotheses
+- [MVP Scope Control](48-product-discovery/mvp-scope-control/SKILL.md) - MVP scoping
+- [User Interviews](48-product-discovery/user-interviews/SKILL.md) - User research
+- [Validation Metrics](48-product-discovery/validation-metrics/SKILL.md) - Success metrics
+
+### 49. 📈 Portfolio Management (4 skills)
+Managing technical portfolios.
+
+- [Cross-team Interfaces](49-portfolio-management/cross-team-interfaces/SKILL.md) - Team interfaces
+- [Delivery Governance](49-portfolio-management/delivery-governance/SKILL.md) - Delivery management
+- [Dependency Mapping](49-portfolio-management/dependency-mapping/SKILL.md) - Dependency tracking
+- [Roadmap Planning](49-portfolio-management/roadmap-planning/SKILL.md) - Roadmap creation
+
+### 50. 🏢 Enterprise Integrations (5 skills)
+Enterprise system integrations.
+
+- [Enterprise RBAC Models](50-enterprise-integrations/enterprise-rbac-models/SKILL.md) - Enterprise RBAC
+- [SCIM Provisioning](50-enterprise-integrations/scim-provisioning/SKILL.md) - User provisioning
+- [Security Questionnaires](50-enterprise-integrations/security-questionnaires/SKILL.md) - Security compliance
+- [SSO SAML OIDC](50-enterprise-integrations/sso-saml-oidc/SKILL.md) - SSO integration
+- [Vendor Onboarding](50-enterprise-integrations/vendor-onboarding/SKILL.md) - Vendor management
+
+### 51. 📜 Contracts & Governance (5 skills)
+API contracts and governance.
+
+- [Backward Compat Rules](51-contracts-governance/backward-compat-rules/SKILL.md) - Compatibility rules
+- [Contract Testing](51-contracts-governance/contract-testing/SKILL.md) - Contract tests
+- [Deprecation Notices](51-contracts-governance/deprecation-notices/SKILL.md) - Deprecation handling
+- [Event Schema Registry](51-contracts-governance/event-schema-registry/SKILL.md) - Schema registry
+- [OpenAPI Governance](51-contracts-governance/openapi-governance/SKILL.md) - API governance
+
+### 52. 🤖 AI Evaluation (5 skills)
+Evaluating AI/ML systems.
+
+- [Ground Truth Management](52-ai-evaluation/ground-truth-management/SKILL.md) - Ground truth data
+- [LLM Judge Patterns](52-ai-evaluation/llm-judge-patterns/SKILL.md) - LLM evaluation
+- [Offline vs Online Eval](52-ai-evaluation/offline-vs-online-eval/SKILL.md) - Evaluation methods
+- [RAG Evaluation](52-ai-evaluation/rag-evaluation/SKILL.md) - RAG system evaluation
+- [Regression Benchmarks](52-ai-evaluation/regression-benchmarks/SKILL.md) - ML benchmarks
+
+### 53. 🔄 Data Engineering (5 skills)
+Modern data engineering practices.
+
+- [dbt Patterns](53-data-engineering/dbt-patterns/SKILL.md) - dbt best practices
+- [ELT Modeling](53-data-engineering/elt-modeling/SKILL.md) - ELT patterns
+- [Kafka Streaming](53-data-engineering/kafka-streaming/SKILL.md) - Kafka patterns
+- [Lakehouse Patterns](53-data-engineering/lakehouse-patterns/SKILL.md) - Data lakehouse
+
+### 54. 🤖 AgentOps (5 skills)
+AI agent operations and management.
+
+- [Audit Trails for Agents](54-agentops/audit-trails-for-agents/SKILL.md) - Agent auditing
+- [Prompt Versioning](54-agentops/prompt-versioning/SKILL.md) - Prompt management
+- [Rollout and Kill Switch](54-agentops/rollout-and-kill-switch/SKILL.md) - Agent deployment
+- [Sandboxing](54-agentops/sandboxing/SKILL.md) - Agent isolation
+- [Tool Permission Model](54-agentops/tool-permission-model/SKILL.md) - Tool access control
+
+### 55. ✍️ UX Writing (4 skills)
+User experience writing.
+
+- [Error Messages](55-ux-writing/error-messages/SKILL.md) - Error copy
+- [Microcopy](55-ux-writing/microcopy/SKILL.md) - UI microcopy
+- [Onboarding Flows](55-ux-writing/onboarding-flows/SKILL.md) - Onboarding UX
+- [Trust Pages Structure](55-ux-writing/trust-pages-structure/SKILL.md) - Trust and safety pages
+
+### 56. 📋 Requirements Intake (5 skills)
+Requirements gathering and analysis.
+
+- [Acceptance Criteria](56-requirements-intake/acceptance-criteria/SKILL.md) - AC writing
+- [Constraints and Assumptions](56-requirements-intake/constraints-and-assumptions/SKILL.md) - Documenting constraints
+- [Discovery Questions](56-requirements-intake/discovery-questions/SKILL.md) - Requirements discovery
+- [Requirement to Scope](56-requirements-intake/requirement-to-scope/SKILL.md) - Scope definition
+- [Risk and Dependencies](56-requirements-intake/risk-and-dependencies/SKILL.md) - Risk identification
+
+### 57. 🎯 Skill Orchestration (5 skills)
+Orchestrating Claude skills.
+
+- [Baseline Policy](57-skill-orchestration/baseline-policy/SKILL.md) - Skill policies
+- [Output Templates](57-skill-orchestration/output-templates/SKILL.md) - Template patterns
+- [Routing Rules](57-skill-orchestration/routing-rules/SKILL.md) - Skill routing
+- [Scoring and Prioritization](57-skill-orchestration/scoring-and-prioritization/SKILL.md) - Skill scoring
+- [Skill Improvement Loop](57-skill-orchestration/skill-improvement-loop/SKILL.md) - Continuous skill improvement from real-world usage
+
+### 58. 💵 Investment Estimation (7 skills)
+Investment and ROI analysis.
+
+- [Discovery for Estimation](58-investment-estimation/discovery-for-estimation/SKILL.md) - Estimation discovery
+- [Effort Sizing](58-investment-estimation/effort-sizing/SKILL.md) - Effort estimation
+- [Payback Analysis](58-investment-estimation/payback-analysis/SKILL.md) - Payback calculation
+- [Pricing Strategy](58-investment-estimation/pricing-strategy/SKILL.md) - Pricing models
+- [Proposal Pack](58-investment-estimation/proposal-pack/SKILL.md) - Proposal templates
+- [ROI Modeling](58-investment-estimation/roi-modeling/SKILL.md) - ROI calculation
+- [Sensitivity Analysis](58-investment-estimation/sensitivity-analysis/SKILL.md) - Sensitivity modeling
 
 ---
 
@@ -713,11 +933,11 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📊 Statistics
 
-- **Total Skills**: 240+
-- **Categories**: 39
-- **Languages**: TypeScript, Python, SQL, Dart, Solidity
-- **Frameworks**: 50+
-- **Last Updated**: January 2024
+- **Total Skills**: 346+
+- **Categories**: 58
+- **Languages**: TypeScript, Python, SQL, Dart, Solidity, Go
+- **Frameworks**: 60+
+- **Last Updated**: January 2026
 
 ---
 
@@ -734,74 +954,3 @@ MIT License - see [LICENSE](LICENSE) file for details.
 [Website](https://cerebratechai.com) • [GitHub](https://github.com/AmnadTaowsoam) • [Twitter](https://twitter.com/cerebratechai)
 
 </div>
-```
-
----
-
-## 🎯 Additional Files to Create
-
-### 1. CONTRIBUTING.md
-```markdown
-# Contributing to Cerebrate Chai Skills
-
-We love your input! We want to make contributing as easy as possible.
-
-## How to Contribute
-
-1. Fork the repo
-2. Create a branch (`git checkout -b feature/amazing-skill`)
-3. Commit changes (`git commit -m 'Add amazing skill'`)
-4. Push to branch (`git push origin feature/amazing-skill`)
-5. Open a Pull Request
-
-## Skill Guidelines
-
-- Follow the template
-- Include code examples
-- Add best practices
-- Test all code snippets
-- Update README if adding new category
-
-## Code of Conduct
-
-Be respectful, inclusive, and constructive.
-```
-
-### 2. LICENSE
-```
-MIT License
-
-Copyright (c) 2024 Cerebrate Chai
-
-[Standard MIT License text]
-```
-
-### 3. .github/ISSUE_TEMPLATE/skill-request.md
-```markdown
----
-name: Skill Request
-about: Suggest a new skill
-title: '[SKILL] '
-labels: enhancement
----
-
-## Skill Name
-
-## Category
-
-## Description
-
-## Why This Skill is Needed
-
-## Proposed Content Outline
-```
-
----
-
-ต้องการให้สร้างไฟล์เพิ่มเติมไหมครับ:
-1. ✅ CONTRIBUTING.md
-2. ✅ Automation Script (Python)
-3. ✅ Skill Selection CLI Tool
-4. ✅ GitHub Actions Workflows
-
-บอกได้เลยครับ! 🚀

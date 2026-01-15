@@ -1,6 +1,8 @@
 # Grafana Dashboards
 
-A comprehensive guide to creating and managing Grafana dashboards for monitoring and visualization.
+## Overview
+
+Grafana is an open-source analytics and interactive visualization platform that allows you to query, visualize, alert on, and understand your metrics. This skill covers Grafana setup, dashboard design, and common patterns.
 
 ## Table of Contents
 
@@ -18,36 +20,66 @@ A comprehensive guide to creating and managing Grafana dashboards for monitoring
 
 ## Grafana Setup
 
-### Installation
-
-```bash
-# Docker
-docker run -d -p 3000:3000 \
-  -e GF_SECURITY_ADMIN_PASSWORD=admin \
-  -v grafana-storage:/var/lib/grafana \
-  grafana/grafana:latest
-
-# Kubernetes
-kubectl apply -f grafana-deployment.yaml
-```
-
-### Basic Configuration
+### Docker Installation
 
 ```yaml
-# grafana.ini
-[server]
-http_port = 3000
-root_url = https://grafana.example.com
+# docker-compose.yml
+version: '3.8'
 
-[security]
-admin_user = admin
-admin_password = admin
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - grafana_provisioning:/etc/grafana/provisioning
+    restart: unless-stopped
 
-[auth.anonymous]
-enabled = false
+volumes:
+  grafana_data:
+  grafana_provisioning:
+```
 
-[users]
-default_theme = dark
+### Provisioning Data Sources
+
+```yaml
+# provisioning/datasources/prometheus.yml
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      httpMethod: POST
+      timeInterval: 15s
+```
+
+### Provisioning Dashboards
+
+```yaml
+# provisioning/dashboards/dashboard.yml
+apiVersion: 1
+
+providers:
+  - name: 'Default'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
 ```
 
 ---
@@ -65,7 +97,13 @@ default_theme = dark
   "isDefault": true,
   "jsonData": {
     "httpMethod": "POST",
-    "timeInterval": "15s"
+    "timeInterval": "15s",
+    "exemplarTraceIdDestinations": [
+      {
+        "datasourceUid": "jaeger",
+        "name": "traceID"
+      }
+    ]
   }
 }
 ```
@@ -84,7 +122,7 @@ default_theme = dark
       {
         "datasourceUid": "jaeger",
         "matcherRegex": "traceID=(\\w+)",
-        "name": "TraceID",
+        "name": "traceID",
         "url": "$${__value.raw}"
       }
     ]
@@ -102,25 +140,9 @@ default_theme = dark
   "access": "proxy",
   "database": "logs-*",
   "jsonData": {
-    "esVersion": "7.10.0",
-    "maxConcurrentShardRequests": 5,
-    "timeField": "@timestamp"
-  }
-}
-```
-
-### InfluxDB Data Source
-
-```json
-{
-  "name": "InfluxDB",
-  "type": "influxdb",
-  "url": "http://influxdb:8086",
-  "access": "proxy",
-  "database": "telegraf",
-  "jsonData": {
-    "version": "InfluxQL",
-    "httpMode": "POST"
+    "esVersion": "7.0.0",
+    "timeField": "@timestamp",
+    "maxConcurrentShardRequests": 5
   }
 }
 ```
@@ -129,86 +151,47 @@ default_theme = dark
 
 ## Dashboard Design Principles
 
-### 1. Purpose-Driven Design
+### Layout Guidelines
 
-Each dashboard should have a clear, single purpose:
+1. **Important metrics at the top**
+2. **Related metrics grouped together**
+3. **Consistent color schemes**
+4. **Clear labels and titles**
+5. **Appropriate time ranges**
 
-| Dashboard Type | Purpose | Audience |
-|----------------|---------|----------|
-| Overview | High-level health check | Executives, Managers |
-| Application | Application performance | Developers, SREs |
-| Infrastructure | Resource utilization | DevOps, SREs |
-| Business | KPIs and metrics | Business, Product |
-
-### 2. Information Hierarchy
+### Dashboard Structure
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  Title: Production API Overview                      │
-├─────────────────────────────────────────────────────┤
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐   │
-│  │   Uptime    │ │   Errors    │ │   Latency   │   │
-│  │   99.9%     │ │   0.01%     │ │    45ms     │   │
-│  └─────────────┘ └─────────────┘ └─────────────┘   │
-├─────────────────────────────────────────────────────┤
-│  ┌─────────────────────────────────────────────┐   │
-│  │         Request Rate (Top Level)             │   │
-│  │  ┌───────────────────────────────────────┐  │   │
-│  │  │  Time Series Graph                    │  │   │
-│  │  │                                       │  │   │
-│  │  └───────────────────────────────────────┘  │   │
-│  └─────────────────────────────────────────────┘   │
-├─────────────────────────────────────────────────────┤
-│  ┌─────────────────────────────────────────────┐   │
-│  │         Error Rate by Endpoint              │   │
-│  │  ┌───────────────────────────────────────┐  │   │
-│  │  │  Time Series Graph                    │  │   │
-│  │  │                                       │  │   │
-│  │  └───────────────────────────────────────┘  │   │
-│  └─────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│  Title: Application Overview                          │
+├─────────────────────────────────────────────────────────┤
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────┐ │
+│  │ Requests│  │ Errors  │  │ Latency │  │ Uptime│ │
+│  └─────────┘  └─────────┘  └─────────┘  └─────┘ │
+├─────────────────────────────────────────────────────────┤
+│  ┌─────────────────────────────────────────────────┐ │
+│  │         Request Rate (Time Series)               │ │
+│  └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────────┤
+│  ┌─────────────────────────────────────────────────┐ │
+│  │         Error Rate (Time Series)                │ │
+│  └─────────────────────────────────────────────────┘ │
+├─────────────────────────────────────────────────────────┤
+│  ┌─────────────────────────────────────────────────┐ │
+│  │         Response Time (Histogram)               │ │
+│  └─────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### 3. Color Coding
-
-- **Green**: Healthy/Normal
-- **Yellow**: Warning/Degraded
-- **Red**: Critical/Error
-- **Blue**: Informational
-- **Purple**: Secondary metrics
-
-### 4. Time Range Selection
+### Color Schemes
 
 ```json
 {
-  "time": {
-    "from": "now-1h",
-    "to": "now"
-  },
-  "timepicker": {
-    "refresh_intervals": [
-      "5s",
-      "10s",
-      "30s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h",
-      "2h",
-      "1d"
-    ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d",
-      "30d"
-    ]
+  "colors": {
+    "success": "#50fa7b",
+    "warning": "#ffb86c",
+    "error": "#ff5555",
+    "info": "#8be9fd"
   }
 }
 ```
@@ -217,33 +200,36 @@ Each dashboard should have a clear, single purpose:
 
 ## Panel Types
 
-### Time Series Panel
+### Time Series
 
 ```json
 {
   "type": "timeseries",
   "title": "Request Rate",
-  "gridPos": {
-    "h": 8,
-    "w": 12,
-    "x": 0,
-    "y": 0
-  },
+  "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
   "targets": [
     {
-      "expr": "sum(rate(http_requests_total[5m])) by (route)",
-      "legendFormat": "{{route}}",
-      "refId": "A"
+      "expr": "sum by (job) (rate(http_requests_total[5m]))",
+      "legendFormat": "{{job}}"
     }
   ],
   "fieldConfig": {
     "defaults": {
+      "custom": {
+        "lineWidth": 2,
+        "fillOpacity": 10,
+        "thresholdsStyle": {
+          "mode": "line"
+        }
+      },
       "color": {
         "mode": "palette-classic"
       },
-      "custom": {
-        "lineWidth": 2,
-        "fillOpacity": 10
+      "thresholds": {
+        "steps": [
+          { "color": "green", "value": null },
+          { "color": "red", "value": 100 }
+        ]
       }
     }
   }
@@ -255,17 +241,12 @@ Each dashboard should have a clear, single purpose:
 ```json
 {
   "type": "stat",
-  "title": "Current Requests/sec",
-  "gridPos": {
-    "h": 4,
-    "w": 4,
-    "x": 0,
-    "y": 0
-  },
+  "title": "Total Requests",
+  "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
   "targets": [
     {
-      "expr": "sum(rate(http_requests_total[1m]))",
-      "refId": "A"
+      "expr": "sum(increase(http_requests_total[1h]))",
+      "legendFormat": "Total"
     }
   ],
   "fieldConfig": {
@@ -273,25 +254,16 @@ Each dashboard should have a clear, single purpose:
       "color": {
         "mode": "thresholds"
       },
-      "mappings": [],
       "thresholds": {
         "steps": [
-          {
-            "color": "green",
-            "value": null
-          },
-          {
-            "color": "yellow",
-            "value": 1000
-          },
-          {
-            "color": "red",
-            "value": 5000
-          }
+          { "color": "green", "value": null },
+          { "color": "yellow", "value": 1000 },
+          { "color": "red", "value": 5000 }
         ]
       },
-      "unit": "reqps"
-    }
+      "mappings": []
+    },
+    "overrides": []
   },
   "options": {
     "graphMode": "area",
@@ -305,116 +277,29 @@ Each dashboard should have a clear, single purpose:
 }
 ```
 
-### Table Panel
-
-```json
-{
-  "type": "table",
-  "title": "Top 10 Slow Endpoints",
-  "gridPos": {
-    "h": 8,
-    "w": 12,
-    "x": 12,
-    "y": 0
-  },
-  "targets": [
-    {
-      "expr": "topk(10, histogram_quantile(0.95, sum by (le, route) (rate(http_request_duration_seconds_bucket[5m]))))",
-      "format": "table",
-      "instant": true,
-      "refId": "A"
-    }
-  ],
-  "transformations": [
-    {
-      "id": "organize",
-      "options": {
-        "excludeByName": {
-          "Time": true
-        },
-        "renameByName": {
-          "Value": "95th Percentile",
-          "route": "Endpoint"
-        }
-      }
-    }
-  ],
-  "fieldConfig": {
-    "defaults": {
-      "custom": {
-        "align": "left",
-        "width": 200
-      }
-    }
-  }
-}
-```
-
-### Logs Panel
-
-```json
-{
-  "type": "logs",
-  "title": "Application Logs",
-  "gridPos": {
-    "h": 8,
-    "w": 12,
-    "x": 0,
-    "y": 8
-  },
-  "targets": [
-    {
-      "expr": "{app=\"api\",level=\"error\"}",
-      "refId": "A"
-    }
-  ],
-  "options": {
-    "showLabels": true,
-    "showTime": true,
-    "wrapLogMessage": false,
-    "sortOrder": "Descending",
-    "dedupStrategy": "none"
-  }
-}
-```
-
 ### Gauge Panel
 
 ```json
 {
   "type": "gauge",
-  "title": "CPU Usage",
-  "gridPos": {
-    "h": 6,
-    "w": 6,
-    "x": 0,
-    "y": 0
-  },
+  "title": "Error Rate",
+  "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
   "targets": [
     {
-      "expr": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
-      "refId": "A"
+      "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))",
+      "legendFormat": "Error Rate"
     }
   ],
   "fieldConfig": {
     "defaults": {
-      "unit": "percent",
+      "unit": "percentunit",
       "min": 0,
-      "max": 100,
+      "max": 1,
       "thresholds": {
         "steps": [
-          {
-            "color": "green",
-            "value": null
-          },
-          {
-            "color": "yellow",
-            "value": 70
-          },
-          {
-            "color": "red",
-            "value": 90
-          }
+          { "color": "green", "value": null },
+          { "color": "yellow", "value": 0.01 },
+          { "color": "red", "value": 0.05 }
         ]
       }
     }
@@ -432,33 +317,70 @@ Each dashboard should have a clear, single purpose:
 }
 ```
 
-### Pie Chart Panel
+### Table Panel
 
 ```json
 {
-  "type": "piechart",
-  "title": "Requests by Status Code",
-  "gridPos": {
-    "h": 8,
-    "w": 6,
-    "x": 6,
-    "y": 0
-  },
+  "type": "table",
+  "title": "Top Endpoints by Error Rate",
+  "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
   "targets": [
     {
-      "expr": "sum by (status_code) (http_requests_total)",
+      "expr": "topk(10, sum by (path) (rate(http_requests_total{status=~\"5..\"}[5m])) / sum by (path) (rate(http_requests_total[5m])))",
+      "format": "table",
+      "instant": true
+    }
+  ],
+  "transformations": [
+    {
+      "id": "organize",
+      "options": {
+        "excludeByName": { "Time": true, "__name__": true },
+        "indexByName": {},
+        "renameByName": {}
+      }
+    }
+  ],
+  "fieldConfig": {
+    "defaults": {
+      "color": {
+        "mode": "thresholds"
+      },
+      "thresholds": {
+        "steps": [
+          { "color": "green", "value": null },
+          { "color": "yellow", "value": 0.01 },
+          { "color": "red", "value": 0.05 }
+        ]
+      },
+      "unit": "percentunit"
+    }
+  }
+}
+```
+
+### Logs Panel
+
+```json
+{
+  "type": "logs",
+  "title": "Application Logs",
+  "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+  "targets": [
+    {
+      "expr": "{job=\"nodejs-app\"}",
       "refId": "A"
     }
   ],
   "options": {
-    "legend": {
-      "displayMode": "table",
-      "placement": "right"
-    },
-    "pieType": "pie",
-    "tooltip": {
-      "mode": "single"
-    }
+    "showLabels": false,
+    "showCommonLabels": false,
+    "showTime": true,
+    "wrapLogMessage": false,
+    "sortOrder": "Descending",
+    "dedupStrategy": "none",
+    "enableLogDetails": true,
+    "prettifyLogMessage": false
   }
 }
 ```
@@ -471,15 +393,30 @@ Each dashboard should have a clear, single purpose:
 
 ```json
 {
-  "name": "instance",
+  "name": "job",
   "type": "query",
   "datasource": "Prometheus",
   "refresh": 1,
-  "query": "label_values(up, instance)",
-  "sort": 1,
-  "multi": true,
+  "query": {
+    "query": "label_values(up, job)",
+    "refId": "StandardVariableQuery"
+  },
   "includeAll": true,
-  "allValue": ".*"
+  "multi": true,
+  "allValue": ".+"
+}
+```
+
+### Interval Variable
+
+```json
+{
+  "name": "interval",
+  "type": "interval",
+  "query": "1m,5m,10m,30m,1h,6h,12h,1d",
+  "auto": true,
+  "auto_count": 30,
+  "auto_min": "10s"
 }
 ```
 
@@ -491,34 +428,7 @@ Each dashboard should have a clear, single purpose:
   "type": "custom",
   "query": "production,staging,development",
   "multi": false,
-  "options": [
-    {
-      "value": "production",
-      "text": "Production",
-      "selected": true
-    },
-    {
-      "value": "staging",
-      "text": "Staging"
-    },
-    {
-      "value": "development",
-      "text": "Development"
-    }
-  ]
-}
-```
-
-### Interval Variable
-
-```json
-{
-  "name": "interval",
-  "type": "interval",
-  "query": "1m,5m,10m,30m,1h,6h,12h,1d",
-  "auto": false,
-  "auto_count": 30,
-  "auto_min": "10s"
+  "includeAll": false
 }
 ```
 
@@ -528,92 +438,40 @@ Each dashboard should have a clear, single purpose:
 {
   "targets": [
     {
-      "expr": "rate(http_requests_total{instance=~\"$instance\"}[$interval])",
-      "legendFormat": "{{instance}}",
-      "refId": "A"
+      "expr": "sum by (job) (rate(http_requests_total{job=~\"$job\"}[$interval]))",
+      "legendFormat": "{{job}}"
     }
   ]
 }
 ```
 
-### Chained Variables
+### Variable Chaining
 
 ```json
-[
-  {
-    "name": "region",
-    "type": "query",
-    "query": "label_values(up, region)"
+{
+  "name": "instance",
+  "type": "query",
+  "datasource": "Prometheus",
+  "refresh": 2,
+  "query": {
+    "query": "label_values(up{job=\"$job\"}, instance)",
+    "refId": "StandardVariableQuery"
   },
-  {
-    "name": "instance",
-    "type": "query",
-    "query": "label_values(up{region=\"$region\"}, instance)"
-  }
-]
+  "includeAll": true,
+  "multi": true
+}
 ```
 
 ---
 
 ## Alerts
 
-### Alert Rule
+### Panel Alert
 
 ```json
 {
-  "conditions": [
-    {
-      "evaluator": {
-        "params": [0.05],
-        "type": "gt"
-      },
-      "operator": {
-        "type": "and"
-      },
-      "query": {
-        "params": ["A", "5m", "now"]
-      },
-      "reducer": {
-        "params": [],
-        "type": "avg"
-      },
-      "type": "query"
-    }
-  ],
-  "executionErrorState": "alerting",
-  "frequency": "1m",
-  "handler": 1,
-  "name": "High Error Rate Alert",
-  "noDataState": "no_data",
-  "notifications": []
-}
-```
-
-### Alert Notification Channel
-
-```json
-{
-  "name": "Slack",
-  "type": "slack",
-  "settings": {
-    "url": "https://hooks.slack.com/services/XXX/YYY/ZZZ",
-    "uploadImage": false
-  },
-  "secureSettings": {}
-}
-```
-
-### Alert Query
-
-```json
-{
-  "targets": [
-    {
-      "expr": "sum(rate(http_requests_total{status_code=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))",
-      "refId": "A",
-      "hide": false
-    }
-  ],
+  "type": "timeseries",
+  "title": "Error Rate",
   "alert": {
     "conditions": [
       {
@@ -637,9 +495,40 @@ Each dashboard should have a clear, single purpose:
     "executionErrorState": "alerting",
     "frequency": "1m",
     "handler": 1,
+    "message": "Error rate is {{ $value }}",
     "name": "High Error Rate",
-    "noDataState": "no_data",
-    "notifications": []
+    "noDataState": "no_data"
+  },
+  "targets": [
+    {
+      "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))",
+      "refId": "A"
+    }
+  ]
+}
+```
+
+### Alert Notification Channels
+
+```json
+{
+  "name": "Email",
+  "type": "email",
+  "settings": {
+    "addresses": "alerts@example.com"
+  },
+  "secureSettings": {}
+}
+```
+
+```json
+{
+  "name": "Slack",
+  "type": "slack",
+  "settings": {
+    "url": "https://hooks.slack.com/services/...",
+    "recipient": "#alerts",
+    "uploadImage": true
   }
 }
 ```
@@ -652,47 +541,71 @@ Each dashboard should have a clear, single purpose:
 
 ```json
 {
-  "dashboard": {
-    "title": "Application Metrics",
-    "panels": [
-      {
-        "title": "Request Rate",
-        "type": "timeseries",
-        "targets": [
-          {
-            "expr": "sum(rate(http_requests_total[5m])) by (route)"
-          }
-        ]
-      },
-      {
-        "title": "Error Rate",
-        "type": "timeseries",
-        "targets": [
-          {
-            "expr": "sum(rate(http_requests_total{status_code=~\"5..\"}[5m])) by (route)"
-          }
-        ]
-      },
-      {
-        "title": "P95 Latency",
-        "type": "timeseries",
-        "targets": [
-          {
-            "expr": "histogram_quantile(0.95, sum by (le, route) (rate(http_request_duration_seconds_bucket[5m])))"
-          }
-        ]
-      },
-      {
-        "title": "Active Connections",
-        "type": "stat",
-        "targets": [
-          {
-            "expr": "active_connections"
-          }
-        ]
+  "title": "Application Metrics",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Requests/sec",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total[1m]))"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Error Rate",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{status=~\"5..\"}[1m])) / sum(rate(http_requests_total[1m]))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        }
       }
-    ]
-  }
+    },
+    {
+      "type": "stat",
+      "title": "P95 Latency",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Request Rate",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        {
+          "expr": "sum by (path) (rate(http_requests_total[5m]))",
+          "legendFormat": "{{path}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Error Rate",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        {
+          "expr": "sum by (status) (rate(http_requests_total{status=~\"5..\"}[5m]))",
+          "legendFormat": "{{status}}"
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -700,52 +613,83 @@ Each dashboard should have a clear, single purpose:
 
 ```json
 {
-  "dashboard": {
-    "title": "System Metrics",
-    "panels": [
-      {
-        "title": "CPU Usage",
-        "type": "timeseries",
-        "targets": [
-          {
-            "expr": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)"
-          }
-        ]
-      },
-      {
-        "title": "Memory Usage",
-        "type": "timeseries",
-        "targets": [
-          {
-            "expr": "1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)"
-          }
-        ]
-      },
-      {
-        "title": "Disk Usage",
-        "type": "timeseries",
-        "targets": [
-          {
-            "expr": "1 - (node_filesystem_avail_bytes{fstype!=\"tmpfs\"} / node_filesystem_size_bytes)"
-          }
-        ]
-      },
-      {
-        "title": "Network Traffic",
-        "type": "timeseries",
-        "targets": [
-          {
-            "expr": "rate(node_network_receive_bytes_total[5m])",
-            "legendFormat": "{{instance}} RX"
-          },
-          {
-            "expr": "rate(node_network_transmit_bytes_total[5m])",
-            "legendFormat": "{{instance}} TX"
-          }
-        ]
+  "title": "System Metrics",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "CPU Usage",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "max": 100,
+          "min": 0
+        }
       }
-    ]
-  }
+    },
+    {
+      "type": "timeseries",
+      "title": "Memory Usage",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "max": 100,
+          "min": 0
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Disk Usage",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "(1 - (node_filesystem_avail_bytes{fstype!=\"tmpfs\"} / node_filesystem_size_bytes{fstype!=\"tmpfs\"})) * 100",
+          "legendFormat": "{{instance}}:{{mountpoint}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "max": 100,
+          "min": 0
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Network Traffic",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "rate(node_network_receive_bytes_total[5m])",
+          "legendFormat": "{{instance}}:rx"
+        },
+        {
+          "expr": "rate(node_network_transmit_bytes_total[5m])",
+          "legendFormat": "{{instance}}:tx"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps"
+        }
+      }
+    }
+  ]
 }
 ```
 
@@ -753,47 +697,79 @@ Each dashboard should have a clear, single purpose:
 
 ```json
 {
-  "dashboard": {
-    "title": "Business Metrics",
-    "panels": [
-      {
-        "title": "Daily Active Users",
-        "type": "stat",
-        "targets": [
-          {
-            "expr": "count_over_time(active_users[1d])"
-          }
-        ]
-      },
-      {
-        "title": "Revenue (Today)",
-        "type": "stat",
-        "targets": [
-          {
-            "expr": "increase(revenue_usd[1d])"
-          }
-        ]
-      },
-      {
-        "title": "Conversion Rate",
-        "type": "gauge",
-        "targets": [
-          {
-            "expr": "increase(signups_total[1d]) / increase(visits_total[1d]) * 100"
-          }
-        ]
-      },
-      {
-        "title": "Revenue Trend",
-        "type": "timeseries",
-        "targets": [
-          {
-            "expr": "increase(revenue_usd[1h])"
-          }
-        ]
+  "title": "Business Metrics",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Active Users",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(active_users)"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Registrations Today",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "targets": [
+        {
+          "expr": "increase(user_registrations_total[1d])"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Revenue Today",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(increase(order_total_usd[1d]))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD"
+        }
       }
-    ]
-  }
+    },
+    {
+      "type": "timeseries",
+      "title": "User Registrations",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        {
+          "expr": "sum by (plan) (rate(user_registrations_total[5m]))",
+          "legendFormat": "{{plan}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Order Value Distribution",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.5, sum(rate(order_value_usd_bucket[1h])))",
+          "legendFormat": "P50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(order_value_usd_bucket[1h])))",
+          "legendFormat": "P95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(order_value_usd_bucket[1h])))",
+          "legendFormat": "P99"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD"
+        }
+      }
+    }
+  ]
 }
 ```
 
@@ -804,205 +780,143 @@ Each dashboard should have a clear, single purpose:
 ### Terraform Provider
 
 ```hcl
-resource "grafana_dashboard" "api_metrics" {
-  config_json = file("${path.module}/dashboards/api-metrics.json")
-  folder      = grafana_folder.production.id
+# terraform/grafana.tf
+terraform {
+  required_providers {
+    grafana = {
+      source  = "grafana/grafana"
+      version = "~> 1.0"
+    }
+  }
 }
 
-resource "grafana_folder" "production" {
-  title = "Production"
+provider "grafana" {
+  url  = "http://grafana:3000"
+  auth = "admin:admin"
 }
 
 resource "grafana_data_source" "prometheus" {
-  name                = "Prometheus"
-  type                = "prometheus"
-  url                 = "http://prometheus:9090"
-  access_mode         = "proxy"
-  is_default          = true
+  name = "Prometheus"
+  type = "prometheus"
+  url  = "http://prometheus:9090"
+
+  json_data_encoded = jsonencode({
+    httpMethod = "POST"
+    timeInterval = "15s"
+  })
+}
+
+resource "grafana_dashboard" "application" {
+  config_json = file("${path.module}/dashboards/application.json")
 }
 ```
 
-### Grafana Operator (Kubernetes)
+### Dashboard JSON Template
 
-```yaml
-apiVersion: grafana.integreatly.org/v1beta1
-kind: GrafanaDashboard
-metadata:
-  name: api-metrics
-  namespace: monitoring
-spec:
-  instanceSelector:
-    matchLabels:
-      dashboards: "grafana"
-  json: |
-    {
-      "title": "API Metrics",
-      "panels": [...]
-    }
-```
-
-### Ansible
-
-```yaml
-- name: Deploy Grafana dashboard
-  community.grafana.grafana_dashboard:
-    grafana_url: "http://grafana:3000"
-    grafana_user: "admin"
-    grafana_password: "admin"
-    state: present
-    dashboard_id: 1
-    commit_message: "Updated via Ansible"
-    overwrite: yes
-    path: "dashboards/api-metrics.json"
+```json
+{
+  "dashboard": {
+    "title": "Application Metrics",
+    "uid": "application-metrics",
+    "tags": ["application"],
+    "timezone": "browser",
+    "schemaVersion": 27,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "type": "timeseries",
+        "title": "Request Rate",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total[5m]))"
+          }
+        ]
+      }
+    ]
+  }
+}
 ```
 
 ---
 
 ## Best Practices
 
-### 1. Use Consistent Naming
-
-```
-✅ Good:
-- Production API Overview
-- Development System Metrics
-- Staging Business KPIs
-
-❌ Bad:
-- API
-- Metrics
-- Dashboard 1
-```
-
-### 2. Organize in Folders
-
-```
-├── Production/
-│   ├── Application Metrics
-│   ├── Infrastructure
-│   └── Business KPIs
-├── Staging/
-│   └── Application Metrics
-└── Development/
-    └── Application Metrics
-```
-
-### 3. Use Descriptive Titles
+### 1. Use Descriptive Titles
 
 ```json
 {
-  "title": "API Response Time - P95 (Last 24h)",
-  "description": "95th percentile response time for API endpoints"
+  "title": "HTTP Request Rate (req/s)"
 }
 ```
 
-### 4. Set Appropriate Time Ranges
+### 2. Set Appropriate Time Ranges
 
 ```json
 {
   "time": {
-    "from": "now-6h",
+    "from": "now-1h",
     "to": "now"
-  },
-  "refresh": "30s"
-}
-```
-
-### 5. Use Annotations
-
-```json
-{
-  "annotations": {
-    "list": [
-      {
-        "builtIn": 1,
-        "datasource": "-- Grafana --",
-        "enable": true,
-        "hide": true,
-        "iconColor": "rgba(0, 211, 255, 1)",
-        "name": "Annotations & Alerts",
-        "type": "dashboard"
-      },
-      {
-        "datasource": "Prometheus",
-        "enable": true,
-        "expr": "changes(deployments_total[1h]) > 0",
-        "name": "Deployments"
-      }
-    ]
   }
 }
 ```
 
-### 6. Limit Panel Count
-
-- Overview dashboards: 6-12 panels
-- Detailed dashboards: 12-20 panels
-- Too many panels = cognitive overload
-
-### 7. Use Thresholds
+### 3. Use Thresholds
 
 ```json
 {
-  "thresholds": {
-    "steps": [
-      {
-        "color": "green",
-        "value": null
-      },
-      {
-        "color": "yellow",
-        "value": 70
-      },
-      {
-        "color": "orange",
-        "value": 85
-      },
-      {
-        "color": "red",
-        "value": 95
+  "fieldConfig": {
+    "defaults": {
+      "thresholds": {
+        "steps": [
+          { "color": "green", "value": null },
+          { "color": "yellow", "value": 0.01 },
+          { "color": "red", "value": 0.05 }
+        ]
       }
-    ]
+    }
   }
 }
 ```
 
-### 8. Document Your Dashboards
+### 4. Use Variables for Flexibility
 
 ```json
 {
-  "description": "This dashboard monitors the production API server. It shows request rate, error rate, latency, and resource utilization. Alert thresholds: Error rate > 1%, P95 latency > 500ms, CPU > 80%",
-  "tags": ["production", "api", "metrics"]
-}
-```
-
-### 9. Use Row Repeating
-
-```json
-{
-  "rows": [
+  "variables": [
     {
-      "repeat": "instance",
-      "repeatIteration": "1",
-      "repeatPanelId": 2,
-      "title": "$instance"
+      "name": "job",
+      "type": "query",
+      "query": "label_values(up, job)"
     }
   ]
 }
 ```
 
-### 10. Test Your Queries
+### 5. Organize Panels Logically
 
-```bash
-# Test queries in Prometheus before adding to Grafana
-curl 'http://prometheus:9090/api/v1/query?query=sum(rate(http_requests_total[5m]))'
+```json
+{
+  "panels": [
+    { "title": "Overview", "gridPos": { "y": 0 } },
+    { "title": "Details", "gridPos": { "y": 4 } }
+  ]
+}
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [Grafana Documentation](https://grafana.com/docs/)
-- [Grafana Panel Options](https://grafana.com/docs/grafana/latest/panels/)
-- [PromQL Examples](https://prometheus.io/docs/prometheus/latest/querying/examples/)
-- [Grafana Terraform Provider](https://registry.terraform.io/providers/grafana/grafana/latest/docs)
+This skill covers comprehensive Grafana dashboard creation including:
+
+- **Grafana Setup**: Docker installation and provisioning
+- **Data Sources**: Prometheus, Loki, Elasticsearch
+- **Dashboard Design Principles**: Layout, structure, color schemes
+- **Panel Types**: Time series, stat, gauge, table, logs
+- **Variables and Templating**: Query, interval, custom variables
+- **Alerts**: Panel alerts and notification channels
+- **Common Dashboard Patterns**: Application, system, business metrics
+- **Dashboard as Code**: Terraform provider and JSON templates
+- **Best Practices**: Titles, time ranges, thresholds, variables, organization

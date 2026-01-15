@@ -1,6 +1,8 @@
 # Pytest Patterns
 
-A comprehensive guide to pytest testing patterns for Python applications.
+## Overview
+
+Pytest is a powerful testing framework for Python that makes it easy to write simple yet scalable test cases. This skill covers pytest basics, fixtures, mocking, and best practices.
 
 ## Table of Contents
 
@@ -23,36 +25,24 @@ A comprehensive guide to pytest testing patterns for Python applications.
 ### Installation
 
 ```bash
-# Install pytest
-pip install pytest
-
-# Install with plugins
-pip install pytest pytest-asyncio pytest-cov pytest-mock
-
-# Install for async testing
-pip install pytest-asyncio
-
-# Install for coverage
-pip install pytest-cov
+pip install pytest pytest-cov pytest-asyncio pytest-mock
 ```
 
-### Configuration
+### Basic Test
 
-```ini
-# pytest.ini
-[pytest]
-testpaths = tests
-python_files = test_*.py
-python_classes = Test*
-python_functions = test_*
-addopts =
-    -v
-    --strict-markers
-    --tb=short
-markers =
-    slow: marks tests as slow
-    integration: marks tests as integration tests
-    unit: marks tests as unit tests
+```python
+# test_basic.py
+def test_addition():
+    """Test basic addition."""
+    assert 1 + 1 == 2
+
+def test_string_equality():
+    """Test string equality."""
+    assert "hello" == "hello"
+
+def test_list_contains():
+    """Test list contains."""
+    assert 3 in [1, 2, 3]
 ```
 
 ### Running Tests
@@ -61,78 +51,80 @@ markers =
 # Run all tests
 pytest
 
-# Run specific test file
+# Run specific file
 pytest tests/test_user.py
 
-# Run specific test function
-pytest tests/test_user.py::test_create_user
-
-# Run tests matching pattern
-pytest -k "test_create"
+# Run specific test
+pytest tests/test_user.py::test_get_user
 
 # Run with verbose output
 pytest -v
 
 # Run with coverage
 pytest --cov=src --cov-report=html
-
-# Run tests with markers
-pytest -m unit
-pytest -m "not slow"
-
-# Stop on first failure
-pytest -x
-
-# Show local variables on failure
-pytest -l
-
-# Run failed tests only
-pytest --lf
 ```
 
 ---
 
 ## Test Structure
 
-### Basic Test Function
+### Basic Structure
 
 ```python
-# tests/test_calculator.py
-def test_add():
-    result = add(2, 3)
-    assert result == 5
+# test_user.py
+import pytest
 
-def test_subtract():
-    result = subtract(5, 3)
-    assert result == 2
+from src.user import User
+
+class TestUser:
+    """Test User class."""
+
+    def test_init(self):
+        """Test User initialization."""
+        user = User("John", "john@example.com")
+        assert user.name == "John"
+        assert user.email == "john@example.com"
+
+    def test_full_name(self):
+        """Test full name property."""
+        user = User("John", "john@example.com")
+        assert user.full_name == "John (john@example.com)"
+
+    def test_validate_email(self):
+        """Test email validation."""
+        user = User("John", "invalid-email")
+        assert not user.is_valid_email()
 ```
 
-### Test Class
+### Test Modules
 
 ```python
-# tests/test_calculator.py
-class TestCalculator:
-    def test_add(self):
-        result = add(2, 3)
-        assert result == 5
+# test_user.py
+import pytest
 
-    def test_subtract(self):
-        result = subtract(5, 3)
-        assert result == 2
-```
+from src import user
 
-### Test Organization
+def test_create_user():
+    """Test user creation."""
+    user = user.create("John", "john@example.com")
+    assert user.id is not None
+    assert user.name == "John"
 
-```
-tests/
-├── unit/
-│   ├── test_user.py
-│   ├── test_calculator.py
-│   └── test_utils.py
-├── integration/
-│   ├── test_api.py
-│   └── test_database.py
-└── conftest.py
+def test_get_user():
+    """Test getting user."""
+    user = user.get(1)
+    assert user is not None
+    assert user.id == 1
+
+def test_update_user():
+    """Test user update."""
+    user = user.update(1, name="Jane")
+    assert user.name == "Jane"
+
+def test_delete_user():
+    """Test user deletion."""
+    user = user.delete(1)
+    assert user is None
 ```
 
 ---
@@ -142,106 +134,79 @@ tests/
 ### Basic Fixture
 
 ```python
+# conftest.py
 import pytest
+from src.database import Database
 
 @pytest.fixture
-def user():
-    return {
-        'id': 1,
-        'name': 'John Doe',
-        'email': 'john@example.com'
-    }
-
-def test_user_name(user):
-    assert user['name'] == 'John Doe'
-```
-
-### Fixture with Setup and Teardown
-
-```python
-@pytest.fixture
-def database():
-    # Setup
+def db():
+    """Database fixture."""
     db = Database()
     db.connect()
-
     yield db
-
-    # Teardown
     db.disconnect()
-    db.cleanup()
 
-def test_database_query(database):
-    result = database.query('SELECT * FROM users')
-    assert len(result) > 0
-```
-
-### Fixture Scope
-
-```python
-# Function scope (default)
-@pytest.fixture(scope='function')
-def temp_file():
-    with open('temp.txt', 'w') as f:
-        f.write('test')
-    yield 'temp.txt'
-    os.remove('temp.txt')
-
-# Module scope
-@pytest.fixture(scope='module')
-def module_resource():
-    resource = Resource()
-    resource.initialize()
-    yield resource
-    resource.cleanup()
-
-# Session scope
-@pytest.fixture(scope='session')
-def session_resource():
-    resource = SessionResource()
-    resource.initialize()
-    yield resource
-    resource.cleanup()
+# test_user.py
+def test_create_user(db):
+    """Test user creation with database."""
+    user = db.create_user("John", "john@example.com")
+    assert user.id is not None
 ```
 
 ### Fixture with Parameters
 
 ```python
-@pytest.fixture(params=['postgres', 'mysql', 'sqlite'])
-def database(request):
-    return Database(request.param)
+# conftest.py
+import pytest
 
-def test_database_connection(database):
-    assert database.connect() is True
+@pytest.fixture(params=["John", "Jane", "Alice"])
+def user(request):
+    """User fixture with parameters."""
+    return {"name": request.param, "email": f"{request.param.lower()}@example.com"}
+
+# test_user.py
+def test_user_creation(user):
+    """Test user creation."""
+    assert user["name"] is not None
+    assert "@" in user["email"]
 ```
 
-### Fixture Dependencies
+### Fixture with Scope
 
 ```python
-@pytest.fixture
-def user():
-    return User(id=1, name='John Doe')
+# conftest.py
+import pytest
 
-@pytest.fixture
-def post(user):
-    return Post(id=1, title='Test Post', author=user)
+@pytest.fixture(scope="session")
+def session_db():
+    """Session-scoped database fixture."""
+    db = Database()
+    db.connect()
+    yield db
+    db.disconnect()
 
-def test_post_author(post):
-    assert post.author.name == 'John Doe'
+@pytest.fixture(scope="function")
+def function_db():
+    """Function-scoped database fixture."""
+    db = Database()
+    db.connect()
+    yield db
+    db.disconnect()
 ```
 
-### Using Fixtures in Classes
+### Fixture with Autouse
 
 ```python
-@pytest.mark.usefixtures('database')
-class TestDatabase:
-    def test_query(self, database):
-        result = database.query('SELECT * FROM users')
-        assert len(result) > 0
+# conftest.py
+import pytest
 
-    def test_insert(self, database):
-        database.insert('INSERT INTO users VALUES (1, "John")')
-        assert database.count() == 1
+@pytest.fixture(autouse=True)
+def setup_database():
+    """Setup database before each test."""
+    db = Database()
+    db.connect()
+    yield db
+    db.disconnect()
 ```
 
 ---
@@ -251,446 +216,438 @@ class TestDatabase:
 ### Basic Parametrization
 
 ```python
+# test_math.py
 import pytest
 
-@pytest.mark.parametrize('a, b, expected', [
+@pytest.mark.parametrize("a,b,expected", [
+    (1, 2, 3),
     (2, 3, 5),
-    (0, 0, 0),
-    (-1, 1, 0),
+    (3, 4, 7),
 ])
-def test_add(a, b, expected):
-    assert add(a, b) == expected
+def test_addition(a, b, expected):
+    """Test addition with parametrization."""
+    assert a + b == expected
+```
+
+### Multiple Parameters
+
+```python
+# test_string.py
+import pytest
+
+@pytest.mark.parametrize("input,expected", [
+    ("hello", "HELLO"),
+    ("world", "WORLD"),
+    ("test", "TEST"),
+])
+def test_uppercase(input, expected):
+    """Test uppercase function."""
+    assert input.upper() == expected
 ```
 
 ### Parametrize with IDs
 
 ```python
-@pytest.mark.parametrize('a, b, expected', [
-    (2, 3, 5),
-    (0, 0, 0),
-    (-1, 1, 0),
-], ids=['positive', 'zero', 'mixed'])
-def test_add(a, b, expected):
-    assert add(a, b) == expected
-```
-
-### Parametrize with Fixtures
-
-```python
-@pytest.fixture(params=['postgres', 'mysql'])
-def database(request):
-    return Database(request.param)
-
-@pytest.mark.parametrize('user_id', [1, 2, 3])
-def test_get_user(database, user_id):
-    user = database.get_user(user_id)
-    assert user is not None
-```
-
-### Parametrize from File
-
-```python
-import json
+# test_numbers.py
 import pytest
 
-# Load test data from JSON file
-with open('test_data.json') as f:
-    test_data = json.load(f)
-
-@pytest.mark.parametrize('data', test_data)
-def test_with_data(data):
-    assert validate(data['input']) == data['expected']
+@pytest.mark.parametrize("input,expected", [
+    pytest.param(1, 2, id="1+1=2"),
+    pytest.param(2, 3, id="2+1=3"),
+    pytest.param(3, 4, id="3+1=4"),
+])
+def test_addition(input, expected):
+    """Test addition with parametrization IDs."""
+    assert input + 1 == expected
 ```
 
 ---
 
 ## Markers
 
-### Defining Markers
+### Basic Markers
+
+```python
+# test_api.py
+import pytest
+
+@pytest.mark.unit
+def test_user_creation():
+    """Unit test for user creation."""
+    assert True
+
+@pytest.mark.integration
+def test_api_user_creation():
+    """Integration test for API user creation."""
+    assert True
+```
+
+### Marker Configuration
 
 ```python
 # pytest.ini
 [pytest]
 markers =
-    slow: marks tests as slow
-    integration: marks tests as integration tests
-    unit: marks tests as unit tests
+    unit: Unit tests
+    integration: Integration tests
+    slow: Slow tests
 ```
 
-### Using Markers
-
-```python
-import pytest
-
-@pytest.mark.unit
-def test_unit_function():
-    assert add(2, 3) == 5
-
-@pytest.mark.integration
-def test_integration():
-    response = requests.get('https://api.example.com')
-    assert response.status_code == 200
-
-@pytest.mark.slow
-def test_slow_operation():
-    result = slow_operation()
-    assert result is not None
-```
-
-### Multiple Markers
-
-```python
-@pytest.mark.unit
-@pytest.mark.slow
-def test_slow_unit():
-    assert slow_calculation() is not None
-```
-
-### Running Tests with Markers
+### Running Marked Tests
 
 ```bash
 # Run only unit tests
 pytest -m unit
 
-# Run only integration tests
-pytest -m integration
-
-# Run tests not marked as slow
+# Skip slow tests
 pytest -m "not slow"
 
-# Run tests with multiple markers
-pytest -m "unit and not slow"
+# Run integration tests
+pytest -m integration
 ```
 
-### Skip and Xfail Markers
+### Skip Marker
 
 ```python
-@pytest.mark.skip(reason="Not implemented yet")
-def test_not_implemented():
-    pass
+# test_slow.py
+import pytest
 
-@pytest.mark.skipif(sys.version_info < (3, 8), reason="Requires Python 3.8+")
-def test_python38_feature():
-    pass
+@pytest.mark.slow
+def test_slow_operation():
+    """Slow operation test."""
+    import time
+    time.sleep(10)
+    assert True
 
-@pytest.mark.xfail(reason="Known issue")
-def test_known_failure():
-    assert False
-
-@pytest.mark.xfail(raises=ValueError)
-def test_expected_failure():
-    raise ValueError("Expected error")
+@pytest.mark.skip(reason="Feature not implemented")
+def test_unimplemented_feature():
+    """Test for unimplemented feature."""
+    assert True
 ```
 
 ---
 
 ## Mocking
 
-### Basic Mocking
+### Mocking Functions
 
 ```python
-from unittest.mock import Mock, patch
-
-def test_with_mock():
-    mock_func = Mock(return_value=42)
-    result = mock_func()
-    assert result == 42
-    mock_func.assert_called_once()
-```
-
-### Patching
-
-```python
+# test_utils.py
+import pytest
+from src.utils import send_email
 from unittest.mock import patch
 
-def test_external_api():
-    with patch('requests.get') as mock_get:
-        mock_get.return_value.status_code = 200
-        response = external_api_call()
-        assert response == 200
-        mock_get.assert_called_once()
-```
-
-### Patching with Side Effects
-
-```python
-def test_with_side_effect():
-    with patch('requests.get') as mock_get:
-        mock_get.side_effect = [200, 404, 500]
-
-        assert external_api_call() == 200
-        assert external_api_call() == 404
-        assert external_api_call() == 500
+def test_send_email(mocker):
+    """Test email sending with mock."""
+    mocker.patch('src.utils.smtp.sendmail')
+    mock_sendmail = mocker.Mock()
+    
+    send_email("test@example.com", "Test subject", "Test body")
+    
+    mock_sendmail.assert_called_once()
+    mock_sendmail.assert_called_with(
+        "test@example.com",
+        "Test subject",
+        "Test body"
+    )
 ```
 
 ### Mocking Classes
 
 ```python
-def test_class_mock():
-    with patch('myapp.Database') as MockDatabase:
-        mock_db = MockDatabase.return_value
-        mock_db.query.return_value = [{'id': 1}]
-
-        result = get_users()
-        assert result == [{'id': 1}]
-```
-
-### Mocking Async Functions
-
-```python
+# test_service.py
 import pytest
-from unittest.mock import AsyncMock, patch
+from src.service import UserService
+from unittest.mock import Mock
 
-@pytest.mark.asyncio
-async def test_async_mock():
-    with patch('myapp.async_function', new_callable=AsyncMock()) as mock_func:
-        mock_func.return_value = 42
-        result = await async_function()
-        assert result == 42
+@pytest.fixture
+def mock_user_service():
+    """Mock user service."""
+    return Mock(spec=UserService)
+
+def test_get_user(mock_user_service):
+    """Test getting user with mock service."""
+    mock_user_service.get_user.return_value = {
+        "id": 1,
+        "name": "John",
+        "email": "john@example.com"
+    }
+    
+    service = UserService(mock_user_service)
+    user = service.get_user(1)
+    
+    assert user["id"] == 1
+    assert user["name"] == "John"
+    mock_user_service.get_user.assert_called_once_with(1)
 ```
 
-### Pytest Mock Fixture
+### Mocking External APIs
 
 ```python
-@pytest.fixture
-def mock_database():
-    with patch('myapp.Database') as MockDatabase:
-        mock_db = MockDatabase.return_value
-        mock_db.connect.return_value = True
-        mock_db.query.return_value = [{'id': 1}]
-        yield mock_db
+# test_external_api.py
+import pytest
+import requests
+from unittest.mock import patch
 
-def test_with_mock_database(mock_database):
-    result = get_users()
-    assert result == [{'id': 1}]
+def test_external_api(mocker):
+    """Test external API call with mock."""
+    mock_response = mocker.Mock()
+    mock_response.json.return_value = {"data": "test"}
+    mocker.patch('requests.get', return_value=mock_response)
+    
+    response = requests.get("https://api.example.com/data")
+    
+    assert response.json()["data"] == "test"
+    mock_response.json.assert_called_once()
 ```
 
 ---
 
 ## Async Tests
 
-### Basic Async Test
+### Async Test
 
 ```python
+# test_async.py
 import pytest
 
 @pytest.mark.asyncio
 async def test_async_function():
+    """Test async function."""
     result = await async_function()
-    assert result is not None
+    assert result == "success"
+
+async def async_function():
+    """Async function to test."""
+    return "success"
 ```
 
 ### Async Fixture
 
 ```python
-@pytest.fixture
-async def async_resource():
-    resource = await AsyncResource.create()
-    yield resource
-    await resource.close()
+# conftest.py
+import pytest
+import asyncio
 
-@pytest.mark.asyncio
-async def test_with_async_resource(async_resource):
-    result = await async_resource.get_data()
-    assert result is not None
-```
-
-### Async Tests with Database
-
-```python
 @pytest.fixture
 async def async_db():
+    """Async database fixture."""
     db = AsyncDatabase()
     await db.connect()
     yield db
     await db.disconnect()
 
+# test_async_user.py
 @pytest.mark.asyncio
-async def test_async_database_query(async_db):
-    result = await async_db.query('SELECT * FROM users')
-    assert len(result) > 0
+async def test_async_create_user(async_db):
+    """Test async user creation."""
+    user = await async_db.create_user("John", "john@example.com")
+    assert user.id is not None
 ```
 
 ---
 
 ## Coverage
 
-### Running Coverage
-
-```bash
-# Generate coverage report
-pytest --cov=src --cov-report=html
-
-# Generate coverage for specific module
-pytest --cov=src.user --cov-report=term-missing
-
-# Generate coverage with minimum threshold
-pytest --cov=src --cov-fail-under=80
-```
-
 ### Coverage Configuration
 
 ```ini
-# .coveragerc
-[run]
-source = src
-omit =
-    */tests/*
-    */__pycache__/*
-    */migrations/*
-    */venv/*
-
-[report]
-exclude_lines =
-    pragma: no cover
-    def __repr__
-    raise AssertionError
-    raise NotImplementedError
-    if __name__ == .__main__.:
-    if TYPE_CHECKING:
+# pytest.ini
+[pytest]
+addopts = --cov=src --cov-report=html --cov-report=term
 ```
 
-### Coverage Thresholds
+### Running Coverage
 
 ```bash
-# Fail if coverage is below 80%
-pytest --cov=src --cov-fail-under=80
+# Run tests with coverage
+pytest --cov=src --cov-report=html
 
-# Fail if specific module coverage is below 90%
-pytest --cov=src.user --cov-fail-under=90
+# Generate coverage report
+pytest --cov=src --cov-report=xml
+```
+
+### Coverage Exclusions
+
+```ini
+# pytest.ini
+[pytest]
+addopts = --cov=src --cov-report=html --cov-report=term
+[coverage:run]
+omit =
+    */tests/*
+    */conftest.py
+    */__init__.py
 ```
 
 ---
 
 ## Testing FastAPI
 
-### Basic FastAPI Test
+### Basic API Test
 
 ```python
+# test_main.py
 from fastapi.testclient import TestClient
-from myapp.main import app
+from src.main import app
 
 client = TestClient(app)
 
 def test_read_root():
+    """Test root endpoint."""
     response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {"message": "Hello World"}
-```
 
-### Testing Endpoints
-
-```python
 def test_create_user():
+    """Test user creation endpoint."""
     response = client.post(
         "/users/",
-        json={"name": "John Doe", "email": "john@example.com"}
+        json={"name": "John", "email": "john@example.com"}
     )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["name"] == "John Doe"
-    assert "id" in data
+    assert response.status_code == 201
+    assert response.json()["name"] == "John"
 ```
 
-### Testing with Authentication
+### Test with Database
 
 ```python
+# test_users.py
+from fastapi.testclient import TestClient
+from src.main import app
+from src.database import Database
+
+client = TestClient(app)
+
+@pytest.fixture
+def db():
+    """Database fixture."""
+    db = Database()
+    db.connect()
+    yield db
+    db.disconnect()
+
+def test_create_user(db):
+    """Test user creation with database."""
+    response = client.post(
+        "/users/",
+        json={"name": "John", "email": "john@example.com"}
+    )
+    assert response.status_code == 201
+    
+    user = db.get_user(response.json()["id"])
+    assert user is not None
+    assert user["name"] == "John"
+```
+
+### Test Authentication
+
+```python
+# test_auth.py
+from fastapi.testclient import TestClient
+from src.main import app
+
+client = TestClient(app)
+
 def test_protected_endpoint():
-    # Test without authentication
-    response = client.get("/protected")
+    """Test protected endpoint without auth."""
+    response = client.get("/users/me")
     assert response.status_code == 401
 
-    # Test with authentication
-    response = client.get(
-        "/protected",
-        headers={"Authorization": "Bearer token123"}
-    )
+def test_protected_endpoint_with_auth():
+    """Test protected endpoint with auth."""
+    headers = {"Authorization": "Bearer test-token"}
+    response = client.get("/users/me", headers=headers)
     assert response.status_code == 200
-```
-
-### Testing with Database
-
-```python
-@pytest.fixture
-async def test_db():
-    # Use test database
-    async with TestDatabase() as db:
-        yield db
-
-@pytest.mark.asyncio
-async def test_create_user(test_db):
-    response = client.post(
-        "/users/",
-        json={"name": "John Doe", "email": "john@example.com"}
-    )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["name"] == "John Doe"
 ```
 
 ---
 
 ## Testing Database Code
 
-### Testing with SQLite In-Memory
+### Model Tests
 
 ```python
+# test_models.py
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from src.models import User
 
-@pytest.fixture
-def db_session():
-    engine = create_engine('sqlite:///:memory:')
-    Session = sessionmaker(bind=engine)
-    Base.metadata.create_all(engine)
+def test_user_creation():
+    """Test user model creation."""
+    user = User(name="John", email="john@example.com")
+    assert user.id is None
+    assert user.name == "John"
+    assert user.email == "john@example.com"
 
-    session = Session()
-    yield session
-
-    session.close()
-    engine.dispose()
-
-def test_create_user(db_session):
-    user = User(name='John Doe', email='john@example.com')
-    db_session.add(user)
-    db_session.commit()
-
-    retrieved = db_session.query(User).first()
-    assert retrieved.name == 'John Doe'
+def test_user_validation():
+    """Test user email validation."""
+    user = User(name="John", email="invalid-email")
+    assert not user.is_valid_email()
 ```
 
-### Testing with Mock Database
+### Repository Tests
 
 ```python
-from unittest.mock import Mock, patch
+# test_repositories.py
+import pytest
+from src.repositories import UserRepository
+from src.models import User
 
 @pytest.fixture
-def mock_db():
-    with patch('myapp.Database') as MockDatabase:
-        mock_db = MockDatabase.return_value
-        mock_db.session.return_value = Mock()
-        yield mock_db
+def db():
+    """Database fixture."""
+    from src.database import Database
+    db = Database()
+    db.connect()
+    yield db
+    db.disconnect()
 
-def test_user_service(mock_db):
-    user = UserService.create('John Doe', 'john@example.com')
-    assert user.name == 'John Doe'
-    mock_db.session.add.assert_called_once()
+def test_create_user(db):
+    """Test user repository create."""
+    repo = UserRepository(db)
+    user = repo.create("John", "john@example.com")
+    assert user.id is not None
+    assert user.name == "John"
+
+def test_get_user(db):
+    """Test user repository get."""
+    repo = UserRepository(db)
+    user = repo.create("Jane", "jane@example.com")
+    retrieved_user = repo.get(user.id)
+    assert retrieved_user.id == user.id
+    assert retrieved_user.name == "Jane"
 ```
 
-### Testing Database Queries
+### Transaction Tests
 
 ```python
-def test_user_query(db_session):
-    user1 = User(name='John Doe', email='john@example.com')
-    user2 = User(name='Jane Doe', email='jane@example.com')
-    db_session.add(user1)
-    db_session.add(user2)
-    db_session.commit()
+# test_transactions.py
+import pytest
+from src.repositories import UserRepository
+from src.models import User
 
-    users = db_session.query(User).all()
-    assert len(users) == 2
-    assert users[0].name == 'John Doe'
+@pytest.fixture
+def db():
+    """Database fixture."""
+    from src.database import Database
+    db = Database()
+    db.connect()
+    yield db
+    db.disconnect()
+
+def test_transaction(db):
+    """Test database transaction."""
+    repo = UserRepository(db)
+    
+    with db.transaction():
+        user1 = repo.create("John", "john@example.com")
+        user2 = repo.create("Jane", "jane@example.com")
+        user1.name = "Updated"
+        user2.name = "Updated"
+        db.commit()
+    
+    assert repo.get(user1.id).name == "Updated"
+    assert repo.get(user2.id).name == "Updated"
 ```
 
 ---
@@ -700,160 +657,125 @@ def test_user_query(db_session):
 ### 1. Use Descriptive Test Names
 
 ```python
-# ❌ BAD: Vague test name
-def test_user():
+# Good
+def test_create_user_with_valid_email():
+    """Test user creation with valid email."""
     pass
 
-# ✅ GOOD: Descriptive test name
-def test_create_user_with_valid_data():
+def test_create_user_with_invalid_email():
+    """Test user creation with invalid email."""
     pass
 
-def test_create_user_with_duplicate_email():
+# Bad
+def test_1():
+    """Test user creation."""
     pass
 ```
 
-### 2. Use Fixtures for Setup
+### 2. Use Fixtures Effectively
 
 ```python
-# ❌ BAD: Setup in test
-def test_database():
-    db = Database()
-    db.connect()
-    result = db.query('SELECT * FROM users')
-    assert len(result) > 0
-    db.disconnect()
-
-# ✅ GOOD: Use fixture
+# Good
 @pytest.fixture
-def database():
-    db = Database()
-    db.connect()
-    yield db
-    db.disconnect()
+def user():
+    """User fixture."""
+    return User("John", "john@example.com")
 
-def test_database(database):
-    result = database.query('SELECT * FROM users')
-    assert len(result) > 0
+def test_user_name(user):
+    """Test user name."""
+    assert user.name == "John"
+
+# Bad
+def test_user_name():
+    """Test user name."""
+    user = User("John", "john@example.com")
+    assert user.name == "John"
 ```
 
 ### 3. Use Parametrization
 
 ```python
-# ❌ BAD: Multiple similar tests
-def test_add_positive():
-    assert add(2, 3) == 5
-
-def test_add_zero():
-    assert add(0, 0) == 0
-
-def test_add_negative():
-    assert add(-1, 1) == 0
-
-# ✅ GOOD: Use parametrization
-@pytest.mark.parametrize('a, b, expected', [
-    (2, 3, 5),
-    (0, 0, 0),
-    (-1, 1, 0),
+# Good
+@pytest.mark.parametrize("input,expected", [
+    (1, 2),
+    (2, 3),
+    (3, 4),
 ])
-def test_add(a, b, expected):
-    assert add(a, b) == expected
+def test_addition(input, expected):
+    """Test addition."""
+    assert input + 1 == expected
+
+# Bad
+def test_addition_1():
+    assert 1 + 1 == 2
+
+def test_addition_2():
+    assert 2 + 1 == 3
+
+def test_addition_3():
+    assert 3 + 1 == 4
 ```
 
 ### 4. Use Markers
 
 ```python
+# Good
 @pytest.mark.unit
-def test_unit_function():
+def test_user_creation():
+    """Unit test for user creation."""
     pass
 
 @pytest.mark.integration
-def test_integration():
+def test_api_user_creation():
+    """Integration test for API user creation."""
+    pass
+
+# Bad
+def test_user_creation_unit():
+    """Unit test for user creation."""
+    pass
+
+def test_api_user_creation_integration():
+    """Integration test for API user creation."""
     pass
 ```
 
-### 5. Mock External Dependencies
+### 5. Test One Thing Per Test
 
 ```python
-from unittest.mock import patch
+# Good
+def test_user_name():
+    """Test user name."""
+    user = User("John", "john@example.com")
+    assert user.name == "John"
 
-def test_external_api():
-    with patch('requests.get') as mock_get:
-        mock_get.return_value.status_code = 200
-        response = external_api_call()
-        assert response == 200
-```
+def test_user_email():
+    """Test user email."""
+    user = User("John", "john@example.com")
+    assert user.email == "john@example.com"
 
-### 6. Use Coverage
-
-```bash
-pytest --cov=src --cov-report=html
-```
-
-### 7. Test Edge Cases
-
-```python
-def test_empty_input():
-    with pytest.raises(ValueError):
-        validate_user({})
-
-def test_null_input():
-    with pytest.raises(ValueError):
-        validate_user(None)
-```
-
-### 8. Keep Tests Independent
-
-```python
-# Each test should be able to run independently
-def test_1():
-    pass
-
-def test_2():
-    pass
-```
-
-### 9. Use Conftest for Shared Fixtures
-
-```python
-# conftest.py
-@pytest.fixture
-def app():
-    return create_app()
-
-@pytest.fixture
-def client(app):
-    return app.test_client()
-```
-
-### 10. Run Tests in CI
-
-```yaml
-# .github/workflows/test.yml
-name: Test
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install pytest pytest-cov
-      - name: Run tests
-        run: pytest --cov=src --cov-report=xml
+# Bad
+def test_user():
+    """Test user."""
+    user = User("John", "john@example.com")
+    assert user.name == "John"
+    assert user.email == "john@example.com"
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [Pytest Documentation](https://docs.pytest.org/)
-- [Pytest Fixtures](https://docs.pytest.org/en/stable/fixture.html)
-- [Pytest Asyncio](https://pytest-asyncio.readthedocs.io/)
-- [Pytest Coverage](https://pytest-cov.readthedocs.io/)
-- [Pytest Mock](https://pytest-mock.readthedocs.io/)
+This skill covers comprehensive pytest testing patterns including:
+
+- **Pytest Basics**: Installation, basic tests, running tests
+- **Test Structure**: Basic structure, test modules
+- **Fixtures**: Basic fixtures, parameters, scope, autouse
+- **Parametrization**: Basic, multiple parameters, IDs
+- **Markers**: Basic markers, configuration, running, skip
+- **Mocking**: Functions, classes, external APIs
+- **Async Tests**: Async functions and fixtures
+- **Coverage**: Configuration, running, exclusions
+- **Testing FastAPI**: Basic API tests, database tests, authentication
+- **Testing Database Code**: Models, repositories, transactions
+- **Best Practices**: Descriptive names, fixtures, parametrization, markers, one thing per test
