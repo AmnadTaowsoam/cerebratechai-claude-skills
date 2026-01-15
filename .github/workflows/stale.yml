@@ -3,6 +3,9 @@ name: Close Stale Issues and PRs
 on:
   schedule:
     - cron: '0 0 * * *' # Daily at midnight
+permissions:
+  issues: write
+  pull-requests: write
 
 jobs:
   stale:

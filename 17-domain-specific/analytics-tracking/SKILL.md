@@ -1,14 +1,19 @@
-# Analytics Tracking
+# Analytics and Event Tracking
 
-A comprehensive guide to analytics and event tracking.
+## Overview
+
+Analytics and event tracking help understand user behavior and measure product success. This skill covers analytics platforms (Google Analytics 4, Mixpanel, Segment), event tracking, user properties, custom dimensions, e-commerce tracking, privacy considerations, server-side tracking, data validation, testing analytics, and best practices.
 
 ## Table of Contents
 
 1. [Analytics Platforms](#analytics-platforms)
+   - [Google Analytics 4](#google-analytics-4)
+   - [Mixpanel](#mixpanel)
+   - [Segment](#segment)
 2. [Event Tracking](#event-tracking)
 3. [User Properties](#user-properties)
 4. [Custom Dimensions](#custom-dimensions)
-5. [E-Commerce Tracking](#e-commerce-tracking)
+5. [E-commerce Tracking](#e-commerce-tracking)
 6. [Privacy Considerations](#privacy-considerations)
 7. [Server-Side Tracking](#server-side-tracking)
 8. [Data Validation](#data-validation)
@@ -19,517 +24,916 @@ A comprehensive guide to analytics and event tracking.
 
 ## Analytics Platforms
 
-### Google Analytics 4 (GA4)
+### Google Analytics 4
+
+#### Setup
 
 ```typescript
-// Install GA4
-npm install gtag
+// src/analytics/ga4.ts
+// Install: npm install @gtag/js
 
-// Initialize GA4
-import { gtag, install } from 'ga-gtag';
+export const GA4_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID || '';
 
-install('G-XXXXXXXXXX', {
-  send_page_view: true,
-  debug_mode: process.env.NODE_ENV !== 'production',
-});
+export function initGA4(): void {
+  if (typeof window === 'undefined' || !GA4_MEASUREMENT_ID) {
+    return;
+  }
 
-// Track page view
-gtag('event', 'page_view', {
-  page_title: document.title,
-  page_location: window.location.href,
-});
+  // Load GA4 script
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`;
+  document.head.appendChild(script);
 
-// Track custom event
-gtag('event', 'button_click', {
-  event_category: 'engagement',
-  event_label: 'signup_button',
-});
+  // Initialize GA4
+  (window as any).dataLayer = (window as any).dataLayer || [];
+  (window as any).gtag('js', new Date());
+  (window as any).gtag('config', GA4_MEASUREMENT_ID);
+}
+
+export function trackEvent(eventName: string, parameters?: Record<string, any>): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  (window as any).gtag('event', eventName, parameters);
+}
+
+export function trackPageView(pagePath: string, pageTitle: string): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  (window as any).gtag('event', 'page_view', {
+    page_path: pagePath,
+    page_title: pageTitle,
+  });
+}
+
+export function setUser(userId: string): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  (window as any).gtag('config', GA4_MEASUREMENT_ID, {
+    user_id: userId,
+  });
+}
+
+export function setUserProperties(properties: Record<string, any>): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  (window as any).gtag('set', 'user_properties', properties);
+}
 ```
 
-```python
-# Install GA4
-pip install google-analytics-data-api
+#### Usage in React
 
-# Initialize GA4
-from google.analytics.data_api import BetaAnalyticsDataApiV4
+```typescript
+// src/components/App.tsx
+import { useEffect } from 'react';
+import { initGA4, trackPageView } from '../analytics/ga4';
+import { useRouter } from 'next/router';
 
-client = BetaAnalyticsDataApiV4()
-client.initialize(
-    property_id='GA_MEASUREMENT_ID',
-    transport='http',
-    debug_mode=False
-)
+export function App() {
+  const router = useRouter();
 
-# Track page view
-client.events().create(
-    event_name='page_view',
-    params={
-        'page_title': 'Home Page',
-        'page_location': 'https://example.com/home'
-    }
-).execute()
+  useEffect(() => {
+    // Initialize GA4
+    initGA4();
 
-# Track custom event
-client.events().create(
-    event_name='button_click',
-    params={
-        'event_category': 'engagement',
-        'event_label': 'signup_button'
-    }
-).execute()
+    // Track page views
+    const handleRouteChange = (url: string) => {
+      trackPageView(url, document.title);
+    };
+
+    router.events.on('routeChangeComplete', handleRouteChange);
+
+    // Track initial page view
+    handleRouteChange(router.pathname);
+
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange);
+    };
+  }, [router]);
+
+  return <div>Your App</div>;
+}
 ```
 
 ### Mixpanel
 
-```typescript
-// Install Mixpanel
-npm install mixpanel-browser
+#### Setup
 
-// Initialize Mixpanel
+```typescript
+// src/analytics/mixpanel.ts
+// Install: npm install mixpanel-browser
+
 import mixpanel from 'mixpanel-browser';
 
-mixpanel.init('YOUR_PROJECT_TOKEN', {
-  debug: process.env.NODE_ENV !== 'production',
-});
+const MIXPANEL_TOKEN = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN || '';
 
-// Track page view
-mixpanel.track('Page View', {
-  page: window.location.pathname,
-});
+export function initMixpanel(): void {
+  if (typeof window === 'undefined' || !MIXPANEL_TOKEN) {
+    return;
+  }
 
-// Track custom event
-mixpanel.track('Button Click', {
-  button_name: 'Sign Up',
-  location: 'Homepage',
-});
+  mixpanel.init(MIXPANEL_TOKEN, {
+    debug: process.env.NODE_ENV === 'development',
+    track_pageview: true,
+    persistence: 'localStorage',
+  });
+}
+
+export function trackEvent(eventName: string, properties?: Record<string, any>): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  mixpanel.track(eventName, properties);
+}
+
+export function identify(userId: string): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  mixpanel.identify(userId);
+}
+
+export function setUserProperties(properties: Record<string, any>): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  mixpanel.people.set(properties);
+}
+
+export function alias(distinctId: string, alias: string): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  mixpanel.alias(alias, distinctId);
+}
+
+export function reset(): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  mixpanel.reset();
+}
 ```
 
-```python
-# Install Mixpanel
-pip install mixpanel
+#### Usage in React
 
-# Initialize Mixpanel
-import mixpanel
+```typescript
+// src/components/Button.tsx
+import { trackEvent } from '../analytics/mixpanel';
 
-mixpanel.init(
-    token='YOUR_PROJECT_TOKEN',
-    debug=False
-)
+interface ButtonProps {
+  onClick?: () => void;
+  eventName?: string;
+  eventProperties?: Record<string, any>;
+}
 
-# Track page view
-mixpanel.track('Page View', {
-    'page': '/home'
-})
+export function Button({ onClick, eventName, eventProperties, children }: ButtonProps) {
+  const handleClick = () => {
+    if (eventName) {
+      trackEvent(eventName, eventProperties);
+    }
+    onClick?.();
+  };
 
-# Track custom event
-mixpanel.track('Button Click', {
-    'button_name': 'Sign Up',
-    'location': 'Homepage'
-})
+  return <button onClick={handleClick}>{children}</button>;
+}
+
+// Usage
+<Button
+  eventName="button_clicked"
+  eventProperties={{ button_name: 'submit', page: 'checkout' }}
+>
+  Submit
+</Button>
 ```
 
 ### Segment
 
+#### Setup
+
 ```typescript
-// Install Segment
-npm install @segment/analytics-node
+// src/analytics/segment.ts
+// Install: npm install @segment/analytics-next
 
-// Initialize Segment
-import Analytics from '@segment/analytics-node';
+import { AnalyticsBrowser } from '@segment/analytics-next';
 
-const analytics = new Analytics('YOUR_WRITE_KEY', {
-  flushAt: 20,
-});
+const SEGMENT_WRITE_KEY = process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY || '';
 
-// Track page view
-analytics.track('Page View', {
-  path: window.location.pathname,
-});
+export const analytics = new AnalyticsBrowser();
 
-// Track custom event
-analytics.track('Button Click', {
-  button_name: 'Sign Up',
-  location: 'Homepage',
-});
+export async function initSegment(): Promise<void> {
+  if (typeof window === 'undefined' || !SEGMENT_WRITE_KEY) {
+    return;
+  }
+
+  await analytics.load({ writeKey: SEGMENT_WRITE_KEY });
+}
+
+export function trackEvent(eventName: string, properties?: Record<string, any>): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  analytics.track(eventName, properties);
+}
+
+export function identify(userId: string, traits?: Record<string, any>): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  analytics.identify(userId, traits);
+}
+
+export function page(category?: string, name?: string, properties?: Record<string, any>): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  analytics.page(category, name, properties);
+}
+
+export function group(groupId: string, traits?: Record<string, any>): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  analytics.group(groupId, traits);
+}
+
+export function alias(userId: string, previousId?: string): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  analytics.alias(userId, previousId);
+}
 ```
 
-```python
-# Install Segment
-pip install segment-analytics-python
+#### Usage in React
 
-# Initialize Segment
-from segment import Analytics
+```typescript
+// src/components/SignupForm.tsx
+import { useState } from 'react';
+import { identify, trackEvent } from '../analytics/segment';
 
-analytics = Analytics('YOUR_WRITE_KEY')
+export function SignupForm() {
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
 
-# Track page view
-analytics.track(
-    'Page View',
-    {'path': '/home'}
-)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-# Track custom event
-analytics.track(
-    'Button Click',
-    {
-        'button_name': 'Sign Up',
-        'location': 'Homepage'
-    }
-)
+    // Identify user
+    identify(email, {
+      name,
+      email,
+      signupDate: new Date().toISOString(),
+    });
+
+    // Track signup event
+    trackEvent('user_signed_up', {
+      method: 'email',
+      plan: 'free',
+    });
+
+    // Submit form...
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Name"
+      />
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+      />
+      <button type="submit">Sign Up</button>
+    </form>
+  );
+}
 ```
 
 ---
 
 ## Event Tracking
 
-### Page View Tracking
+### Event Naming Conventions
 
 ```typescript
-// Track page views
-import { gtag } from 'ga-gtag';
-
-export function trackPageView(title: string, location: string) {
-  gtag('event', 'page_view', {
-    page_title: title,
-    page_location: location,
-  });
-}
-
-// Usage
-trackPageView('Home Page', 'https://example.com/home');
+// src/analytics/event-naming.ts
+export const AnalyticsEvents = {
+  // User actions
+  USER_SIGNED_UP: 'user_signed_up',
+  USER_LOGGED_IN: 'user_logged_in',
+  USER_LOGGED_OUT: 'user_logged_out',
+  
+  // Page interactions
+  PAGE_VIEWED: 'page_viewed',
+  BUTTON_CLICKED: 'button_clicked',
+  LINK_CLICKED: 'link_clicked',
+  FORM_SUBMITTED: 'form_submitted',
+  
+  // E-commerce
+  PRODUCT_VIEWED: 'product_viewed',
+  PRODUCT_ADDED_TO_CART: 'product_added_to_cart',
+  PRODUCT_REMOVED_FROM_CART: 'product_removed_from_cart',
+  CHECKOUT_STARTED: 'checkout_started',
+  CHECKOUT_COMPLETED: 'checkout_completed',
+  ORDER_PLACED: 'order_placed',
+  
+  // Content
+  ARTICLE_VIEWED: 'article_viewed',
+  VIDEO_PLAYED: 'video_played',
+  VIDEO_PAUSED: 'video_paused',
+  VIDEO_COMPLETED: 'video_completed',
+  
+  // Search
+  SEARCH_PERFORMED: 'search_performed',
+  SEARCH_RESULT_CLICKED: 'search_result_clicked',
+} as const;
 ```
 
-```python
-# Track page views
-from google.analytics.data_api import BetaAnalyticsDataApiV4
-
-client = BetaAnalyticsDataApiV4()
-client.initialize(property_id='GA_MEASUREMENT_ID')
-
-def track_page_view(title: str, location: str):
-    client.events().create(
-        event_name='page_view',
-        params={
-            'page_title': title,
-            'page_location': location
-        }
-    ).execute()
-```
-
-### Custom Event Tracking
+### Event Tracking Hook
 
 ```typescript
-// Track custom events
-import { gtag } from 'ga-gtag';
+// src/hooks/useAnalytics.ts
+import { useCallback } from 'react';
+import { trackEvent as gaTrackEvent } from '../analytics/ga4';
+import { trackEvent as mixpanelTrackEvent } from '../analytics/mixpanel';
+import { trackEvent as segmentTrackEvent } from '../analytics/segment';
 
-export function trackEvent(category: string, action: string, label?: string, value?: any) {
-  gtag('event', action, {
-    event_category: category,
-    event_label: label,
-    value,
-  });
+export function useAnalytics() {
+  const trackEvent = useCallback((
+    eventName: string,
+    properties?: Record<string, any>
+  ) => {
+    // Track in GA4
+    gaTrackEvent(eventName, properties);
+    
+    // Track in Mixpanel
+    mixpanelTrackEvent(eventName, properties);
+    
+    // Track in Segment
+    segmentTrackEvent(eventName, properties);
+  }, []);
+
+  const trackPageView = useCallback((
+    pagePath: string,
+    pageTitle: string
+  ) => {
+    gaTrackEvent('page_view', {
+      page_path: pagePath,
+      page_title: pageTitle,
+    });
+  }, []);
+
+  const identifyUser = useCallback((userId: string, traits?: Record<string, any>) => {
+    // Identify in Mixpanel
+    mixpanel.identify(userId);
+    
+    // Identify in Segment
+    segmentTrackEvent('identify', { userId, ...traits });
+  }, []);
+
+  const setUserProperties = useCallback((properties: Record<string, any>) => {
+    // Set user properties in Mixpanel
+    mixpanel.setUserProperties(properties);
+    
+    // Set user properties in Segment
+    segmentTrackEvent('set_user_properties', properties);
+  }, []);
+
+  return {
+    trackEvent,
+    trackPageView,
+    identifyUser,
+    setUserProperties,
+  };
 }
-
-// Usage
-trackEvent('engagement', 'click', 'signup_button');
-trackEvent('ecommerce', 'purchase', 'product_123', 99.99);
 ```
 
-```python
-# Track custom events
-from google.analytics.data_api import BetaAnalyticsDataApiV4
-
-client = BetaAnalyticsDataApiV4()
-client.initialize(property_id='GA_MEASUREMENT_ID')
-
-def track_event(category: str, action: str, label: str = None, value: any = None):
-    client.events().create(
-        event_name=action,
-        params={
-            'event_category': category,
-            'event_label': label,
-            'value': value
-        }
-    ).execute()
-
-# Usage
-track_event('engagement', 'click', 'signup_button')
-track_event('ecommerce', 'purchase', value=99.99)
-```
-
-### Form Submission Tracking
+### Usage Example
 
 ```typescript
-// Track form submissions
-import { gtag } from 'ga-gtag';
+// src/components/ProductCard.tsx
+import { useAnalytics } from '../hooks/useAnalytics';
 
-export function trackFormSubmission(formName: string, formData: Record<string, any>) {
-  gtag('event', 'form_submit', {
-    event_category: 'forms',
-    event_label: formName,
-    form_name: formName,
-    ...formData,
-  });
+interface ProductCardProps {
+  product: {
+    id: string;
+    name: string;
+    price: number;
+    category: string;
+  };
 }
 
-// Usage
-trackFormSubmission('Contact', {
-  name: 'John Doe',
-  email: 'john@example.com',
-  message: 'Hello',
-});
+export function ProductCard({ product }: ProductCardProps) {
+  const { trackEvent } = useAnalytics();
+
+  const handleView = () => {
+    trackEvent('product_viewed', {
+      product_id: product.id,
+      product_name: product.name,
+      product_price: product.price,
+      product_category: product.category,
+    });
+  };
+
+  const handleAddToCart = () => {
+    trackEvent('product_added_to_cart', {
+      product_id: product.id,
+      product_name: product.name,
+      product_price: product.price,
+      product_category: product.category,
+    });
+  };
+
+  return (
+    <div className="product-card">
+      <h3>{product.name}</h3>
+      <p>${product.price}</p>
+      <button onClick={handleView}>View Details</button>
+      <button onClick={handleAddToCart}>Add to Cart</button>
+    </div>
+  );
+}
 ```
 
 ---
 
 ## User Properties
 
-### Setting User Properties
+### User Property Tracking
 
 ```typescript
-// Set user properties
-import { gtag } from 'ga-gtag';
-
-export function setUserProperties(userId: string, properties: Record<string, any>) {
-  gtag('set', 'user_properties', properties);
+// src/analytics/user-properties.ts
+export interface UserProperties {
+  // Basic info
+  userId?: string;
+  email?: string;
+  name?: string;
+  
+  // Demographics
+  age?: number;
+  gender?: string;
+  country?: string;
+  city?: string;
+  
+  // Account info
+  plan?: 'free' | 'basic' | 'premium' | 'enterprise';
+  signupDate?: string;
+  lastLoginDate?: string;
+  
+  // Usage
+  totalOrders?: number;
+  totalSpent?: number;
+  lastOrderDate?: string;
+  
+  // Preferences
+  language?: string;
+  currency?: string;
+  timezone?: string;
 }
 
-// Usage
-setUserProperties('user_123', {
-  user_id: 'user_123',
-  plan: 'premium',
-  signup_date: '2024-01-01',
-});
+export function setUserProperties(properties: UserProperties): void {
+  // Set in GA4
+  (window as any).gtag('set', 'user_properties', properties);
+  
+  // Set in Mixpanel
+  mixpanel.people.set(properties);
+  
+  // Set in Segment
+  analytics.identify(properties.userId, properties);
+}
+
+export function incrementUserProperty(property: string, value: number): void {
+  // Increment in Mixpanel
+  mixpanel.people.increment(property, value);
+}
+
+export function setUserPropertyOnce(property: string, value: any): void {
+  // Set once in Mixpanel
+  mixpanel.people.set_once(property, value);
+}
+
+export function appendUserProperty(property: string, value: any): void {
+  // Append in Mixpanel
+  mixpanel.people.union(property, value);
+}
 ```
 
-```python
-# Set user properties
-from google.analytics.data_api import BetaAnalyticsDataApiV4
-
-client = BetaAnalyticsDataApiV4()
-client.initialize(property_id='GA_MEASUREMENT_ID')
-
-def set_user_properties(user_id: str, properties: dict):
-    client.events().create(
-        event_name='set_user_properties',
-        params={
-            'user_id': user_id,
-            **properties
-        }
-    ).execute()
-
-# Usage
-set_user_properties('user_123', {
-    'plan': 'premium',
-    'signup_date': '2024-01-01'
-})
-```
-
-### Updating User Properties
+### Usage Example
 
 ```typescript
-// Update user properties
-import { gtag } from 'ga-gtag';
+// src/components/Profile.tsx
+import { useEffect } from 'react';
+import { setUserProperties } from '../analytics/user-properties';
 
-export function updateUserProperties(userId: string, properties: Record<string, any>) {
-  gtag('set', 'user_properties', properties);
+export function Profile({ user }: { user: User }) {
+  useEffect(() => {
+    setUserProperties({
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      plan: user.plan,
+      signupDate: user.createdAt,
+      lastLoginDate: user.lastLoginAt,
+      totalOrders: user.orderCount,
+      totalSpent: user.totalSpent,
+      language: user.language,
+      currency: user.currency,
+    });
+  }, [user]);
+
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <p>Email: {user.email}</p>
+      <p>Plan: {user.plan}</p>
+    </div>
+  );
 }
-
-// Usage
-updateUserProperties('user_123', {
-  plan: 'enterprise',
-  upgraded_at: new Date().toISOString(),
-});
 ```
 
 ---
 
 ## Custom Dimensions
 
-### Defining Custom Dimensions
+### GA4 Custom Dimensions
 
 ```typescript
-// Define custom dimensions
-import { gtag } from 'gtag';
+// src/analytics/custom-dimensions.ts
+export const CustomDimensions = {
+  // User-scoped custom dimensions
+  USER_PLAN: 'custom_dimension_1',
+  USER_TIER: 'custom_dimension_2',
+  USER_SIGNUP_SOURCE: 'custom_dimension_3',
+  
+  // Event-scoped custom dimensions
+  EVENT_CATEGORY: 'custom_dimension_4',
+  EVENT_LABEL: 'custom_dimension_5',
+  PRODUCT_CATEGORY: 'custom_dimension_6',
+  
+  // Item-scoped custom dimensions
+  ITEM_BRAND: 'custom_dimension_7',
+  ITEM_VARIANT: 'custom_dimension_8',
+} as const;
 
-// Configure custom dimensions
-gtag('config', {
-  custom_map: {
-    dimension1: 'user_tier',
-    dimension2: 'content_type',
-    dimension3: 'page_section',
-  },
-});
-```
-
-### Using Custom Dimensions
-
-```typescript
-// Use custom dimensions in events
-import { gtag } from 'ga-gtag';
-
-export function trackPageView(title: string, section: string, tier: string) {
-  gtag('event', 'page_view', {
-    page_title: title,
-    page_section: section,
-    user_tier: tier,
-  });
+export function setCustomDimensions(dimensions: Record<string, any>): void {
+  (window as any).gtag('set', 'custom_map', dimensions);
 }
 
-// Usage
-trackPageView('Product Page', 'products', 'premium');
+export function trackEventWithCustomDimensions(
+  eventName: string,
+  parameters: Record<string, any>,
+  customDimensions?: Record<string, any>
+): void {
+  const allParameters = {
+    ...parameters,
+    ...customDimensions,
+  };
+  
+  (window as any).gtag('event', eventName, allParameters);
+}
+```
+
+### Usage Example
+
+```typescript
+// src/components/ProductCard.tsx
+import { trackEventWithCustomDimensions, CustomDimensions } from '../analytics/custom-dimensions';
+
+export function ProductCard({ product }: { product: Product }) {
+  const handleView = () => {
+    trackEventWithCustomDimensions(
+      'product_viewed',
+      {
+        item_id: product.id,
+        item_name: product.name,
+        price: product.price,
+      },
+      {
+        [CustomDimensions.PRODUCT_CATEGORY]: product.category,
+        [CustomDimensions.ITEM_BRAND]: product.brand,
+        [CustomDimensions.ITEM_VARIANT]: product.variant,
+      }
+    );
+  };
+
+  return <div onClick={handleView}>{product.name}</div>;
+}
 ```
 
 ---
 
-## E-Commerce Tracking
+## E-commerce Tracking
 
-### Product View Tracking
+### GA4 E-commerce Events
 
 ```typescript
-// Track product views
-import { gtag } from 'ga-gtag';
-
-export function trackProductView(productId: string, productName: string, price: number, category: string) {
-  gtag('event', 'view_item', {
-    event_category: 'ecommerce',
-    event_label: productId,
-    items: [
-      {
-        item_id: productId,
-        item_name: productName,
-        price: price,
-        item_category: category,
-      },
-    ],
+// src/analytics/ecommerce.ts
+export function trackViewItemList(
+  items: EcommerceItem[],
+  itemListName: string
+): void {
+  (window as any).gtag('event', 'view_item_list', {
+    item_list_name: itemListName,
+    items: items.map(item => ({
+      item_id: item.id,
+      item_name: item.name,
+      item_category: item.category,
+      price: item.price,
+      quantity: item.quantity,
+    })),
   });
 }
 
-// Usage
-trackProductView('prod_123', 'Premium Widget', 99.99, 'widgets');
+export function trackSelectItem(item: EcommerceItem, itemListName: string): void {
+  (window as any).gtag('event', 'select_item', {
+    item_list_name: itemListName,
+    items: [{
+      item_id: item.id,
+      item_name: item.name,
+      item_category: item.category,
+      price: item.price,
+    }],
+  });
+}
+
+export function trackViewItem(item: EcommerceItem): void {
+  (window as any).gtag('event', 'view_item', {
+    items: [{
+      item_id: item.id,
+      item_name: item.name,
+      item_category: item.category,
+      price: item.price,
+    }],
+    value: item.price,
+    currency: 'USD',
+  });
+}
+
+export function trackAddToCart(item: EcommerceItem): void {
+  (window as any).gtag('event', 'add_to_cart', {
+    items: [{
+      item_id: item.id,
+      item_name: item.name,
+      item_category: item.category,
+      price: item.price,
+      quantity: item.quantity,
+    }],
+    value: item.price * item.quantity,
+    currency: 'USD',
+  });
+}
+
+export function trackRemoveFromCart(item: EcommerceItem): void {
+  (window as any).gtag('event', 'remove_from_cart', {
+    items: [{
+      item_id: item.id,
+      item_name: item.name,
+      item_category: item.category,
+      price: item.price,
+      quantity: item.quantity,
+    }],
+    value: item.price * item.quantity,
+    currency: 'USD',
+  });
+}
+
+export function trackBeginCheckout(items: EcommerceItem[]): void {
+  const totalValue = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  
+  (window as any).gtag('event', 'begin_checkout', {
+    items: items.map(item => ({
+      item_id: item.id,
+      item_name: item.name,
+      item_category: item.category,
+      price: item.price,
+      quantity: item.quantity,
+    })),
+    value: totalValue,
+    currency: 'USD',
+  });
+}
+
+export function trackPurchase(order: Order): void {
+  (window as any).gtag('event', 'purchase', {
+    transaction_id: order.id,
+    value: order.total,
+    currency: 'USD',
+    items: order.items.map(item => ({
+      item_id: item.id,
+      item_name: item.name,
+      item_category: item.category,
+      price: item.price,
+      quantity: item.quantity,
+    })),
+  });
+}
+
+interface EcommerceItem {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  quantity: number;
+  brand?: string;
+  variant?: string;
+}
+
+interface Order {
+  id: string;
+  total: number;
+  items: EcommerceItem[];
+}
 ```
 
-### Purchase Tracking
+### Usage Example
 
 ```typescript
-// Track purchases
-import { gtag } from 'gtag';
+// src/components/ProductList.tsx
+import { trackViewItemList, trackSelectItem } from '../analytics/ecommerce';
 
-export function trackPurchase(orderId: string, items: Array<any>, total: number) {
-  gtag('event', 'purchase', {
-    transaction_id: orderId,
-    value: total,
-    items: items,
-  });
+export function ProductList({ products }: { products: Product[] }) {
+  useEffect(() => {
+    const items = products.map(p => ({
+      id: p.id,
+      name: p.name,
+      category: p.category,
+      price: p.price,
+      quantity: 1,
+    }));
+    
+    trackViewItemList(items, 'product_list');
+  }, [products]);
+
+  const handleProductClick = (product: Product) => {
+    trackSelectItem({
+      id: product.id,
+      name: product.name,
+      category: product.category,
+      price: product.price,
+      quantity: 1,
+    }, 'product_list');
+  };
+
+  return (
+    <div>
+      {products.map(product => (
+        <div key={product.id} onClick={() => handleProductClick(product)}>
+          {product.name} - ${product.price}
+        </div>
+      ))}
+    </div>
+  );
 }
-
-// Usage
-trackPurchase('order_456', [
-  {
-    item_id: 'prod_123',
-    item_name: 'Premium Widget',
-    price: 99.99,
-    quantity: 2,
-  },
-], 199.98);
-```
-
-### Checkout Tracking
-
-```typescript
-// Track checkout steps
-import { gtag } from 'ga-gtag';
-
-export function trackCheckoutStep(step: string, stepNumber: number) {
-  gtag('event', 'begin_checkout', {
-    event_category: 'ecommerce',
-    event_label: step,
-    checkout_step: stepNumber,
-  });
-}
-
-// Usage
-trackCheckoutStep('shipping_info', 1);
-trackCheckoutStep('payment_info', 2);
-trackCheckoutStep('review', 3);
-trackCheckoutStep('complete', 4);
 ```
 
 ---
 
 ## Privacy Considerations
 
-### Anonymizing IP Addresses
-
-```typescript
-// Anonymize IP addresses
-export function anonymizeIP(ip: string): string {
-  const parts = ip.split('.');
-  return `${parts[0]}.${parts[1]}.${parts[2]}.xxx`;
-}
-
-// Usage
-const anonymizedIP = anonymizeIP('192.168.1.100');
-// Returns: 192.168.1.xxx
-```
-
-### Hashing User Data
-
-```typescript
-// Hash user identifiers
-import { createHash } from 'crypto';
-
-export function hashUserId(userId: string): string {
-  return createHash('sha256').update(userId).digest('hex');
-}
-
-// Usage
-const hashedUserId = hashUserId('user_123');
-```
-
-### Removing PII
-
-```typescript
-// Remove PII from events
-export function sanitizeEvent(event: any): any {
-  const sanitized = { ...event };
-
-  // Remove PII fields
-  delete sanitized.email;
-  delete sanitized.phone;
-  delete sanitized.ssn;
-  delete sanitized.creditCard;
-
-  return sanitized;
-}
-
-// Usage
-const event = {
-  user_id: 'user_123',
-  email: 'john@example.com', // Will be removed
-  phone: '555-1234', // Will be removed
-  action: 'purchase',
-};
-
-const sanitized = sanitizeEvent(event);
-```
-
 ### Consent Management
 
 ```typescript
-// Check user consent
-export function hasConsent(consentType: string): boolean {
-  const consent = localStorage.getItem(`consent_${consentType}`);
-  return consent === 'true';
+// src/analytics/consent.ts
+export type ConsentCategory = 'analytics' | 'marketing' | 'personalization';
+
+export interface ConsentState {
+  analytics: boolean;
+  marketing: boolean;
+  personalization: boolean;
 }
 
-export function setConsent(consentType: string, granted: boolean): void {
-  localStorage.setItem(`consent_${consentType}`, granted.toString());
+export function initConsent(): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  // Load consent from localStorage
+  const savedConsent = localStorage.getItem('analytics_consent');
+  
+  if (savedConsent) {
+    const consent = JSON.parse(savedConsent) as ConsentState;
+    applyConsent(consent);
+  }
 }
 
-// Usage
-if (hasConsent('analytics')) {
-  // Track analytics
+export function setConsent(consent: ConsentState): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  // Save consent to localStorage
+  localStorage.setItem('analytics_consent', JSON.stringify(consent));
+  
+  // Apply consent
+  applyConsent(consent);
+}
+
+export function applyConsent(consent: ConsentState): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  // Update GA4 consent
+  (window as any).gtag('consent', 'update', {
+    analytics_storage: consent.analytics ? 'granted' : 'denied',
+    ad_storage: consent.marketing ? 'granted' : 'denied',
+    ad_user_data: consent.marketing ? 'granted' : 'denied',
+    ad_personalization: consent.personalization ? 'granted' : 'denied',
+  });
+}
+
+export function hasConsent(category: ConsentCategory): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const savedConsent = localStorage.getItem('analytics_consent');
+  
+  if (!savedConsent) {
+    return false;
+  }
+
+  const consent = JSON.parse(savedConsent) as ConsentState;
+  return consent[category];
+}
+```
+
+### Data Anonymization
+
+```typescript
+// src/analytics/anonymization.ts
+export function anonymizeEmail(email: string): string {
+  const [username, domain] = email.split('@');
+  const anonymizedUsername = username.substring(0, 2) + '***';
+  return `${anonymizedUsername}@${domain}`;
+}
+
+export function anonymizePhone(phone: string): string {
+  return phone.substring(0, 3) + '***' + phone.substring(phone.length - 2);
+}
+
+export function anonymizeName(name: string): string {
+  const parts = name.split(' ');
+  const anonymizedParts = parts.map(part => part.substring(0, 1) + '***');
+  return anonymizedParts.join(' ');
+}
+
+export function anonymizeAddress(address: string): string {
+  const parts = address.split(' ');
+  return parts[0] + '*** ' + parts.slice(-2).join(' ');
+}
+```
+
+### Usage Example
+
+```typescript
+// src/components/AnalyticsProvider.tsx
+import { useEffect } from 'react';
+import { initConsent, hasConsent } from '../analytics/consent';
+import { trackEvent } from '../analytics/ga4';
+
+export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    // Initialize consent
+    initConsent();
+  }, []);
+
+  const handleTrackEvent = (eventName: string, properties?: Record<string, any>) => {
+    // Only track if consent is given
+    if (hasConsent('analytics')) {
+      trackEvent(eventName, properties);
+    }
+  };
+
+  return (
+    <AnalyticsContext.Provider value={{ trackEvent: handleTrackEvent }}>
+      {children}
+    </AnalyticsContext.Provider>
+  );
 }
 ```
 
@@ -537,58 +941,88 @@ if (hasConsent('analytics')) {
 
 ## Server-Side Tracking
 
-### Node.js Server-Side Tracking
+### GA4 Server-Side Tracking
 
 ```typescript
-// Install GA4
-npm install @google-analytics/data
+// src/analytics/ga4-server.ts
+import { createTransport } from '@gtag/server';
 
-// Initialize GA4
-import { MeasurementProtocol } from '@google-analytics/data';
+const GA4_MEASUREMENT_ID = process.env.GA4_MEASUREMENT_ID || '';
+const GA4_API_SECRET = process.env.GA4_API_SECRET || '';
 
-const measurement = new MeasurementProtocol('GA_MEASUREMENT_ID', {
-  debug: process.env.NODE_ENV !== 'production',
-});
+export async function trackEventServer(
+  eventName: string,
+  parameters?: Record<string, any>,
+  clientId?: string
+): Promise<void> {
+  if (!GA4_MEASUREMENT_ID || !GA4_API_SECRET) {
+    return;
+  }
 
-// Track event from server
-export function trackServerEvent(eventName: string, parameters: Record<string, any>) {
-  measurement.event(eventName, parameters);
+  const transport = createTransport({
+    measurementId: GA4_MEASUREMENT_ID,
+    apiSecret: GA4_API_SECRET,
+  });
+
+  await transport.send({
+    name: eventName,
+    parameters: {
+      ...parameters,
+      engagement_time_msec: 100,
+    },
+    clientId,
+  });
 }
 
-// Usage
-trackServerEvent('api_request', {
-  endpoint: '/api/users',
-  method: 'GET',
-  status_code: 200,
-  response_time_ms: 150,
-});
+export async function trackPageViewServer(
+  pagePath: string,
+  pageTitle: string,
+  clientId?: string
+): Promise<void> {
+  await trackEventServer('page_view', {
+    page_path: pagePath,
+    page_title: pageTitle,
+  }, clientId);
+}
 ```
 
-### Python Server-Side Tracking
+### Mixpanel Server-Side Tracking
 
-```python
-# Install GA4
-pip install google-analytics-data-api
+```typescript
+// src/analytics/mixpanel-server.ts
+import Mixpanel from 'mixpanel';
 
-from google.analytics.data_api import BetaAnalyticsDataApiV4
+const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN || '';
 
-client = BetaAnalyticsDataApiV4()
-client.initialize(property_id='GA_MEASUREMENT_ID')
+const mixpanel = Mixpanel.init(MIXPANEL_TOKEN, {
+  geolocate: true,
+});
 
-# Track event from server
-def track_server_event(event_name: str, parameters: dict):
-    client.events().create(
-        event_name=event_name,
-        params=parameters
-    ).execute()
+export function trackEventServer(
+  eventName: string,
+  properties?: Record<string, any>,
+  distinctId?: string
+): void {
+  mixpanel.track(eventName, {
+    ...properties,
+    distinct_id: distinctId,
+    ip: '0.0.0.0', // Disable IP tracking
+  });
+}
 
-# Usage
-track_server_event('api_request', {
-    'endpoint': '/api/users',
-    'method': 'GET',
-    'status_code': 200,
-    "response_time_ms": 150
-})
+export function identifyServer(
+  distinctId: string,
+  traits?: Record<string, any>
+): void {
+  mixpanel.people.set(distinctId, traits);
+}
+
+export function setUserPropertiesServer(
+  distinctId: string,
+  properties: Record<string, any>
+): void {
+  mixpanel.people.set(distinctId, properties);
+}
 ```
 
 ---
@@ -598,62 +1032,64 @@ track_server_event('api_request', {
 ### Event Schema Validation
 
 ```typescript
-// Validate event data
-interface AnalyticsEvent {
-  event_name: string;
-  event_category?: string;
-  event_label?: string;
-  value?: number;
-  [key: string]: any;
-}
+// src/analytics/validation.ts
+import { z } from 'zod';
 
-export function validateEvent(event: any): AnalyticsEvent | null {
-  if (!event || typeof event !== 'object') {
-    return null;
-  }
-
-  if (!event.event_name || typeof event.event_name !== 'string') {
-    return null;
-  }
-
-  return event as AnalyticsEvent;
-}
-
-// Usage
-const event = validateEvent({
-  event_name: 'button_click',
-  event_category: 'engagement',
-  event_label: 'signup_button',
+export const EventSchema = z.object({
+  eventName: z.string().min(1),
+  properties: z.record(z.any()).optional(),
+  userId: z.string().optional(),
+  timestamp: z.date().optional(),
 });
 
-if (event) {
-  // Track event
+export const UserPropertiesSchema = z.object({
+  userId: z.string().optional(),
+  email: z.string().email().optional(),
+  name: z.string().optional(),
+  plan: z.enum(['free', 'basic', 'premium', 'enterprise']).optional(),
+});
+
+export function validateEvent(event: unknown): boolean {
+  try {
+    EventSchema.parse(event);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function validateUserProperties(properties: unknown): boolean {
+  try {
+    UserPropertiesSchema.parse(properties);
+    return true;
+  } catch {
+    return false;
+  }
 }
 ```
 
-### Required Fields Validation
+### Usage Example
 
 ```typescript
-// Validate required fields
-export function validateRequiredFields(event: any, requiredFields: string[]): boolean {
-  for (const field of requiredFields) {
-    if (!event[field]) {
-      console.warn(`Missing required field: ${field}`);
-      return false;
-    }
+// src/analytics/analytics.ts
+export function trackEvent(
+  eventName: string,
+  properties?: Record<string, any>
+): void {
+  const event = {
+    eventName,
+    properties,
+    timestamp: new Date(),
+  };
+
+  // Validate event before tracking
+  if (!validateEvent(event)) {
+    console.error('Invalid event:', event);
+    return;
   }
-  return true;
-}
 
-// Usage
-const event = {
-  event_name: 'purchase',
-  transaction_id: 'order_123',
-  value: 99.99,
-};
-
-if (validateRequiredFields(event, ['event_name', 'transaction_id', 'value'])) {
   // Track event
+  (window as any).gtag('event', eventName, properties);
 }
 ```
 
@@ -661,54 +1097,56 @@ if (validateRequiredFields(event, ['event_name', 'transaction_id', 'value'])) {
 
 ## Testing Analytics
 
-### Debug Mode
+### Analytics Testing Utilities
 
 ```typescript
-// Enable debug mode for development
-import { gtag } from 'ga-gtag';
+// test/analytics/analytics.test.ts
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import { trackEvent, setUserProperties } from '../../src/analytics/ga4';
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
+describe('Analytics', () => {
+  beforeEach(() => {
+    // Setup mock
+    (window as any).gtag = jest.fn();
+  });
 
-gtag('config', {
-  debug_mode: isDevelopment,
-  send_page_view: !isDevelopment, // Don't send page views in dev
+  afterEach(() => {
+    // Cleanup
+    delete (window as any).gtag;
+  });
+
+  it('should track event', () => {
+    trackEvent('test_event', { test_param: 'test_value' });
+
+    expect((window as any).gtag).toHaveBeenCalledWith('event', 'test_event', {
+      test_param: 'test_value',
+    });
+  });
+
+  it('should track page view', () => {
+    trackEvent('page_view', {
+      page_path: '/test',
+      page_title: 'Test Page',
+    });
+
+    expect((window as any).gtag).toHaveBeenCalledWith('event', 'page_view', {
+      page_path: '/test',
+      page_title: 'Test Page',
+    });
+  });
+
+  it('should set user properties', () => {
+    setUserProperties({
+      user_id: '123',
+      plan: 'premium',
+    });
+
+    expect((window as any).gtag).toHaveBeenCalledWith('set', 'user_properties', {
+      user_id: '123',
+      plan: 'premium',
+    });
+  });
 });
-
-// Log events in development
-export function trackEvent(category: string, action: string, label?: string) {
-  const eventData = {
-    event_category: category,
-    event_label: label,
-  };
-
-  if (isDevelopment) {
-    console.log('Analytics Event:', eventData);
-  } else {
-    gtag('event', action, eventData);
-  }
-}
-```
-
-### Test Events
-
-```typescript
-// Test analytics tracking
-export function testAnalytics() {
-  console.log('Testing analytics...');
-
-  // Test page view
-  gtag('event', 'page_view', {
-    page_title: 'Test Page',
-  });
-
-  // Test custom event
-  gtag('event', 'test_event', {
-    event_category: 'test',
-    event_label: 'test_label',
-  });
-
-  console.log('Analytics test complete');
-}
 ```
 
 ---
@@ -718,189 +1156,109 @@ export function testAnalytics() {
 ### 1. Use Consistent Event Names
 
 ```typescript
-// Use consistent naming convention
-export const EVENT_NAMES = {
-  PAGE_VIEW: 'page_view',
-  BUTTON_CLICK: 'button_click',
-  FORM_SUBMIT: 'form_submit',
-  PURCHASE: 'purchase',
-  SEARCH: 'search',
-};
+// Good: Consistent event names
+export const Events = {
+  USER_SIGNED_UP: 'user_signed_up',
+  USER_LOGGED_IN: 'user_logged_in',
+  PRODUCT_VIEWED: 'product_viewed',
+} as const;
 
-// Usage
-gtag('event', EVENT_NAMES.BUTTON_CLICK, {
-  event_category: 'engagement',
-  event_label: 'signup_button',
-});
+// Bad: Inconsistent event names
+export const Events = {
+  signUp: 'sign_up',
+  login: 'login',
+  viewProduct: 'view_product',
+} as const;
 ```
 
-### 2. Set User Context
+### 2. Validate Events
 
 ```typescript
-// Set user context early
-export function setUserContext(userId: string, properties: Record<string, any>) {
-  gtag('set', 'user_id', userId);
-  gtag('set', 'user_properties', properties);
+// Good: Validate events
+export function trackEvent(eventName: string, properties?: Record<string, any>): void {
+  if (!validateEvent({ eventName, properties })) {
+    console.error('Invalid event:', { eventName, properties });
+    return;
+  }
+
+  (window as any).gtag('event', eventName, properties);
 }
 
-// Usage
-setUserContext('user_123', {
-  plan: 'premium',
-  signup_date: '2024-01-01',
-});
+// Bad: No validation
+export function trackEvent(eventName: string, properties?: Record<string, any>): void {
+  (window as any).gtag('event', eventName, properties);
+}
 ```
 
-### 3. Track Key Metrics
+### 3. Respect User Consent
 
 ```typescript
-// Track key business metrics
-export function trackKeyMetrics() {
-  gtag('event', 'page_view', {
-    page_title: document.title,
-    page_location: window.location.href,
+// Good: Respect consent
+export function trackEvent(eventName: string, properties?: Record<string, any>): void {
+  if (!hasConsent('analytics')) {
+    return;
+  }
+
+  (window as any).gtag('event', eventName, properties);
+}
+
+// Bad: Ignore consent
+export function trackEvent(eventName: string, properties?: Record<string, any>): void {
+  (window as any).gtag('event', eventName, properties);
+}
+```
+
+### 4. Anonymize Sensitive Data
+
+```typescript
+// Good: Anonymize data
+export function trackUserSignup(email: string, name: string): void {
+  (window as any).gtag('event', 'user_signed_up', {
+    email: anonymizeEmail(email),
+    name: anonymizeName(name),
   });
 }
 
-export function trackConversion() {
-  gtag('event', 'conversion', {
-    value: 1,
-  });
-}
-```
-
-### 4. Use Custom Dimensions
-
-```typescript
-// Use custom dimensions for better analysis
-export function trackWithDimensions(event: string, dimensions: Record<string, string>) {
-  gtag('event', event, dimensions);
-}
-
-// Usage
-trackWithDimensions('page_view', {
-  user_tier: 'premium',
-  content_type: 'article',
-  page_section: 'blog',
-});
-```
-
-### 5. Validate Data Before Sending
-
-```typescript
-// Validate event data
-export function trackValidatedEvent(event: any) {
-  const validated = validateEvent(event);
-
-  if (validated) {
-    gtag('event', validated.event_name, validated);
-  }
-}
-```
-
-### 6. Handle Errors Gracefully
-
-```typescript
-// Handle tracking errors
-export function safeTrack(event: string, parameters?: Record<string, any>) {
-  try {
-    gtag('event', event, parameters);
-  } catch (error) {
-    console.error('Analytics error:', error);
-  }
-}
-
-// Usage
-safeTrack('button_click', {
-  button_name: 'signup_button',
-});
-```
-
-### 7. Use Server-Side Tracking for Sensitive Data
-
-```typescript
-// Track sensitive data server-side
-export function trackServerEvent(eventName: string, parameters: Record<string, any>) {
-  fetch('/api/analytics', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      event_name: eventName,
-      parameters,
-      timestamp: new Date().toISOString(),
-    }),
-  }).catch(error => {
-    console.error('Analytics error:', error);
+// Bad: Send raw data
+export function trackUserSignup(email: string, name: string): void {
+  (window as any).gtag('event', 'user_signed_up', {
+    email,
+    name,
   });
 }
 ```
 
-### 8. Respect User Consent
+### 5. Test Analytics
 
 ```typescript
-// Check consent before tracking
-export function trackWithConsent(event: string, parameters?: Record<string, any>) {
-  if (hasConsent('analytics')) {
-    gtag('event', event, parameters);
-  } else {
-    console.log('Analytics consent not granted');
-  }
-}
-```
+// Good: Test analytics
+describe('Analytics', () => {
+  it('should track event', () => {
+    trackEvent('test_event', { test_param: 'test_value' });
 
-### 9. Use Event Batching
-
-```typescript
-// Batch events for performance
-const eventQueue: any[] = [];
-
-export function queueEvent(event: any) {
-  eventQueue.push(event);
-
-  if (eventQueue.length >= 10) {
-    flushEvents();
-  }
-}
-
-function flushEvents() {
-  if (eventQueue.length === 0) return;
-
-  eventQueue.forEach(event => {
-    gtag('event', event.event_name, event);
+    expect((window as any).gtag).toHaveBeenCalledWith('event', 'test_event', {
+      test_param: 'test_value',
+    });
   });
+});
 
-  eventQueue.length = 0;
-}
-```
-
-### 10. Document Your Events
-
-```typescript
-// Document analytics events
-/**
- * Analytics Events
- *
- * PAGE_VIEW: Tracked when a user views a page
- * BUTTON_CLICK: Tracked when a user clicks a button
- * FORM_SUBMIT: Tracked when a user submits a form
- * PURCHASE: Tracked when a user makes a purchase
- *
- * Event Naming Convention: category_action
- */
-export const EVENTS = {
-  PAGE_VIEW: 'page_view',
-  BUTTON_CLICK: 'button_click',
-  FORM_SUBMIT: 'form_submit',
-  PURCHASE: 'purchase',
-};
+// Bad: No tests
+// No testing of analytics
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [Google Analytics 4 Documentation](https://developers.google.com/analytics/devguides/collection/gtagjs/)
-- [Mixpanel Documentation](https://mixpanel.com/help/reference/)
-- [Segment Documentation](https://segment.com/docs/connections/sources/)
-- [Analytics Best Practices](https://www.optimizesmartly.com/blog/google-analytics/)
+This skill covers comprehensive analytics and event tracking patterns including:
+
+- **Analytics Platforms**: Google Analytics 4, Mixpanel, Segment setup and usage
+- **Event Tracking**: Event naming conventions, tracking hooks, usage examples
+- **User Properties**: User property tracking, usage examples
+- **Custom Dimensions**: GA4 custom dimensions, usage examples
+- **E-commerce Tracking**: GA4 e-commerce events, usage examples
+- **Privacy Considerations**: Consent management, data anonymization
+- **Server-Side Tracking**: GA4 and Mixpanel server-side tracking
+- **Data Validation**: Event schema validation
+- **Testing Analytics**: Analytics testing utilities
+- **Best Practices**: Consistent names, validation, consent, anonymization, testing

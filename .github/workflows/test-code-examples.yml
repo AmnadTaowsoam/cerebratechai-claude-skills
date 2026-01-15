@@ -5,6 +5,8 @@ on:
     branches: [ main ]
     paths:
       - '**/SKILL.md'
+permissions:
+  contents: read
 
 jobs:
   extract-and-test:
@@ -61,7 +63,7 @@ jobs:
 
       - name: Report results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ matrix.language }}
           path: extracted-examples/${{ matrix.language }}/test-results/

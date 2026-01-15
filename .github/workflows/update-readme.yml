@@ -6,6 +6,8 @@ on:
     paths:
       - '**/SKILL.md'
       - '.github/workflows/update-readme.yml'
+permissions:
+  contents: write
 
 jobs:
   update-readme:
@@ -16,7 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
 
       - name: Setup Python
         uses: actions/setup-python@v4

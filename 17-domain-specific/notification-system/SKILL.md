@@ -1,19 +1,24 @@
 # Notification System
 
-A comprehensive guide to notification system implementation.
+## Overview
+
+A notification system delivers messages to users through various channels. This skill covers notification types (email, SMS, push, in-app), service integration (SendGrid/AWS SES, Twilio, Firebase), template management, notification preferences, queue-based delivery, retry logic, delivery tracking, rate limiting, testing, and best practices.
 
 ## Table of Contents
 
 1. [Notification Types](#notification-types)
 2. [Service Integration](#service-integration)
+   - [Email (SendGrid/AWS SES)](#email-sendgridaws-ses)
+   - [SMS (Twilio)](#sms-twilio)
+   - [Push Notifications (Firebase)](#push-notifications-firebase)
+   - [In-App Notifications](#in-app-notifications)
 3. [Template Management](#template-management)
 4. [Notification Preferences](#notification-preferences)
 5. [Queue-Based Delivery](#queue-based-delivery)
 6. [Retry Logic](#retry-logic)
 7. [Delivery Tracking](#delivery-tracking)
-8. [Rate Limiting](#rate-limiting)
-9. [Testing](#testing)
-10. [Best Practices](#best-practices)
+8. [Testing](#testing)
+9. [Best Practices](#best-practices)
 
 ---
 
@@ -22,361 +27,377 @@ A comprehensive guide to notification system implementation.
 ### Email Notifications
 
 ```typescript
-// Send email notification
-import { SendGrid } from '@sendgrid/mail';
-import { EmailData } from './types';
-
-export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
-  const msg = {
-    to,
-    from: process.env.SENDGRID_FROM_EMAIL,
-    subject,
-    html,
-  };
-
-  await sg.send(msg);
+// src/notifications/email-notification.ts
+export interface EmailNotification {
+  to: string | string[];
+  subject: string;
+  html?: string;
+  text?: string;
+  templateId?: string;
+  templateData?: Record<string, any>;
+  attachments?: EmailAttachment[];
+  from?: string;
+  replyTo?: string;
 }
-```
 
-```python
-# Send email notification
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Content
-from python.core import serializers
-
-sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-
-def send_email(to: str, subject: str, html: str) -> None:
-    message = Mail(
-        from_email=os.environ.get('SENDGRID_FROM_EMAIL'),
-        to_emails=[to],
-        subject=subject,
-        html_content=Content(html)
-    )
-
-    response = sg.send(message)
-    print(f"Email sent: {response.status_code}")
+export interface EmailAttachment {
+  filename: string;
+  content: string | Buffer;
+  contentType?: string;
+}
 ```
 
 ### SMS Notifications
 
 ```typescript
-// Send SMS notification
-import twilio from 'twilio';
-
-const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-
-export async function sendSMS(to: string, message: string): Promise<void> {
-  const message = await client.messages.create({
-    body: message,
-    to,
-    from: process.env.TWILIO_PHONE_NUMBER,
-  });
-
-  console.log(`SMS sent: ${message.sid}`);
+// src/notifications/sms-notification.ts
+export interface SMSNotification {
+  to: string;
+  body: string;
+  from?: string;
+  mediaUrls?: string[];
 }
-```
-
-```python
-# Send SMS notification
-from twilio.rest import Client
-
-client = Client(
-    os.environ.get('TWILIO_ACCOUNT_SID'),
-    os.environ.get('TILIO_AUTH_TOKEN')
-)
-
-def send_sms(to: str, message: str) -> None:
-    message = client.messages.create(
-        body=message,
-        to=to,
-        from_=os.environ.get('TWILIO_PHONE_NUMBER')
-    )
-
-    print(f"SMS sent: {message.sid}")
 ```
 
 ### Push Notifications
 
 ```typescript
-// Send push notification
-import admin from 'firebase-admin';
-
-const messaging = admin.messaging();
-
-export async function sendPushNotification(userId: string, title: string, body: string): Promise<void> {
-  const message = {
-    notification: {
-      title,
-      body,
-    },
-    token: await getDeviceToken(userId),
-  };
-
-  await messaging.send(message);
+// src/notifications/push-notification.ts
+export interface PushNotification {
+  to: string | string[];
+  title: string;
+  body: string;
+  data?: Record<string, any>;
+  badge?: number;
+  sound?: string;
+  image?: string;
+  priority?: 'high' | 'normal';
+  ttl?: number;
 }
-```
-
-```python
-# Send push notification
-from firebase_admin import messaging
-
-messaging = messaging.Client(api_key=os.environ.get('FIREBASE_API_KEY'))
-
-def send_push_notification(user_id: str, title: str, body: str) -> None:
-    message = messaging.Message(
-        notification=messaging.Notification(
-            title=title,
-            body=body
-        ),
-        token=get_device_token(user_id)
-    )
-
-    response = messaging.send(message)
-    print(f"Push notification sent: {response}")
 ```
 
 ### In-App Notifications
 
 ```typescript
-// In-app notification
-import { toast } from 'react-hot-toast';
-
-export function showNotification(title: string, message: string): void {
-  toast.success(title, {
-    description: message,
-    position: 'top-right',
-    autoClose: 5000,
-  });
+// src/notifications/inapp-notification.ts
+export interface InAppNotification {
+  userId: string;
+  title: string;
+  body: string;
+  type: NotificationType;
+  data?: Record<string, any>;
+  actionUrl?: string;
+  expiresAt?: Date;
 }
-```
 
-```python
-# In-app notification (Django)
-from django.contrib import messages
-
-def show_in_app_notification(request, title: str, message: str) -> None:
-    messages.success(request, title, message)
+export enum NotificationType {
+  INFO = 'info',
+  SUCCESS = 'success',
+  WARNING = 'warning',
+  ERROR = 'error',
+}
 ```
 
 ---
 
 ## Service Integration
 
-### SendGrid Integration
+### Email (SendGrid/AWS SES)
+
+#### SendGrid Integration
 
 ```typescript
-// services/emailService.ts
-import { SendGrid } from '@sendgrid/mail';
+// src/notifications/sendgrid.service.ts
+import sgMail from '@sendgrid/mail';
 
-const sg = new SendGrid(process.env.SENDGRID_API_KEY);
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || '';
 
-export class EmailService {
-  async sendWelcomeEmail(to: string, name: string): Promise<void> {
-    const html = `
-      <h1>Welcome, ${name}!</h1>
-      <p>Thank you for signing up for our service.</p>
-      <p>We're excited to have you on board!</p>
-    `;
+sgMail.setApiKey(SENDGRID_API_KEY);
 
-    const msg = {
-      to,
-      from: process.env.SENDGRID_FROM_EMAIL,
-      subject: 'Welcome to Our Service',
-      html,
+export class SendGridService {
+  async sendEmail(notification: EmailNotification): Promise<void> {
+    const msg: sgMail.MailDataRequired = {
+      to: notification.to,
+      from: notification.from || 'noreply@example.com',
+      subject: notification.subject,
+      text: notification.text,
+      html: notification.html,
+      templateId: notification.templateId,
+      dynamicTemplateData: notification.templateData,
+      attachments: notification.attachments?.map(att => ({
+        filename: att.filename,
+        content: att.content.toString('base64'),
+        type: att.contentType,
+        disposition: 'attachment',
+      })),
     };
 
-    await sg.send(msg);
+    try {
+      await sgMail.send(msg);
+      console.log('Email sent successfully:', notification.to);
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      throw error;
+    }
   }
 
-  async sendPasswordResetEmail(to: string, resetToken: string): Promise<void> {
-    const html = `
-      <h1>Password Reset</h1>
-      <p>Click the link below to reset your password:</p>
-      <p><a href="${process.env.APP_URL}/reset?token=${resetToken}">Reset Password</a></p>
-      `;
-
-    const msg = {
+  async sendTemplateEmail(
+    to: string | string[],
+    templateId: string,
+    templateData: Record<string, any>
+  ): Promise<void> {
+    const msg: sgMail.MailDataRequired = {
       to,
-      from: process.env.SENDGRID_FROM_EMAIL,
-      subject: 'Password Reset',
-      html,
+      from: 'noreply@example.com',
+      templateId,
+      dynamicTemplateData: templateData,
     };
 
-    await sg.send(msg);
+    try {
+      await sgMail.send(msg);
+      console.log('Template email sent successfully:', to);
+    } catch (error) {
+      console.error('Failed to send template email:', error);
+      throw error;
+    }
   }
 }
+
+export const sendGridService = new SendGridService();
 ```
 
-```python
-# services/email_service.py
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Content
-from python.core import serializers
-
-sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-
-class EmailService:
-    @staticmethod
-    def send_welcome_email(to: str, name: str):
-        html = f"""
-        <h1>Welcome, {name}!</h1>
-        <p>Thank you for signing up for our service.</p>
-        <p>We're excited to have you on board!</p>
-        """
-        message = Mail(
-            from_email=os.environ.get('SENDGRID_FROM_EMAIL'),
-            to_emails=[to],
-            subject='Welcome to Our Service',
-            html_content=Content(html)
-        )
-
-        response = sg.send(message)
-        return response.status_code
-
-    @staticmethod
-    def send_password_reset_email(to: str, reset_token: str):
-        html = f"""
-        <h1>Password Reset</h1>
-        <p>Click the link below to reset your password:</p>
-        <p><a href="{os.environ.get('APP_URL')}/reset?token={reset_token}">Reset Password</a></p>
-        """
-        message = Mail(
-            from_email=os.environ.get('SENDGRID_FROM_EMAIL'),
-            to_emails=[to],
-            subject='Password Reset',
-            html_content=Content(html)
-        )
-
-        response = sg.send(message)
-        return response.status_code
-```
-
-### Twilio Integration
+#### AWS SES Integration
 
 ```typescript
-// services/smsService.ts
+// src/notifications/aws-ses.service.ts
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+
+const sesClient = new SESClient({
+  region: process.env.AWS_REGION || 'us-east-1',
+});
+
+export class AWSSESService {
+  async sendEmail(notification: EmailNotification): Promise<void> {
+    const command = new SendEmailCommand({
+      Source: notification.from || 'noreply@example.com',
+      Destination: {
+        ToAddresses: Array.isArray(notification.to) ? notification.to : [notification.to],
+      },
+      Message: {
+        Subject: { Data: notification.subject },
+        Body: {
+          Text: { Data: notification.text || '' },
+          Html: { Data: notification.html || '' },
+        },
+      },
+    });
+
+    try {
+      await sesClient.send(command);
+      console.log('Email sent successfully:', notification.to);
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      throw error;
+    }
+  }
+}
+
+export const awsSESService = new AWSSESService();
+```
+
+### SMS (Twilio)
+
+```typescript
+// src/notifications/twilio.service.ts
 import twilio from 'twilio';
 
-const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || '';
+const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
+const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER || '';
 
-export class SMSService {
-  async sendVerificationCode(to: string, code: string): Promise<void> {
-    const message = await client.messages.create({
-      body: `Your verification code is: ${code}`,
-      to,
-      from: process.env.TWILIO_PHONE_NUMBER,
-    });
+const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
-    console.log(`SMS sent: ${message.sid}`);
+export class TwilioService {
+  async sendSMS(notification: SMSNotification): Promise<void> {
+    try {
+      const message = await client.messages.create({
+        body: notification.body,
+        from: notification.from || TWILIO_PHONE_NUMBER,
+        to: notification.to,
+        mediaUrl: notification.mediaUrls,
+      });
+
+      console.log('SMS sent successfully:', message.sid);
+    } catch (error) {
+      console.error('Failed to send SMS:', error);
+      throw error;
+    }
   }
 
-  async sendAlert(to: string, message: string): Promise<void> {
-    const msg = await client.messages.create({
-      body: message,
-      to,
-      from: process.env.TWILIO_PHONE_NUMBER,
-    });
-
-    console.log(`Alert SMS sent: ${msg.sid}`);
+  async sendBulkSMS(notifications: SMSNotification[]): Promise<void> {
+    const promises = notifications.map(notification => this.sendSMS(notification));
+    await Promise.all(promises);
   }
 }
+
+export const twilioService = new TwilioService();
 ```
 
-```python
-# services/sms_service.py
-from twilio.rest import Client
-
-client = Client(
-    os.environ.get('TWILIO_ACCOUNT_SID'),
-    os.environ.get('TILIO_AUTH_TOKEN')
-)
-
-class SMSService:
-    @staticmethod
-    def send_verification_code(to: str, code: str):
-        message = client.messages.create(
-            body=f"Your verification code is: {code}",
-            to=to,
-            from_=os.environ.get('TILIO_PHONE_NUMBER')
-        )
-        print(f"SMS sent: {message.sid}")
-
-    @staticmethod
-    def send_alert(to: str, message: str):
-        message = client.messages.create(
-            body=message,
-            to=to,
-            from_=os.environ.get('TILIO_PHONE_NUMBER')
-        )
-        print(f"Alert SMS sent: {message.sid}")
-```
-
-### Firebase Integration
+### Push Notifications (Firebase)
 
 ```typescript
-// services/pushService.ts
+// src/notifications/firebase.service.ts
 import admin from 'firebase-admin';
-import { getMessaging } from 'firebase-admin/messaging';
 
-const messaging = getMessaging();
+const firebaseConfig = {
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  }),
+};
 
-export class PushService {
-  async sendPushNotification(userId: string, title: string, body: string): Promise<void> {
-    const token = await this.getDeviceToken(userId);
+admin.initializeApp(firebaseConfig);
 
-    const message = {
+export class FirebasePushService {
+  async sendPushNotification(notification: PushNotification): Promise<void> {
+    const message: admin.messaging.Message = {
       notification: {
-        title,
-        body,
+        title: notification.title,
+        body: notification.body,
+        badge: notification.badge,
+        sound: notification.sound,
+        imageUrl: notification.image,
       },
-      token,
+      data: notification.data,
+      android: {
+        priority: notification.priority || 'normal',
+        ttl: notification.ttl,
+      },
+      apns: {
+        payload: {
+          aps: {
+            badge: notification.badge,
+            sound: notification.sound,
+          },
+        },
+      },
+      token: Array.isArray(notification.to) ? undefined : notification.to,
+      topic: Array.isArray(notification.to) ? undefined : notification.to,
+      tokens: Array.isArray(notification.to) ? notification.to : undefined,
     };
 
-    await messaging.send(message);
+    try {
+      const response = await admin.messaging().send(message);
+      console.log('Push notification sent successfully:', response);
+    } catch (error) {
+      console.error('Failed to send push notification:', error);
+      throw error;
+    }
   }
 
-  private async getDeviceToken(userId: string): Promise<string> {
-    // Fetch device token from database
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { deviceToken: true },
-    });
-
-    if (!user?.deviceToken) {
-      throw new Error('No device token found');
+  async sendMulticastNotification(notification: PushNotification): Promise<void> {
+    if (!Array.isArray(notification.to)) {
+      throw new Error('Multicast requires array of tokens');
     }
 
-    return user.deviceToken;
+    const message: admin.messaging.MulticastMessage = {
+      notification: {
+        title: notification.title,
+        body: notification.body,
+      },
+      data: notification.data,
+      tokens: notification.to,
+    };
+
+    try {
+      const response = await admin.messaging().sendMulticast(message);
+      console.log('Multicast notification sent:', response.successCount, 'successful');
+      
+      if (response.failureCount > 0) {
+        console.error('Failed tokens:', response.responses
+          .filter(r => !r.success)
+          .map(r => r.error));
+      }
+    } catch (error) {
+      console.error('Failed to send multicast notification:', error);
+      throw error;
+    }
   }
 }
+
+export const firebasePushService = new FirebasePushService();
 ```
 
-```python
-# services/push_service.py
-from firebase_admin import messaging
+### In-App Notifications
 
-messaging = messaging.Client(api_key=os.environ.get('FIREBASE_API_KEY'))
+```typescript
+// src/notifications/inapp.service.ts
+import { PrismaClient } from '@prisma/client';
 
-class PushService:
-    @staticmethod
-    def send_push_notification(user_id: str, title: str, body: str):
-        message = messaging.Message(
-            notification=messaging.Notification(
-                title=title,
-                body=body
-            ),
-            token=get_device_token(user_id)
-        )
+const prisma = new PrismaClient();
 
-        response = messaging.send(message)
-        print(f"Push notification sent: {response}")
+export class InAppNotificationService {
+  async createNotification(notification: InAppNotification): Promise<void> {
+    try {
+      await prisma.notification.create({
+        data: {
+          userId: notification.userId,
+          title: notification.title,
+          body: notification.body,
+          type: notification.type,
+          data: notification.data,
+          actionUrl: notification.actionUrl,
+          expiresAt: notification.expiresAt,
+          read: false,
+        },
+      });
+      
+      console.log('In-app notification created:', notification.userId);
+    } catch (error) {
+      console.error('Failed to create in-app notification:', error);
+      throw error;
+    }
+  }
 
-    @staticmethod
-    def get_device_token(user_id: str) -> str:
-        # Fetch device token from database
-        user = get_user_from_db(user_id)
-        return user.device_token or ""
+  async getUserNotifications(
+    userId: string,
+    unreadOnly: boolean = false
+  ): Promise<Notification[]> {
+    const where: any = { userId };
+    
+    if (unreadOnly) {
+      where.read = false;
+    }
+
+    return prisma.notification.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async markAsRead(notificationId: string): Promise<void> {
+    await prisma.notification.update({
+      where: { id: notificationId },
+      data: { read: true },
+    });
+  }
+
+  async markAllAsRead(userId: string): Promise<void> {
+    await prisma.notification.updateMany({
+      where: { userId },
+      data: { read: true },
+    });
+  }
+
+  async deleteNotification(notificationId: string): Promise<void> {
+    await prisma.notification.delete({
+      where: { id: notificationId },
+    });
+  }
+}
+
+export const inAppNotificationService = new InAppNotificationService();
 ```
 
 ---
@@ -386,104 +407,137 @@ class PushService:
 ### Email Templates
 
 ```typescript
-// templates/emailTemplates.ts
-export const emailTemplates = {
-  welcome: (name: string) => `
-    <h1>Welcome, ${name}!</h1>
-    <p>Thank you for signing up for our service.</p>
-    <p>We're excited to have you on board!</p>
-    <p>Here are some tips to get started:</p>
-    <ul>
-      <li>Complete your profile</li>
-      <li>Explore our features</li>
-      <li>Contact support if you need help</li>
-    </ul>
-  </p>
-    <p>Best regards,<br>The Team</p>
-  `,
+// src/notifications/email-templates.ts
+export interface EmailTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  html: string;
+  text?: string;
+}
 
-  passwordReset: (resetLink: string) => `
-    <h1>Password Reset</h1>
-    <p>Click the link below to reset your password:</p>
-    <p><a href="${resetLink}">Reset Password</a></p>
-    <p>If you didn't request this, please ignore this email.</p>
-    </p>
-    <p>Best regards,<br>The Team</p>
-  `,
+export const EmailTemplates: Record<string, EmailTemplate> = {
+  WELCOME_EMAIL: {
+    id: 'd-1234567890',
+    name: 'Welcome Email',
+    subject: 'Welcome to {{company_name}}!',
+    html: `
+      <h1>Welcome, {{user_name}}!</h1>
+      <p>Thank you for joining {{company_name}}.</p>
+      <p>We're excited to have you on board.</p>
+      <a href="{{verify_email_url}}">Verify your email</a>
+    `,
+    text: `
+      Welcome, {{user_name}}!
+      
+      Thank you for joining {{company_name}}.
+      We're excited to have you on board.
+      
+      Verify your email: {{verify_email_url}}
+    `,
+  },
 
-  orderConfirmation: (orderId: string, items: any[]) => `
-    <h1>Order Confirmed #${orderId}</h1>
-    <p>Thank you for your order!</p>
-    <p>Order Details:</p>
-    <ul>
-      ${items.map(item => `<li>${item.name} - $${item.price}</li>`).join('')}
-    </ul>
-    <p>Total: $${items.reduce((sum, item) => sum + item.price, 0)}</p>
-    </p>
-    <p>Best regards,<br>The Team</p>
-  `,
+  PASSWORD_RESET: {
+    id: 'd-0987654321',
+    name: 'Password Reset',
+    subject: 'Reset your password',
+    html: `
+      <h1>Password Reset Request</h1>
+      <p>Hi {{user_name}},</p>
+      <p>We received a request to reset your password.</p>
+      <a href="{{reset_url}}">Reset your password</a>
+      <p>If you didn't request this, please ignore this email.</p>
+    `,
+    text: `
+      Password Reset Request
+      
+      Hi {{user_name}},
+      
+      We received a request to reset your password.
+      
+      Reset your password: {{reset_url}}
+      
+      If you didn't request this, please ignore this email.
+    `,
+  },
+
+  ORDER_CONFIRMATION: {
+    id: 'd-1122334455',
+    name: 'Order Confirmation',
+    subject: 'Order #{{order_id}} Confirmed',
+    html: `
+      <h1>Order Confirmed!</h1>
+      <p>Thank you for your order, {{user_name}}.</p>
+      <p>Order #{{order_id}}</p>
+      <p>Total: ${{order_total}}</p>
+      <a href="{{order_url}}">View your order</a>
+    `,
+    text: `
+      Order Confirmed!
+      
+      Thank you for your order, {{user_name}}.
+      Order #{{order_id}}
+      Total: ${{order_total}}
+      
+      View your order: {{order_url}}
+    `,
+  },
 };
 ```
 
-```python
-# templates/email_templates.py
-from string import Template
-
-class EmailTemplates:
-    welcome = Template("""
-        <h1>Welcome, {{ name }}!</h1>
-        <p>Thank you for signing up for our service.</p>
-        <p>We're excited to have you on board!</p>
-        <p>Here are some tips to get started:</p>
-        <ul>
-          <li>Complete your profile</li>
-          <li>Explore our features</li>
-          <li>Contact support if you need help</li>
-        </ul>
-        </p>
-        <p>Best regards,<br>The Team</p>
-    """)
-
-    password_reset = Template("""
-        <h1>Password Reset</h1>
-        <p>Click the link below to reset your password:</p>
-        <p><a href="{{ reset_link }}">Reset Password</a></p>
-        <p>If you didn't request this, please ignore this email.</p>
-        </p>
-        <p>Best regards,<br>The Team</p>
-    """)
-
-    @staticmethod
-    def render(template_name: str, **context) -> str:
-        template = getattr(EmailTemplates, template_name)
-        return template.render(**context)
-
-    @staticmethod
-    def welcome_email(name: str) -> str:
-        return EmailTemplates.render('welcome', name=name)
-
-    @staticmethod
-    def password_reset_email(reset_link: str) -> str:
-        return EmailTemplates.render('password_reset', reset_link=reset_link)
-```
-
-### SMS Templates
+### Template Rendering
 
 ```typescript
-// templates/smsTemplates.ts
-export const smsTemplates = {
-  verificationCode: (code: string) => `Your verification code is: ${code}`,
-  alert: (message: string) => message,
-  orderUpdate: (orderId: string, status: string) => `Order #${orderId} status: ${status}`,
-};
+// src/notifications/template-renderer.ts
+export class TemplateRenderer {
+  render(template: string, data: Record<string, any>): string {
+    return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+      return data[key] !== undefined ? data[key] : match;
+    });
+  }
+
+  renderEmailTemplate(
+    template: EmailTemplate,
+    data: Record<string, any>
+  ): EmailNotification {
+    return {
+      to: data.to,
+      subject: this.render(template.subject, data),
+      html: this.render(template.html, data),
+      text: template.text ? this.render(template.text, data) : undefined,
+      templateId: template.id,
+      templateData: data,
+    };
+  }
+}
+
+export const templateRenderer = new TemplateRenderer();
 ```
 
-```python
-# templates/sms_templates.py
-class SMSTemplates:
-    verification_code = "Your verification code is: {code}"
-    alert = "{message}"
-    order_update = "Order #{order_id} status: {status}"
+### Usage Example
+
+```typescript
+// src/notifications/notification-sender.ts
+import { EmailTemplates } from './email-templates';
+import { templateRenderer } from './template-renderer';
+import { sendGridService } from './sendgrid.service';
+
+export async function sendWelcomeEmail(
+  userEmail: string,
+  userName: string,
+  verifyUrl: string
+): Promise<void> {
+  const template = EmailTemplates.WELCOME_EMAIL;
+  
+  const notification = templateRenderer.renderEmailTemplate(template, {
+    to: userEmail,
+    user_name: userName,
+    company_name: 'Example Company',
+    verify_email_url: verifyUrl,
+  });
+
+  await sendGridService.sendEmail(notification);
+}
 ```
 
 ---
@@ -493,653 +547,566 @@ class SMSTemplates:
 ### User Preferences Model
 
 ```typescript
-// models/NotificationPreference.ts
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+// src/models/notification-preference.model.ts
+import { Model, DataTypes } from 'sequelize';
 
-@Entity()
-export class NotificationPreference {
-  @PrimaryGeneratedColumn()
-  id: string;
-
-  @Column()
-  userId: string;
-
-  @Column()
-  emailEnabled: boolean;
-
-  @Column()
-  smsEnabled: boolean;
-
-  @Column()
-  pushEnabled: boolean;
-
-  @Column({ type: 'json' })
-  emailTypes: string[];
-
-  @Column({ type: 'json' })
-  smsTypes: string[];
-
-  @Column({ type: 'json' })
-  pushTypes: string[];
+class NotificationPreference extends Model {
+  public id!: number;
+  public userId!: string;
+  public channel!: NotificationChannel;
+  public enabled!: boolean;
+  public types!: NotificationType[];
 }
+
+export enum NotificationChannel {
+  EMAIL = 'email',
+  SMS = 'sms',
+  PUSH = 'push',
+  IN_APP = 'in_app',
+}
+
+export enum NotificationType {
+  MARKETING = 'marketing',
+  TRANSACTIONAL = 'transactional',
+  SECURITY = 'security',
+  UPDATES = 'updates',
+}
+
+NotificationPreference.init({
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  userId: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  channel: {
+    type: DataTypes.ENUM(...Object.values(NotificationChannel)),
+    allowNull: false,
+  },
+  enabled: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+  },
+  types: {
+    type: DataTypes.ARRAY(DataTypes.ENUM(...Object.values(NotificationType))),
+    defaultValue: [NotificationType.TRANSACTIONAL, NotificationType.SECURITY],
+  },
+}, {
+  sequelize,
+  modelName: 'NotificationPreference',
+});
+
+export default NotificationPreference;
 ```
 
-```python
-# models/notification_preference.py
-from sqlalchemy import Column, String, Boolean, JSON, Integer
-from sqlalchemy.dialects.postgresql import UUID
-
-class NotificationPreference(Base):
-    __tablename__ = 'notification_preferences'
-
-    id = Column(UUID(as_uuid=True, primary_key=True)
-    user_id = Column(UUID, nullable=False)
-    email_enabled = Column(Boolean, default=True)
-    sms_enabled = Column(Boolean, default=False)
-    push_enabled = Column(Boolean, default=True)
-    email_types = Column(JSON, default=[])
-    sms_types = Column(JSON, default=[])
-    push_types = JSON, default=[])
-```
-
-### Managing Preferences
+### Preference Service
 
 ```typescript
-// services/notificationPreference.service.ts
-import { NotificationPreference } from '../models/NotificationPreference';
+// src/services/notification-preference.service.ts
+import NotificationPreference, { NotificationChannel, NotificationType } from '../models/notification-preference.model';
 
 export class NotificationPreferenceService {
-  async getPreferences(userId: string): Promise<NotificationPreference> {
-    return await prisma.notificationPreference.findUnique({
+  async getUserPreferences(userId: string): Promise<Map<NotificationChannel, NotificationPreference>> {
+    const preferences = await NotificationPreference.findAll({
       where: { userId },
     });
+
+    const map = new Map<NotificationChannel, NotificationPreference>();
+    preferences.forEach(pref => map.set(pref.channel, pref));
+    
+    return map;
   }
 
-  async updatePreferences(userId: string, updates: Partial<NotificationPreference>): Promise<NotificationPreference> {
-    return prisma.notificationPreference.update({
-      where: { userId },
-      data: updates,
+  async isChannelEnabled(
+    userId: string,
+    channel: NotificationChannel,
+    type: NotificationType
+  ): Promise<boolean> {
+    const preference = await NotificationPreference.findOne({
+      where: { userId, channel },
     });
-  }
 
-  async sendNotificationBasedOnPreferences(userId: string, notification: any): Promise<void> {
-    const preferences = await this.getPreferences(userId);
-
-    if (preferences.emailEnabled && notification.email) {
-      await this.sendEmail(notification.email);
+    if (!preference) {
+      // Default: enable transactional and security notifications
+      return [NotificationType.TRANSACTIONAL, NotificationType.SECURITY].includes(type);
     }
 
-    if (preferences.smsEnabled && notification.sms) {
-      await this.sendSMS(notification.sms);
-    }
-
-    if (preferences.pushEnabled && notification.push) {
-      await this.sendPush(userId, notification.push);
-    }
+    return preference.enabled && preference.types.includes(type);
   }
 
-  private async sendEmail(email: EmailNotification): Promise<void> {
-    // Send email using email service
+  async updatePreferences(
+    userId: string,
+    channel: NotificationChannel,
+    enabled: boolean,
+    types: NotificationType[]
+  ): Promise<NotificationPreference> {
+    const [preference] = await NotificationPreference.findOrCreate({
+      where: { userId, channel },
+      defaults: { enabled, types },
+    });
+
+    preference.enabled = enabled;
+    preference.types = types;
+    await preference.save();
+
+    return preference;
   }
 
-  private async sendSMS(sms: SMSNotification): Promise<void> {
-    // Send SMS using SMS service
-  }
-
-  private async sendPush(userId: string, push: PushNotification): Promise<void> {
-    // Send push notification using push service
+  async disableAllChannels(userId: string): Promise<void> {
+    await NotificationPreference.update(
+      { enabled: false },
+      { where: { userId } }
+    );
   }
 }
+
+export const notificationPreferenceService = new NotificationPreferenceService();
 ```
 
 ---
 
 ## Queue-Based Delivery
 
-### Redis Queue
+### Bull Queue Integration
 
 ```typescript
-// services/notificationQueue.service.ts
-import { createClient } from 'redis';
+// src/queues/notification.queue.ts
+import Queue from 'bull';
+import { sendGridService } from '../notifications/sendgrid.service';
+import { twilioService } from '../notifications/twilio.service';
+import { firebasePushService } from '../notifications/firebase.service';
+import { inAppNotificationService } from '../notifications/inapp.service';
 
-const redis = createClient({ url: process.env.REDIS_URL });
+const notificationQueue = new Queue('notifications', {
+  redis: {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379'),
+  },
+});
 
-export class NotificationQueue {
-  async enqueue(notification: any): Promise<void> {
-  const queueName = 'notifications';
-  const payload = JSON.stringify(notification);
-
-  await redis.lPush(queueName, payload);
-  }
-
-  async dequeue(): Promise<any> {
-    const queueName = 'notifications';
-    const payload = await redis.rPop(queueName);
-
-    if (!payload) {
-      return null;
-    }
-
-    return JSON.parse(payload);
-  }
-
-  async getQueueLength(): Promise<number> {
-    return await redis.lLen('notifications');
-  }
+interface NotificationJob {
+  type: 'email' | 'sms' | 'push' | 'in_app';
+  data: any;
+  userId: string;
+  retryCount?: number;
 }
+
+notificationQueue.process(async (job) => {
+  const { type, data, userId } = job.data as NotificationJob;
+  
+  console.log(`Processing ${type} notification for user ${userId}`);
+
+  try {
+    switch (type) {
+      case 'email':
+        await sendGridService.sendEmail(data);
+        break;
+      case 'sms':
+        await twilioService.sendSMS(data);
+        break;
+      case 'push':
+        await firebasePushService.sendPushNotification(data);
+        break;
+      case 'in_app':
+        await inAppNotificationService.createNotification(data);
+        break;
+    }
+    
+    console.log(`Successfully processed ${type} notification`);
+  } catch (error) {
+    console.error(`Failed to process ${type} notification:`, error);
+    throw error;
+  }
+});
+
+export async function enqueueNotification(job: NotificationJob): Promise<void> {
+  await notificationQueue.add(job, {
+    attempts: 3,
+    backoff: {
+      type: 'exponential',
+      delay: 2000,
+    },
+    removeOnComplete: 100,
+    removeOnFail: 50,
+  });
+}
+
+export { notificationQueue };
 ```
 
-```python
-# services/notification_queue.py
-import redis
-import json
-
-redis = redis.Redis(host=os.environ.get('REDIS_HOST', port=6379)
-
-class NotificationQueue:
-    @staticmethod
-    def enqueue(notification: dict) -> None:
-        queue_name = "notifications"
-        payload = json.dumps(notification)
-        redis.rpush(queue_name, payload)
-
-    @staticmethod
-    def dequeue() -> dict:
-        queue_name = "notifications"
-        payload = redis.rpop(queue_name)
-
-        if not payload:
-            return None
-
-        return json.loads(payload)
-
-    @staticmethod
-    def get_queue_length() -> int:
-        queue_name = "notifications"
-        return redis.llen(queue_name)
-```
-
-### Worker Process
+### Usage Example
 
 ```typescript
-// workers/notificationWorker.ts
-import { NotificationQueue } from '../services/notificationQueue.service';
-import { EmailService } from '../services/emailService';
-import { SMSService } from '../services/smsService';
-import { PushService } from '../services/pushService';
+// src/services/notification.service.ts
+import { enqueueNotification } from '../queues/notification.queue';
+import { notificationPreferenceService } from './notification-preference.service';
+import { NotificationChannel, NotificationType } from '../models/notification-preference.model';
 
-export async function processNotifications(): Promise<void> {
-  while (true) {
-    const notification = await NotificationQueue.dequeue();
+export class NotificationService {
+  async sendNotification(
+    userId: string,
+    type: NotificationType,
+    channels: NotificationChannel[],
+    data: any
+  ): Promise<void> {
+    for (const channel of channels) {
+      const enabled = await notificationPreferenceService.isChannelEnabled(
+        userId,
+        channel,
+        type
+      );
 
-    if (!notification) {
-      await sleep(1000); // Wait 1 second if queue is empty
-      continue;
-    }
-
-    try {
-      switch (notification.type) {
-        case 'email':
-          await EmailService.sendEmail(notification.to, notification.subject, notification.html);
-          break;
-
-        case 'sms':
-          await SMSService.sendSMS(notification.to, notification.message);
-          break;
-
-        case 'push':
-          await PushService.sendPushNotification(notification.userId, notification);
-          break;
-
-        default:
-          console.log(`Unknown notification type: ${notification.type}`);
+      if (!enabled) {
+        console.log(`Channel ${channel} is disabled for user ${userId}`);
+        continue;
       }
-    } catch (error) {
-      console.error(`Error processing notification:`, error);
 
-      // Requeue for retry
-      await NotificationQueue.enqueue(notification);
+      await enqueueNotification({
+        type: channel,
+        data,
+        userId,
+      });
     }
   }
+
+  async sendWelcomeNotification(
+    userId: string,
+    email: string,
+    name: string,
+    verifyUrl: string
+  ): Promise<void> {
+    await this.sendNotification(
+      userId,
+      NotificationType.TRANSACTIONAL,
+      [NotificationChannel.EMAIL],
+      {
+        to: email,
+        subject: 'Welcome!',
+        html: `<h1>Welcome ${name}!</h1>`,
+      }
+    );
+  }
+
+  async sendOrderConfirmation(
+    userId: string,
+    email: string,
+    orderId: string,
+    total: number
+  ): Promise<void> {
+    await this.sendNotification(
+      userId,
+      NotificationType.TRANSACTIONAL,
+      [NotificationChannel.EMAIL, NotificationChannel.IN_APP],
+      {
+        to: email,
+        subject: `Order #${orderId} Confirmed`,
+        html: `<h1>Order Confirmed!</h1><p>Total: $${total}</p>`,
+        userId,
+        title: 'Order Confirmed',
+        body: `Your order #${orderId} has been confirmed.`,
+        type: 'success',
+      }
+    );
+  }
 }
-```
 
-```python
-# workers/notification_worker.py
-from services.notification_queue import NotificationQueue
-from services.email_service import EmailService
-from services.sms_service import SMSService
-from services.push_service import PushService
-
-async def process_notifications():
-    while True:
-        notification = await NotificationQueue.dequeue()
-
-        if notification is None:
-            await asyncio.sleep(1)  # Wait 1 second if queue is empty
-            continue
-
-        try:
-            if notification['type'] == 'email':
-                await EmailService.send_email(
-                    notification['to'],
-                    notification['subject'],
-                    notification['html']
-                )
-            elif notification['type'] == 'sms':
-                await SMSService.send_alert(
-                    notification['to'],
-                    notification['message']
-                )
-            elif notification['type'] == 'push':
-                await PushService.send_push_notification(
-                    notification['user_id'],
-                    notification['title'],
-                    notification['body']
-                )
-            else:
-                print(f"Unknown notification type: {notification['type']}")
-        except Exception as error:
-            print(f"Error processing notification: {error}")
-            # Requeue for retry
-            await NotificationQueue.enqueue(notification)
-```
-
-# Run worker
-if __name__ == '__main__':
-    asyncio.run(process_notifications())
+export const notificationService = new NotificationService();
 ```
 
 ---
 
 ## Retry Logic
 
-### Exponential Backoff
-
 ```typescript
-// services/retry.service.ts
-export async function withRetry<T>(
-  fn: () => Promise,
-  maxRetries: number = 3,
-  baseDelay: number = 1000,
-): Promise {
-  let lastError: Error | null;
-  let attempt = 0;
+// src/notifications/retry.service.ts
+import { notificationQueue } from '../queues/notification.queue';
 
-  while (attempt < maxRetries) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error;
-      const delay = baseDelay * Math.pow(2, attempt);
-      await new Promise(resolve => setTimeout(resolve, delay));
-      attempt++;
+interface RetryConfig {
+  maxAttempts: number;
+  initialDelay: number;
+  maxDelay: number;
+  backoffMultiplier: number;
+}
+
+export class RetryService {
+  private config: RetryConfig = {
+    maxAttempts: 3,
+    initialDelay: 2000, // 2 seconds
+    maxDelay: 60000, // 1 minute
+    backoffMultiplier: 2,
+  };
+
+  async executeWithRetry<T>(
+    fn: () => Promise<T>,
+    context: string
+  ): Promise<T> {
+    let lastError: Error | undefined;
+    let delay = this.config.initialDelay;
+
+    for (let attempt = 1; attempt <= this.config.maxAttempts; attempt++) {
+      try {
+        return await fn();
+      } catch (error) {
+        lastError = error as Error;
+        
+        console.error(
+          `Attempt ${attempt} failed for ${context}:`,
+          error
+        );
+
+        if (attempt < this.config.maxAttempts) {
+          await this.sleep(delay);
+          delay = Math.min(
+            delay * this.config.backoffMultiplier,
+            this.config.maxDelay
+          );
+        }
+      }
     }
+
+    throw new Error(
+      `Max retry attempts (${this.config.maxAttempts}) reached for ${context}`,
+      { cause: lastError }
+    );
   }
 
-  throw lastError;
-}
-```
-
-```python
-# services/retry_service.py
-import asyncio
-import time
-
-async def with_retry(func, max_retries=3, base_delay=1.0):
-    last_error = None
-    for attempt in range(max_retries):
-        try:
-            return await func()
-        except Exception as error:
-            last_error = error
-            delay = base_delay * (2 ** attempt)
-            await asyncio.sleep(delay)
-    raise last_error
-```
-
-### Retry with Jitter
-
-```typescript
-// Add jitter to prevent thundering herd
-export async function withJitteredRetry<T>(
-  fn: () => Promise,
-  maxRetries: number = 3,
-  baseDelay: number = 1000,
-): Promise {
-  let lastError: Error | null;
-  let attempt = 0;
-
-  while (attempt < maxRetries) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error;
-      const jitter = Math.random() * 0.5 * baseDelay; // 50% jitter
-      const delay = baseDelay * Math.pow(2, attempt) + jitter;
-      await new Promise(resolve => setTimeout(resolve, delay));
-      attempt++;
-    }
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  throw lastError;
+  async retryFailedJob(jobId: string): Promise<void> {
+    const job = await notificationQueue.getJob(jobId);
+    
+    if (!job) {
+      throw new Error(`Job ${jobId} not found`);
+    }
+
+    const retryCount = (job.data.retryCount || 0) + 1;
+    
+    if (retryCount > this.config.maxAttempts) {
+      console.log(`Max retries reached for job ${jobId}`);
+      await job.moveToFailed(new Error('Max retries reached'));
+      return;
+    }
+
+    job.data.retryCount = retryCount;
+    await job.update(job.data);
+    await job.retry();
+    
+    console.log(`Retrying job ${jobId}, attempt ${retryCount}`);
+  }
 }
+
+export const retryService = new RetryService();
 ```
 
 ---
 
 ## Delivery Tracking
 
-### Delivery Status Model
+### Delivery Tracking Model
 
 ```typescript
-// models/DeliveryStatus.ts
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+// src/models/delivery-tracker.model.ts
+import { Model, DataTypes } from 'sequelize';
 
-@Entity()
-export class DeliveryStatus {
-  @PrimaryGeneratedColumn()
-  id: string;
-
-  @Column()
-  notificationId: string;
-
-  @Column()
-  type: string;
-
-  @Column()
-  status: string;
-
-  @Column()
-  attempts: number;
-
-  @Column({ type: 'json' })
-  metadata: Record<string, any>;
-
-  @Column()
-  deliveredAt: Date;
-
-  @Column()
-  failedAt: Date;
-
-  @Column()
-  errorMessage: string;
+class DeliveryTracker extends Model {
+  public id!: number;
+  public notificationId!: string;
+  public channel!: NotificationChannel;
+  public status!: DeliveryStatus;
+  public attempts!: number;
+  public lastAttemptAt?: Date;
+  public deliveredAt?: Date;
+  public error?: string;
+  public metadata?: Record<string, any>;
 }
-```
 
-```python
-# models/delivery_status.py
-from sqlalchemy import Column, String, Integer, DateTime, JSON
-from sqlalchemy.dialects.postgresql import UUID
-from datetime import datetime
-
-class DeliveryStatus(Base):
-    __tablename__ = 'delivery_statuses'
-
-    id = Column(UUID(as_uuid=True, primary_key=True)
-    notification_id = Column(UUID, nullable=False)
-    type = Column(String, nullable=False)
-    status = Column(String, nullable=False)
-    attempts = Column(Integer, default=0)
-    metadata = Column(JSON, default={})
-    delivered_at = Column(DateTime)
-    failed_at = Column(DateTime)
-    error_message = Column(String)
-```
-
-### Tracking Delivery
-
-```typescript
-// services/deliveryTracking.service.ts
-import { DeliveryStatus } from '../models/DeliveryStatus';
-import { prisma } from '../lib/prisma';
-
-export class DeliveryTrackingService {
-  async createDeliveryRecord(notificationId: string, type: string): Promise<DeliveryStatus> {
-    return prisma.deliveryStatus.create({
-      data: {
-        notificationId,
-        type,
-        status: 'pending',
-        attempts: 0,
-      },
-    });
-  }
-
-  async markDelivered(deliveryId: string): Promise<DeliveryStatus> {
-    return prisma.deliveryStatus.update({
-      where: { id: deliveryId },
-      data: {
-        status: 'delivered',
-        deliveredAt: new Date(),
-      },
-    });
-  }
-
-  async markFailed(deliveryId: string, errorMessage: string): Promise<DeliveryStatus> {
-  return prisma.deliveryStatus.update({
-      where: { id: deliveryId },
-      data: {
-        status: 'failed',
-        failedAt: new Date(),
-        errorMessage,
-      },
-    });
-  }
-
-  async incrementAttempts(deliveryId: string): Promise<DeliveryStatus> {
-  const delivery = await prisma.deliveryStatus.findUnique({
-      where: { id: deliveryId },
-    });
-
-  return prisma.deliveryStatus.update({
-      where: { id: deliveryId },
-      data: {
-        attempts: delivery.attempts + 1,
-      },
-    });
-  }
+export enum DeliveryStatus {
+  PENDING = 'pending',
+  SENDING = 'sending',
+  DELIVERED = 'delivered',
+  FAILED = 'failed',
+  BOUNCED = 'bounced',
+  OPENED = 'opened',
+  CLICKED = 'clicked',
 }
+
+DeliveryTracker.init({
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  notificationId: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  channel: {
+    type: DataTypes.ENUM(...Object.values(NotificationChannel)),
+    allowNull: false,
+  },
+  status: {
+    type: DataTypes.ENUM(...Object.values(DeliveryStatus)),
+    allowNull: false,
+    defaultValue: DeliveryStatus.PENDING,
+  },
+  attempts: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+  },
+  lastAttemptAt: {
+    type: DataTypes.DATE,
+  },
+  deliveredAt: {
+    type: DataTypes.DATE,
+  },
+  error: {
+    type: DataTypes.TEXT,
+  },
+  metadata: {
+    type: DataTypes.JSONB,
+  },
+}, {
+  sequelize,
+  modelName: 'DeliveryTracker',
+});
+
+export default DeliveryTracker;
 ```
 
-```python
-# services/delivery_tracking.py
-from sqlalchemy import update
-from models.delivery_status import DeliveryStatus
-
-class DeliveryTrackingService:
-    @staticmethod
-    async def create_delivery_record(notification_id: str, type: str) -> DeliveryStatus:
-        return await DeliveryStatus.create(
-            notification_id=notification_id,
-            type=type,
-            status='pending',
-            attempts=0
-        )
-
-    @staticmethod
-    async def mark_delivered(delivery_id: str) -> DeliveryStatus:
-        return await update(
-            DeliveryStatus,
-            id=delivery_id,
-            updates={
-                'status': 'delivered',
-                'delivered_at': datetime.now()
-            }
-        )
-
-    @staticmethod
-    async def mark_failed(delivery_id: str, error_message: str) -> DeliveryStatus:
-        return await update(
-            DeliveryStatus,
-            id=delivery_id,
-            updates={
-                'status': 'failed',
-                'failed_at': datetime.now(),
-                'error_message': error_message
-            }
-        )
-
-    @staticmethod
-    async def increment_attempts(delivery_id: str) -> DeliveryStatus:
-        delivery = await DeliveryStatus.get(delivery_id)
-        return await update(
-            DeliveryStatus,
-            id=delivery_id,
-            updates={
-                'attempts': delivery.attempts + 1
-            }
-        )
-```
-
----
-
-## Rate Limiting
-
-### Per-User Rate Limiting
+### Delivery Tracking Service
 
 ```typescript
-// services/rateLimit.service.ts
-import { createClient } from 'redis';
+// src/services/delivery-tracker.service.ts
+import DeliveryTracker, { DeliveryStatus } from '../models/delivery-tracker.model';
+import { NotificationChannel } from '../models/notification-preference.model';
 
-const redis = createClient({ url: process.env.REDIS_URL });
+export class DeliveryTrackerService {
+  async createTracker(
+    notificationId: string,
+    channel: NotificationChannel
+  ): Promise<DeliveryTracker> {
+    return DeliveryTracker.create({
+      notificationId,
+      channel,
+      status: DeliveryStatus.PENDING,
+      attempts: 0,
+    });
+  }
 
-export class NotificationRateLimiter {
-  async checkRateLimit(userId: string): Promise<boolean> {
-    const key = `notification_rate:${userId}`;
-    const count = await redis.incr(key);
-
-    // Reset every hour
-    await redis.expire(key, 3600); // 1 hour TTL
-
-  // Check if rate limit exceeded
-  const limit = 100; // 100 notifications per hour
-  if (count > limit) {
-      return false;
+  async updateStatus(
+    trackerId: number,
+    status: DeliveryStatus,
+    error?: string
+  ): Promise<void> {
+    const updateData: any = { status };
+    
+    if (status === DeliveryStatus.DELIVERED) {
+      updateData.deliveredAt = new Date();
     }
-
-  return true;
+    
+    if (error) {
+      updateData.error = error;
+    }
+    
+    await DeliveryTracker.update(updateData, {
+      where: { id: trackerId },
+    });
   }
 
-  async decrementCount(userId: string): Promise<void> {
-    const key = `notification_rate:${userId}`;
-    await redis.decr(key);
-  }
-}
-```
-
-```python
-# services/rate_limit_service.py
-import redis
-
-redis = redis.Redis(host=os.environ.get('REDIS_HOST', port=6379)
-
-class NotificationRateLimiter:
-    @staticmethod
-    async def check_rate_limit(user_id: str) -> bool:
-        key = f"notification_rate:{user_id}"
-        count = redis.incr(key)
-
-        # Reset every hour
-        redis.expire(key, 3600)  # 1 hour TTL
-
-        # Check if rate limit exceeded
-        limit = 100  # 100 notifications per hour
-        if count > limit:
-            return False
-
-        return True
-
-    @staticmethod
-    async def decrement_count(user_id: str):
-        key = f"notification_rate:{user_id}"
-        redis.decr(key)
-```
-
-### Per-Type Rate Limiting
-
-```typescript
-// services/rateLimit.service.ts
-export class NotificationRateLimiter {
-  async checkRateLimit(userId: string, type: string): Promise<boolean> {
-  const key = `notification_rate:${userId}:${type}`;
-  const count = await redis.incr(key);
-
-  // Reset every hour
-  await redis.expire(key, 3600);
-
-  // Different limits per type
-  const limits: Record<string, number> = {
-    email: 1000,    // 1000 emails per hour
-    sms: 100,       // 100 SMS per hour
-    push: 500,       // 500 pushes per hour
-  };
-
-  const limit = limits[type] || 100;
-
-  if (count > limit) {
-    return false;
+  async incrementAttempts(trackerId: number): Promise<void> {
+    await DeliveryTracker.update(
+      {
+        attempts: DeliveryTracker.sequelize!.literal('attempts + 1'),
+        lastAttemptAt: new Date(),
+      },
+      { where: { id: trackerId } }
+    );
   }
 
-  return true;
+  async getDeliveryStats(
+    notificationId: string
+  ): Promise<DeliveryStats> {
+    const trackers = await DeliveryTracker.findAll({
+      where: { notificationId },
+    });
+
+    const stats: DeliveryStats = {
+      total: trackers.length,
+      pending: 0,
+      sending: 0,
+      delivered: 0,
+      failed: 0,
+      bounced: 0,
+    };
+
+    trackers.forEach(tracker => {
+      stats[tracker.status]++;
+    });
+
+    return stats;
   }
 }
+
+interface DeliveryStats {
+  total: number;
+  pending: number;
+  sending: number;
+  delivered: number;
+  failed: number;
+  bounced: number;
+}
+
+export const deliveryTrackerService = new DeliveryTrackerService();
 ```
 
 ---
 
 ## Testing
 
-### Unit Tests
+### Notification Service Tests
 
 ```typescript
-// tests/notificationQueue.test.ts
-import { NotificationQueue } from '../services/notificationQueue.service';
+// test/notifications/notification.service.test.ts
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import { notificationService } from '../../src/services/notification.service';
+import { enqueueNotification } from '../../src/queues/notification.queue';
 
-describe('NotificationQueue', () => {
-  it('should enqueue and dequeue notification', async () => {
-    const notification = { type: 'email', to: 'test@example.com', subject: 'Test', html: '<p>Test</p>' };
+jest.mock('../../src/queues/notification.queue');
 
-    await NotificationQueue.enqueue(notification);
-    const dequeued = await NotificationQueue.dequeue();
-
-    expect(dequeued).toEqual(notification);
-  });
-
-  it('should return null when queue is empty', async () => {
-    const dequeued = await NotificationQueue.dequeue();
-
-    expect(dequeued).toBeNull();
-  });
-});
-```
-
-### Integration Tests
-
-```typescript
-// tests/emailService.test.ts
-import { EmailService } from '../services/emailService';
-import { EmailService as MockedEmailService } from '../__mocks__/EmailService';
-
-describe('EmailService', () => {
-  let emailService: MockedEmailService;
-
+describe('Notification Service', () => {
   beforeEach(() => {
-    emailService = new MockedEmailService();
+    jest.clearAllMocks();
   });
 
-  it('should send welcome email', async () => {
-    await emailService.sendWelcomeEmail('test@example.com', 'Test User');
-    expect(emailService.sendWelcomeEmail).toHaveBeenCalled();
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
-  it('should send password reset email', async () => {
-    await emailService.sendPasswordResetEmail('test@example.com', 'reset-token-123');
-
-    expect(emailService.sendPasswordResetEmail).toHaveBeenCalledWith(
-      'test@example.com',
-      'reset-token-123'
+  it('should send notification to enabled channels', async () => {
+    await notificationService.sendNotification(
+      'user123',
+      'transactional',
+      ['email', 'sms'],
+      { to: 'test@example.com', subject: 'Test' }
     );
+
+    expect(enqueueNotification).toHaveBeenCalledTimes(2);
+  });
+
+  it('should skip disabled channels', async () => {
+    await notificationService.sendNotification(
+      'user123',
+      'marketing',
+      ['email', 'sms'],
+      { to: 'test@example.com', subject: 'Test' }
+    );
+
+    expect(enqueueNotification).not.toHaveBeenCalled();
   });
 });
 ```
@@ -1151,101 +1118,94 @@ describe('EmailService', () => {
 ### 1. Use Templates
 
 ```typescript
-// Use email templates for consistent formatting
-const email = emailTemplates.welcome('John Doe');
+// Good: Use templates
+const template = EmailTemplates.WELCOME_EMAIL;
+const notification = templateRenderer.renderEmailTemplate(template, {
+  user_name: userName,
+  company_name: 'Example Company',
+});
+
+// Bad: Hardcode content
+const notification = {
+  to: userEmail,
+  subject: 'Welcome to Example Company!',
+  html: `<h1>Welcome, ${userName}!</h1>`,
+};
 ```
 
-### 2. Use Queues for Delivery
+### 2. Respect User Preferences
 
 ```typescript
-// Use queues for async delivery
-await NotificationQueue.enqueue(notification);
+// Good: Check preferences
+const enabled = await notificationPreferenceService.isChannelEnabled(
+  userId,
+  channel,
+  type
+);
+
+if (enabled) {
+  await sendNotification(channel, data);
+}
+
+// Bad: Ignore preferences
+await sendNotification(channel, data);
 ```
 
-### 3. Track Delivery Status
+### 3. Use Queues for Delivery
 
 ```typescript
-// Track delivery status for monitoring
-await DeliveryTrackingService.markDelivered(deliveryId);
+// Good: Use queue
+await enqueueNotification({
+  type: 'email',
+  data: emailData,
+  userId,
+});
+
+// Bad: Send synchronously
+await sendEmail(emailData);
 ```
 
 ### 4. Implement Retry Logic
 
 ```typescript
-// Implement retry with exponential backoff
-await withRetry(() => sendEmail(...), 3);
-```
+// Good: Retry with exponential backoff
+await retryService.executeWithRetry(
+  () => sendEmail(data),
+  'email delivery'
+);
 
-### 5. Respect User Preferences
-
-```typescript
-// Check user preferences before sending
-const preferences = await getPreferences(userId);
-if (preferences.emailEnabled) {
-  await sendEmail(...);
-}
-```
-
-### 6. Use Idempotent Operations
-
-```typescript
-// Ensure notifications are idempotent
-await sendEmail(email); // Should handle duplicate sends
-```
-
-### 7. Monitor Queue Length
-
-```typescript
-// Monitor queue for backlog
-const queueLength = await NotificationQueue.getQueueLength();
-if (queueLength > 10000) {
-  alert('Notification queue backlog is high');
-}
-```
-
-### 8. Handle Errors Gracefully
-
-```typescript
-// Handle errors and retry
+// Bad: No retry
 try {
-  await sendNotification(notification);
+  await sendEmail(data);
 } catch (error) {
-  console.error('Failed to send notification:', error);
-  await NotificationQueue.enqueue(notification); // Requeue for retry
+  console.error('Failed to send email:', error);
 }
 ```
 
-### 9. Use Structured Logging
+### 5. Track Delivery
 
 ```typescript
-// Use structured logging for debugging
-logger.info('Sending notification', { notificationId, type, userId });
-```
+// Good: Track delivery
+const tracker = await deliveryTrackerService.createTracker(notificationId, channel);
+await sendEmail(data);
+await deliveryTrackerService.updateStatus(tracker.id, DeliveryStatus.DELIVERED);
 
-### 10. Test Notifications
-
-```typescript
-// Test notification delivery
-describe('Notification Delivery', () => {
-  it('should deliver email successfully', async () => {
-    const notification = { type: 'email', to: 'test@example.com', subject: 'Test', html: '<p>Test</p>' };
-
-    const deliveryId = await DeliveryTrackingService.createDeliveryRecord('1', 'email');
-    await EmailService.sendEmail('test@example.com', 'Test', '<p>Test</p>');
-    await DeliveryTrackingService.markDelivered(deliveryId);
-
-    const delivery = await DeliveryTrackingService.getDeliveryStatus(deliveryId);
-    expect(delivery.status).toBe('delivered');
-  });
-});
+// Bad: No tracking
+await sendEmail(data);
 ```
 
 ---
 
-## Resources
+## Summary
 
-- [SendGrid Documentation](https://docs.sendgrid.com/)
-- [Twilio Documentation](https://www.twilio.com/docs/)
-- [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging/)
-- [Redis Queues](https://redis.io/docs/manual/patterns/)
-- [AWS SES Documentation](https://docs.aws.amazon.com/ses/)
+This skill covers comprehensive notification system implementation patterns including:
+
+- **Notification Types**: Email, SMS, push, in-app notifications
+- **Service Integration**: SendGrid/AWS SES (email), Twilio (SMS), Firebase (push), in-app
+- **Template Management**: Email templates, template rendering
+- **Notification Preferences**: User preferences model, preference service
+- **Queue-Based Delivery**: Bull queue integration, notification service
+- **Retry Logic**: Retry service with exponential backoff
+- **Delivery Tracking**: Delivery tracker model, tracking service
+- **Testing**: Notification service tests
+- **Best Practices**: Use templates, respect preferences, use queues, implement retry, track delivery
