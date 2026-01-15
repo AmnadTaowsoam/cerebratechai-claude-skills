@@ -954,3 +954,695 @@ MIT License - see [LICENSE](LICENSE) file for details.
 [Website](https://cerebratechai.com) • [GitHub](https://github.com/AmnadTaowsoam) • [Twitter](https://twitter.com/cerebratechai)
 
 </div>
+
+<!-- SKILLS-START -->
+## Skills Overview
+
+**Total Skills:** 380
+
+
+### 00. Meta Skills
+
+| Skill | Description |
+|-------|-------------|
+| [architectural-reviews](00-meta-skills/architectural-reviews/SKILL.md) | Architectural Reviews |
+| [decision-records](00-meta-skills/decision-records/SKILL.md) | Technical Decision Records (ADRs) |
+| [risk-assessment](00-meta-skills/risk-assessment/SKILL.md) | Risk Assessment |
+| [system-thinking](00-meta-skills/system-thinking/SKILL.md) | System Thinking |
+| [technical-debt-management](00-meta-skills/technical-debt-management/SKILL.md) | Technical Debt Management |
+
+### 01. Foundations
+
+| Skill | Description |
+|-------|-------------|
+| [api-design](01-foundations/api-design/SKILL.md) | RESTful API Design Principles |
+| [code-review](01-foundations/code-review/SKILL.md) | Code Review Best Practices |
+| [git-workflow](01-foundations/git-workflow/SKILL.md) | Git Workflow and Best Practices |
+| [python-standards](01-foundations/python-standards/SKILL.md) | Python Coding Standards |
+| [typescript-standards](01-foundations/typescript-standards/SKILL.md) | TypeScript Coding Standards |
+
+### 02. Frontend
+
+| Skill | Description |
+|-------|-------------|
+| [animation](02-frontend/animation/SKILL.md) | Animation Patterns in React |
+| [form-handling](02-frontend/form-handling/SKILL.md) | Form Handling with React Hook Form and Zod |
+| [mui-material](02-frontend/mui-material/SKILL.md) | Material-UI (MUI) Best Practices |
+| [nextjs-patterns](02-frontend/nextjs-patterns/SKILL.md) | Next.js 14+ App Router Patterns |
+| [react-best-practices](02-frontend/react-best-practices/SKILL.md) | React Best Practices and Patterns |
+| [shadcn-ui](02-frontend/shadcn-ui/SKILL.md) | shadcn/ui Component Patterns |
+| [state-management](02-frontend/state-management/SKILL.md) | State Management Patterns in React |
+| [tailwind-patterns](02-frontend/tailwind-patterns/SKILL.md) | Tailwind CSS Patterns and Best Practices |
+
+### 03. Backend Api
+
+| Skill | Description |
+|-------|-------------|
+| [error-handling](03-backend-api/error-handling/SKILL.md) | Backend Error Handling Patterns |
+| [express-rest](03-backend-api/express-rest/SKILL.md) | Express.js REST API Patterns |
+| [fastapi-patterns](03-backend-api/fastapi-patterns/SKILL.md) | FastAPI Patterns and Best Practices |
+| [fastify-rest-api](03-backend-api/fastify-rest-api/SKILL.md) | Fastify REST API Patterns |
+| [middleware](03-backend-api/middleware/SKILL.md) | Backend Middleware Patterns |
+| [nodejs-api](03-backend-api/nodejs-api/SKILL.md) | Node.js REST API Patterns |
+| [validation](03-backend-api/validation/SKILL.md) | API Request Validation Patterns |
+
+### 04. Database
+
+| Skill | Description |
+|-------|-------------|
+| [database-migrations](04-database/database-migrations/SKILL.md) | Database Migrations |
+| [database-optimization](04-database/database-optimization/SKILL.md) | Database Optimization Techniques |
+| [mongodb-patterns](04-database/mongodb-patterns/SKILL.md) | MongoDB Patterns and Best Practices |
+| [prisma-guide](04-database/prisma-guide/SKILL.md) | Prisma ORM Guide |
+| [redis-caching](04-database/redis-caching/SKILL.md) | Redis Caching Patterns |
+| [timescaledb](04-database/timescaledb/SKILL.md) | TimescaleDB (Time-Series Database) Patterns |
+| [vector-database](04-database/vector-database/SKILL.md) | Vector Database Patterns (Pinecone, Qdrant, Weaviate) |
+
+### 05. Ai Ml Core
+
+| Skill | Description |
+|-------|-------------|
+| [data-augmentation](05-ai-ml-core/data-augmentation/SKILL.md) | Data Augmentation |
+| [data-preprocessing](05-ai-ml-core/data-preprocessing/SKILL.md) | Data Preprocessing |
+| [label-studio-setup](05-ai-ml-core/label-studio-setup/SKILL.md) | Label Studio Setup |
+| [model-optimization](05-ai-ml-core/model-optimization/SKILL.md) | Model Optimization |
+| [model-training](05-ai-ml-core/model-training/SKILL.md) | Model Training Workflows |
+| [model-versioning](05-ai-ml-core/model-versioning/SKILL.md) | Model Versioning |
+| [pytorch-deployment](05-ai-ml-core/pytorch-deployment/SKILL.md) | PyTorch Deployment |
+| [yolo-integration](05-ai-ml-core/yolo-integration/SKILL.md) | YOLO Integration |
+
+### 06. Ai Ml Production
+
+| Skill | Description |
+|-------|-------------|
+| [ai-observability](06-ai-ml-production/ai-observability/SKILL.md) | AI/ML Observability and Monitoring |
+| [embedding-models](06-ai-ml-production/embedding-models/SKILL.md) | Embedding Models |
+| [llm-guardrails](06-ai-ml-production/llm-guardrails/SKILL.md) | LLM Guardrails |
+| [llm-integration](06-ai-ml-production/llm-integration/SKILL.md) | LLM Integration |
+| [llm-local-deployment](06-ai-ml-production/llm-local-deployment/SKILL.md) | Local LLM Deployment |
+| [prompt-engineering](06-ai-ml-production/prompt-engineering/SKILL.md) | Prompt Engineering |
+| [rag-implementation](06-ai-ml-production/rag-implementation/SKILL.md) | RAG Implementation |
+| [vector-search](06-ai-ml-production/vector-search/SKILL.md) | Vector Search |
+
+### 07. Document Processing
+
+| Skill | Description |
+|-------|-------------|
+| [document-parsing](07-document-processing/document-parsing/SKILL.md) | Document Parsing |
+| [image-preprocessing](07-document-processing/image-preprocessing/SKILL.md) | Image Preprocessing |
+| [ocr-paddleocr](07-document-processing/ocr-paddleocr/SKILL.md) | OCR PaddleOCR |
+| [ocr-tesseract](07-document-processing/ocr-tesseract/SKILL.md) | OCR with Tesseract |
+| [pdf-processing](07-document-processing/pdf-processing/SKILL.md) | PDF Processing |
+
+### 08. Messaging Queue
+
+| Skill | Description |
+|-------|-------------|
+| [kafka-streams](08-messaging-queue/kafka-streams/SKILL.md) | Kafka Streams |
+| [mqtt-integration](08-messaging-queue/mqtt-integration/SKILL.md) | MQTT Integration |
+| [queue-monitoring](08-messaging-queue/queue-monitoring/SKILL.md) | Queue Monitoring |
+| [rabbitmq-patterns](08-messaging-queue/rabbitmq-patterns/SKILL.md) | RabbitMQ Patterns |
+| [redis-queue](08-messaging-queue/redis-queue/SKILL.md) | Redis Queue |
+
+### 09. Microservices
+
+| Skill | Description |
+|-------|-------------|
+| [api-gateway](09-microservices/api-gateway/SKILL.md) | API Gateway |
+| [circuit-breaker](09-microservices/circuit-breaker/SKILL.md) | Circuit Breaker Pattern |
+| [event-driven](09-microservices/event-driven/SKILL.md) | Event-Driven Architecture |
+| [service-design](09-microservices/service-design/SKILL.md) | Service Design |
+| [service-discovery](09-microservices/service-discovery/SKILL.md) | Service Discovery |
+| [service-mesh](09-microservices/service-mesh/SKILL.md) | Service Mesh |
+
+### 10. Authentication Authorization
+
+| Skill | Description |
+|-------|-------------|
+| [api-key-management](10-authentication-authorization/api-key-management/SKILL.md) | API Key Management |
+| [jwt-authentication](10-authentication-authorization/jwt-authentication/SKILL.md) | JWT Authentication |
+| [oauth2-implementation](10-authentication-authorization/oauth2-implementation/SKILL.md) | OAuth 2.0 Implementation |
+| [rbac-patterns](10-authentication-authorization/rbac-patterns/SKILL.md) | RBAC Patterns |
+| [session-management](10-authentication-authorization/session-management/SKILL.md) | Session Management |
+
+### 11. Billing Subscription
+
+| Skill | Description |
+|-------|-------------|
+| [billing-cycles](11-billing-subscription/billing-cycles/SKILL.md) | Billing Cycles |
+| [invoice-generation](11-billing-subscription/invoice-generation/SKILL.md) | Invoice Generation |
+| [stripe-integration](11-billing-subscription/stripe-integration/SKILL.md) | Stripe Integration |
+| [subscription-plans](11-billing-subscription/subscription-plans/SKILL.md) | Subscription Plans |
+| [usage-metering](11-billing-subscription/usage-metering/SKILL.md) | Usage Metering |
+| [webhook-handling](11-billing-subscription/webhook-handling/SKILL.md) | Webhook Handling |
+
+### 12. Compliance Governance
+
+| Skill | Description |
+|-------|-------------|
+| [audit-logging](12-compliance-governance/audit-logging/SKILL.md) | Audit Logging |
+| [consent-management](12-compliance-governance/consent-management/SKILL.md) | Consent Management |
+| [data-privacy](12-compliance-governance/data-privacy/SKILL.md) | Data Privacy |
+| [data-retention](12-compliance-governance/data-retention/SKILL.md) | Data Retention |
+| [gdpr-compliance](12-compliance-governance/gdpr-compliance/SKILL.md) | GDPR Compliance |
+| [pdpa-compliance](12-compliance-governance/pdpa-compliance/SKILL.md) | PDPA Compliance |
+
+### 13. File Storage
+
+| Skill | Description |
+|-------|-------------|
+| [cdn-integration](13-file-storage/cdn-integration/SKILL.md) | CDN Integration |
+| [file-compression](13-file-storage/file-compression/SKILL.md) | File Compression |
+| [file-upload-handling](13-file-storage/file-upload-handling/SKILL.md) | File Upload Handling |
+| [image-optimization](13-file-storage/image-optimization/SKILL.md) | Image Optimization |
+| [multipart-upload](13-file-storage/multipart-upload/SKILL.md) | Multipart Upload |
+| [s3-integration](13-file-storage/s3-integration/SKILL.md) | AWS S3 / MinIO Integration |
+
+### 14. Monitoring Observability
+
+| Skill | Description |
+|-------|-------------|
+| [distributed-tracing](14-monitoring-observability/distributed-tracing/SKILL.md) | Distributed Tracing |
+| [elk-stack](14-monitoring-observability/elk-stack/SKILL.md) | ELK Stack |
+| [error-tracking](14-monitoring-observability/error-tracking/SKILL.md) | Error Tracking |
+| [grafana-dashboards](14-monitoring-observability/grafana-dashboards/SKILL.md) | Grafana Dashboards |
+| [performance-monitoring](14-monitoring-observability/performance-monitoring/SKILL.md) | Performance Monitoring |
+| [prometheus-metrics](14-monitoring-observability/prometheus-metrics/SKILL.md) | Prometheus Metrics |
+
+### 15. Devops Infrastructure
+
+| Skill | Description |
+|-------|-------------|
+| [ci-cd-github-actions](15-devops-infrastructure/ci-cd-github-actions/SKILL.md) | CI/CD GitHub Actions |
+| [docker-compose](15-devops-infrastructure/docker-compose/SKILL.md) | Docker Compose |
+| [docker-patterns](15-devops-infrastructure/docker-patterns/SKILL.md) | Docker Patterns |
+| [helm-charts](15-devops-infrastructure/helm-charts/SKILL.md) | Helm Charts |
+| [kubernetes-deployment](15-devops-infrastructure/kubernetes-deployment/SKILL.md) | Kubernetes Deployment |
+| [secrets-management](15-devops-infrastructure/secrets-management/SKILL.md) | Secrets Management |
+| [terraform-infrastructure](15-devops-infrastructure/terraform-infrastructure/SKILL.md) | Terraform Infrastructure |
+
+### 16. Testing
+
+| Skill | Description |
+|-------|-------------|
+| [e2e-playwright](16-testing/e2e-playwright/SKILL.md) | E2E Testing with Playwright |
+| [integration-testing](16-testing/integration-testing/SKILL.md) | Integration Testing |
+| [jest-patterns](16-testing/jest-patterns/SKILL.md) | Jest Patterns |
+| [load-testing](16-testing/load-testing/SKILL.md) | Load Testing |
+| [ml-model-testing](16-testing/ml-model-testing/SKILL.md) | ML Model Testing |
+| [pytest-patterns](16-testing/pytest-patterns/SKILL.md) | Pytest Patterns |
+| [test-data-factory](16-testing/test-data-factory/SKILL.md) | Test Data Factory |
+
+### 17. Domain Specific
+
+| Skill | Description |
+|-------|-------------|
+| [analytics-tracking](17-domain-specific/analytics-tracking/SKILL.md) | Analytics and Event Tracking |
+| [api-versioning](17-domain-specific/api-versioning/SKILL.md) | API Versioning |
+| [feature-flags](17-domain-specific/feature-flags/SKILL.md) | Feature Flags |
+| [multi-tenancy](17-domain-specific/multi-tenancy/SKILL.md) | Multi-Tenancy Architecture |
+| [notification-system](17-domain-specific/notification-system/SKILL.md) | Notification System |
+| [rate-limiting](17-domain-specific/rate-limiting/SKILL.md) | Rate Limiting |
+
+### 18. Project Management
+
+| Skill | Description |
+|-------|-------------|
+| [agile-scrum](18-project-management/agile-scrum/SKILL.md) | Untitled |
+| [estimation-techniques](18-project-management/estimation-techniques/SKILL.md) | Estimation Techniques |
+| [project-planning](18-project-management/project-planning/SKILL.md) | Project Planning |
+| [requirement-analysis](18-project-management/requirement-analysis/SKILL.md) | Requirement Analysis |
+| [risk-management](18-project-management/risk-management/SKILL.md) | Risk Management |
+| [technical-specifications](18-project-management/technical-specifications/SKILL.md) | Technical Specifications |
+| [user-stories](18-project-management/user-stories/SKILL.md) | User Stories |
+
+### 19. Seo Optimization
+
+| Skill | Description |
+|-------|-------------|
+| [core-web-vitals](19-seo-optimization/core-web-vitals/SKILL.md) | Untitled |
+| [meta-tags](19-seo-optimization/meta-tags/SKILL.md) | Untitled |
+| [nextjs-seo](19-seo-optimization/nextjs-seo/SKILL.md) | Untitled |
+| [page-speed](19-seo-optimization/page-speed/SKILL.md) | Untitled |
+| [sitemap-robots](19-seo-optimization/sitemap-robots/SKILL.md) | Untitled |
+| [structured-data](19-seo-optimization/structured-data/SKILL.md) | Untitled |
+| [technical-seo](19-seo-optimization/technical-seo/SKILL.md) | Untitled |
+
+### 20. Ai Integration
+
+| Skill | Description |
+|-------|-------------|
+| [ai-agents](20-ai-integration/ai-agents/SKILL.md) | Untitled |
+| [ai-search](20-ai-integration/ai-search/SKILL.md) | Untitled |
+| [chatbot-integration](20-ai-integration/chatbot-integration/SKILL.md) | Untitled |
+| [conversational-ui](20-ai-integration/conversational-ui/SKILL.md) | Untitled |
+| [llm-txt-protocol](20-ai-integration/llm-txt-protocol/SKILL.md) | Untitled |
+
+### 21. Documentation
+
+| Skill | Description |
+|-------|-------------|
+| [api-documentation](21-documentation/api-documentation/SKILL.md) | Untitled |
+| [changelog-management](21-documentation/changelog-management/SKILL.md) | Untitled |
+| [runbooks](21-documentation/runbooks/SKILL.md) | Untitled |
+| [system-architecture-docs](21-documentation/system-architecture-docs/SKILL.md) | Untitled |
+| [technical-writing](21-documentation/technical-writing/SKILL.md) | Untitled |
+| [user-guides](21-documentation/user-guides/SKILL.md) | Untitled |
+
+### 22. Ux Ui Design
+
+| Skill | Description |
+|-------|-------------|
+| [accessibility](22-ux-ui-design/accessibility/SKILL.md) | Untitled |
+| [design-handoff](22-ux-ui-design/design-handoff/SKILL.md) | Untitled |
+| [design-systems](22-ux-ui-design/design-systems/SKILL.md) | Untitled |
+| [responsive-design](22-ux-ui-design/responsive-design/SKILL.md) | Untitled |
+| [user-research](22-ux-ui-design/user-research/SKILL.md) | Untitled |
+| [wireframing](22-ux-ui-design/wireframing/SKILL.md) | Untitled |
+
+### 23. Business Analytics
+
+| Skill | Description |
+|-------|-------------|
+| [ab-testing-analysis](23-business-analytics/ab-testing-analysis/SKILL.md) | Untitled |
+| [business-intelligence](23-business-analytics/business-intelligence/SKILL.md) | Untitled |
+| [cohort-analysis](23-business-analytics/cohort-analysis/SKILL.md) | Untitled |
+| [conversion-optimization](23-business-analytics/conversion-optimization/SKILL.md) | Untitled |
+| [dashboard-design](23-business-analytics/dashboard-design/SKILL.md) | Untitled |
+| [data-visualization](23-business-analytics/data-visualization/SKILL.md) | Untitled |
+| [funnel-analysis](23-business-analytics/funnel-analysis/SKILL.md) | Untitled |
+| [kpi-metrics](23-business-analytics/kpi-metrics/SKILL.md) | Untitled |
+| [sql-for-analytics](23-business-analytics/sql-for-analytics/SKILL.md) | Untitled |
+
+### 24. Security Practices
+
+| Skill | Description |
+|-------|-------------|
+| [incident-response](24-security-practices/incident-response/SKILL.md) | Untitled |
+| [owasp-top-10](24-security-practices/owasp-top-10/SKILL.md) | Untitled |
+| [penetration-testing](24-security-practices/penetration-testing/SKILL.md) | Untitled |
+| [secure-coding](24-security-practices/secure-coding/SKILL.md) | Untitled |
+| [security-audit](24-security-practices/security-audit/SKILL.md) | Untitled |
+| [vulnerability-management](24-security-practices/vulnerability-management/SKILL.md) | Untitled |
+
+### 25. Internationalization
+
+| Skill | Description |
+|-------|-------------|
+| [currency-timezone](25-internationalization/currency-timezone/SKILL.md) | Untitled |
+| [i18n-setup](25-internationalization/i18n-setup/SKILL.md) | Untitled |
+| [localization](25-internationalization/localization/SKILL.md) | Untitled |
+| [multi-language](25-internationalization/multi-language/SKILL.md) | Untitled |
+| [rtl-support](25-internationalization/rtl-support/SKILL.md) | Untitled |
+
+### 26. Deployment Strategies
+
+| Skill | Description |
+|-------|-------------|
+| [blue-green-deployment](26-deployment-strategies/blue-green-deployment/SKILL.md) | Untitled |
+| [canary-deployment](26-deployment-strategies/canary-deployment/SKILL.md) | Untitled |
+| [feature-toggles](26-deployment-strategies/feature-toggles/SKILL.md) | Untitled |
+| [rollback-strategies](26-deployment-strategies/rollback-strategies/SKILL.md) | Untitled |
+| [rolling-deployment](26-deployment-strategies/rolling-deployment/SKILL.md) | Untitled |
+
+### 27. Team Collaboration
+
+| Skill | Description |
+|-------|-------------|
+| [code-review-culture](27-team-collaboration/code-review-culture/SKILL.md) | Untitled |
+| [knowledge-sharing](27-team-collaboration/knowledge-sharing/SKILL.md) | Untitled |
+| [onboarding](27-team-collaboration/onboarding/SKILL.md) | Untitled |
+| [pair-programming](27-team-collaboration/pair-programming/SKILL.md) | Untitled |
+| [remote-work](27-team-collaboration/remote-work/SKILL.md) | Untitled |
+
+### 28. Marketing Integration
+
+| Skill | Description |
+|-------|-------------|
+| [ab-testing](28-marketing-integration/ab-testing/SKILL.md) | Untitled |
+| [campaign-management](28-marketing-integration/campaign-management/SKILL.md) | Untitled |
+| [email-marketing](28-marketing-integration/email-marketing/SKILL.md) | Untitled |
+| [marketing-automation](28-marketing-integration/marketing-automation/SKILL.md) | Untitled |
+| [social-media-integration](28-marketing-integration/social-media-integration/SKILL.md) | Untitled |
+| [utm-tracking](28-marketing-integration/utm-tracking/SKILL.md) | Untitled |
+
+### 29. Customer Support
+
+| Skill | Description |
+|-------|-------------|
+| [customer-feedback](29-customer-support/customer-feedback/SKILL.md) | Untitled |
+| [helpdesk-integration](29-customer-support/helpdesk-integration/SKILL.md) | Untitled |
+| [knowledge-base](29-customer-support/knowledge-base/SKILL.md) | Untitled |
+| [live-chat](29-customer-support/live-chat/SKILL.md) | Untitled |
+| [support-analytics](29-customer-support/support-analytics/SKILL.md) | Untitled |
+| [ticketing-system](29-customer-support/ticketing-system/SKILL.md) | Untitled |
+
+### 30. Ecommerce
+
+| Skill | Description |
+|-------|-------------|
+| [discount-promotions](30-ecommerce/discount-promotions/SKILL.md) | Untitled |
+| [inventory-management](30-ecommerce/inventory-management/SKILL.md) | Untitled |
+| [order-fulfillment](30-ecommerce/order-fulfillment/SKILL.md) | Untitled |
+| [order-management](30-ecommerce/order-management/SKILL.md) | Untitled |
+| [payment-gateways](30-ecommerce/payment-gateways/SKILL.md) | Untitled |
+| [product-catalog](30-ecommerce/product-catalog/SKILL.md) | Untitled |
+| [shipping-integration](30-ecommerce/shipping-integration/SKILL.md) | Untitled |
+| [shopping-cart](30-ecommerce/shopping-cart/SKILL.md) | Untitled |
+
+### 31. Mobile Development
+
+| Skill | Description |
+|-------|-------------|
+| [app-distribution](31-mobile-development/app-distribution/SKILL.md) | Untitled |
+| [deep-linking](31-mobile-development/deep-linking/SKILL.md) | Untitled |
+| [flutter-patterns](31-mobile-development/flutter-patterns/SKILL.md) | Untitled |
+| [mobile-ci-cd](31-mobile-development/mobile-ci-cd/SKILL.md) | Untitled |
+| [offline-mode](31-mobile-development/offline-mode/SKILL.md) | Untitled |
+| [push-notifications](31-mobile-development/push-notifications/SKILL.md) | Untitled |
+| [react-native-patterns](31-mobile-development/react-native-patterns/SKILL.md) | Untitled |
+
+### 32. Crm Integration
+
+| Skill | Description |
+|-------|-------------|
+| [contact-management](32-crm-integration/contact-management/SKILL.md) | Contact Management |
+| [custom-crm](32-crm-integration/custom-crm/SKILL.md) | Custom CRM Development |
+| [hubspot-integration](32-crm-integration/hubspot-integration/SKILL.md) | HubSpot Integration |
+| [lead-management](32-crm-integration/lead-management/SKILL.md) | Lead Management |
+| [sales-pipeline](32-crm-integration/sales-pipeline/SKILL.md) | Sales Pipeline |
+| [salesforce-integration](32-crm-integration/salesforce-integration/SKILL.md) | Salesforce Integration |
+
+### 33. Content Management
+
+| Skill | Description |
+|-------|-------------|
+| [content-versioning](33-content-management/content-versioning/SKILL.md) | Content Versioning |
+| [contentful-integration](33-content-management/contentful-integration/SKILL.md) | Contentful Integration |
+| [headless-cms](33-content-management/headless-cms/SKILL.md) | Headless CMS Integration |
+| [media-library](33-content-management/media-library/SKILL.md) | Media Library |
+| [strapi-integration](33-content-management/strapi-integration/SKILL.md) | Strapi Integration |
+| [wordpress-api](33-content-management/wordpress-api/SKILL.md) | WordPress API |
+
+### 34. Real Time Features
+
+| Skill | Description |
+|-------|-------------|
+| [collaborative-editing](34-real-time-features/collaborative-editing/SKILL.md) | Collaborative Editing |
+| [live-notifications](34-real-time-features/live-notifications/SKILL.md) | Live Notifications |
+| [presence-detection](34-real-time-features/presence-detection/SKILL.md) | Presence Detection |
+| [real-time-dashboard](34-real-time-features/real-time-dashboard/SKILL.md) | Real-time Dashboard |
+| [server-sent-events](34-real-time-features/server-sent-events/SKILL.md) | Server-Sent Events (SSE) |
+| [websocket-patterns](34-real-time-features/websocket-patterns/SKILL.md) | WebSocket Patterns |
+
+### 35. Blockchain Web3
+
+| Skill | Description |
+|-------|-------------|
+| [blockchain-authentication](35-blockchain-web3/blockchain-authentication/SKILL.md) | Blockchain Authentication |
+| [cryptocurrency-payment](35-blockchain-web3/cryptocurrency-payment/SKILL.md) | Cryptocurrency Payment |
+| [nft-integration](35-blockchain-web3/nft-integration/SKILL.md) | NFT Integration |
+| [smart-contracts](35-blockchain-web3/smart-contracts/SKILL.md) | Smart Contracts Integration |
+| [wallet-connection](35-blockchain-web3/wallet-connection/SKILL.md) | Wallet Connection |
+| [web3-integration](35-blockchain-web3/web3-integration/SKILL.md) | Web3 Integration |
+
+### 36. Iot Integration
+
+| Skill | Description |
+|-------|-------------|
+| [device-management](36-iot-integration/device-management/SKILL.md) | Device Management |
+| [edge-computing](36-iot-integration/edge-computing/SKILL.md) | Edge Computing |
+| [iot-protocols](36-iot-integration/iot-protocols/SKILL.md) | IoT Protocols |
+| [iot-security](36-iot-integration/iot-security/SKILL.md) | IoT Security |
+| [real-time-monitoring](36-iot-integration/real-time-monitoring/SKILL.md) | Real-time Monitoring |
+| [sensor-data-processing](36-iot-integration/sensor-data-processing/SKILL.md) | Sensor Data Processing |
+
+### 37. Video Streaming
+
+| Skill | Description |
+|-------|-------------|
+| [adaptive-bitrate](37-video-streaming/adaptive-bitrate/SKILL.md) | Adaptive Bitrate Streaming |
+| [cdn-delivery](37-video-streaming/cdn-delivery/SKILL.md) | CDN for Video Delivery |
+| [live-streaming](37-video-streaming/live-streaming/SKILL.md) | Live Streaming |
+| [video-analytics](37-video-streaming/video-analytics/SKILL.md) | Video Analytics |
+| [video-transcoding](37-video-streaming/video-transcoding/SKILL.md) | Video Transcoding |
+| [video-upload-processing](37-video-streaming/video-upload-processing/SKILL.md) | Video Upload & Processing |
+
+### 38. Gaming Features
+
+| Skill | Description |
+|-------|-------------|
+| [achievements](38-gaming-features/achievements/SKILL.md) | Achievements System |
+| [game-analytics](38-gaming-features/game-analytics/SKILL.md) | Game Analytics |
+| [in-game-purchases](38-gaming-features/in-game-purchases/SKILL.md) | In-Game Purchases |
+| [leaderboards](38-gaming-features/leaderboards/SKILL.md) | Leaderboards |
+| [matchmaking](38-gaming-features/matchmaking/SKILL.md) | Matchmaking |
+| [real-time-multiplayer](38-gaming-features/real-time-multiplayer/SKILL.md) | Real-time Multiplayer |
+
+### 39. Data Science Ml
+
+| Skill | Description |
+|-------|-------------|
+| [ab-testing-ml](39-data-science-ml/ab-testing-ml/SKILL.md) | A/B Testing for ML |
+| [automl](39-data-science-ml/automl/SKILL.md) | AutoML |
+| [data-pipeline](39-data-science-ml/data-pipeline/SKILL.md) | Data Pipeline |
+| [feature-engineering](39-data-science-ml/feature-engineering/SKILL.md) | Feature Engineering |
+| [ml-serving](39-data-science-ml/ml-serving/SKILL.md) | ML Model Serving |
+| [model-experiments](39-data-science-ml/model-experiments/SKILL.md) | ML Experiment Tracking |
+
+### 40. System Resilience
+
+| Skill | Description |
+|-------|-------------|
+| [bulkhead-patterns](40-system-resilience/bulkhead-patterns/SKILL.md) | Bulkhead Patterns |
+| [chaos-engineering](40-system-resilience/chaos-engineering/SKILL.md) | Chaos Engineering |
+| [circuit-breaker-bulkhead](40-system-resilience/circuit-breaker-bulkhead/SKILL.md) | Untitled |
+| [disaster-recovery](40-system-resilience/disaster-recovery/SKILL.md) | Untitled |
+| [failure-modes](40-system-resilience/failure-modes/SKILL.md) | Failure Modes Analysis |
+| [failure-modes-and-effects](40-system-resilience/failure-modes-and-effects/SKILL.md) | Untitled |
+| [graceful-degradation](40-system-resilience/graceful-degradation/SKILL.md) | Untitled |
+| [idempotency-and-dedup](40-system-resilience/idempotency-and-dedup/SKILL.md) | Untitled |
+| [postmortem-analysis](40-system-resilience/postmortem-analysis/SKILL.md) | Postmortem Analysis (Incident Review) |
+| [postmortems-and-rca](40-system-resilience/postmortems-and-rca/SKILL.md) | Untitled |
+| [retry-timeout-backoff](40-system-resilience/retry-timeout-backoff/SKILL.md) | Untitled |
+| [retry-timeout-strategies](40-system-resilience/retry-timeout-strategies/SKILL.md) | Retry, Timeout & Backoff Strategies |
+
+### 41. Incident Management
+
+| Skill | Description |
+|-------|-------------|
+| [communication-templates](41-incident-management/communication-templates/SKILL.md) | Untitled |
+| [escalation-and-ownership](41-incident-management/escalation-and-ownership/SKILL.md) | Untitled |
+| [escalation-paths](41-incident-management/escalation-paths/SKILL.md) | Escalation Paths |
+| [incident-retrospective](41-incident-management/incident-retrospective/SKILL.md) | Untitled |
+| [incident-severity-levels](41-incident-management/incident-severity-levels/SKILL.md) | Untitled |
+| [incident-triage](41-incident-management/incident-triage/SKILL.md) | Incident Triage |
+| [oncall-playbooks](41-incident-management/oncall-playbooks/SKILL.md) | On-Call Playbooks and Runbooks |
+| [runbook-templates](41-incident-management/runbook-templates/SKILL.md) | Untitled |
+| [severity-levels](41-incident-management/severity-levels/SKILL.md) | Incident Severity Levels |
+| [stakeholder-communication](41-incident-management/stakeholder-communication/SKILL.md) | Stakeholder Communication During Incidents |
+| [triage-workflow](41-incident-management/triage-workflow/SKILL.md) | Untitled |
+
+### 42. Cost Engineering
+
+| Skill | Description |
+|-------|-------------|
+| [autoscaling-and-rightsizing](42-cost-engineering/autoscaling-and-rightsizing/SKILL.md) | Untitled |
+| [budget-guardrails](42-cost-engineering/budget-guardrails/SKILL.md) | Budget Guardrails and Cost Controls |
+| [cloud-cost-models](42-cost-engineering/cloud-cost-models/SKILL.md) | Cloud Cost Models and Pricing |
+| [cost-guardrails](42-cost-engineering/cost-guardrails/SKILL.md) | Untitled |
+| [cost-modeling](42-cost-engineering/cost-modeling/SKILL.md) | Untitled |
+| [cost-observability](42-cost-engineering/cost-observability/SKILL.md) | Cost Observability and Monitoring |
+| [infra-sizing](42-cost-engineering/infra-sizing/SKILL.md) | Infrastructure Sizing and Capacity Planning |
+| [llm-cost-optimization](42-cost-engineering/llm-cost-optimization/SKILL.md) | LLM and AI Cost Optimization |
+| [llm-token-optimization](42-cost-engineering/llm-token-optimization/SKILL.md) | Untitled |
+| [pricing-and-usage-meters](42-cost-engineering/pricing-and-usage-meters/SKILL.md) | Untitled |
+| [storage-egress-optimization](42-cost-engineering/storage-egress-optimization/SKILL.md) | Untitled |
+| [usage-based-pricing](42-cost-engineering/usage-based-pricing/SKILL.md) | Usage-Based Pricing (Consumption Billing) |
+
+### 43. Data Reliability
+
+| Skill | Description |
+|-------|-------------|
+| [data-contracts](43-data-reliability/data-contracts/SKILL.md) | Data Contracts |
+| [data-incident-response](43-data-reliability/data-incident-response/SKILL.md) | Untitled |
+| [data-lineage](43-data-reliability/data-lineage/SKILL.md) | Data Lineage |
+| [data-quality-monitoring](43-data-reliability/data-quality-monitoring/SKILL.md) | Data Quality Monitoring |
+| [data-quality-rules](43-data-reliability/data-quality-rules/SKILL.md) | Untitled |
+| [data-retention-archiving](43-data-reliability/data-retention-archiving/SKILL.md) | Data Retention and Archiving |
+| [database-health-monitoring](43-data-reliability/database-health-monitoring/SKILL.md) | Database Health Monitoring |
+| [freshness-latency-slos](43-data-reliability/freshness-latency-slos/SKILL.md) | Untitled |
+| [lineage-and-provenance](43-data-reliability/lineage-and-provenance/SKILL.md) | Untitled |
+| [schema-drift-handling](43-data-reliability/schema-drift-handling/SKILL.md) | Untitled |
+| [schema-management](43-data-reliability/schema-management/SKILL.md) | Schema Management |
+
+### 44. Ai Governance
+
+| Skill | Description |
+|-------|-------------|
+| [ai-data-privacy](44-ai-governance/ai-data-privacy/SKILL.md) | AI Data Privacy |
+| [ai-ethics-compliance](44-ai-governance/ai-ethics-compliance/SKILL.md) | AI Ethics and Compliance |
+| [model-bias-fairness](44-ai-governance/model-bias-fairness/SKILL.md) | Model Bias and Fairness |
+| [model-explainability](44-ai-governance/model-explainability/SKILL.md) | Model Explainability (XAI) |
+| [model-registry](44-ai-governance/model-registry/SKILL.md) | AI Model Registry |
+| [model-risk-management](44-ai-governance/model-risk-management/SKILL.md) | Model Risk Management (MRM) |
+
+### 44. Architecture Decision
+
+| Skill | Description |
+|-------|-------------|
+| [adr-templates](44-architecture-decision/adr-templates/SKILL.md) | Untitled |
+| [deprecation-policy](44-architecture-decision/deprecation-policy/SKILL.md) | Untitled |
+| [system-boundaries](44-architecture-decision/system-boundaries/SKILL.md) | Untitled |
+| [tradeoff-analysis](44-architecture-decision/tradeoff-analysis/SKILL.md) | Untitled |
+| [versioning-strategy](44-architecture-decision/versioning-strategy/SKILL.md) | Untitled |
+
+### 45. Developer Experience
+
+| Skill | Description |
+|-------|-------------|
+| [commit-conventions](45-developer-experience/commit-conventions/SKILL.md) | Untitled |
+| [lint-format-typecheck](45-developer-experience/lint-format-typecheck/SKILL.md) | Untitled |
+| [local-dev-standard](45-developer-experience/local-dev-standard/SKILL.md) | Untitled |
+| [release-workflow](45-developer-experience/release-workflow/SKILL.md) | Untitled |
+| [repo-automation-scripts](45-developer-experience/repo-automation-scripts/SKILL.md) | Untitled |
+
+### 45. Product Thinking
+
+| Skill | Description |
+|-------|-------------|
+| [agile-scrum-practices](45-product-thinking/agile-scrum-practices/SKILL.md) | Agile and Scrum Practices |
+| [metrics-north-star](45-product-thinking/metrics-north-star/SKILL.md) | Metrics and North Star |
+| [product-roadmapping](45-product-thinking/product-roadmapping/SKILL.md) | Product Roadmapping |
+| [product-vision-strategy](45-product-thinking/product-vision-strategy/SKILL.md) | Product Vision and Strategy |
+| [stakeholder-management](45-product-thinking/stakeholder-management/SKILL.md) | Stakeholder Management |
+| [user-research-discovery](45-product-thinking/user-research-discovery/SKILL.md) | User Research and Discovery |
+
+### 46. Data Classification
+
+| Skill | Description |
+|-------|-------------|
+| [access-audit-and-reviews](46-data-classification/access-audit-and-reviews/SKILL.md) | Untitled |
+| [logging-redaction](46-data-classification/logging-redaction/SKILL.md) | Untitled |
+| [pii-detection](46-data-classification/pii-detection/SKILL.md) | Untitled |
+| [retention-and-deletion](46-data-classification/retention-and-deletion/SKILL.md) | Untitled |
+
+### 47. Performance Engineering
+
+| Skill | Description |
+|-------|-------------|
+| [caching-strategies](47-performance-engineering/caching-strategies/SKILL.md) | Untitled |
+| [concurrency-and-throughput](47-performance-engineering/concurrency-and-throughput/SKILL.md) | Untitled |
+| [db-query-optimization](47-performance-engineering/db-query-optimization/SKILL.md) | Untitled |
+| [profiling-node-python](47-performance-engineering/profiling-node-python/SKILL.md) | Untitled |
+| [sla-slo-slis](47-performance-engineering/sla-slo-slis/SKILL.md) | Untitled |
+
+### 48. Product Discovery
+
+| Skill | Description |
+|-------|-------------|
+| [experiment-design](48-product-discovery/experiment-design/SKILL.md) | Untitled |
+| [hypothesis-writing](48-product-discovery/hypothesis-writing/SKILL.md) | Untitled |
+| [mvp-scope-control](48-product-discovery/mvp-scope-control/SKILL.md) | Untitled |
+| [user-interviews](48-product-discovery/user-interviews/SKILL.md) | Untitled |
+| [validation-metrics](48-product-discovery/validation-metrics/SKILL.md) | Untitled |
+
+### 49. Portfolio Management
+
+| Skill | Description |
+|-------|-------------|
+| [cross-team-interfaces](49-portfolio-management/cross-team-interfaces/SKILL.md) | Untitled |
+| [delivery-governance](49-portfolio-management/delivery-governance/SKILL.md) | Untitled |
+| [dependency-mapping](49-portfolio-management/dependency-mapping/SKILL.md) | Untitled |
+| [roadmap-planning](49-portfolio-management/roadmap-planning/SKILL.md) | Untitled |
+
+### 50. Enterprise Integrations
+
+| Skill | Description |
+|-------|-------------|
+| [enterprise-rbac-models](50-enterprise-integrations/enterprise-rbac-models/SKILL.md) | Untitled |
+| [scim-provisioning](50-enterprise-integrations/scim-provisioning/SKILL.md) | Untitled |
+| [security-questionnaires](50-enterprise-integrations/security-questionnaires/SKILL.md) | Untitled |
+| [sso-saml-oidc](50-enterprise-integrations/sso-saml-oidc/SKILL.md) | Untitled |
+| [vendor-onboarding](50-enterprise-integrations/vendor-onboarding/SKILL.md) | Untitled |
+
+### 51. Contracts Governance
+
+| Skill | Description |
+|-------|-------------|
+| [backward-compat-rules](51-contracts-governance/backward-compat-rules/SKILL.md) | Untitled |
+| [contract-testing](51-contracts-governance/contract-testing/SKILL.md) | Untitled |
+| [deprecation-notices](51-contracts-governance/deprecation-notices/SKILL.md) | Untitled |
+| [event-schema-registry](51-contracts-governance/event-schema-registry/SKILL.md) | Untitled |
+| [openapi-governance](51-contracts-governance/openapi-governance/SKILL.md) | Untitled |
+
+### 52. Ai Evaluation
+
+| Skill | Description |
+|-------|-------------|
+| [ground-truth-management](52-ai-evaluation/ground-truth-management/SKILL.md) | Untitled |
+| [llm-judge-patterns](52-ai-evaluation/llm-judge-patterns/SKILL.md) | Untitled |
+| [offline-vs-online-eval](52-ai-evaluation/offline-vs-online-eval/SKILL.md) | Untitled |
+| [rag-evaluation](52-ai-evaluation/rag-evaluation/SKILL.md) | Untitled |
+| [regression-benchmarks](52-ai-evaluation/regression-benchmarks/SKILL.md) | Untitled |
+
+### 53. Data Engineering
+
+| Skill | Description |
+|-------|-------------|
+| [53-data-engineering](53-data-engineering/SKILL.md) | Untitled |
+| [dbt-patterns](53-data-engineering/dbt-patterns/SKILL.md) | Untitled |
+| [elt-modeling](53-data-engineering/elt-modeling/SKILL.md) | Untitled |
+| [kafka-streaming](53-data-engineering/kafka-streaming/SKILL.md) | Untitled |
+
+### 54. Agentops
+
+| Skill | Description |
+|-------|-------------|
+| [audit-trails-for-agents](54-agentops/audit-trails-for-agents/SKILL.md) | Untitled |
+| [prompt-versioning](54-agentops/prompt-versioning/SKILL.md) | Untitled |
+| [rollout-and-kill-switch](54-agentops/rollout-and-kill-switch/SKILL.md) | Untitled |
+| [sandboxing](54-agentops/sandboxing/SKILL.md) | Untitled |
+| [tool-permission-model](54-agentops/tool-permission-model/SKILL.md) | Untitled |
+
+### 55. Ux Writing
+
+| Skill | Description |
+|-------|-------------|
+| [error-messages](55-ux-writing/error-messages/SKILL.md) | Untitled |
+| [microcopy](55-ux-writing/microcopy/SKILL.md) | Untitled |
+| [onboarding-flows](55-ux-writing/onboarding-flows/SKILL.md) | Untitled |
+| [trust-pages-structure](55-ux-writing/trust-pages-structure/SKILL.md) | Untitled |
+
+### 56. Requirements Intake
+
+| Skill | Description |
+|-------|-------------|
+| [acceptance-criteria](56-requirements-intake/acceptance-criteria/SKILL.md) | Untitled |
+| [constraints-and-assumptions](56-requirements-intake/constraints-and-assumptions/SKILL.md) | Untitled |
+| [discovery-questions](56-requirements-intake/discovery-questions/SKILL.md) | Untitled |
+| [requirement-to-scope](56-requirements-intake/requirement-to-scope/SKILL.md) | Untitled |
+| [risk-and-dependencies](56-requirements-intake/risk-and-dependencies/SKILL.md) | Untitled |
+
+### 57. Skill Orchestration
+
+| Skill | Description |
+|-------|-------------|
+| [baseline-policy](57-skill-orchestration/baseline-policy/SKILL.md) | Untitled |
+| [output-templates](57-skill-orchestration/output-templates/SKILL.md) | Untitled |
+| [routing-rules](57-skill-orchestration/routing-rules/SKILL.md) | Untitled |
+| [scoring-and-prioritization](57-skill-orchestration/scoring-and-prioritization/SKILL.md) | Untitled |
+| [skill-improvement-loop](57-skill-orchestration/skill-improvement-loop/SKILL.md) | Skill Improvement Loop |
+
+### 58. Investment Estimation
+
+| Skill | Description |
+|-------|-------------|
+| [discovery-for-estimation](58-investment-estimation/discovery-for-estimation/SKILL.md) | Untitled |
+| [effort-sizing](58-investment-estimation/effort-sizing/SKILL.md) | Untitled |
+| [payback-analysis](58-investment-estimation/payback-analysis/SKILL.md) | Untitled |
+| [pricing-strategy](58-investment-estimation/pricing-strategy/SKILL.md) | Untitled |
+| [proposal-pack](58-investment-estimation/proposal-pack/SKILL.md) | Untitled |
+| [roi-modeling](58-investment-estimation/roi-modeling/SKILL.md) | Untitled |
+| [sensitivity-analysis](58-investment-estimation/sensitivity-analysis/SKILL.md) | Untitled |
+<!-- SKILLS-END -->
