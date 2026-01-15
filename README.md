@@ -1186,7 +1186,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [page-speed](19-seo-optimization/page-speed/SKILL.md) | Untitled |
 | [sitemap-robots](19-seo-optimization/sitemap-robots/SKILL.md) | Untitled |
 | [structured-data](19-seo-optimization/structured-data/SKILL.md) | Untitled |
-| [technical-seo](19-seo-optimization/technical-seo/SKILL.md) | Untitled |
+| [technical-seo](19-seo-optimization/technical-seo/SKILL.md) | Technical SEO |
 
 ### 20. Ai Integration
 
@@ -1431,32 +1431,32 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 | Skill | Description |
 |-------|-------------|
-| [communication-templates](41-incident-management/communication-templates/SKILL.md) | Untitled |
-| [escalation-and-ownership](41-incident-management/escalation-and-ownership/SKILL.md) | Untitled |
+| [communication-templates](41-incident-management/communication-templates/SKILL.md) | Communication Templates |
+| [escalation-and-ownership](41-incident-management/escalation-and-ownership/SKILL.md) | Escalation and Ownership |
 | [escalation-paths](41-incident-management/escalation-paths/SKILL.md) | Escalation Paths |
 | [incident-retrospective](41-incident-management/incident-retrospective/SKILL.md) | Untitled |
-| [incident-severity-levels](41-incident-management/incident-severity-levels/SKILL.md) | Untitled |
+| [incident-severity-levels](41-incident-management/incident-severity-levels/SKILL.md) | Incident Severity Levels |
 | [incident-triage](41-incident-management/incident-triage/SKILL.md) | Incident Triage |
 | [oncall-playbooks](41-incident-management/oncall-playbooks/SKILL.md) | On-Call Playbooks and Runbooks |
-| [runbook-templates](41-incident-management/runbook-templates/SKILL.md) | Untitled |
+| [runbook-templates](41-incident-management/runbook-templates/SKILL.md) | Runbook Templates |
 | [severity-levels](41-incident-management/severity-levels/SKILL.md) | Incident Severity Levels |
 | [stakeholder-communication](41-incident-management/stakeholder-communication/SKILL.md) | Stakeholder Communication During Incidents |
-| [triage-workflow](41-incident-management/triage-workflow/SKILL.md) | Untitled |
+| [triage-workflow](41-incident-management/triage-workflow/SKILL.md) | Triage Workflow |
 
 ### 42. Cost Engineering
 
 | Skill | Description |
 |-------|-------------|
-| [autoscaling-and-rightsizing](42-cost-engineering/autoscaling-and-rightsizing/SKILL.md) | Untitled |
+| [autoscaling-and-rightsizing](42-cost-engineering/autoscaling-and-rightsizing/SKILL.md) | Autoscaling and Right-Sizing |
 | [budget-guardrails](42-cost-engineering/budget-guardrails/SKILL.md) | Budget Guardrails and Cost Controls |
 | [cloud-cost-models](42-cost-engineering/cloud-cost-models/SKILL.md) | Cloud Cost Models and Pricing |
-| [cost-guardrails](42-cost-engineering/cost-guardrails/SKILL.md) | Untitled |
-| [cost-modeling](42-cost-engineering/cost-modeling/SKILL.md) | Untitled |
+| [cost-guardrails](42-cost-engineering/cost-guardrails/SKILL.md) | Cost Guardrails |
+| [cost-modeling](42-cost-engineering/cost-modeling/SKILL.md) | Cost Modeling |
 | [cost-observability](42-cost-engineering/cost-observability/SKILL.md) | Cost Observability and Monitoring |
 | [infra-sizing](42-cost-engineering/infra-sizing/SKILL.md) | Infrastructure Sizing and Capacity Planning |
 | [llm-cost-optimization](42-cost-engineering/llm-cost-optimization/SKILL.md) | LLM and AI Cost Optimization |
-| [llm-token-optimization](42-cost-engineering/llm-token-optimization/SKILL.md) | Untitled |
-| [pricing-and-usage-meters](42-cost-engineering/pricing-and-usage-meters/SKILL.md) | Untitled |
+| [llm-token-optimization](42-cost-engineering/llm-token-optimization/SKILL.md) | LLM Token Optimization |
+| [pricing-and-usage-meters](42-cost-engineering/pricing-and-usage-meters/SKILL.md) | Pricing and Usage Meters |
 | [storage-egress-optimization](42-cost-engineering/storage-egress-optimization/SKILL.md) | Untitled |
 | [usage-based-pricing](42-cost-engineering/usage-based-pricing/SKILL.md) | Usage-Based Pricing (Consumption Billing) |
 
