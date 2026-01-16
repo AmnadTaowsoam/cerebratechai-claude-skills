@@ -990,7 +990,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 <!-- SKILLS-START -->
 ## Skills Overview
 
-**Total Skills:** 376+
+**Total Skills:** 380
 
 
 ### 00. Meta Skills
@@ -1212,45 +1212,45 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 | Skill | Description |
 |-------|-------------|
-| [core-web-vitals](19-seo-optimization/core-web-vitals/SKILL.md) | Untitled |
-| [meta-tags](19-seo-optimization/meta-tags/SKILL.md) | Untitled |
-| [nextjs-seo](19-seo-optimization/nextjs-seo/SKILL.md) | Untitled |
-| [page-speed](19-seo-optimization/page-speed/SKILL.md) | Untitled |
-| [sitemap-robots](19-seo-optimization/sitemap-robots/SKILL.md) | Untitled |
-| [structured-data](19-seo-optimization/structured-data/SKILL.md) | Untitled |
-| [technical-seo](19-seo-optimization/technical-seo/SKILL.md) | Untitled |
+| [core-web-vitals](19-seo-optimization/core-web-vitals/SKILL.md) | Core Web Vitals |
+| [meta-tags](19-seo-optimization/meta-tags/SKILL.md) | Meta Tags |
+| [nextjs-seo](19-seo-optimization/nextjs-seo/SKILL.md) | Next.js SEO |
+| [page-speed](19-seo-optimization/page-speed/SKILL.md) | Page Speed Optimization |
+| [sitemap-robots](19-seo-optimization/sitemap-robots/SKILL.md) | Sitemap and Robots.txt Management |
+| [structured-data](19-seo-optimization/structured-data/SKILL.md) | Structured Data (Schema.org) |
+| [technical-seo](19-seo-optimization/technical-seo/SKILL.md) | Technical SEO |
 
 ### 20. Ai Integration
 
 | Skill | Description |
 |-------|-------------|
-| [ai-agents](20-ai-integration/ai-agents/SKILL.md) | Untitled |
-| [ai-search](20-ai-integration/ai-search/SKILL.md) | Untitled |
-| [chatbot-integration](20-ai-integration/chatbot-integration/SKILL.md) | Untitled |
-| [conversational-ui](20-ai-integration/conversational-ui/SKILL.md) | Untitled |
-| [llm-txt-protocol](20-ai-integration/llm-txt-protocol/SKILL.md) | Untitled |
+| [ai-agents](20-ai-integration/ai-agents/SKILL.md) | AI Agents |
+| [ai-search](20-ai-integration/ai-search/SKILL.md) | AI Search |
+| [chatbot-integration](20-ai-integration/chatbot-integration/SKILL.md) | Chatbot Integration |
+| [conversational-ui](20-ai-integration/conversational-ui/SKILL.md) | Conversational UI |
+| [llm-txt-protocol](20-ai-integration/llm-txt-protocol/SKILL.md) | llm.txt Protocol |
 
 ### 21. Documentation
 
 | Skill | Description |
 |-------|-------------|
-| [api-documentation](21-documentation/api-documentation/SKILL.md) | Untitled |
-| [changelog-management](21-documentation/changelog-management/SKILL.md) | Untitled |
-| [runbooks](21-documentation/runbooks/SKILL.md) | Untitled |
-| [system-architecture-docs](21-documentation/system-architecture-docs/SKILL.md) | Untitled |
-| [technical-writing](21-documentation/technical-writing/SKILL.md) | Untitled |
-| [user-guides](21-documentation/user-guides/SKILL.md) | Untitled |
+| [api-documentation](21-documentation/api-documentation/SKILL.md) | API Documentation |
+| [changelog-management](21-documentation/changelog-management/SKILL.md) | Changelog Management |
+| [runbooks](21-documentation/runbooks/SKILL.md) | Operational Runbooks |
+| [system-architecture-docs](21-documentation/system-architecture-docs/SKILL.md) | System Architecture Documentation |
+| [technical-writing](21-documentation/technical-writing/SKILL.md) | Technical Writing |
+| [user-guides](21-documentation/user-guides/SKILL.md) | User Guides |
 
 ### 22. Ux Ui Design
 
 | Skill | Description |
 |-------|-------------|
-| [accessibility](22-ux-ui-design/accessibility/SKILL.md) | Untitled |
-| [design-handoff](22-ux-ui-design/design-handoff/SKILL.md) | Untitled |
-| [design-systems](22-ux-ui-design/design-systems/SKILL.md) | Untitled |
-| [responsive-design](22-ux-ui-design/responsive-design/SKILL.md) | Untitled |
-| [user-research](22-ux-ui-design/user-research/SKILL.md) | Untitled |
-| [wireframing](22-ux-ui-design/wireframing/SKILL.md) | Untitled |
+| [accessibility](22-ux-ui-design/accessibility/SKILL.md) | Accessibility (a11y) |
+| [design-handoff](22-ux-ui-design/design-handoff/SKILL.md) | Design Handoff |
+| [design-systems](22-ux-ui-design/design-systems/SKILL.md) | Design Systems |
+| [responsive-design](22-ux-ui-design/responsive-design/SKILL.md) | Responsive Design |
+| [user-research](22-ux-ui-design/user-research/SKILL.md) | User Research |
+| [wireframing](22-ux-ui-design/wireframing/SKILL.md) | Wireframing |
 
 ### 23. Business Analytics
 
@@ -1463,33 +1463,33 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 | Skill | Description |
 |-------|-------------|
-| [communication-templates](41-incident-management/communication-templates/SKILL.md) | Untitled |
-| [escalation-and-ownership](41-incident-management/escalation-and-ownership/SKILL.md) | Untitled |
+| [communication-templates](41-incident-management/communication-templates/SKILL.md) | Communication Templates |
+| [escalation-and-ownership](41-incident-management/escalation-and-ownership/SKILL.md) | Escalation and Ownership |
 | [escalation-paths](41-incident-management/escalation-paths/SKILL.md) | Escalation Paths |
 | [incident-retrospective](41-incident-management/incident-retrospective/SKILL.md) | Untitled |
-| [incident-severity-levels](41-incident-management/incident-severity-levels/SKILL.md) | Untitled |
+| [incident-severity-levels](41-incident-management/incident-severity-levels/SKILL.md) | Incident Severity Levels |
 | [incident-triage](41-incident-management/incident-triage/SKILL.md) | Incident Triage |
 | [oncall-playbooks](41-incident-management/oncall-playbooks/SKILL.md) | On-Call Playbooks and Runbooks |
-| [runbook-templates](41-incident-management/runbook-templates/SKILL.md) | Untitled |
+| [runbook-templates](41-incident-management/runbook-templates/SKILL.md) | Runbook Templates |
 | [severity-levels](41-incident-management/severity-levels/SKILL.md) | Incident Severity Levels |
 | [stakeholder-communication](41-incident-management/stakeholder-communication/SKILL.md) | Stakeholder Communication During Incidents |
-| [triage-workflow](41-incident-management/triage-workflow/SKILL.md) | Untitled |
+| [triage-workflow](41-incident-management/triage-workflow/SKILL.md) | Triage Workflow |
 
 ### 42. Cost Engineering
 
 | Skill | Description |
 |-------|-------------|
-| [autoscaling-and-rightsizing](42-cost-engineering/autoscaling-and-rightsizing/SKILL.md) | Untitled |
+| [autoscaling-and-rightsizing](42-cost-engineering/autoscaling-and-rightsizing/SKILL.md) | Autoscaling and Right-Sizing |
 | [budget-guardrails](42-cost-engineering/budget-guardrails/SKILL.md) | Budget Guardrails and Cost Controls |
 | [cloud-cost-models](42-cost-engineering/cloud-cost-models/SKILL.md) | Cloud Cost Models and Pricing |
-| [cost-guardrails](42-cost-engineering/cost-guardrails/SKILL.md) | Untitled |
-| [cost-modeling](42-cost-engineering/cost-modeling/SKILL.md) | Untitled |
+| [cost-guardrails](42-cost-engineering/cost-guardrails/SKILL.md) | Cost Guardrails |
+| [cost-modeling](42-cost-engineering/cost-modeling/SKILL.md) | Cost Modeling |
 | [cost-observability](42-cost-engineering/cost-observability/SKILL.md) | Cost Observability and Monitoring |
 | [infra-sizing](42-cost-engineering/infra-sizing/SKILL.md) | Infrastructure Sizing and Capacity Planning |
 | [llm-cost-optimization](42-cost-engineering/llm-cost-optimization/SKILL.md) | LLM and AI Cost Optimization |
-| [llm-token-optimization](42-cost-engineering/llm-token-optimization/SKILL.md) | Untitled |
-| [pricing-and-usage-meters](42-cost-engineering/pricing-and-usage-meters/SKILL.md) | Untitled |
-| [storage-egress-optimization](42-cost-engineering/storage-egress-optimization/SKILL.md) | Untitled |
+| [llm-token-optimization](42-cost-engineering/llm-token-optimization/SKILL.md) | LLM Token Optimization |
+| [pricing-and-usage-meters](42-cost-engineering/pricing-and-usage-meters/SKILL.md) | Pricing and Usage Meters |
+| [storage-egress-optimization](42-cost-engineering/storage-egress-optimization/SKILL.md) | Storage and Egress Optimization |
 | [usage-based-pricing](42-cost-engineering/usage-based-pricing/SKILL.md) | Usage-Based Pricing (Consumption Billing) |
 
 ### 43. Data Reliability
@@ -1497,15 +1497,19 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | Skill | Description |
 |-------|-------------|
 | [data-contracts](43-data-reliability/data-contracts/SKILL.md) | Data Contracts |
-| [data-incident-response](43-data-reliability/data-incident-response/SKILL.md) | Untitled |
+| [data-incident-response](43-data-reliability/data-incident-response/SKILL.md) | Data Incident Response |
 | [data-lineage](43-data-reliability/data-lineage/SKILL.md) | Data Lineage |
+| [data-quality-checks](43-data-reliability/data-quality-checks/SKILL.md) | Data Quality Checks and Validation |
 | [data-quality-monitoring](43-data-reliability/data-quality-monitoring/SKILL.md) | Data Quality Monitoring |
-| [data-quality-rules](43-data-reliability/data-quality-rules/SKILL.md) | Untitled |
+| [data-quality-rules](43-data-reliability/data-quality-rules/SKILL.md) | Data Quality Rules |
 | [data-retention-archiving](43-data-reliability/data-retention-archiving/SKILL.md) | Data Retention and Archiving |
+| [data-validation-rules](43-data-reliability/data-validation-rules/SKILL.md) | Data Validation Rules |
 | [database-health-monitoring](43-data-reliability/database-health-monitoring/SKILL.md) | Database Health Monitoring |
-| [freshness-latency-slos](43-data-reliability/freshness-latency-slos/SKILL.md) | Untitled |
-| [lineage-and-provenance](43-data-reliability/lineage-and-provenance/SKILL.md) | Untitled |
-| [schema-drift-handling](43-data-reliability/schema-drift-handling/SKILL.md) | Untitled |
+| [freshness-latency](43-data-reliability/freshness-latency/SKILL.md) | Data Freshness and Latency |
+| [freshness-latency-slos](43-data-reliability/freshness-latency-slos/SKILL.md) | Freshness Latency SLOs |
+| [lineage-and-provenance](43-data-reliability/lineage-and-provenance/SKILL.md) | Lineage and Provenance |
+| [schema-drift](43-data-reliability/schema-drift/SKILL.md) | Schema Drift Detection |
+| [schema-drift-handling](43-data-reliability/schema-drift-handling/SKILL.md) | Schema Drift Handling |
 | [schema-management](43-data-reliability/schema-management/SKILL.md) | Schema Management |
 
 ### 44. Ai Governance
@@ -1514,41 +1518,31 @@ MIT License - see [LICENSE](LICENSE) file for details.
 |-------|-------------|
 | [ai-data-privacy](44-ai-governance/ai-data-privacy/SKILL.md) | AI Data Privacy |
 | [ai-ethics-compliance](44-ai-governance/ai-ethics-compliance/SKILL.md) | AI Ethics and Compliance |
+| [ai-risk-assessment](44-ai-governance/ai-risk-assessment/SKILL.md) | AI Risk Assessment |
+| [auditability](44-ai-governance/auditability/SKILL.md) | AI Auditability |
+| [confidence-scoring](44-ai-governance/confidence-scoring/SKILL.md) | Confidence Scoring |
+| [explainability](44-ai-governance/explainability/SKILL.md) | Explainability |
+| [human-approval-flows](44-ai-governance/human-approval-flows/SKILL.md) | Human-in-the-Loop (HITL) Workflows |
 | [model-bias-fairness](44-ai-governance/model-bias-fairness/SKILL.md) | Model Bias and Fairness |
 | [model-explainability](44-ai-governance/model-explainability/SKILL.md) | Model Explainability (XAI) |
 | [model-registry](44-ai-governance/model-registry/SKILL.md) | AI Model Registry |
 | [model-risk-management](44-ai-governance/model-risk-management/SKILL.md) | Model Risk Management (MRM) |
-
-### 44. Architecture Decision
-
-| Skill | Description |
-|-------|-------------|
-| [adr-templates](44-architecture-decision/adr-templates/SKILL.md) | Untitled |
-| [deprecation-policy](44-architecture-decision/deprecation-policy/SKILL.md) | Untitled |
-| [system-boundaries](44-architecture-decision/system-boundaries/SKILL.md) | Untitled |
-| [tradeoff-analysis](44-architecture-decision/tradeoff-analysis/SKILL.md) | Untitled |
-| [versioning-strategy](44-architecture-decision/versioning-strategy/SKILL.md) | Untitled |
+| [override-mechanisms](44-ai-governance/override-mechanisms/SKILL.md) | Override Mechanisms |
 
 ### 45. Developer Experience
 
 | Skill | Description |
 |-------|-------------|
-| [commit-conventions](45-developer-experience/commit-conventions/SKILL.md) | Untitled |
-| [lint-format-typecheck](45-developer-experience/lint-format-typecheck/SKILL.md) | Untitled |
-| [local-dev-standard](45-developer-experience/local-dev-standard/SKILL.md) | Untitled |
-| [release-workflow](45-developer-experience/release-workflow/SKILL.md) | Untitled |
-| [repo-automation-scripts](45-developer-experience/repo-automation-scripts/SKILL.md) | Untitled |
-
-### 45. Product Thinking
-
-| Skill | Description |
-|-------|-------------|
-| [agile-scrum-practices](45-product-thinking/agile-scrum-practices/SKILL.md) | Agile and Scrum Practices |
-| [metrics-north-star](45-product-thinking/metrics-north-star/SKILL.md) | Metrics and North Star |
-| [product-roadmapping](45-product-thinking/product-roadmapping/SKILL.md) | Product Roadmapping |
-| [product-vision-strategy](45-product-thinking/product-vision-strategy/SKILL.md) | Product Vision and Strategy |
-| [stakeholder-management](45-product-thinking/stakeholder-management/SKILL.md) | Stakeholder Management |
-| [user-research-discovery](45-product-thinking/user-research-discovery/SKILL.md) | User Research and Discovery |
+| [code-review-standards](45-developer-experience/code-review-standards/SKILL.md) | Code Review Standards |
+| [commit-conventions](45-developer-experience/commit-conventions/SKILL.md) | Commit Conventions |
+| [debugging-tools](45-developer-experience/debugging-tools/SKILL.md) | Debugging Tools and Techniques |
+| [dev-environment-setup](45-developer-experience/dev-environment-setup/SKILL.md) | Development Environment Setup |
+| [hot-reload-fast-feedback](45-developer-experience/hot-reload-fast-feedback/SKILL.md) | Hot Reload and Fast Feedback Loops |
+| [lint-format-typecheck](45-developer-experience/lint-format-typecheck/SKILL.md) | Lint, Format, and Type Check |
+| [local-dev-standard](45-developer-experience/local-dev-standard/SKILL.md) | Local Development Standard |
+| [onboarding-docs](45-developer-experience/onboarding-docs/SKILL.md) | Developer Onboarding Documentation |
+| [release-workflow](45-developer-experience/release-workflow/SKILL.md) | Release Workflow |
+| [repo-automation-scripts](45-developer-experience/repo-automation-scripts/SKILL.md) | Repository Automation Scripts |
 
 ### 46. Data Classification
 
@@ -1677,17 +1671,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [proposal-pack](58-investment-estimation/proposal-pack/SKILL.md) | Untitled |
 | [roi-modeling](58-investment-estimation/roi-modeling/SKILL.md) | Untitled |
 | [sensitivity-analysis](58-investment-estimation/sensitivity-analysis/SKILL.md) | Untitled |
-
-### 60. GitHub MCP
-
-| Skill | Description |
-|-------|-------------|
-| [github-repo-navigation](60-github-mcp/github-repo-navigation/SKILL.md) | Repo discovery and file search |
-| [github-issue-triage](60-github-mcp/github-issue-triage/SKILL.md) | Issue labeling and routing |
-| [github-pr-lifecycle](60-github-mcp/github-pr-lifecycle/SKILL.md) | PR creation and merge flow |
-| [github-code-review](60-github-mcp/github-code-review/SKILL.md) | Diff review and risk analysis |
-| [github-workflow-ops](60-github-mcp/github-workflow-ops/SKILL.md) | Workflow failure diagnosis |
-| [github-release-management](60-github-mcp/github-release-management/SKILL.md) | Release notes and tags |
-| [github-security-triage](60-github-mcp/github-security-triage/SKILL.md) | Security alert handling |
-| [github-repo-governance](60-github-mcp/github-repo-governance/SKILL.md) | Rulesets and permissions |
 <!-- SKILLS-END -->
