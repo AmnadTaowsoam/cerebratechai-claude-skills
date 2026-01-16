@@ -34,7 +34,7 @@ jobs:
 
       - name: Validate markdown syntax
         run: |
-          markdownlint '**/*.md' --ignore node_modules --ignore .github
+          markdownlint '**/*.md' --ignore node_modules --ignore .github --config .markdownlint.json
 
       - name: Check for broken links
         run: |
