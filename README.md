@@ -1041,6 +1041,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 **Total Skills:** 473
 
+
 ### 00. Meta Skills
 
 | Skill | Description |
@@ -1726,7 +1727,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [output-templates](57-skill-orchestration/output-templates/SKILL.md) | Output Templates |
 | [routing-rules](57-skill-orchestration/routing-rules/SKILL.md) | Routing Rules |
 | [scoring-and-prioritization](57-skill-orchestration/scoring-and-prioritization/SKILL.md) | Scoring and Prioritization |
-| [skill-improvement-loop](57-skill-orchestration/skill-improvement-loop/SKILL.md) | Skill Improvement Loop |
+| [skill-improvement-loop](57-skill-orchestration/skill-improvement-loop/SKILL.md) | Skill Improvement Loop - Auto-Update & Gap Detection |
 
 ### 58. Investment Estimation
 
@@ -1760,7 +1761,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [feature-flags-experimentation](59-release-engineering/feature-flags-experimentation/SKILL.md) | Feature Flags & Experimentation |
 | [release-management](59-release-engineering/release-management/SKILL.md) | Release Management |
 
-### 60. GitHub MCP
+### 60. Github Mcp
 
 | Skill | Description |
 |-------|-------------|
@@ -1781,7 +1782,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [caching-strategies](60-infrastructure-patterns/caching-strategies/SKILL.md) | Caching Strategies |
 | [secrets-key-management](60-infrastructure-patterns/secrets-key-management/SKILL.md) | Secrets & Key Management |
 
-### 61. AI Production
+### 61. Ai Production
 
 | Skill | Description |
 |-------|-------------|
@@ -1817,7 +1818,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [security-baseline-controls](64-meta-standards/security-baseline-controls/SKILL.md) | Security Baseline Controls |
 | [service-standards-blueprint](64-meta-standards/service-standards-blueprint/SKILL.md) | Service Standards Blueprint |
 
-### 65. Context & Token Optimization
+### 65. Context Token Optimization
 
 | Skill | Description |
 |-------|-------------|
@@ -1827,7 +1828,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [retrieval-playbook-for-ai](65-context-token-optimization/retrieval-playbook-for-ai/SKILL.md) | Retrieval Playbook for AI |
 | [summarization-rules-evidence-first](65-context-token-optimization/summarization-rules-evidence-first/SKILL.md) | Summarization Rules (Evidence First) |
 
-### 66. Repo Navigation & Knowledge Map
+### 66. Repo Navigation Knowledge Map
 
 | Skill | Description |
 |-------|-------------|
@@ -1837,7 +1838,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [repo-map-ssot](66-repo-navigation-knowledge-map/repo-map-ssot/SKILL.md) | Repo Map SSOT |
 | [where-to-find-what](66-repo-navigation-knowledge-map/where-to-find-what/SKILL.md) | Where to Find What |
 
-### 67. Codegen & Scaffolding Automation
+### 67. Codegen Scaffolding Automation
 
 | Skill | Description |
 |-------|-------------|
@@ -1848,7 +1849,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [event-contract-generator](67-codegen-scaffolding-automation/event-contract-generator/SKILL.md) | Event Contract Generator |
 | [service-scaffold-generator](67-codegen-scaffolding-automation/service-scaffold-generator/SKILL.md) | Service Scaffold Generator |
 
-### 68. Quality Gates & CI Policies
+### 68. Quality Gates Ci Policies
 
 | Skill | Description |
 |-------|-------------|
