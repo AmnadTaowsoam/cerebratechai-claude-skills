@@ -29,9 +29,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install markdown-link-check
           pip install pyspelling
-          npm install -g markdownlint-cli
+          npm install -g markdownlint-cli markdown-link-check
 
       - name: Validate markdown syntax
         run: |
