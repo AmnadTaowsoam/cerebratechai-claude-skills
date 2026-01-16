@@ -2,7 +2,7 @@
 
 Complete guide for setting up Claude Skills with GitHub and Model Context Protocol (MCP)
 
-**Last Updated**: January 15, 2024  
+**Last Updated**: January 16, 2026  
 **Estimated Time**: 15-20 minutes  
 **Difficulty**: Beginner-Friendly
 
@@ -1351,7 +1351,20 @@ npm link
    - Code examples
    ```
 
-3. **Version Control**
+3. **Category Placement**
+   ```
+   - GitHub MCP skills: 60-github-mcp/<skill-name>/SKILL.md
+   ```
+
+4. **Using GitHub MCP Skills**
+   ```
+   Use the skill name directly in prompts:
+   - "Use github-repo-navigation to find the auth module in owner/repo"
+   - "Use github-issue-triage to label new bugs in owner/repo"
+   - "Use github-pr-lifecycle to prepare a PR summary for #123"
+   ```
+
+5. **Version Control**
    ```bash
    # Always use meaningful commit messages
    git commit -m "Add error handling patterns to nodejs-api skill"
@@ -1583,6 +1596,12 @@ For each new device:
 ---
 
 ## Changelog
+
+### Version 1.1 - January 16, 2026
+
+- Updated skill counts (368+ skills, 59 categories)
+- Added 22 new skills including GraphQL, gRPC, Saga Pattern, CQRS, and more
+- Improved documentation structure
 
 ### Version 1.0 - January 15, 2024
 
@@ -2726,5 +2745,5 @@ You now have a complete, production-ready skills system that syncs across all yo
 
 ---
 
-*Last updated: January 15, 2024*
-*Version: 1.0.0*
+*Last updated: January 16, 2026*
+*Version: 1.1.0*

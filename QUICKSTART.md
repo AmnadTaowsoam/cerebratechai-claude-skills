@@ -105,34 +105,37 @@ skill [ชื่อ skill] พบปัญหา:
 ```
 00 - Meta Skills (การคิดเชิงระบบ)
 01 - Foundations (พื้นฐาน)
-02 - Frontend
-03 - Backend API
-04 - Database
+02 - Frontend (10 skills)
+03 - Backend API (10 skills)
+04 - Database (11 skills)
 05 - AI/ML Core
-06 - AI/ML Production
+06 - AI/ML Production (11 skills)
 07 - Document Processing
 08 - Messaging Queue
-09 - Microservices
+09 - Microservices (9 skills)
 10 - Authentication
 11 - Billing
 12 - Compliance
 13 - File Storage
 14 - Monitoring
-15 - DevOps
-16 - Testing
-17 - Domain-Specific
+15 - DevOps (10 skills)
+16 - Testing (8 skills)
+17 - Domain-Specific (8 skills)
 18 - Project Management
 19 - SEO
 20 - AI Integration
 21 - Documentation
 22 - UX/UI Design
 23 - Business Analytics
-24 - Security
+24 - Security (7 skills)
 25 - i18n
 26 - Deployment
 27 - Team Collaboration
 28-39 - Specialized (E-commerce, Mobile, CRM, etc.)
 40-58 - Enterprise (Resilience, Cost, Data, etc.)
+60 - GitHub MCP (8 skills)
+
+Total: 376+ Skills | 60 Categories
 ```
 
 ### Popular Skills
@@ -147,6 +150,10 @@ skill [ชื่อ skill] พบปัญหา:
 | `llm-integration` | LLM (OpenAI, Claude) |
 | `docker-patterns` | Docker containerization |
 | `ci-cd-github-actions` | GitHub Actions CI/CD |
+| `graphql-best-practices` | GraphQL patterns |
+| `grpc-integration` | gRPC integration |
+| `saga-pattern` | Distributed transactions |
+| `agent-patterns` | AI Agent architectures |
 
 ---
 

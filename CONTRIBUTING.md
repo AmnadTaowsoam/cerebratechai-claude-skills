@@ -551,22 +551,36 @@ Before submitting, ensure your skill passes this checklist:
 
 We're particularly looking for contributions in these areas:
 
-### High Priority
-- [ ] GraphQL patterns
-- [ ] gRPC implementation
-- [ ] Terraform advanced patterns
-- [ ] Kubernetes security
-- [ ] Advanced caching strategies
-- [ ] Database replication
-- [ ] Disaster recovery
+### High Priority (Recently Added ✅)
+- [x] GraphQL patterns - `03-backend-api/graphql-best-practices`
+- [x] gRPC implementation - `03-backend-api/grpc-integration`
+- [x] Saga Pattern - `09-microservices/saga-pattern`
+- [x] Event Sourcing - `09-microservices/event-sourcing`
+- [x] CQRS Pattern - `09-microservices/cqrs-pattern`
+- [x] Database Transactions - `04-database/database-transactions`
+- [x] Connection Pooling - `04-database/connection-pooling`
+- [x] Load Balancing - `15-devops-infrastructure/load-balancing`
+- [x] GitHub MCP skills - `60-github-mcp/*`
 
-### Medium Priority
+### Medium Priority (Recently Added ✅)
+- [x] Cache Invalidation - `04-database/cache-invalidation`
+- [x] Error Boundaries React - `02-frontend/error-boundaries-react`
+- [x] State Machines XState - `02-frontend/state-machines-xstate`
+- [x] Secrets Management - `24-security-practices/secrets-management`
+- [x] Vector Search Patterns - `06-ai-ml-production/vector-search-patterns`
+- [x] GitOps ArgoCD - `15-devops-infrastructure/gitops-argocd`
+- [x] Contract Testing Pact - `16-testing/contract-testing-pact`
+- [x] Multi-Cloud Patterns - `15-devops-infrastructure/multi-cloud-patterns`
+
+### Still Needed
 - [ ] CI/CD with GitLab
 - [ ] Monitoring with Datadog
 - [ ] Log aggregation with Loki
 - [ ] Service mesh (Linkerd)
-- [ ] API rate limiting strategies
 - [ ] WebAssembly integration
+- [ ] Terraform advanced patterns
+- [ ] Kubernetes security
+- [ ] Database replication
 
 ### Language-Specific
 - [ ] Go patterns

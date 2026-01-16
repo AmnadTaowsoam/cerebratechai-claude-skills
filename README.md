@@ -2,10 +2,10 @@
 
 > **Comprehensive skill library for Claude AI to build production-ready applications**
 
-A curated collection of **346+ specialized skills** across **58 categories** covering everything from core development to advanced features like AI/ML, blockchain, IoT, system resilience, cost engineering, and more. Each skill provides detailed implementation guides, best practices, and production-ready code examples.
+A curated collection of **376+ specialized skills** across **60 categories** covering everything from core development to advanced features like AI/ML, blockchain, IoT, system resilience, cost engineering, and more. Each skill provides detailed implementation guides, best practices, and production-ready code examples.
 
-[![Skills](https://img.shields.io/badge/Skills-346+-blue)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
-[![Categories](https://img.shields.io/badge/Categories-58-purple)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
+[![Skills](https://img.shields.io/badge/Skills-376+-blue)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
+[![Categories](https://img.shields.io/badge/Categories-60-purple)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
@@ -37,7 +37,7 @@ This repository contains specialized skills that help Claude understand and impl
 
 ### 🌟 Key Features
 
-- **346+ Skills** covering full-stack development across **58 categories**
+- **376+ Skills** covering full-stack development across **60 categories**
 - **Production-Ready** patterns and examples
 - **Language Support**: TypeScript, Python, SQL, and more
 - **Framework Coverage**: Next.js, React, FastAPI, Express, and more
@@ -104,7 +104,7 @@ Strategic thinking and architectural practices.
 - [System Thinking](00-meta-skills/system-thinking/SKILL.md) - Holistic system analysis
 - [Technical Debt Management](00-meta-skills/technical-debt-management/SKILL.md) - Managing tech debt
 
-### 02. 🎨 Frontend Development (8 skills)
+### 02. 🎨 Frontend Development (10 skills)
 Modern frontend frameworks and patterns.
 
 - [Next.js Patterns](02-frontend/nextjs-patterns/SKILL.md) - Next.js 14+ App Router
@@ -115,19 +115,24 @@ Modern frontend frameworks and patterns.
 - [Form Handling](02-frontend/form-handling/SKILL.md) - React Hook Form + Zod
 - [State Management](02-frontend/state-management/SKILL.md) - Zustand, Redux, TanStack Query
 - [Animation](02-frontend/animation/SKILL.md) - Framer Motion, CSS animations
+- [Error Boundaries React](02-frontend/error-boundaries-react/SKILL.md) - React error boundaries
+- [State Machines XState](02-frontend/state-machines-xstate/SKILL.md) - XState state machines
 
-### 03. ⚙️ Backend API (7 skills)
+### 03. ⚙️ Backend API (10 skills)
 Backend development patterns.
 
 - [Node.js API](03-backend-api/nodejs-api/SKILL.md) - Node.js REST APIs
 - [FastAPI Patterns](03-backend-api/fastapi-patterns/SKILL.md) - FastAPI Python
 - [Express REST](03-backend-api/express-rest/SKILL.md) - Express.js patterns
 - [Fastify REST API](03-backend-api/fastify-rest-api/SKILL.md) - Fastify patterns
+- [GraphQL Best Practices](03-backend-api/graphql-best-practices/SKILL.md) - GraphQL patterns
+- [gRPC Integration](03-backend-api/grpc-integration/SKILL.md) - gRPC integration
 - [Error Handling](03-backend-api/error-handling/SKILL.md) - Error patterns
 - [Validation](03-backend-api/validation/SKILL.md) - Request validation
 - [Middleware](03-backend-api/middleware/SKILL.md) - Middleware patterns
+- [WebSocket Patterns](03-backend-api/websocket-patterns/SKILL.md) - WebSocket implementation
 
-### 04. 🗄️ Database (7 skills)
+### 04. 🗄️ Database (11 skills)
 Database design and optimization.
 
 - [Prisma Guide](04-database/prisma-guide/SKILL.md) - Prisma ORM
@@ -137,6 +142,10 @@ Database design and optimization.
 - [Vector Database](04-database/vector-database/SKILL.md) - Pinecone, Qdrant, Weaviate
 - [Database Optimization](04-database/database-optimization/SKILL.md) - Performance tuning
 - [Database Migrations](04-database/database-migrations/SKILL.md) - Schema migrations
+- [Database Transactions](04-database/database-transactions/SKILL.md) - Transaction management
+- [Connection Pooling](04-database/connection-pooling/SKILL.md) - Connection pool management
+- [Cache Invalidation](04-database/cache-invalidation/SKILL.md) - Cache invalidation patterns
+- [Database Locking](04-database/database-locking/SKILL.md) - Locking strategies
 
 ### 05. 🤖 AI/ML Core (8 skills)
 Machine learning and model development.
@@ -150,7 +159,7 @@ Machine learning and model development.
 - [Data Augmentation](05-ai-ml-core/data-augmentation/SKILL.md) - Augmentation techniques
 - [Label Studio](05-ai-ml-core/label-studio-setup/SKILL.md) - Data labeling
 
-### 06. 🚀 AI/ML Production (8 skills)
+### 06. 🚀 AI/ML Production (11 skills)
 Production AI/ML systems.
 
 - [LLM Integration](06-ai-ml-production/llm-integration/SKILL.md) - OpenAI, Anthropic, Azure
@@ -161,6 +170,9 @@ Production AI/ML systems.
 - [Prompt Engineering](06-ai-ml-production/prompt-engineering/SKILL.md) - Prompt patterns
 - [LLM Guardrails](06-ai-ml-production/llm-guardrails/SKILL.md) - NeMo Guardrails
 - [AI Observability](06-ai-ml-production/ai-observability/SKILL.md) - Monitoring
+- [LLM Function Calling](06-ai-ml-production/llm-function-calling/SKILL.md) - Tool use with LLMs
+- [Agent Patterns](06-ai-ml-production/agent-patterns/SKILL.md) - AI agent architectures
+- [Vector Search Patterns](06-ai-ml-production/vector-search-patterns/SKILL.md) - Advanced vector search
 
 ### 07. 📄 Document Processing (5 skills)
 OCR and document parsing.
@@ -180,7 +192,7 @@ Message queuing systems.
 - [Redis Queue](08-messaging-queue/redis-queue/SKILL.md) - Bull/BullMQ
 - [Queue Monitoring](08-messaging-queue/queue-monitoring/SKILL.md) - Observability
 
-### 09. 🔧 Microservices (6 skills)
+### 09. 🔧 Microservices (9 skills)
 Microservices architecture.
 
 - [Service Design](09-microservices/service-design/SKILL.md) - Design principles
@@ -189,6 +201,9 @@ Microservices architecture.
 - [Circuit Breaker](09-microservices/circuit-breaker/SKILL.md) - Resilience patterns
 - [Service Discovery](09-microservices/service-discovery/SKILL.md) - Consul, etcd
 - [Event-Driven](09-microservices/event-driven/SKILL.md) - Event sourcing, CQRS
+- [Saga Pattern](09-microservices/saga-pattern/SKILL.md) - Distributed transactions
+- [Event Sourcing](09-microservices/event-sourcing/SKILL.md) - Event sourcing patterns
+- [CQRS Pattern](09-microservices/cqrs-pattern/SKILL.md) - Command Query Responsibility Segregation
 
 ### 10. 🔐 Authentication & Authorization (5 skills)
 Security and access control.
@@ -239,7 +254,7 @@ Application monitoring and logging.
 - [Error Tracking](14-monitoring-observability/error-tracking/SKILL.md) - Sentry
 - [Performance Monitoring](14-monitoring-observability/performance-monitoring/SKILL.md) - APM
 
-### 15. 🐳 DevOps & Infrastructure (7 skills)
+### 15. 🐳 DevOps & Infrastructure (10 skills)
 Infrastructure as code and CI/CD.
 
 - [Docker Patterns](15-devops-infrastructure/docker-patterns/SKILL.md) - Docker
@@ -249,8 +264,11 @@ Infrastructure as code and CI/CD.
 - [GitHub Actions](15-devops-infrastructure/ci-cd-github-actions/SKILL.md) - CI/CD
 - [Terraform](15-devops-infrastructure/terraform-infrastructure/SKILL.md) - IaC
 - [Secrets Management](15-devops-infrastructure/secrets-management/SKILL.md) - Vault
+- [Load Balancing](15-devops-infrastructure/load-balancing/SKILL.md) - Load balancer patterns
+- [GitOps ArgoCD](15-devops-infrastructure/gitops-argocd/SKILL.md) - GitOps with ArgoCD
+- [Multi-Cloud Patterns](15-devops-infrastructure/multi-cloud-patterns/SKILL.md) - Multi-cloud strategies
 
-### 16. 🧪 Testing (7 skills)
+### 16. 🧪 Testing (8 skills)
 Testing strategies and frameworks.
 
 - [Jest Patterns](16-testing/jest-patterns/SKILL.md) - Jest testing
@@ -260,13 +278,16 @@ Testing strategies and frameworks.
 - [Load Testing](16-testing/load-testing/SKILL.md) - k6, Artillery
 - [ML Model Testing](16-testing/ml-model-testing/SKILL.md) - Model validation
 - [Test Data Factory](16-testing/test-data-factory/SKILL.md) - Test data
+- [Contract Testing Pact](16-testing/contract-testing-pact/SKILL.md) - Consumer-driven contract testing
 
-### 17. 🎯 Domain-Specific (6 skills)
+### 17. 🎯 Domain-Specific (8 skills)
 Cross-cutting concerns.
 
 - [Multi-Tenancy](17-domain-specific/multi-tenancy/SKILL.md) - Multi-tenant architecture
+- [Multi-Tenancy Advanced](17-domain-specific/multi-tenancy-advanced/SKILL.md) - Advanced multi-tenant patterns
 - [Rate Limiting](17-domain-specific/rate-limiting/SKILL.md) - Rate limiting
 - [API Versioning](17-domain-specific/api-versioning/SKILL.md) - Versioning strategies
+- [API Versioning Strategies](17-domain-specific/api-versioning-strategies/SKILL.md) - Advanced versioning patterns
 - [Feature Flags](17-domain-specific/feature-flags/SKILL.md) - Feature toggles
 - [Analytics Tracking](17-domain-specific/analytics-tracking/SKILL.md) - Analytics
 - [Notification System](17-domain-specific/notification-system/SKILL.md) - Notifications
@@ -335,7 +356,7 @@ Business intelligence and KPIs.
 - [KPI Metrics](23-business-analytics/kpi-metrics/SKILL.md) - Key performance indicators
 - [SQL for Analytics](23-business-analytics/sql-for-analytics/SKILL.md) - Analytics SQL patterns
 
-### 24. 🔒 Security Practices (6 skills)
+### 24. 🔒 Security Practices (7 skills)
 Security best practices.
 
 - [Incident Response](24-security-practices/incident-response/SKILL.md) - Security incident handling
@@ -344,6 +365,7 @@ Security best practices.
 - [Secure Coding](24-security-practices/secure-coding/SKILL.md) - Secure development
 - [Security Audit](24-security-practices/security-audit/SKILL.md) - Security assessments
 - [Vulnerability Management](24-security-practices/vulnerability-management/SKILL.md) - Vulnerability tracking
+- [Secrets Management](24-security-practices/secrets-management/SKILL.md) - Secrets handling and rotation
 
 ### 25. 🌍 Internationalization (5 skills)
 Multi-language support.
@@ -495,16 +517,14 @@ Data engineering and ML ops.
 - [Model Serving](39-data-science-ml/ml-serving/SKILL.md) - Model deployment
 - [A/B Testing ML](39-data-science-ml/ab-testing-ml/SKILL.md) - Model experiments
 
-### 40. 🛡️ System Resilience (7 skills)
+### 40. 🛡️ System Resilience (5 skills)
 Building resilient and fault-tolerant systems.
 
-- [Circuit Breaker & Bulkhead](40-system-resilience/circuit-breaker-bulkhead/SKILL.md) - Resilience patterns
+- [Bulkhead Patterns](40-system-resilience/bulkhead-patterns/SKILL.md) - Bulkhead isolation patterns
 - [Disaster Recovery](40-system-resilience/disaster-recovery/SKILL.md) - DR planning
-- [Failure Modes and Effects](40-system-resilience/failure-modes-and-effects/SKILL.md) - FMEA analysis
+- [Failure Modes](40-system-resilience/failure-modes/SKILL.md) - Failure mode analysis
 - [Graceful Degradation](40-system-resilience/graceful-degradation/SKILL.md) - Degradation strategies
 - [Idempotency and Dedup](40-system-resilience/idempotency-and-dedup/SKILL.md) - Idempotent operations
-- [Postmortems and RCA](40-system-resilience/postmortems-and-rca/SKILL.md) - Root cause analysis
-- [Retry, Timeout, Backoff](40-system-resilience/retry-timeout-backoff/SKILL.md) - Retry patterns
 
 ### 41. 🚨 Incident Management (6 skills)
 Handling production incidents effectively.
@@ -667,6 +687,18 @@ Investment and ROI analysis.
 - [Proposal Pack](58-investment-estimation/proposal-pack/SKILL.md) - Proposal templates
 - [ROI Modeling](58-investment-estimation/roi-modeling/SKILL.md) - ROI calculation
 - [Sensitivity Analysis](58-investment-estimation/sensitivity-analysis/SKILL.md) - Sensitivity modeling
+
+### 60. 🧩 GitHub MCP (8 skills)
+GitHub repository automation via MCP.
+
+- [GitHub Repo Navigation](60-github-mcp/github-repo-navigation/SKILL.md) - Repo discovery and file search
+- [GitHub Issue Triage](60-github-mcp/github-issue-triage/SKILL.md) - Issue labeling and routing
+- [GitHub PR Lifecycle](60-github-mcp/github-pr-lifecycle/SKILL.md) - PR creation and merge flow
+- [GitHub Code Review](60-github-mcp/github-code-review/SKILL.md) - Diff review and risk analysis
+- [GitHub Workflow Ops](60-github-mcp/github-workflow-ops/SKILL.md) - Workflow failure diagnosis
+- [GitHub Release Management](60-github-mcp/github-release-management/SKILL.md) - Release notes and tags
+- [GitHub Security Triage](60-github-mcp/github-security-triage/SKILL.md) - Security alert handling
+- [GitHub Repo Governance](60-github-mcp/github-repo-governance/SKILL.md) - Rulesets and permissions
 
 ---
 
@@ -933,8 +965,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📊 Statistics
 
-- **Total Skills**: 346+
-- **Categories**: 58
+- **Total Skills**: 376+
+- **Categories**: 60
 - **Languages**: TypeScript, Python, SQL, Dart, Solidity, Go
 - **Frameworks**: 60+
 - **Last Updated**: January 2026
@@ -958,7 +990,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 <!-- SKILLS-START -->
 ## Skills Overview
 
-**Total Skills:** 380
+**Total Skills:** 376+
 
 
 ### 00. Meta Skills
@@ -1645,4 +1677,17 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [proposal-pack](58-investment-estimation/proposal-pack/SKILL.md) | Untitled |
 | [roi-modeling](58-investment-estimation/roi-modeling/SKILL.md) | Untitled |
 | [sensitivity-analysis](58-investment-estimation/sensitivity-analysis/SKILL.md) | Untitled |
+
+### 60. GitHub MCP
+
+| Skill | Description |
+|-------|-------------|
+| [github-repo-navigation](60-github-mcp/github-repo-navigation/SKILL.md) | Repo discovery and file search |
+| [github-issue-triage](60-github-mcp/github-issue-triage/SKILL.md) | Issue labeling and routing |
+| [github-pr-lifecycle](60-github-mcp/github-pr-lifecycle/SKILL.md) | PR creation and merge flow |
+| [github-code-review](60-github-mcp/github-code-review/SKILL.md) | Diff review and risk analysis |
+| [github-workflow-ops](60-github-mcp/github-workflow-ops/SKILL.md) | Workflow failure diagnosis |
+| [github-release-management](60-github-mcp/github-release-management/SKILL.md) | Release notes and tags |
+| [github-security-triage](60-github-mcp/github-security-triage/SKILL.md) | Security alert handling |
+| [github-repo-governance](60-github-mcp/github-repo-governance/SKILL.md) | Rulesets and permissions |
 <!-- SKILLS-END -->

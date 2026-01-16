@@ -52,15 +52,22 @@
 | [express-rest](03-backend-api/express-rest/SKILL.md) | Express.js patterns |
 | [fastapi-patterns](03-backend-api/fastapi-patterns/SKILL.md) | FastAPI Python |
 | [fastify-rest-api](03-backend-api/fastify-rest-api/SKILL.md) | Fastify patterns |
+| [graphql-best-practices](03-backend-api/graphql-best-practices/SKILL.md) | GraphQL patterns |
+| [grpc-integration](03-backend-api/grpc-integration/SKILL.md) | gRPC integration |
 | [middleware](03-backend-api/middleware/SKILL.md) | Middleware patterns |
 | [nodejs-api](03-backend-api/nodejs-api/SKILL.md) | Node.js REST APIs |
 | [validation](03-backend-api/validation/SKILL.md) | Request validation |
+| [websocket-patterns](03-backend-api/websocket-patterns/SKILL.md) | WebSocket patterns |
 
 ### 04. Database
 | Skill | Description |
 |-------|-------------|
+| [cache-invalidation](04-database/cache-invalidation/SKILL.md) | Cache invalidation patterns |
+| [connection-pooling](04-database/connection-pooling/SKILL.md) | Connection pool management |
+| [database-locking](04-database/database-locking/SKILL.md) | Locking strategies |
 | [database-migrations](04-database/database-migrations/SKILL.md) | Schema migrations |
 | [database-optimization](04-database/database-optimization/SKILL.md) | Performance tuning |
+| [database-transactions](04-database/database-transactions/SKILL.md) | Transaction management |
 | [mongodb-patterns](04-database/mongodb-patterns/SKILL.md) | MongoDB |
 | [prisma-guide](04-database/prisma-guide/SKILL.md) | Prisma ORM |
 | [redis-caching](04-database/redis-caching/SKILL.md) | Redis patterns |
@@ -121,6 +128,18 @@
 | [ml-model-testing](16-testing/ml-model-testing/SKILL.md) | Model validation |
 | [pytest-patterns](16-testing/pytest-patterns/SKILL.md) | Python testing |
 | [test-data-factory](16-testing/test-data-factory/SKILL.md) | Test data |
+
+### 60. GitHub MCP
+| Skill | Description |
+|-------|-------------|
+| [github-repo-navigation](60-github-mcp/github-repo-navigation/SKILL.md) | Repo discovery and file search |
+| [github-issue-triage](60-github-mcp/github-issue-triage/SKILL.md) | Issue labeling and routing |
+| [github-pr-lifecycle](60-github-mcp/github-pr-lifecycle/SKILL.md) | PR creation and merge flow |
+| [github-code-review](60-github-mcp/github-code-review/SKILL.md) | Diff review and risk analysis |
+| [github-workflow-ops](60-github-mcp/github-workflow-ops/SKILL.md) | Workflow failure diagnosis |
+| [github-release-management](60-github-mcp/github-release-management/SKILL.md) | Release notes and tags |
+| [github-security-triage](60-github-mcp/github-security-triage/SKILL.md) | Security alert handling |
+| [github-repo-governance](60-github-mcp/github-repo-governance/SKILL.md) | Rulesets and permissions |
 
 ---
 
@@ -220,6 +239,16 @@
 - `ci-cd-github-actions` - CI/CD
 - `terraform-infrastructure` - IaC
 
+### GitHub Operations
+- `github-repo-navigation` - Repo discovery
+- `github-issue-triage` - Issue triage
+- `github-pr-lifecycle` - PR lifecycle
+- `github-code-review` - Code review
+- `github-workflow-ops` - CI workflow ops
+- `github-release-management` - Release management
+- `github-security-triage` - Security alerts
+- `github-repo-governance` - Repo governance
+
 ### Security
 - `jwt-authentication` - Auth
 - `oauth2-implementation` - OAuth
@@ -257,8 +286,10 @@
 - [ai-observability](06-ai-ml-production/ai-observability/SKILL.md)
 - [ai-search](20-ai-integration/ai-search/SKILL.md)
 - [animation](02-frontend/animation/SKILL.md)
+- [agent-patterns](06-ai-ml-production/agent-patterns/SKILL.md)
 - [api-design](01-foundations/api-design/SKILL.md)
 - [api-documentation](21-documentation/api-documentation/SKILL.md)
+- [api-versioning-strategies](17-domain-specific/api-versioning-strategies/SKILL.md)
 - [api-gateway](09-microservices/api-gateway/SKILL.md)
 - [api-key-management](10-authentication-authorization/api-key-management/SKILL.md)
 - [api-versioning](17-domain-specific/api-versioning/SKILL.md)
@@ -276,8 +307,12 @@
 - [blockchain-authentication](35-blockchain-web3/blockchain-authentication/SKILL.md)
 - [blue-green-deployment](26-deployment-strategies/blue-green-deployment/SKILL.md)
 - [business-intelligence](23-business-analytics/business-intelligence/SKILL.md)
+- [cache-invalidation](04-database/cache-invalidation/SKILL.md)
 - [caching-strategies](47-performance-engineering/caching-strategies/SKILL.md)
 - [campaign-management](28-marketing-integration/campaign-management/SKILL.md)
+- [connection-pooling](04-database/connection-pooling/SKILL.md)
+- [contract-testing-pact](16-testing/contract-testing-pact/SKILL.md)
+- [cqrs-pattern](09-microservices/cqrs-pattern/SKILL.md)
 - [canary-deployment](26-deployment-strategies/canary-deployment/SKILL.md)
 - [cdn-delivery](37-video-streaming/cdn-delivery/SKILL.md)
 - [cdn-integration](13-file-storage/cdn-integration/SKILL.md)
@@ -285,7 +320,6 @@
 - [chatbot-integration](20-ai-integration/chatbot-integration/SKILL.md)
 - [ci-cd-github-actions](15-devops-infrastructure/ci-cd-github-actions/SKILL.md)
 - [circuit-breaker](09-microservices/circuit-breaker/SKILL.md)
-- [circuit-breaker-bulkhead](40-system-resilience/circuit-breaker-bulkhead/SKILL.md)
 - [code-review](01-foundations/code-review/SKILL.md)
 - [code-review-culture](27-team-collaboration/code-review-culture/SKILL.md)
 - [cohort-analysis](23-business-analytics/cohort-analysis/SKILL.md)
@@ -320,8 +354,10 @@
 - [data-quality-rules](43-data-reliability/data-quality-rules/SKILL.md)
 - [data-retention](12-compliance-governance/data-retention/SKILL.md)
 - [data-visualization](23-business-analytics/data-visualization/SKILL.md)
+- [database-locking](04-database/database-locking/SKILL.md)
 - [database-migrations](04-database/database-migrations/SKILL.md)
 - [database-optimization](04-database/database-optimization/SKILL.md)
+- [database-transactions](04-database/database-transactions/SKILL.md)
 - [dbt-patterns](53-data-engineering/dbt-patterns/SKILL.md)
 - [decision-records](00-meta-skills/decision-records/SKILL.md)
 - [deep-linking](31-mobile-development/deep-linking/SKILL.md)
@@ -348,8 +384,10 @@
 - [email-marketing](28-marketing-integration/email-marketing/SKILL.md)
 - [embedding-models](06-ai-ml-production/embedding-models/SKILL.md)
 - [enterprise-rbac-models](50-enterprise-integrations/enterprise-rbac-models/SKILL.md)
+- [error-boundaries-react](02-frontend/error-boundaries-react/SKILL.md)
 - [error-handling](03-backend-api/error-handling/SKILL.md)
 - [error-messages](55-ux-writing/error-messages/SKILL.md)
+- [event-sourcing](09-microservices/event-sourcing/SKILL.md)
 - [error-tracking](14-monitoring-observability/error-tracking/SKILL.md)
 - [escalation-and-ownership](41-incident-management/escalation-and-ownership/SKILL.md)
 - [estimation-techniques](18-project-management/estimation-techniques/SKILL.md)
@@ -359,7 +397,6 @@
 - [express-rest](03-backend-api/express-rest/SKILL.md)
 
 ### F-L
-- [failure-modes-and-effects](40-system-resilience/failure-modes-and-effects/SKILL.md)
 - [fastapi-patterns](03-backend-api/fastapi-patterns/SKILL.md)
 - [fastify-rest-api](03-backend-api/fastify-rest-api/SKILL.md)
 - [feature-engineering](39-data-science-ml/feature-engineering/SKILL.md)
@@ -374,7 +411,18 @@
 - [game-analytics](38-gaming-features/game-analytics/SKILL.md)
 - [gdpr-compliance](12-compliance-governance/gdpr-compliance/SKILL.md)
 - [git-workflow](01-foundations/git-workflow/SKILL.md)
+- [github-code-review](60-github-mcp/github-code-review/SKILL.md)
+- [github-issue-triage](60-github-mcp/github-issue-triage/SKILL.md)
+- [github-pr-lifecycle](60-github-mcp/github-pr-lifecycle/SKILL.md)
+- [github-release-management](60-github-mcp/github-release-management/SKILL.md)
+- [github-repo-governance](60-github-mcp/github-repo-governance/SKILL.md)
+- [github-repo-navigation](60-github-mcp/github-repo-navigation/SKILL.md)
+- [github-security-triage](60-github-mcp/github-security-triage/SKILL.md)
+- [github-workflow-ops](60-github-mcp/github-workflow-ops/SKILL.md)
+- [gitops-argocd](15-devops-infrastructure/gitops-argocd/SKILL.md)
 - [graceful-degradation](40-system-resilience/graceful-degradation/SKILL.md)
+- [graphql-best-practices](03-backend-api/graphql-best-practices/SKILL.md)
+- [grpc-integration](03-backend-api/grpc-integration/SKILL.md)
 - [grafana-dashboards](14-monitoring-observability/grafana-dashboards/SKILL.md)
 - [ground-truth-management](52-ai-evaluation/ground-truth-management/SKILL.md)
 - [headless-cms](33-content-management/headless-cms/SKILL.md)
@@ -412,8 +460,10 @@
 - [live-chat](29-customer-support/live-chat/SKILL.md)
 - [live-notifications](34-real-time-features/live-notifications/SKILL.md)
 - [live-streaming](37-video-streaming/live-streaming/SKILL.md)
+- [llm-function-calling](06-ai-ml-production/llm-function-calling/SKILL.md)
 - [llm-guardrails](06-ai-ml-production/llm-guardrails/SKILL.md)
 - [llm-integration](06-ai-ml-production/llm-integration/SKILL.md)
+- [load-balancing](15-devops-infrastructure/load-balancing/SKILL.md)
 - [llm-judge-patterns](52-ai-evaluation/llm-judge-patterns/SKILL.md)
 - [llm-local-deployment](06-ai-ml-production/llm-local-deployment/SKILL.md)
 - [llm-token-optimization](42-cost-engineering/llm-token-optimization/SKILL.md)
@@ -439,6 +489,8 @@
 - [model-versioning](05-ai-ml-core/model-versioning/SKILL.md)
 - [mongodb-patterns](04-database/mongodb-patterns/SKILL.md)
 - [mqtt-integration](08-messaging-queue/mqtt-integration/SKILL.md)
+- [multi-cloud-patterns](15-devops-infrastructure/multi-cloud-patterns/SKILL.md)
+- [multi-tenancy-advanced](17-domain-specific/multi-tenancy-advanced/SKILL.md)
 - [mui-material](02-frontend/mui-material/SKILL.md)
 - [multi-language](25-internationalization/multi-language/SKILL.md)
 - [multi-tenancy](17-domain-specific/multi-tenancy/SKILL.md)
@@ -470,7 +522,6 @@
 - [penetration-testing](24-security-practices/penetration-testing/SKILL.md)
 - [performance-monitoring](14-monitoring-observability/performance-monitoring/SKILL.md)
 - [pii-detection](46-data-classification/pii-detection/SKILL.md)
-- [postmortems-and-rca](40-system-resilience/postmortems-and-rca/SKILL.md)
 - [presence-detection](34-real-time-features/presence-detection/SKILL.md)
 - [pricing-and-usage-meters](42-cost-engineering/pricing-and-usage-meters/SKILL.md)
 - [pricing-strategy](58-investment-estimation/pricing-strategy/SKILL.md)
@@ -509,7 +560,6 @@
 - [requirement-to-scope](56-requirements-intake/requirement-to-scope/SKILL.md)
 - [responsive-design](22-ux-ui-design/responsive-design/SKILL.md)
 - [retention-and-deletion](46-data-classification/retention-and-deletion/SKILL.md)
-- [retry-timeout-backoff](40-system-resilience/retry-timeout-backoff/SKILL.md)
 - [risk-and-dependencies](56-requirements-intake/risk-and-dependencies/SKILL.md)
 - [risk-assessment](00-meta-skills/risk-assessment/SKILL.md)
 - [risk-management](18-project-management/risk-management/SKILL.md)
@@ -524,8 +574,10 @@
 - [runbooks](21-documentation/runbooks/SKILL.md)
 - [s3-integration](13-file-storage/s3-integration/SKILL.md)
 - [sales-pipeline](32-crm-integration/sales-pipeline/SKILL.md)
+- [saga-pattern](09-microservices/saga-pattern/SKILL.md)
 - [salesforce-integration](32-crm-integration/salesforce-integration/SKILL.md)
 - [sandboxing](54-agentops/sandboxing/SKILL.md)
+- [secrets-management](24-security-practices/secrets-management/SKILL.md)
 - [schema-drift-handling](43-data-reliability/schema-drift-handling/SKILL.md)
 - [scim-provisioning](50-enterprise-integrations/scim-provisioning/SKILL.md)
 - [scoring-and-prioritization](57-skill-orchestration/scoring-and-prioritization/SKILL.md)
@@ -550,6 +602,7 @@
 - [social-media-integration](28-marketing-integration/social-media-integration/SKILL.md)
 - [sql-for-analytics](23-business-analytics/sql-for-analytics/SKILL.md)
 - [sso-saml-oidc](50-enterprise-integrations/sso-saml-oidc/SKILL.md)
+- [state-machines-xstate](02-frontend/state-machines-xstate/SKILL.md)
 - [state-management](02-frontend/state-management/SKILL.md)
 - [storage-egress-optimization](42-cost-engineering/storage-egress-optimization/SKILL.md)
 - [strapi-integration](33-content-management/strapi-integration/SKILL.md)
@@ -586,6 +639,7 @@
 - [validation-metrics](48-product-discovery/validation-metrics/SKILL.md)
 - [vector-database](04-database/vector-database/SKILL.md)
 - [vector-search](06-ai-ml-production/vector-search/SKILL.md)
+- [vector-search-patterns](06-ai-ml-production/vector-search-patterns/SKILL.md)
 - [vendor-onboarding](50-enterprise-integrations/vendor-onboarding/SKILL.md)
 - [versioning-strategy](44-architecture-decision/versioning-strategy/SKILL.md)
 - [video-analytics](37-video-streaming/video-analytics/SKILL.md)
@@ -595,7 +649,8 @@
 - [wallet-connection](35-blockchain-web3/wallet-connection/SKILL.md)
 - [web3-integration](35-blockchain-web3/web3-integration/SKILL.md)
 - [webhook-handling](11-billing-subscription/webhook-handling/SKILL.md)
-- [websocket-patterns](34-real-time-features/websocket-patterns/SKILL.md)
+- [websocket-patterns](03-backend-api/websocket-patterns/SKILL.md)
+- [websocket-realtime](34-real-time-features/websocket-patterns/SKILL.md)
 - [wireframing](22-ux-ui-design/wireframing/SKILL.md)
 - [wordpress-api](33-content-management/wordpress-api/SKILL.md)
 - [yolo-integration](05-ai-ml-core/yolo-integration/SKILL.md)
@@ -604,6 +659,6 @@
 
 ## Statistics
 
-- **Total Skills**: 346+
-- **Categories**: 58
+- **Total Skills**: 368+
+- **Categories**: 59
 - **Last Updated**: January 2026
