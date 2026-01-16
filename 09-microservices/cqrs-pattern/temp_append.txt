@@ -1,0 +1,154 @@
+
+## Best Practices
+
+### Command Design
+
+- **Use intent-revealing names**: Commands should clearly express user intent
+- **Validate commands**: Validate before processing
+- **Keep commands small**: Single responsibility per command
+- **Include command metadata**: Add timestamps, user IDs, etc.
+- **Design for idempotency**: Commands should be safe to retry
+
+### Query Design
+
+- **Optimize for reads**: Denormalize data for fast queries
+- **Use appropriate storage**: Choose storage based on query patterns
+- **Implement caching**: Cache frequently accessed data
+- **Paginate results**: Support large result sets
+- **Use query models**: Separate models optimized for different use cases
+
+### Read/Write Separation
+
+- **Use separate databases**: Different storage for reads and writes
+- **Scale independently**: Scale read and write sides separately
+- **Handle eventual consistency**: Accept temporary inconsistency
+- **Communicate staleness**: Inform users of data freshness
+- **Use read-your-writes when needed**: For strong consistency requirements
+
+### Eventual Consistency
+
+- **Design for lag**: Assume reads may lag behind writes
+- **Provide status indicators**: Show data freshness to users
+- **Use cache invalidation**: Invalidate cache on updates
+- **Implement sync projections**: For critical data that needs consistency
+- **Monitor lag**: Track time between write and read availability
+
+### Command Handlers
+
+- **Validate invariants**: Enforce business rules before persistence
+- **Use transactions**: Ensure atomic state changes
+- **Emit events**: Publish events after state changes
+- **Handle errors gracefully**: Return appropriate error responses
+- **Log command execution**: Track command processing for debugging
+
+### Query Handlers
+
+- **Use read-optimized storage**: Query from read replicas or caches
+- **Avoid complex joins**: Denormalize data to reduce joins
+- **Implement pagination**: Support large result sets efficiently
+- **Cache aggressively**: Cache frequently accessed data
+- **Monitor query performance**: Track slow queries
+
+### Database Configuration
+
+- **Choose appropriate databases**: Match database to workload
+- **Configure replication**: Set up read replicas for query side
+- **Implement connection pooling**: Optimize database connections
+- **Use appropriate indexes**: Index for read patterns
+- **Monitor database health**: Track performance and errors
+
+### Projection Management
+
+- **Make projections rebuildable**: Allow complete rebuild from source
+- **Use incremental updates**: Update projections as events arrive
+- **Handle projection failures**: Retry failed projections
+- **Monitor projection lag**: Track how far behind projections are
+- **Version projections**: Support multiple projection versions
+
+### Testing
+
+- **Test command handlers**: Verify validation and state changes
+- **Test query handlers**: Verify query results and performance
+- **Test consistency scenarios**: Test eventual consistency behavior
+- **Test failure scenarios**: Test error handling and recovery
+- **Performance test**: Measure throughput and latency
+
+### Monitoring
+
+- **Track command metrics**: Monitor command processing rates and failures
+- **Track query metrics**: Monitor query performance and patterns
+- **Monitor lag**: Track time between writes and read availability
+- **Set up alerts**: Notify on anomalies or failures
+- **Create dashboards**: Visualize CQRS system health
+
+## Checklist
+
+### Design
+- [ ] Identify read/write workload differences
+- [ ] Design command models
+- [ ] Design query models
+- [ ] Choose appropriate databases
+- [ ] Define consistency requirements
+
+### Command Side
+- [ ] Implement command validation
+- [ ] Set up command handlers
+- [ ] Configure write database
+- [ ] Implement event publishing
+- [ ] Add command logging
+
+### Query Side
+- [ ] Design read models
+- [ ] Set up read database/replica
+- [ ] Implement query handlers
+- [ ] Configure caching
+- [ ] Add query logging
+
+### Eventual Consistency
+- [ ] Define acceptable lag
+- [ ] Implement status indicators
+- [ ] Set up cache invalidation
+- [ ] Configure sync projections
+- [ ] Monitor lag metrics
+
+### Projections
+- [ ] Design projection schemas
+- [ ] Implement projection handlers
+- [ ] Set up incremental updates
+- [ ] Configure projection rebuilds
+- [ ] Monitor projection lag
+
+### Database Setup
+- [ ] Configure write database
+- [ ] Configure read database/replica
+- [ ] Set up connection pooling
+- [ ] Configure replication
+- [ ] Optimize indexes
+
+### Caching
+- [ ] Identify cacheable data
+- [ ] Configure cache strategy
+- [ ] Set up cache invalidation
+- [ ] Monitor cache hit rates
+- [ ] Configure cache expiration
+
+### Monitoring
+- [ ] Set up command metrics
+- [ ] Set up query metrics
+- [ ] Configure lag monitoring
+- [ ] Create dashboards
+- [ ] Set up alerts
+
+### Testing
+- [ ] Write command handler tests
+- [ ] Write query handler tests
+- [ ] Test consistency scenarios
+- [ ] Performance test
+- [ ] Test failure scenarios
+
+### Documentation
+- [ ] Document command models
+- [ ] Document query models
+- [ ] Document consistency requirements
+- [ ] Create runbooks
+- [ ] Maintain API documentation

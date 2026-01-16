@@ -2,10 +2,10 @@
 
 > **Comprehensive skill library for Claude AI to build production-ready applications**
 
-A curated collection of **376+ specialized skills** across **60 categories** covering everything from core development to advanced features like AI/ML, blockchain, IoT, system resilience, cost engineering, and more. Each skill provides detailed implementation guides, best practices, and production-ready code examples.
+A curated collection of **473+ specialized skills** across **73 categories** covering everything from core development to advanced features like AI/ML, blockchain, IoT, system resilience, platform engineering, governance, and more. Each skill provides detailed implementation guides, best practices, and production-ready code examples.
 
-[![Skills](https://img.shields.io/badge/Skills-376+-blue)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
-[![Categories](https://img.shields.io/badge/Categories-60-purple)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
+[![Skills](https://img.shields.io/badge/Skills-473+-blue)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
+[![Categories](https://img.shields.io/badge/Categories-73-purple)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
@@ -37,7 +37,7 @@ This repository contains specialized skills that help Claude understand and impl
 
 ### 🌟 Key Features
 
-- **376+ Skills** covering full-stack development across **60 categories**
+- **473+ Skills** covering full-stack development across **73 categories**
 - **Production-Ready** patterns and examples
 - **Language Support**: TypeScript, Python, SQL, and more
 - **Framework Coverage**: Next.js, React, FastAPI, Express, and more
@@ -965,8 +965,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📊 Statistics
 
-- **Total Skills**: 376+
-- **Categories**: 60
+- **Total Skills**: 473+
+- **Categories**: 73
 - **Languages**: TypeScript, Python, SQL, Dart, Solidity, Go
 - **Frameworks**: 60+
 - **Last Updated**: January 2026
@@ -990,8 +990,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 <!-- SKILLS-START -->
 ## Skills Overview
 
-**Total Skills:** 420
-
+**Total Skills:** 473
 
 ### 00. Meta Skills
 
@@ -1705,7 +1704,14 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [tradeoff-analysis](59-architecture-decision/tradeoff-analysis/SKILL.md) | Trade-off Analysis |
 | [versioning-strategy](59-architecture-decision/versioning-strategy/SKILL.md) | Versioning Strategy |
 
-### 60. Github Mcp
+### 59. Release Engineering
+
+| Skill | Description |
+|-------|-------------|
+| [feature-flags-experimentation](59-release-engineering/feature-flags-experimentation/SKILL.md) | Feature Flags & Experimentation |
+| [release-management](59-release-engineering/release-management/SKILL.md) | Release Management |
+
+### 60. GitHub MCP
 
 | Skill | Description |
 |-------|-------------|
@@ -1717,4 +1723,110 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [github-repo-navigation](60-github-mcp/github-repo-navigation/SKILL.md) | GitHub Repo Navigation |
 | [github-security-triage](60-github-mcp/github-security-triage/SKILL.md) | GitHub Security Triage |
 | [github-workflow-ops](60-github-mcp/github-workflow-ops/SKILL.md) | GitHub Workflow Ops |
+
+### 60. Infrastructure Patterns
+
+| Skill | Description |
+|-------|-------------|
+| [api-design-contracts](60-infrastructure-patterns/api-design-contracts/SKILL.md) | API Design & Contracts |
+| [caching-strategies](60-infrastructure-patterns/caching-strategies/SKILL.md) | Caching Strategies |
+| [secrets-key-management](60-infrastructure-patterns/secrets-key-management/SKILL.md) | Secrets & Key Management |
+
+### 61. AI Production
+
+| Skill | Description |
+|-------|-------------|
+| [llm-security-redteaming](61-ai-production/llm-security-redteaming/SKILL.md) | LLM Security & Red Teaming |
+| [model-serving-inference](61-ai-production/model-serving-inference/SKILL.md) | Model Serving & Inference |
+| [prompting-patterns](61-ai-production/prompting-patterns/SKILL.md) | Prompting Patterns |
+| [retrieval-quality](61-ai-production/retrieval-quality/SKILL.md) | Retrieval Quality |
+
+### 62. Scale Operations
+
+| Skill | Description |
+|-------|-------------|
+| [data-migrations-backfill](62-scale-operations/data-migrations-backfill/SKILL.md) | Data Migrations & Backfill |
+| [kubernetes-platform](62-scale-operations/kubernetes-platform/SKILL.md) | Kubernetes Platform Engineering |
+| [multi-tenancy-saas](62-scale-operations/multi-tenancy-saas/SKILL.md) | Multi-Tenancy & SaaS Architecture |
+
+### 63. Professional Services
+
+| Skill | Description |
+|-------|-------------|
+| [proposal-sow-delivery](63-professional-services/proposal-sow-delivery/SKILL.md) | Proposal, SOW & Delivery Management |
+| [runbooks-ops](63-professional-services/runbooks-ops/SKILL.md) | Runbooks & Ops |
+
+### 64. Meta Standards
+
+| Skill | Description |
+|-------|-------------|
+| [api-style-guide](64-meta-standards/api-style-guide/SKILL.md) | API Style Guide |
+| [config-env-conventions](64-meta-standards/config-env-conventions/SKILL.md) | Config & Environment Conventions |
+| [error-shape-taxonomy](64-meta-standards/error-shape-taxonomy/SKILL.md) | Error Shape Taxonomy |
+| [event-style-guide](64-meta-standards/event-style-guide/SKILL.md) | Event Style Guide |
+| [logging-metrics-tracing-standard](64-meta-standards/logging-metrics-tracing-standard/SKILL.md) | Logging, Metrics & Tracing Standard |
+| [security-baseline-controls](64-meta-standards/security-baseline-controls/SKILL.md) | Security Baseline Controls |
+| [service-standards-blueprint](64-meta-standards/service-standards-blueprint/SKILL.md) | Service Standards Blueprint |
+
+### 65. Context & Token Optimization
+
+| Skill | Description |
+|-------|-------------|
+| [anti-bloat-checklist](65-context-token-optimization/anti-bloat-checklist/SKILL.md) | Anti-Bloat Checklist |
+| [context-pack-format](65-context-token-optimization/context-pack-format/SKILL.md) | Context Pack Format |
+| [prompt-library-minimal](65-context-token-optimization/prompt-library-minimal/SKILL.md) | Prompt Library Minimal |
+| [retrieval-playbook-for-ai](65-context-token-optimization/retrieval-playbook-for-ai/SKILL.md) | Retrieval Playbook for AI |
+| [summarization-rules-evidence-first](65-context-token-optimization/summarization-rules-evidence-first/SKILL.md) | Summarization Rules (Evidence First) |
+
+### 66. Repo Navigation & Knowledge Map
+
+| Skill | Description |
+|-------|-------------|
+| [change-impact-map](66-repo-navigation-knowledge-map/change-impact-map/SKILL.md) | Change Impact Map |
+| [docs-indexing-strategy](66-repo-navigation-knowledge-map/docs-indexing-strategy/SKILL.md) | Docs Indexing Strategy |
+| [naming-and-folder-conventions](66-repo-navigation-knowledge-map/naming-and-folder-conventions/SKILL.md) | Naming & Folder Conventions |
+| [repo-map-ssot](66-repo-navigation-knowledge-map/repo-map-ssot/SKILL.md) | Repo Map SSOT |
+| [where-to-find-what](66-repo-navigation-knowledge-map/where-to-find-what/SKILL.md) | Where to Find What |
+
+### 67. Codegen & Scaffolding Automation
+
+| Skill | Description |
+|-------|-------------|
+| [bruno-smoke-test-generator](67-codegen-scaffolding-automation/bruno-smoke-test-generator/SKILL.md) | Bruno Smoke Test Generator |
+| [ci-pipeline-generator](67-codegen-scaffolding-automation/ci-pipeline-generator/SKILL.md) | CI Pipeline Generator |
+| [db-migration-generator](67-codegen-scaffolding-automation/db-migration-generator/SKILL.md) | DB Migration Generator |
+| [endpoint-generator](67-codegen-scaffolding-automation/endpoint-generator/SKILL.md) | Endpoint Generator |
+| [event-contract-generator](67-codegen-scaffolding-automation/event-contract-generator/SKILL.md) | Event Contract Generator |
+| [service-scaffold-generator](67-codegen-scaffolding-automation/service-scaffold-generator/SKILL.md) | Service Scaffold Generator |
+
+### 68. Quality Gates & CI Policies
+
+| Skill | Description |
+|-------|-------------|
+| [contract-test-gates](68-quality-gates-ci-policies/contract-test-gates/SKILL.md) | Contract Test Gates |
+| [definition-of-done](68-quality-gates-ci-policies/definition-of-done/SKILL.md) | Definition of Done |
+| [lint-test-typecheck-policy](68-quality-gates-ci-policies/lint-test-typecheck-policy/SKILL.md) | Lint, Test, Typecheck Policy |
+| [performance-regression-gates](68-quality-gates-ci-policies/performance-regression-gates/SKILL.md) | Performance Regression Gates |
+| [release-checklist-gate](68-quality-gates-ci-policies/release-checklist-gate/SKILL.md) | Release Checklist Gate |
+| [security-scan-policy](68-quality-gates-ci-policies/security-scan-policy/SKILL.md) | Security Scan Policy |
+
+### 69. Platform Engineering Lite
+
+| Skill | Description |
+|-------|-------------|
+| [config-distribution](69-platform-engineering-lite/config-distribution/SKILL.md) | Config Distribution |
+| [deployment-patterns](69-platform-engineering-lite/deployment-patterns/SKILL.md) | Deployment Patterns |
+| [env-matrix-dev-stg-prod](69-platform-engineering-lite/env-matrix-dev-stg-prod/SKILL.md) | Environment Matrix: Dev/Stg/Prod |
+| [observability-packaging](69-platform-engineering-lite/observability-packaging/SKILL.md) | Observability Packaging |
+| [tenant-aware-ops](69-platform-engineering-lite/tenant-aware-ops/SKILL.md) | Tenant-Aware Ops |
+
+### 70. Data Platform Governance
+
+| Skill | Description |
+|-------|-------------|
+| [backfill-and-reconciliation-playbook](70-data-platform-governance/backfill-and-reconciliation-playbook/SKILL.md) | Backfill and Reconciliation Playbook |
+| [data-contracts](70-data-platform-governance/data-contracts/SKILL.md) | Data Contracts |
+| [lineage-and-provenance](70-data-platform-governance/lineage-and-provenance/SKILL.md) | Lineage and Provenance |
+| [pii-policy-enforcement](70-data-platform-governance/pii-policy-enforcement/SKILL.md) | PII Policy Enforcement |
+| [retention-archival](70-data-platform-governance/retention-archival/SKILL.md) | Retention and Archival |
 <!-- SKILLS-END -->

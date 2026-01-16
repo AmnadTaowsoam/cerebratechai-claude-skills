@@ -153,3 +153,132 @@ Compensation: reverse ledger entry if notification fails.
 - `09-microservices/event-driven`
 - `09-microservices/event-sourcing`
 - `08-messaging-queue/kafka-patterns`
+
+## Best Practices
+
+### Saga Design
+
+- **Keep sagas short**: Long-running sagas increase complexity and risk
+- **Use compensating transactions**: Ensure every step can be undone
+- **Make compensations idempotent**: Compensations should be safe to retry
+- **Design for eventual consistency**: Accept temporary inconsistency during saga execution
+- **Use correlation IDs**: Track saga instances across services
+
+### Orchestration vs Choreography
+
+- **Use orchestration for complex workflows**: When you need centralized control
+- **Use choreography for simple workflows**: When services can act independently
+- **Mix patterns appropriately**: Some workflows may benefit from hybrid approaches
+- **Document decision criteria**: Clear guidelines for when to use each pattern
+
+### Error Handling
+
+- **Classify errors**: Distinguish between retryable and non-retryable errors
+- **Use exponential backoff**: Retry with increasing delays for transient failures
+- **Implement dead letter queues**: Route permanently failed messages for analysis
+- **Set appropriate timeouts**: Don't let sagas hang indefinitely
+- **Log saga state**: Maintain detailed logs for debugging
+
+### State Management
+
+- **Persist saga state**: Store state in durable storage
+- **Use optimistic concurrency**: Version checks to prevent conflicts
+- **Implement timeout handling**: Clean up stuck sagas
+- **Design for replay**: Allow sagas to be restarted from checkpoints
+- **Audit state changes**: Track all state transitions
+
+### Messaging
+
+- **Use message brokers**: Decouple services with Kafka, RabbitMQ, etc.
+- **Ensure at-least-once delivery**: Configure QoS appropriately
+- **Use outbox pattern**: Prevent event loss during database transactions
+- **Implement idempotent handlers**: Handle duplicate messages safely
+- **Monitor message flow**: Track message throughput and latency
+
+### Testing
+
+- **Test individual steps**: Unit test each saga step and compensation
+- **Test compensation flows**: Verify rollback logic works correctly
+- **Test failure scenarios**: Chaos test partial failures
+- **Test saga restart**: Verify sagas can recover from checkpoints
+- **Test performance**: Measure saga execution time under load
+
+### Production Considerations
+
+- **Monitor saga execution**: Track active, completed, and failed sagas
+- **Set up alerts**: Notify on saga failures or timeouts
+- **Implement dashboards**: Visualize saga flow and state
+- **Document runbooks**: Clear procedures for handling saga issues
+- **Plan for scale**: Design sagas to handle increased load
+
+## Checklist
+
+### Saga Design
+- [ ] Identify workflows that need distributed transactions
+- [ ] Design compensating transactions for each step
+- [ ] Define saga timeout and retry policies
+- [ ] Choose orchestration or choreography approach
+- [ ] Document saga flow and decision points
+
+### State Management
+- [ ] Design saga state model
+- [ ] Choose durable storage for saga state
+- [ ] Implement optimistic concurrency control
+- [ ] Set up timeout handling
+- [ ] Design saga restart mechanism
+
+### Compensation Logic
+- [ ] Define compensation for each step
+- [ ] Ensure compensations are idempotent
+- [ ] Test compensation flows
+- [ ] Handle compensation failures
+- [ ] Document compensation behavior
+
+### Messaging Setup
+- [ ] Configure message broker (Kafka/RabbitMQ)
+- [ ] Set up topics/queues for saga events
+- [ ] Configure message ordering guarantees
+- [ ] Implement outbox pattern
+- [ ] Set up dead letter queues
+
+### Error Handling
+- [ ] Classify error types (retryable/non-retryable)
+- [ ] Configure retry policies with backoff
+- [ ] Set up DLQ for failed messages
+- [ ] Implement timeout handling
+- [ ] Add comprehensive logging
+
+### Orchestration Setup
+- [ ] Choose orchestration framework (Temporal, Camunda, custom)
+- [ ] Configure workflow definitions
+- [ ] Set up saga coordinator
+- [ ] Implement saga instance tracking
+- [ ] Configure retry and timeout policies
+
+### Choreography Setup
+- [ ] Define event schemas
+- [ ] Set up event subscriptions
+- [ ] Implement event handlers
+- [ ] Configure event ordering
+- [ ] Set up correlation ID tracking
+
+### Monitoring
+- [ ] Set up metrics collection
+- [ ] Configure dashboards for saga state
+- [ ] Set up alerts for failures
+- [ ] Track saga execution time
+- [ ] Monitor message flow
+
+### Testing
+- [ ] Write unit tests for saga steps
+- [ ] Test compensation flows
+- [ ] Test failure scenarios
+- [ ] Test saga restart and recovery
+- [ ] Perform load testing
+
+### Documentation
+- [ ] Document saga flows
+- [ ] Document compensation logic
+- [ ] Create runbooks for common issues
+- [ ] Document monitoring setup
+- [ ] Maintain API documentation

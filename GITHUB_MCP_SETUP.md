@@ -98,10 +98,10 @@ npm --version
 2. Fill in repository details:
    - **Repository name**: `cerebratechai-claude-skills`
    - **Description**: `Production-ready skills for Claude AI development`
-   - **Visibility**: 
+   - **Visibility**:
      - ✅ **Public** (recommended for easy sharing)
      - or **Private** (if needed, works with MCP)
-   - **Initialize**: 
+   - **Initialize**:
      - ✅ Add README file
      - ✅ Add .gitignore (choose "Node" template)
      - ✅ Choose a license (MIT recommended)
@@ -126,12 +126,17 @@ Replace `YOUR_USERNAME` with your actual GitHub username.
 
 ```bash
 # Create all skill category folders
-mkdir -p {01-foundations,02-frontend,03-backend-api,04-database,05-ai-ml-core,06-ai-ml-production,07-document-processing,08-messaging-queue,09-microservices,10-authentication-authorization,11-billing-subscription,12-compliance-governance,13-file-storage,14-monitoring-observability,15-devops-infrastructure,16-testing,17-domain-specific,18-project-management,19-seo-optimization,20-ai-integration,21-documentation,22-ux-ui-design,28-marketing-integration,29-customer-support,30-ecommerce,31-mobile-development,32-crm-integration,33-content-management,34-real-time-features,35-blockchain-web3,36-iot-integration,37-video-streaming,38-gaming-features,39-data-science-ml}
+mkdir -p {00-meta-skills,01-foundations,02-frontend,03-backend-api,04-database,05-ai-ml-core,06-ai-ml-production,07-document-processing,08-messaging-queue,09-microservices,10-authentication-authorization,11-billing-subscription,12-compliance-governance,13-file-storage,14-monitoring-observability,15-devops-infrastructure,16-testing,17-domain-specific,18-project-management,19-seo-optimization,20-ai-integration,21-documentation,22-ux-ui-design,23-business-analytics,24-security-practices,25-internationalization,26-deployment-strategies,27-team-collaboration,28-marketing-integration,29-customer-support,30-ecommerce,31-mobile-development,32-crm-integration,33-content-management,34-real-time-features,35-blockchain-web3,36-iot-integration,37-video-streaming,38-gaming-features,39-data-science-ml,40-system-resilience,41-incident-management,42-cost-engineering,43-data-reliability,44-ai-governance,45-developer-experience,46-data-classification,47-performance-engineering,48-product-discovery,49-portfolio-management,50-enterprise-integrations,51-contracts-governance,52-ai-evaluation,53-data-engineering,54-agentops,55-ux-writing,56-requirements-intake,57-skill-orchestration,58-investment-estimation,59-architecture-decision,59-release-engineering,60-github-mcp,60-infrastructure-patterns,61-ai-production,62-scale-operations,63-professional-services,64-meta-standards,65-context-token-optimization,66-repo-navigation-knowledge-map,67-codegen-scaffolding-automation,68-quality-gates-ci-policies,69-platform-engineering-lite,70-data-platform-governance}
 
 # Create a sample skill to test
 mkdir -p 01-foundations/typescript-standards
 
 cat > 01-foundations/typescript-standards/SKILL.md << 'EOF'
+---
+name: TypeScript Standards
+description: Comprehensive TypeScript coding standards for production applications
+---
+
 # TypeScript Standards
 
 ## Overview
@@ -334,7 +339,7 @@ Skills are comprehensive markdown documents that teach Claude best practices, pa
 
 ## 🗂️ Repository Structure
 
-```
+````
 cerebratechai-claude-skills/
 ├── 01-foundations/          # Core development standards
 ├── 02-frontend/             # Frontend frameworks & patterns
@@ -354,7 +359,7 @@ cerebratechai-claude-skills/
 ├── 16-testing/             # Testing strategies
 ├── 17-domain-specific/     # Cross-cutting concerns
 └── [18-39]/                # Additional categories
-```
+````
 
 ## 🚀 Quick Start
 
@@ -370,14 +375,14 @@ See [GITHUB_MCP_SETUP.md](./docs/GITHUB_MCP_SETUP.md) for complete setup instruc
 
 Once configured, reference skills in your conversations:
 
-```
+````
 Using skills from cerebratechai-skills:
 - typescript-standards
 - nextjs-patterns
 - jwt-authentication
 
 Create a complete authentication system for my Next.js app.
-```
+````
 
 Claude will read these skills and implement following all best practices.
 
@@ -433,7 +438,7 @@ GitHub tokens allow Claude to read your skills repository securely without requi
 2. Click: **Generate new token**
 3. Fill in details:
    - **Token name**: `Claude MCP - Skills` (or any descriptive name)
-   - **Expiration**: 
+   - **Expiration**:
      - Recommended: `90 days` (you'll need to renew)
      - or `Custom` with specific date
      - ⚠️ Avoid: `No expiration` (security risk)
@@ -2736,7 +2741,7 @@ MCP server-github supports:
 
 You now have a complete, production-ready skills system that syncs across all your devices.
 
-**Questions or issues?** 
+**Questions or issues?**
 - Review the Troubleshooting section
 - Check Claude logs
 - Create an issue in your skills repository

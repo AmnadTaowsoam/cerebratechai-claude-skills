@@ -1123,3 +1123,695 @@ description: Migration guide
 - v1 deprecated → v2
 - Maintain v1 during transition
 - Eventually remove v1
+
+## Overview
+
+Deprecation Notices is the practice of announcing end-of-life for an API/feature with time for users to migrate before eventual removal.
+
+### Lifecycle
+
+```
+Active → Deprecated → Sunset → Removed
+Month 0:  Fully supported
+Month 3: Deprecated (6-12 months notice)
+Month 6: Final warning
+Month 12: Sunset (stops working)
+```
+
+### Example
+
+```
+Jan 2024: API v1 active
+Jun 2024: API v1 deprecated (announce v2)
+Dec 2024: API v1 sunset (stops working)
+Jan 2025: API v1 code removed
+```
+
+---
+
+## Why Proper Deprecation Matters
+
+### 1. Avoid Breaking Users Without Warning
+
+**Without Deprecation:**
+```
+Deploy new version
+→ All clients break immediately
+→ Emergency rollback
+→ Coordinate with all clients to update
+→ Big bang migration (risky!)
+```
+
+**With Deprecation:**
+```
+Deploy new version
+→ Old clients continue working
+→ Clients migrate gradually
+→ No coordination needed
+```
+
+### 2. Maintain Trust
+
+**Trust Built By:**
+- Advance notice (6-12 months)
+- Clear migration path
+- Support during migration
+- No surprises
+
+**Trust Broken By:**
+- Sudden changes
+- No warning
+- Unclear migration
+- Breaking without notice
+```
+
+### 3. Smooth Migration
+
+**Gradual Migration:**
+```
+Month 0: Deploy v2 (backward compatible)
+Month 1: 20% of clients migrated
+Month 3: 50% of clients migrated
+Month 6: 80% of clients migrated
+Month 12: 100% migrated, deprecate v1
+```
+
+### 4. Reduce Coordination Overhead
+
+**Without:**
+- Coordinate deployment with all clients
+- Schedule maintenance window
+- Rollback plan if issues
+
+**With:**
+- Deploy anytime
+- Clients migrate when ready
+- No coordination needed
+```
+
+### 5. Customer Trust (Stable APIs)
+
+**Trust:**
+- "This API won't break my integration"
+- "I can upgrade when I'm ready"
+- "No surprises"
+
+---
+
+## Deprecation Timeline
+
+### Typical: 6-12 Months for APIs
+
+**Timeline:**
+```
+Month 0: Announce deprecation
+Month 3: Reminder + usage stats
+Month 6: Final warning
+Month 12: Sunset
+```
+
+### Critical Systems: 12-24 Months
+
+**Examples:**
+- Banking APIs
+- Healthcare systems
+- Government integrations
+
+**Why Longer:**
+- Longer approval processes
+- More stakeholders
+- Higher risk
+
+### Internal APIs: 3-6 Months
+
+**Why Shorter:**
+- Control both sides
+- Faster coordination
+- Lower risk
+
+**Factors:**
+- **Contract terms:** May require 12+ months
+- **User base size:** More users = longer timeline
+- **Criticality:** Mission-critical = longer timeline
+- **Complexity:** Complex migration = longer timeline
+
+---
+
+## Deprecation Process
+
+### Step 1: Mark as Deprecated (Code, Docs)
+
+**Code (JavaScript):**
+```javascript
+/**
+ * @deprecated Use getUser() instead. Will be removed in v2.0.0.
+ * @see getUser
+ */
+function getUserProfile(id) {
+  console.warn('getUserProfile is deprecated. Use getUser() instead.');
+  return getUser(id);
+}
+```
+
+**Code (Python):**
+```python
+import warnings
+
+def get_user_profile(id):
+    """
+    .. deprecated:: 1.5.0
+       Use :func:`get_user` instead.
+    """
+    warnings.warn(
+        "get_user_profile is deprecated. Use get_user() instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    return get_user(id)
+```
+
+**Docs:**
+```markdown
+## GET /users/:id/profile
+
+**⚠️ DEPRECATED:** This endpoint is deprecated and will be removed on December 31, 2024.
+
+**Use instead:** `GET /users/:id`
+
+**Migration guide:** https://docs.example.com/migration
+```
+
+### Step 2: Announce (Email, Blog, Changelog)
+
+**Email:**
+```
+Subject: Deprecation Notice: /users/:id/profile endpoint
+
+Hi developers,
+
+We're deprecating the `/users/:id/profile` endpoint.
+
+What's changing:
+- Endpoint: GET /users/:id/profile
+- Sunset date: December 31, 2024
+
+Why:
+- Consolidating user endpoints for simplicity
+- New endpoint provides more data
+
+Action required:
+- Update your integration by December 31, 2024
+- See migration guide: https://docs.example.com/migration
+
+Need help?
+- Reply to this email
+- Schedule a call: https://calendly.com/api-team
+
+Thank you,
+API Team
+```
+
+**Blog Post:**
+```markdown
+# Deprecation Notice: /users/:id/profile Endpoint
+
+**Date:** June 1, 2024
+
+**Sunset Date:** December 31, 2024
+
+We're deprecating the `/users/:id/profile` endpoint in favor of the consolidated `/users/:id` endpoint.
+
+What's Changing
+The `/users/:id/profile` endpoint will stop working on December 31, 2024.
+
+Why
+Consolidating user endpoints to simplify our API and provide a better developer experience.
+The new endpoint returns all profile data plus additional fields.
+
+Migration Guide
+See our [migration guide](https://docs.example.com/migration) for step-by-step instructions.
+```
+
+### Step 3: Monitor Usage
+
+**Track Deprecated Endpoint Usage:**
+```javascript
+app.get('/users/:id/profile', (req, res) => {
+  // Track usage
+  metrics.increment('deprecated.users_profile.calls', {
+    client: req.headers['user-agent'],
+    clientId: req.user?.clientId
+  });
+
+  // Return response with deprecation headers
+  res.set('Deprecation', 'true');
+  res.set('Sunset', 'Sat, 31 Dec 2024 23:59:59 GMT');
+  res.set('Link', '<https://docs.example.com/migration>; rel="deprecation"');
+  res.set('Warning', '299 - "This endpoint is deprecated. Use /users/:id instead. See https://docs.example.com/migration"');
+  res.json(profile);
+});
+```
+
+**Dashboard:**
+```
+Deprecated Endpoint: /users/:id/profile
+Sunset Date: 2024-12-31 (6 months remaining)
+Usage:
+- Total calls/day: 1,000 (down from 5,000 last month)
+- Top clients: mobile-app (500), web-app (300), partner-api (200)
+```
+
+---
+
+## Deprecation Headers
+
+**Sunset Header (RFC 8594):**
+```
+HTTP/1.1 200 OK
+Sunset: Sat, 31 Dec 2024 23:59:59 GMT
+Link: <https://docs.example.com/migration>; rel="sunset"
+```
+
+**Deprecation Header:**
+```
+HTTP/1.1 200 OK
+Deprecation: true
+Link: <https://docs.example.com/migration>; rel="deprecation"
+```
+
+**Warning Header:**
+```
+HTTP/1.1 200 OK
+Warning: 299 - "This endpoint is deprecated. Use /v2/users instead. See https://docs.example.com/migration"
+```
+
+---
+
+## Deprecation Policy (6-12 Months Notice)
+
+**Timeline:**
+```
+Month 0: Announce deprecation
+Month 3: Reminder + usage stats
+Month 6: Final warning
+Month 12: Sunset
+```
+
+---
+
+## OpenAPI Deprecation
+
+**deprecated: true**
+```yaml
+paths:
+  /users/{id}/profile:
+    get:
+      deprecated: true
+      summary: Get user profile (DEPRECATED)
+      description: |
+        **DEPRECATED:** This endpoint is deprecated and will be removed on 2024-12-31.
+        
+        **Use instead:** GET /users/{id}
+```
+```
+
+---
+
+## GraphQL Deprecation
+
+**@deprecated Directive:**
+```graphql
+type User {
+  id: ID!
+  name: String! @deprecated(reason: "Use firstName and lastName instead")
+  firstName: String!
+  lastName: String!
+}
+```
+
+---
+
+## Code Deprecation
+
+**@deprecated Annotation (Java):**
+```java
+/**
+ * @deprecated Use getUser() instead. Will be removed in v2.0.0.
+ * @see getUser
+ */
+@Deprecated
+public User getUserProfile(String id) {
+    return getUser(id);
+}
+```
+
+**@deprecated JSDoc (JavaScript):**
+```javascript
+/**
+ * @deprecated Use getUser() instead. Will be removed in v2.0.0.
+ * @see getUser
+ */
+/**
+ * @deprecated Use getUser() instead. Will be removed in v2.0.0.
+ */
+function getUserProfile(id) {
+  console.warn('getUserProfile is deprecated. Use getUser() instead.');
+  return getUser(id);
+}
+```
+
+**warnings.warn (Python):**
+```python
+import warnings
+
+def get_user_profile(id):
+    """
+    .. deprecated:: 1.5.0
+       Use :func:`get_user` instead.
+    """
+    warnings.warn(
+        "get_user_profile is deprecated. Use get_user() instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    return get_user(id)
+```
+
+---
+
+## Monitoring Deprecated Usage
+
+**Track Metrics:**
+- Total calls/day
+- Unique clients
+- Top clients
+- Trend (declining = good!)
+
+---
+
+## Reach Out to Active Users
+
+**Email Top Users:**
+```
+Subject: Action Required: Migrate from /users/:id/profile
+
+Hi [Client],
+
+We noticed you're still using the deprecated /users/:id/profile endpoint (500 calls/day).
+
+This endpoint will stop working on December 31, 2024 (3 months remaining).
+
+Action required:
+- Migrate to GET /users/:id immediately
+- See migration guide: https://docs.example.com/migration
+
+Need help?
+- Reply to this email
+- Schedule a call: https://calendly.com/api-team
+- Schedule a call: https://calendly.com/api-team
+
+Thank you,
+API Team
+```
+
+---
+
+## Graceful Degradation
+
+### Optional: Temporary Disable
+
+**Process:**
+```
+1. Disable endpoint for 1 hour
+2. Monitor errors
+3. Identify affected users
+4. Reach out
+5. Re-enable
+6. Give more time to migrate
+```
+
+### Helpful Error Message
+
+**410 Gone Response:**
+```
+HTTP/1.1 410 Gone
+Content-Type: application/json
+
+{
+  "error": "This endpoint has been removed. Use /v2/users instead.",
+  "migrationGuide": "https://docs.example.com/migration",
+  "support": "api@example.com"
+}
+```
+
+---
+
+## Feature Flag Deprecation
+
+### Mark Feature as Deprecated
+
+**Code:**
+```javascript
+if (featureFlags.isEnabled('old-feature')) {
+  console.warn('old-feature flag is deprecated. Will be removed in v2.0.0.');
+}
+```
+
+---
+
+## Database Schema Deprecation
+
+### Multi-Step Migration
+
+**Step 1: Stop Writing to Old Column**
+```sql
+-- Stop writing to 'name' column
+-- Write to 'full_name' instead
+```
+
+**Step 2: Stop Reading (Use New Column)**
+```sql
+-- Stop reading from 'name' column
+-- Read from 'full_name' instead
+```
+
+**Step 3: Drop Old Column**
+```sql
+-- After all code migrated
+ALTER TABLE users DROP COLUMN name;
+```
+
+---
+
+## Real Deprecation Examples
+
+### Stripe API Evolution
+
+**Characteristics:**
+- Excellent consistency
+- Comprehensive docs
+- Versioning via headers
+- Extensive examples
+- Idempotency keys
+- Webhooks (event-driven)
+
+**Learn From:**
+- Error format (detailed, helpful)
+- Pagination (cursor-based)
+- Deprecation notices
+- Comprehensive SDKs
+
+### GitHub API
+
+**Characteristics:**
+- RESTful design
+- GraphQL alternative
+- Deprecation notices
+- Rate limiting
+
+**Learn From:**
+- Deprecation headers
+- Preview features (opt-in)
+- Comprehensive documentation
+
+### Internal API Gateway Patterns
+
+**Pattern:**
+- All APIs go through API gateway
+→ Gateway enforces governance
+→ Rate limiting, auth, logging
+→ Consistent experience
+
+---
+
+## Implementation
+
+### Migration Guide
+
+**Example:**
+```markdown
+## How to Migrate
+
+### What's Changing
+The `/users/:id/profile` endpoint is deprecated. Use `/users/:id` instead.
+
+### Why
+We're consolidating user endpoints to simplify our API and provide a better developer experience.
+
+### How to Migrate
+
+### Before
+```javascript
+const profile = await fetch('/api/users/123/profile');
+```
+
+### After
+```javascript
+const user = await fetch('/api/users/123');
+```
+
+### Timeline
+- **June 1, 2024:** Deprecation announced
+- **September 1, 2024:** Reminder email
+- **December 1, 2024:** Final warning
+- **December 31, 2024:** Endpoint stops working (410 Gone)
+```
+
+---
+
+## Templates
+
+### Deprecation Announcement (Email)
+
+See "Step 2: Announce" section above
+
+### Deprecation Announcement (Blog)
+
+See "Step 2: Announce" section above
+
+---
+
+## Best Practices
+
+### Communication
+- [ ] Communicate changes early
+- [ ] Provide migration guides
+- [ ] Hold breaking change meetings
+- [ ] Create data contracts with consumers
+- [ ] Document breaking changes clearly
+- [ ] Document breaking changes with dates
+- [ ] Set appropriate notice period (6-12 months minimum)
+- [ ] Monitor deprecated endpoint usage
+- [ ] Track consumer adoption
+- [ ] Reach out to active users
+- [ ] Provide support during migration
+- [ ] Send reminders at key milestones
+- [ ]
+
+### Documentation
+- [ ] Document all breaking changes with dates
+- [ ] Document breaking changes clearly
+- [ ] Provide migration guides for consumers
+- [ ] Document version compatibility
+- [ ] Document migration timeline
+- [ ] Document sunset dates
+- [ ] Keep documentation in sync with code
+- [ ] Use consistent deprecation headers
+- [ ] Use appropriate deprecation headers
+- [ ] Include migration guide links
+- [ ] Document breaking changes in changelog
+- [ ] Document examples in documentation
+- [ ] Document breaking changes in API docs
+- [ ] Document breaking changes in README
+- [ ] Document breaking changes in Swagger UI
+- [ ] Document breaking changes in ReDoc
+- [ ]
+
+### Migration
+- [ ] Use zero-downtime migration pattern
+- [ ] Use multi-step migrations for breaking changes
+- [ ] Backfill data before removing old columns
+- [ ] Test migrations in staging environment
+- [ ] Provide rollback procedures
+- [ ] Monitor migration progress
+- [ ] Support consumers during migration
+- [ ] Use feature flags for gradual rollout
+- [ ] Maintain backward compatibility during migration
+- [ ] Use canary deployments for testing
+- [ ]
+
+### Monitoring
+- [ ] Track deprecated endpoint usage
+- [ ] Monitor breaking change impacts
+- [ ] Track consumer adoption of new schema
+- [ ] Set up dashboards for API health
+- [ ] Alert on high usage of deprecated endpoints
+- [ ] Monitor migration success rates
+- [ ] Track time to sunset
+- [ ]
+
+### Testing
+- [ ] Test backward compatibility
+- [ ] Test with production-like data
+- [ ] Test migration scripts thoroughly
+- [ ] Test graceful degradation scenarios
+- [ ] Monitor test coverage
+- [ ]
+
+### Prevention
+- [ ] Use data contracts for all shared data
+- [ ] Enforce schema validation at source
+- [ ] [ ] Implement CI/CD schema checks
+- [ ]
+
+### Version Control
+- [ ] Use semantic versioning
+- [ ] Tag all releases with version numbers
+- [ ] Document version compatibility matrix
+- [ ] Maintain backward compatibility
+- [ ] Use @deprecated directive for breaking changes
+- [ ]
+
+### Legal Compliance
+- [ ] Follow contract terms if applicable
+- [ ] Provide minimum notice period
+- [ ] Ensure migration support
+- [ ] Document breaking changes clearly
+- [ ] Provide migration guides
+- [ ] Maintain deprecation records
+
+### Checklist
+- [ ] Define deprecation process
+- [ ] Set appropriate notice period
+- [ ] Document breaking changes clearly
+- [ ] Provide migration guides
+- [ ] Monitor deprecated endpoint usage
+- [ ] Track consumer adoption
+- [ ] Set up dashboards for API health
+- [ ] Track migration success rates
+- [ ] Test backward compatibility
+- [ ] Test with production-like data
+- [ ] Monitor test coverage
+- [ ] Optimize deprecation headers
+- [ ] Use feature flags for gradual rollout
+- [ ] Use zero-downtime migrations
+- [ ] Backfill data before removing old columns
+- [ ] Test migrations in staging environment
+- [ ] Have rollback procedures ready
+- [ ] Monitor schema drift metrics
+- [ ] Track breaking change impacts
+- [ ] Track consumer adoption of new schema
+- [ ] Set up change notifications
+- [ ] Test with production-like data
+- [ ] Monitor test coverage
+- [ ] Optimize schema validation overhead
+- [ ] Cache schema definitions
+- [ ] Use efficient validation libraries
+- [ ] Monitor schema performance impact
+- [ ] Establish schema ownership
+- [ ] Create schema review process
+- [ ] Define schema lifecycle
+- [ ] Plan schema deprecation strategy
+- [ ] Set up incident response for violations
+- [ ] Test schema validation logic
+- [ ] Train team on deprecation best practices

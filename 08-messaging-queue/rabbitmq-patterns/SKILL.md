@@ -1092,3 +1092,171 @@ export const defaultConfig: RabbitMQConfig = {
 - [amqplib Documentation](https://www.squaremo.com/amqp.node/)
 - [Pika Documentation](https://pika.readthedocs.io/)
 - [RabbitMQ Tutorials](https://www.rabbitmq.com/tutorials/)
+
+## Best Practices
+
+### Exchange Selection
+
+- **Use Direct Exchange**: For point-to-point routing with specific routing keys
+- **Use Topic Exchange**: For flexible routing with pattern matching
+- **Use Fanout Exchange**: For broadcast to multiple consumers
+- **Use Headers Exchange**: For complex routing based on message headers
+- **Document exchange purpose**: Clear documentation for each exchange
+
+### Queue Configuration
+
+- **Use durable queues**: For critical data that must survive broker restart
+- **Set appropriate TTL**: Configure message and queue TTL for cleanup
+- **Use exclusive queues**: For temporary, single-consumer queues
+- **Configure auto-delete**: For queues that should be deleted when unused
+- **Set queue length limits**: Prevent memory exhaustion
+
+### Message Design
+
+- **Keep messages small**: Prefer messages under 1MB for optimal performance
+- **Include message metadata**: Add headers for routing and tracing
+- **Use consistent schemas**: Define message formats and versions
+- **Design for idempotency**: Messages may be delivered multiple times
+- **Add correlation IDs**: For request/response patterns
+
+### Consumer Configuration
+
+- **Use manual acknowledgments**: Enable manual ack for better control
+- **Set appropriate prefetch**: Limit unacknowledged messages per consumer
+- **Handle acknowledgments properly**: Always ack or nack messages
+- **Implement graceful shutdown**: Stop consuming and close connections properly
+- **Monitor consumer health**: Track message processing rates
+
+### Producer Configuration
+
+- **Use publisher confirms**: Ensure messages are received by broker
+- **Set persistent delivery**: For critical messages that must survive restart
+- **Implement retry logic**: Handle transient failures
+- **Use connection pooling**: Reuse connections for better performance
+- **Batch messages when possible**: Reduce network overhead
+
+### Dead Letter Handling
+
+- **Always use DLX**: Route failed messages to dead letter queue
+- **Configure retry policies**: Set max retry counts and backoff
+- **Monitor DLQ size**: Alert on growing dead letter queues
+- **Process DLQ messages**: Analyze and reprocess failed messages
+- **Document DLQ handling**: Clear procedures for handling failed messages
+
+### Performance Optimization
+
+- **Use multiple queues**: Distribute load across queues
+- **Configure appropriate prefetch**: Balance between throughput and fairness
+- **Use connection pooling**: Limit number of TCP connections
+- **Enable compression**: For large message payloads
+- **Monitor resource usage**: Track memory, CPU, and disk I/O
+
+### Security
+
+- **Enable authentication**: Use username/password or certificates
+- **Configure TLS encryption**: Encrypt connections in production
+- **Use virtual hosts**: Isolate different applications
+- **Set up user permissions**: Restrict access to specific resources
+- **Audit access logs**: Monitor who is accessing what
+
+### Monitoring and Observability
+
+- **Track queue depths**: Monitor message counts in queues
+- **Monitor consumer lag**: Track unprocessed messages
+- **Collect broker metrics**: Use management API or plugins
+- **Set up alerts**: Alert on queue depth, consumer failures, or broker issues
+- **Use distributed tracing**: Correlate messages across services
+
+### High Availability
+
+- **Use clustering**: Set up RabbitMQ cluster for high availability
+- **Configure queue mirroring**: Replicate queues across cluster nodes
+- **Use load balancers**: Distribute connections across cluster nodes
+- **Test failover scenarios**: Verify automatic recovery works
+- **Monitor cluster health**: Track node status and synchronization
+
+## Checklist
+
+### Setup and Configuration
+- [ ] Install and configure RabbitMQ broker
+- [ ] Enable management plugin for monitoring
+- [ ] Configure authentication and authorization
+- [ ] Set up TLS encryption for secure connections
+- [ ] Configure clustering for high availability
+
+### Exchange Setup
+- [ ] Choose appropriate exchange type for each use case
+- [ ] Document exchange purpose and routing rules
+- [ ] Configure durable exchanges for critical data
+- [ ] Set up exchange-to-exchange bindings if needed
+- [ ] Test exchange routing behavior
+
+### Queue Setup
+- [ ] Configure durable queues for critical data
+- [ ] Set appropriate TTL for messages and queues
+- [ ] Configure dead letter exchange for failed messages
+- [ ] Set queue length limits to prevent memory issues
+- [ ] Document queue purpose and usage
+
+### Producer Configuration
+- [ ] Enable publisher confirms
+- [ ] Set persistent delivery for critical messages
+- [ ] Implement retry logic with backoff
+- [ ] Use connection pooling
+- [ ] Add message metadata and correlation IDs
+
+### Consumer Configuration
+- [ ] Use manual acknowledgments
+- [ ] Set appropriate prefetch count
+- [ ] Implement graceful shutdown handling
+- [ ] Configure error handling and DLQ routing
+- [ ] Monitor consumer health and processing rates
+
+### Dead Letter Queue Setup
+- [ ] Configure dead letter exchange
+- [ ] Set up dead letter queues
+- [ ] Configure retry policies (max retries, backoff)
+- [ ] Set up DLQ monitoring and alerts
+- [ ] Document DLQ processing procedures
+
+### Security Setup
+- [ ] Enable authentication (username/password or certificates)
+- [ ] Configure TLS/SSL encryption
+- [ ] Set up virtual hosts for isolation
+- [ ] Configure user permissions and ACLs
+- [ ] Enable audit logging
+
+### Performance Tuning
+- [ ] Tune prefetch settings for consumers
+- [ ] Configure connection pooling
+- [ ] Enable compression for large messages
+- [ ] Monitor resource usage (memory, CPU, disk)
+- [ ] Optimize queue and exchange configurations
+
+### High Availability
+- [ ] Set up RabbitMQ cluster
+- [ ] Configure queue mirroring
+- [ ] Set up load balancer for connections
+- [ ] Test failover scenarios
+- [ ] Monitor cluster health and synchronization
+
+### Monitoring and Alerting
+- [ ] Enable management plugin
+- [ ] Set up metrics collection (Prometheus/Grafana)
+- [ ] Configure alerts for queue depth
+- [ ] Monitor consumer lag and processing rates
+- [ ] Track broker health metrics
+
+### Testing
+- [ ] Test message publishing and consuming
+- [ ] Verify exchange routing behavior
+- [ ] Test dead letter queue routing
+- [ ] Validate acknowledgment behavior
+- [ ] Test failover and recovery
+
+### Documentation
+- [ ] Document exchange and queue structure
+- [ ] Document message schemas and formats
+- [ ] Create runbooks for common issues
+- [ ] Document security configuration
+- [ ] Maintain API documentation

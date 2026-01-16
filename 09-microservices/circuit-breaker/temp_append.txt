@@ -1,0 +1,139 @@
+
+## Best Practices
+
+### Circuit Breaker Configuration
+
+- **Set appropriate thresholds**: Don't set too sensitive or too lenient
+- **Use rolling windows**: Track failures over time, not just count
+- **Configure timeout appropriately**: Balance between responsiveness and recovery
+- **Set reset timeout**: Allow circuit to close after recovery time
+- **Monitor circuit state**: Track how often circuits open
+
+### Failure Detection
+
+- **Classify error types**: Distinguish between retryable and non-retryable errors
+- **Use appropriate thresholds**: Different thresholds for different services
+- **Consider seasonal patterns**: Adjust for expected traffic patterns
+- **Handle timeouts separately**: Timeouts may not indicate service failure
+- **Monitor false positives**: Track circuits opening incorrectly
+
+### State Management
+
+- **Persist circuit state**: Store state across restarts
+- **Use distributed coordination**: For multiple instances of same service
+- **Implement graceful degradation**: Use fallbacks when circuit is open
+- **Communicate state**: Notify users when services are degraded
+- **Monitor state transitions**: Track circuit behavior over time
+
+### Fallback Strategies
+
+- **Provide meaningful fallbacks**: Return cached data or default values
+- **Make fallbacks fast**: Don't add latency when circuit is open
+- **Log fallback usage**: Track when and how often fallbacks are used
+- **Consider partial degradation**: Provide reduced functionality instead of complete failure
+- **Test fallback paths**: Ensure fallbacks work correctly
+
+### Retry Integration
+
+- **Use exponential backoff**: Retry with increasing delays
+- **Add jitter**: Randomize retry delays to avoid thundering herd
+- **Limit retry attempts**: Don't retry indefinitely
+- **Combine with circuit breaker**: Stop retries when circuit is open
+- **Monitor retry success rates**: Track if retries are effective
+
+### Monitoring
+
+- **Track circuit state**: Monitor open/closed/half-open transitions
+- **Monitor failure rates**: Track service health over time
+- **Alert on circuit opens**: Notify when circuits trip
+- **Monitor fallback usage**: Track how often fallbacks are used
+- **Visualize metrics**: Create dashboards for circuit breaker health
+
+### Performance
+
+- **Keep circuit checks fast**: Don't add significant latency
+- **Use appropriate data structures**: Efficient tracking of failures
+- **Minimize memory usage**: Don't store excessive history
+- **Consider circuit breaker overhead**: Weigh benefits against cost
+- **Profile under load**: Ensure circuit breaker performs at scale
+
+### Testing
+
+- **Test circuit behavior**: Verify circuits open and close as expected
+- **Test failure scenarios**: Simulate service failures
+- **Test recovery scenarios**: Verify circuits close after service recovers
+- **Test with concurrent requests**: Ensure thread safety
+- **Load test**: Verify circuit breaker handles high traffic
+
+### Production Considerations
+
+- **Start in monitoring mode**: Log actions without affecting requests
+- **Gradually enable enforcement**: Ramp up circuit breaker impact
+- **Monitor closely**: Watch for unexpected behavior after deployment
+- **Have rollback plan**: Be ready to disable if issues arise
+- **Document procedures**: Clear runbooks for circuit breaker issues
+
+## Checklist
+
+### Design
+- [ ] Identify services that need circuit breakers
+- [ ] Define failure thresholds
+- [ ] Configure timeout values
+- [ ] Design fallback strategies
+- [ ] Plan monitoring and alerting
+
+### Configuration
+- [ ] Set failure thresholds
+- [ ] Configure success thresholds
+- [ ] Set timeout values
+- [ ] Configure reset timeout
+- [ ] Choose appropriate rolling window
+
+### State Management
+- [ ] Implement circuit state tracking
+- [ ] Configure state persistence
+- [ ] Set up distributed coordination
+- [ ] Implement graceful degradation
+- [ ] Configure state change notifications
+
+### Fallback Implementation
+- [ ] Design fallback responses
+- [ ] Implement cached data fallbacks
+- [ ] Implement default value fallbacks
+- [ ] Add fallback logging
+- [ ] Test fallback paths
+
+### Retry Integration
+- [ ] Configure retry policies
+- [ ] Set up exponential backoff
+- [ ] Add jitter to retries
+- [ ] Limit retry attempts
+- [ ] Combine with circuit breaker
+
+### Monitoring Setup
+- [ ] Configure metrics collection
+- [ ] Set up state tracking
+- [ ] Configure failure rate monitoring
+- [ ] Set up alerts
+- [ ] Create dashboards
+
+### Testing
+- [ ] Write circuit state tests
+- [ ] Test failure scenarios
+- [ ] Test recovery scenarios
+- [ ] Load test circuit breaker
+- [ ] Test concurrent requests
+
+### Deployment
+- [ ] Plan deployment strategy
+- [ ] Configure monitoring mode
+- [ ] Set up rollback plan
+- [ ] Document deployment procedures
+- [ ] Train team on runbooks
+
+### Documentation
+- [ ] Document circuit breaker configuration
+- [ ] Document fallback strategies
+- [ ] Create runbooks for issues
+- [ ] Document monitoring setup
+- [ ] Maintain API documentation

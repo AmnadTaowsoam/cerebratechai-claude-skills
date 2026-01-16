@@ -990,3 +990,172 @@ print(monitor.get_consumer_lag('user-events', 'consumer-group-1'))
 - [kafka-python Documentation](https://kafka-python.readthedocs.io/)
 - [Kafka Streams Documentation](https://kafka.apache.org/documentation/streams/)
 - [Confluent Kafka Python](https://docs.confluent.io/platform/current/clients/confluent-kafka-python/)
+
+## Best Practices
+
+### Producer Configuration
+
+- **Use appropriate `acks` setting**: `acks=all` for critical data, `acks=1` for high throughput
+- **Configure batching**: Use `batch_size` and `linger_ms` for better throughput
+- **Enable compression**: Use `lz4` or `gzip` to reduce network bandwidth
+- **Set reasonable timeouts**: Configure `request_timeout_ms` and `delivery.timeout.ms`
+- **Use idempotent producers**: Prevent duplicate messages on retries
+- **Implement error handling**: Handle network errors and broker failures gracefully
+
+### Consumer Configuration
+
+- **Use manual offset commits**: Disable `enable_auto_commit` for better control
+- **Set appropriate `session.timeout.ms`**: Balance between failure detection and processing time
+- **Configure `max.poll.records`**: Limit batch size for predictable processing
+- **Use consumer groups**: Enable parallel processing and load balancing
+- **Implement rebalance listeners**: Handle partition reassignment gracefully
+- **Monitor consumer lag**: Track offset lag to detect processing delays
+
+### Topic Design
+
+- **Choose appropriate partition count**: More partitions = more parallelism but more overhead
+- **Set replication factor**: At least 3 for production environments
+- **Configure retention**: Set `retention.ms` based on data freshness requirements
+- **Use compacted topics**: For latest-value semantics (e.g., user profiles)
+- **Plan partition growth**: Kafka doesn't support decreasing partitions
+- **Use descriptive topic names**: Follow naming conventions for clarity
+
+### Message Design
+
+- **Use small message sizes**: Prefer <1MB messages for optimal performance
+- **Include message keys**: For partitioning and ordering guarantees
+- **Add message headers**: Include metadata for tracing and routing
+- **Use consistent schemas**: Consider Avro/Protobuf for schema evolution
+- **Include timestamps**: Use Kafka timestamps or custom timestamps
+- **Design for idempotency**: Messages may be delivered multiple times
+
+### Exactly-Once Semantics
+
+- **Use transactional producers**: For exactly-once write semantics
+- **Configure read_committed isolation**: Consumers only see committed transactions
+- **Use idempotent producers**: Prevent duplicate message production
+- **Monitor transaction coordinator**: Track transaction state and timeouts
+- **Handle transaction failures**: Implement proper rollback logic
+- **Test failure scenarios**: Verify exactly-once behavior under failures
+
+### Performance Tuning
+
+- **Tune batch sizes**: Larger batches improve throughput but increase latency
+- **Adjust linger time**: Balance between batching and latency
+- **Use appropriate compression**: `lz4` for speed, `gzip` for size
+- **Configure fetch sizes**: Match `fetch.max.bytes` to message sizes
+- **Use multiple consumers**: Scale consumer groups for parallel processing
+- **Monitor broker metrics**: Track throughput, latency, and error rates
+
+### Monitoring and Observability
+
+- **Track consumer lag**: Monitor offset lag per partition
+- **Monitor broker health**: Track CPU, memory, disk I/O, and network
+- **Collect JMX metrics**: Use Prometheus/JMX exporter for metrics
+- **Set up alerts**: Alert on high lag, broker failures, or partition imbalances
+- **Log message processing**: Include correlation IDs for tracing
+- **Use distributed tracing**: Integrate with OpenTelemetry or Jaeger
+
+### Security
+
+- **Enable SASL authentication**: Use SCRAM-SHA-256/512 for strong authentication
+- **Configure TLS encryption**: Encrypt data in transit between clients and brokers
+- **Use ACLs**: Restrict topic access based on user roles
+- **Enable audit logging**: Track who is accessing which topics
+- **Rotate credentials**: Regularly update passwords and certificates
+- **Use separate clusters**: Isolate development, staging, and production
+
+### Disaster Recovery
+
+- **Configure replication**: Use replication factor ≥3 for high availability
+- **Enable leader election**: Allow automatic leader failover
+- **Monitor under-replicated partitions**: Alert on replication lag
+- **Test failover scenarios**: Verify automatic recovery works
+- **Backup critical topics**: Use mirror-maker for cross-cluster replication
+- **Document recovery procedures**: Have clear runbooks for common failures
+
+## Checklist
+
+### Setup and Configuration
+- [ ] Configure Kafka broker cluster with appropriate settings
+- [ ] Set up Zookeeper/KRaft for cluster coordination
+- [ ] Configure topic partitions and replication factors
+- [ ] Enable authentication (SASL) and encryption (TLS)
+- [ ] Set up JMX metrics and monitoring
+
+### Producer Setup
+- [ ] Configure producer with appropriate acks setting
+- [ ] Enable batching and compression
+- [ ] Set up idempotent producer
+- [ ] Configure retry and timeout settings
+- [ ] Implement error handling and logging
+
+### Consumer Setup
+- [ ] Configure consumer group and offset management
+- [ ] Set manual offset commits
+- [ ] Configure session and heartbeat timeouts
+- [ ] Implement rebalance listeners
+- [ ] Set up consumer lag monitoring
+
+### Topic Management
+- [ ] Create topics with appropriate partitions
+- [ ] Configure retention policies
+- [ ] Set up compacted topics if needed
+- [ ] Configure topic ACLs
+- [ ] Document topic naming conventions
+
+### Message Design
+- [ ] Define message schemas (Avro/Protobuf)
+- [ ] Include message keys for partitioning
+- [ ] Add message headers for metadata
+- [ ] Design for idempotency
+- [ ] Set up schema registry if using Avro
+
+### Exactly-Once Processing
+- [ ] Configure transactional producers
+- [ ] Set read_committed isolation for consumers
+- [ ] Implement transaction error handling
+- [ ] Monitor transaction coordinator
+- [ ] Test exactly-once behavior
+
+### Performance Tuning
+- [ ] Tune batch sizes and linger time
+- [ ] Configure compression settings
+- [ ] Adjust fetch sizes and poll intervals
+- [ ] Scale consumers for parallel processing
+- [ ] Monitor and optimize throughput/latency
+
+### Monitoring and Alerting
+- [ ] Set up JMX metrics collection
+- [ ] Configure Grafana dashboards
+- [ ] Set up alerts for consumer lag
+- [ ] Monitor broker health metrics
+- [ ] Track message throughput and error rates
+
+### Security
+- [ ] Enable SASL authentication
+- [ ] Configure TLS encryption
+- [ ] Set up ACLs for topic access
+- [ ] Enable audit logging
+- [ ] Rotate credentials regularly
+
+### Disaster Recovery
+- [ ] Configure replication factor ≥3
+- [ ] Set up cross-cluster replication
+- [ ] Test broker failover
+- [ ] Document recovery procedures
+- [ ] Set up automated backups
+
+### Testing
+- [ ] Test producer/consumer under load
+- [ ] Verify exactly-once semantics
+- [ ] Test rebalance scenarios
+- [ ] Validate error handling
+- [ ] Test failover and recovery
+
+### Documentation
+- [ ] Document cluster architecture
+- [ ] Create topic design documentation
+- [ ] Document monitoring and alerting setup
+- [ ] Create runbooks for common issues
+- [ ] Maintain API documentation

@@ -1206,3 +1206,751 @@ See examples throughout this document
 3. Data team review
 4. Register in registry
 5. Deploy code
+
+## Overview
+
+Event Schema Registry is a centralized repository of event schemas with versioning, validation, and compatibility checking for event-driven architectures.
+
+### Purpose
+
+```
+Producer publishes event → Schema Registry validates schema
+Consumer receives event → Schema Registry provides schema
+→ Contract between producer and consumer
+```
+
+### Example
+
+```
+Event: user.created
+Schema v1: { id, email, name }
+Schema v2: { id, email, name, avatar }  (backward compatible)
+
+Consumer using v1 schema can still read v2 events
+```
+
+---
+
+## Why Schema Registry Matters
+
+### 1. Prevents Breaking Changes in Event Streams
+
+**Without Registry:**
+```
+Producer changes event format:
+- name: string (removed)
++ firstName: string
++ lastName: string
+
+Consumer breaks (expects 'name' field)
+```
+
+**With Registry:**
+```
+Producer tries to register breaking change
+→ Registry rejects (not backward compatible)
+→ Producer must use new event type or major version
+```
+
+### 2. Self-Documenting Events
+
+**Registry as Documentation:**
+- What events exist?
+- What fields do they have?
+- What are the types?
+- Who produces/consumes them?
+
+### 3. Type Safety Across Producers/Consumers
+
+**Generated Types:**
+```typescript
+// Auto-generated from schema
+interface UserCreatedEvent {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: string;
+}
+
+// Type-safe producer
+producer.send<UserCreatedEvent>({
+  id: '123',
+  email: 'user@example.com',
+  name: 'John Doe',
+  createdAt: '2024-01-15T10:00:00Z'
+});
+```
+
+### 4. Contract Between Services
+
+**Agreement:**
+- Producer promises to send events matching schema
+- Consumer expects events matching schema
+- Registry enforces contract
+
+---
+
+## Schema Formats
+
+### JSON Schema (Flexible, Widely Supported)
+
+**Pros:**
+- Human-readable
+- Widely supported
+- Flexible
+
+**Cons:**
+- Verbose
+- No built-in schema evolution
+
+### Avro (Compact, Schema Evolution)
+
+**Pros:**
+- Compact binary format
+- Built-in schema evolution
+- Fast serialization
+
+**Cons:**
+- Not human-readable (binary)
+- Requires schema to deserialize
+
+### Protobuf (Efficient, Strongly Typed)
+
+**Pros:**
+- Very efficient
+- Strongly typed
+- Code generation
+
+**Cons:**
+- Requires compilation
+- Less flexible than JSON
+
+---
+
+## Schema Evolution Rules
+
+### Forward Compatibility (New Consumer, Old Producer)
+
+**Definition:** New consumer can read old events
+
+**Rule:** Can add optional fields
+
+### Backward Compatibility (Old Consumer, New Producer)
+
+**Definition:** Old consumer can read new events
+
+**Rule:** Can add fields (old consumers ignore them)
+
+### Full Compatibility (Both Directions)
+
+**Definition:** New consumer reads old events AND old consumer reads new events
+
+**Rule:** Only add optional fields
+
+### Breaking Changes (Require Major Version)
+
+**Examples:**
+- Remove required field
+- Change field type
+- Rename field
+- Change field semantics
+
+---
+
+## Compatible Changes
+
+### Add Optional Field
+
+**Before (v1):**
+```json
+{
+  "type": "object",
+  "required": ["id", "email"],
+  "properties": {
+    "id": {"type": "string"},
+    "email": {"type": "string"}
+  }
+}
+```
+
+**After (v2):**
+```json
+{
+  "type": "object",
+  "required": ["id", "email"],
+  "properties": {
+    "id": {"type": "string"},
+    "email": {"type": "string"},
+    "name": {"type": "string"}  // Optional (not in required)
+  }
+}
+```
+
+**Compatible:** ✅ Backward compatible
+
+### Add New Event Type
+
+**New Event:**
+```
+user.account.deleted  (new event type)
+```
+
+**Compatible:** ✅ Doesn't affect existing events
+
+### Add Enum Value (at End)
+
+**Before:**
+```json
+{
+  "status": {
+    "type": "string",
+    "enum": ["ACTIVE", "INACTIVE"]
+  }
+}
+```
+
+**After:**
+```json
+{
+  "status": {
+    "type": "string",
+    "enum": ["ACTIVE", "INACTIVE", "PENDING"]
+  }
+}
+```
+
+**Compatible:** ✅ Backward compatible (old consumers may not handle new value, but schema is valid)
+
+---
+
+## Breaking Changes
+
+### Remove Required Field
+
+**Before:**
+```json
+{
+  "required": ["id", "email", "name"],
+  "properties": {
+    "id": {"type": "string"},
+    "email": {"type": "string"},
+    "name": {"type": "string"}
+  }
+}
+```
+
+**After:**
+```json
+{
+  "required": ["id", "email"],  // 'name' removed
+  "properties": {
+    "id": {"type": "string"},
+    "email": {"type": "string"}
+  }
+}
+```
+
+**Breaking:** ❌ Old consumers expect 'name' field
+
+### Change Field Type
+
+**Before:**
+```json
+{
+  "age": {"type": "integer"}
+}
+```
+
+**After:**
+```json
+{
+  "age": {"type": "string"}  // Changed type
+}
+```
+
+**Breaking:** ❌ Old consumers expect integer
+
+### Rename Field
+
+**Before:**
+```json
+{
+  "name": {"type": "string"}
+}
+```
+
+**After:**
+```json
+{
+  "fullName": {"type": "string"}  // Renamed
+}
+```
+
+**Breaking:** ❌ Old consumers expect 'name' field
+
+### Change Field Semantics
+
+**Before:**
+```json
+{
+  "amount": {"type": "integer"}  // Amount in dollars
+}
+```
+
+**After:**
+```json
+{
+  "amount": {"type": "integer"}  // Amount in cents (changed meaning!)
+}
+```
+
+**Breaking:** ❌ Same field, different meaning
+
+---
+
+## Schema Versioning
+
+### Semantic Versioning (MAJOR.MINOR.PATCH)
+
+**Format:** `MAJOR.MINOR.PATCH`
+
+**Rules:**
+- **MAJOR:** Breaking changes (remove field, change type)
+- **MINOR:** Backward-compatible additions (add optional field)
+- **PATCH:** Bug fixes (no schema change, just documentation)
+
+**Example:**
+```
+1.0.0: Initial schema
+1.1.0: Add optional 'avatar' field (backward compatible)
+1.1.1: Fix typo in description (no schema change)
+2.0.0: Remove 'name' field, add 'firstName' and 'lastName' (breaking)
+```
+
+---
+
+## Event Naming Conventions
+
+### Format: domain.entity.action
+
+**Structure:**
+```
+{domain}.{entity}.{action}
+
+Examples:
+user.account.created
+order.payment.processed
+inventory.item.updated
+notification.email.sent
+```
+
+### Past Tense (Event Already Happened)
+
+```
+✅ Good:
+user.created
+order.placed
+payment.processed
+
+❌ Bad:
+user.create (present tense)
+order.place (imperative)
+```
+
+### Specific (Not Too Generic)
+
+```
+✅ Good:
+user.account.created
+user.profile.updated
+user.password.reset
+
+❌ Bad:
+user.changed (too generic)
+user.event (meaningless)
+```
+
+---
+
+## Schema Validation
+
+### Producer-Side Validation (Before Publish)
+
+**Example (JavaScript):**
+```javascript
+const Ajv = require('ajv');
+const ajv = new Ajv();
+
+// Get schema from registry
+const schema = await schemaRegistry.getSchema('user.created', 'latest');
+
+// Validate event
+const validate = ajv.compile(schema);
+const event = {
+  id: '123',
+  email: 'user@example.com',
+  name: 'John Doe',
+  createdAt: '2024-01-15T10:00:00Z'
+};
+
+if (!validate(event)) {
+  throw new Error(`Invalid event: ${JSON.stringify(validate.errors)}`);
+}
+
+// Publish event
+await producer.send({
+  topic: 'user-events',
+  value: event
+});
+```
+
+### Consumer-Side Validation (After Receive)
+
+**Example:**
+```javascript
+consumer.on('message', async (message) => {
+  const event = JSON.parse(message.value);
+  
+  // Get schema from registry
+  const schema = await schemaRegistry.getSchema('user.created', event.version);
+  
+  // Validate event
+  const validate = ajv.compile(schema);
+  if (!validate(event)) {
+    console.error('Invalid event:', validate.errors);
+    // Send to Dead Letter Queue
+    await dlq.send(message);
+    return;
+  }
+  
+  // Process event
+  await handleUserCreated(event);
+});
+```
+
+---
+
+## Schema Discovery
+
+### Searchable Registry UI
+
+**Features:**
+- Search schemas by name
+- Browse by domain/entity
+- View schema details
+- See version history
+
+---
+
+## Multi-Environment Schemas
+
+### Dev, Staging, Prod Registries
+
+**Separate Registries:**
+```
+Dev:     http://schema-registry-dev:8081
+Staging: http://schema-registry-staging:8081
+Prod:    http://schema-registry-prod:8081
+```
+
+**Why Separate:**
+- Test schema changes in dev/staging
+- Prevent accidental prod changes
+- Different schemas in different environments
+
+---
+
+## Schema Governance Workflow
+
+### Step 1: Developer Proposes Schema (PR)
+
+**Process:**
+1. Create feature branch
+2. Add/update schema file (schemas/user-created.json)
+3. Commit and push
+4. Create PR
+
+### Step 2: Automated Compatibility Check (CI)
+
+**GitHub Actions:**
+```yaml
+- name: Check schema compatibility
+  run: |
+    # Get previous version
+    PREV_VERSION=$(curl http://schema-registry:8081/subjects/user.created/versions/latest | jq -r '.version')
+    
+    # Check compatibility
+    curl -X POST http://schema-registry:8081/compatibility/subjects/user.created/versions/$PREV_VERSION \
+      -H "Content-Type: application/json" \
+      -d @schemas/user-created.json
+    
+    # Exit if not compatible
+    if [ $? -ne 0 ]; then
+      echo "Schema is not backward compatible"
+      exit 1
+    fi
+```
+
+### Step 3: Review by Data Team
+
+**Review Checklist:**
+- [ ] Follows naming conventions
+- [ ] Has description and examples
+- [ ] Backward compatible (or justified breaking change)
+- [ ] No PII in event name
+- [ ] Appropriate data types
+
+### Step 4: Register Schema in Registry
+
+**After Approval:**
+```bash
+curl -X POST http://schema-registry:8081/subjects/user.created/versions \
+  -H "Content-Type: application/json" \
+  -d @schemas/user-created.json
+```
+
+---
+
+## Dead Letter Queue (DLQ)
+
+### Invalid Events Go to DLQ
+
+**Example:**
+```javascript
+consumer.on('message', async (message) => {
+  try {
+    const event = JSON.parse(message.value);
+    
+    // Validate against schema
+    if (!validate(event)) {
+      throw new Error('Invalid schema');
+    }
+    
+    await handleEvent(event);
+  } catch (err) {
+    // Send to DLQ
+    await dlq.send({
+      topic: 'user-events-dlq',
+      value: message.value,
+      headers: {
+        'error': err.message,
+        'original-topic': 'user-events'
+      }
+    });
+  }
+});
+```
+
+---
+
+## Schema Migration
+
+### Dual Publishing (Old + New Schema)
+
+**Process:**
+1. Publish events in both old and new format
+2. Consumers migrate to new format
+3. Stop publishing old format
+4. Remove old schema
+
+---
+
+## Tools and Libraries
+
+### Confluent Schema Registry
+
+**Features:**
+- Avro, JSON Schema, Protobuf support
+- Compatibility checking
+- REST API
+- Integration with Kafka
+
+### JSON Schema Validators
+
+**JavaScript:**
+```bash
+npm install ajv
+```
+
+**Python:**
+```bash
+pip install jsonschema
+```
+
+### Avro/Protobuf Libraries
+
+**Avro (JavaScript):**
+```bash
+npm install avsc
+```
+
+**Protobuf (JavaScript):**
+```bash
+npm install protobufjs
+```
+
+---
+
+## Real-World Event Schemas
+
+### Kafka Event Schemas
+
+See examples throughout this document
+
+### Webhook Payloads
+
+**GitHub Webhook:**
+```json
+{
+  "action": "created",
+  "issue": {
+    "id": 1,
+    "number": 1,
+    "title": "Bug report",
+    "body": "Description"
+  },
+  "repository": {
+    "id": 123,
+    "name": "my-repo"
+  }
+}
+```
+
+### CloudEvents Standard
+
+**Format:**
+```json
+{
+  "specversion": "1.0",
+  "type": "com.example.user.created",
+  "source": "https://example.com/users",
+  "id": "A234-1234-1234",
+  "time": "2024-01-15T10:00:00Z",
+  "datacontenttype": "application/json",
+  "data": {
+    "userId": "123",
+    "email": "user@example.com"
+  }
+}
+```
+
+---
+
+## Best Practices
+
+### Schema Design
+- [ ] Use consistent naming conventions
+- [ ] Use appropriate data types
+- [ ] Use semantic versioning
+- [ ] Document all fields
+- [ ] Provide examples
+- [ ] Use backward compatible changes
+- [ ] Avoid breaking changes when possible
+- [ ] Use optional fields for additions
+- [ ] Document breaking changes clearly
+- [ ]
+
+### Validation
+- [ ] Validate events before publishing
+- [ ] Validate events after receiving
+- [ ] Use schema registry for validation
+- [ ] Send invalid events to DLQ
+- [ ] Monitor DLQ for schema violations
+- [ ] Fix and replay events
+- [ ]
+
+### Versioning
+- [ ] Use semantic versioning
+- [ ] Tag all releases with version numbers
+- [ ] Document version compatibility matrix
+- [ ] Maintain backward compatibility
+- [ ] Use @deprecated directive for breaking changes
+- [ ] Plan schema deprecation strategy
+- [ ]
+
+### Documentation
+- [ ] Document all breaking changes with dates
+- [ ] Document breaking changes clearly
+- [ ] Provide migration guides for consumers
+- [ ] Document version compatibility
+- [ ] Document schema lifecycle
+- [ ] Document schema evolution rules
+- [ ] Document event naming conventions
+- [ ]
+
+### Monitoring
+- [ ] Monitor breaking change impacts
+- [ ] Track consumer adoption of new schema
+- [ ] Set up dashboards for schema health
+- [ ] Track migration success rates
+- [ ] Monitor DLQ for schema violations
+- [ ] Alert on high DLQ rate
+- [ ]
+
+### Prevention
+- [ ] Use data contracts for all shared data
+- [ ] Enforce schema validation at source
+- [ ] Implement CI/CD schema checks
+- [ ] Use schema registry for validation
+- [ ] Use automated compatibility checking
+- [ ]
+
+### Testing
+- [ ] Test backward compatibility
+- [ ] Test with production-like data
+- [ ] Test migration scripts thoroughly
+- [ ] Test graceful degradation scenarios
+- [ ] Monitor test coverage
+- [ ] Test schema validation logic
+- [ ]
+
+### Governance
+- [ ] Establish schema ownership
+- [ ] Create schema review process
+- [ ] Define schema lifecycle
+- [ ] Plan schema deprecation strategy
+- [ ] Set up incident response for violations
+- [ ] Create data team review board
+- [ ] Define schema evolution rules
+- [ ]
+
+### Tools
+- [ ] Use Confluent Schema Registry for Kafka
+- [ ] Use AWS Glue Schema Registry
+- [ ] Use Azure Schema Registry
+- [ ] Use JSON Schema validators (ajv, jsonschema)
+- [ ] Use Avro/Protobuf libraries
+- [ ] Use schema registry clients
+- [ ]
+
+### Multi-Environment
+- [ ] Use separate registries for dev/staging/prod
+- [ ] Test schema changes in dev/staging
+- [ ] Promote schemas through environments
+- [ ] Prevent accidental prod changes
+- [ ]
+
+### Checklist
+- [ ] Use consistent event naming conventions
+- [ ] Use semantic versioning
+- [ ] Implement zero-downtime migrations
+- [ ] Backfill data before removing old columns
+- [ ] Test backward compatibility
+- [ ] Have rollback procedures ready
+- [ ] Monitor schema drift metrics
+- [ ] Track migration success rates
+- [ ] Document all breaking changes
+- [ ] Set up change notifications
+- [ ] Test with production-like data
+- [ ] Monitor test coverage
+- [ ] Optimize schema validation overhead
+- [ ] Cache schema definitions
+- [ ] Use efficient validation libraries
+- [ ] Monitor schema performance impact
+- [ ] Establish schema ownership
+- [ ] Create schema review process
+- [ ] Define schema lifecycle
+- [ ] Plan schema deprecation strategy
+- [ ] Set up incident response for violations
+- [ ] Test schema validation logic
+- [ ] Train team on schema governance

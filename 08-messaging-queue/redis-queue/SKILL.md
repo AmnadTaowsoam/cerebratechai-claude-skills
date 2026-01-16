@@ -1083,3 +1083,103 @@ app.get('/health', async (req, res) => {
 - [Bull Documentation](https://github.com/OptimalBits/bull)
 - [Redis Documentation](https://redis.io/documentation)
 - [ioredis Documentation](https://github.com/luin/ioredis)
+
+## Best Practices
+
+### Queue Configuration
+
+- **Use separate queues for different job types**: This allows for independent scaling and prioritization
+- **Set appropriate `removeOnComplete` and `removeOnFail` values**: Keep enough history for debugging but avoid memory bloat
+- **Configure `attempts` and `backoff` appropriately**: Balance between reliability and processing time
+- **Use `prefetch` for fair distribution**: Prevent one worker from hogging all jobs
+- **Set reasonable `timeout` values**: Prevent stuck jobs from blocking workers
+
+### Worker Configuration
+
+- **Set appropriate `concurrency`**: Too high can overwhelm resources, too low wastes capacity
+- **Implement graceful shutdown**: Handle SIGTERM/SIGINT to complete in-flight jobs
+- **Monitor worker health**: Track active jobs, failed jobs, and queue depth
+- **Use separate worker processes**: Isolate failures and improve reliability
+- **Implement proper error handling**: Distinguish between retryable and non-retryable errors
+
+### Job Design
+
+- **Keep jobs idempotent**: Jobs should be safe to retry without side effects
+- **Use job dependencies**: Ensure proper ordering when required
+- **Implement progress tracking**: Provide visibility into long-running jobs
+- **Add job metadata**: Include context for debugging and monitoring
+- **Design for eventual consistency**: Jobs may not execute immediately
+
+### Production Considerations
+
+- **Use Redis Cluster for high availability**: Distribute load across multiple nodes
+- **Enable persistence**: Configure Redis AOF or RDB for durability
+- **Monitor Redis metrics**: Track memory usage, connections, and command stats
+- **Implement rate limiting**: Prevent queue flooding from overwhelming workers
+- **Use job priorities**: Ensure critical jobs are processed first
+
+### Security
+
+- **Use Redis AUTH**: Protect your Redis instance with password authentication
+- **Enable TLS**: Encrypt connections between workers and Redis
+- **Use connection pooling**: Limit the number of connections to Redis
+- **Sanitize job data**: Prevent injection attacks through job payloads
+- **Implement job size limits**: Prevent memory exhaustion from large jobs
+
+## Checklist
+
+### Setup and Configuration
+- [ ] Configure Redis connection with appropriate settings
+- [ ] Set up separate queues for different job types
+- [ ] Configure default job options (attempts, backoff, timeout)
+- [ ] Set up Redis persistence (AOF/RDB)
+- [ ] Configure Redis authentication and TLS
+
+### Queue Management
+- [ ] Implement queue monitoring and metrics collection
+- [ ] Set up alerts for queue depth and failure rates
+- [ ] Configure job cleanup policies (removeOnComplete/removeOnFail)
+- [ ] Implement queue pausing and draining procedures
+- [ ] Set up queue backup and recovery procedures
+
+### Worker Setup
+- [ ] Configure appropriate concurrency per worker
+- [ ] Implement graceful shutdown handling
+- [ ] Set up worker health checks
+- [ ] Configure worker logging and error tracking
+- [ ] Implement worker restart policies
+
+### Job Processing
+- [ ] Implement idempotent job handlers
+- [ ] Add progress tracking for long-running jobs
+- [ ] Configure appropriate retry strategies
+- [ ] Implement dead letter queue for failed jobs
+- [ ] Add job metadata for debugging
+
+### Monitoring and Alerting
+- [ ] Set up dashboard for queue metrics
+- [ ] Configure alerts for queue depth thresholds
+- [ ] Monitor worker health and restart failures
+- [ ] Track job completion rates and latency
+- [ ] Set up logs aggregation and search
+
+### Security and Compliance
+- [ ] Enable Redis authentication
+- [ ] Configure TLS for Redis connections
+- [ ] Implement job data sanitization
+- [ ] Set up access controls for queue operations
+- [ ] Audit queue access and job modifications
+
+### Testing and Validation
+- [ ] Test job processing under load
+- [ ] Verify retry and backoff behavior
+- [ ] Test graceful shutdown scenarios
+- [ ] Validate error handling and DLQ routing
+- [ ] Test Redis failover scenarios
+
+### Documentation
+- [ ] Document queue naming conventions
+- [ ] Document job schemas and data formats
+- [ ] Create runbooks for common issues
+- [ ] Document scaling procedures
+- [ ] Maintain API documentation for queue operations

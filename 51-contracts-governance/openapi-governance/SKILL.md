@@ -1578,3 +1578,134 @@ security:
 4. API guild review
 5. Merge
 6. Auto-publish docs
+
+## Overview
+
+OpenAPI Governance is the practice of enforcing API design standards across an organization through automated validation and lifecycle management.
+
+### Key Components
+
+1. **API Design Standards:** Consistent patterns (naming, structure, errors)
+2. **Automated Validation:** Linting rules enforced in CI/CD
+3. **Breaking Change Detection:** Prevent accidental breaking changes
+4. **API Lifecycle Management:** Design → Deploy → Deprecate
+
+### Example
+
+Developer creates API endpoint:
+POST /api/users (wrong - should be /api/v1/users)
+
+Linter catches in CI:
+❌ Error: Missing version prefix in URL
+❌ Error: Missing operation description
+❌ Error: No example provided
+
+Developer fixes → CI passes → Merge allowed
+
+---
+
+## Best Practices
+
+### API Design
+- [ ] Follow RESTful conventions
+- [ ] Use consistent naming patterns
+- [ ] Document all endpoints
+- [ ] Provide examples for all endpoints
+- [ ] Use appropriate HTTP methods
+- [ ] Implement proper error handling
+- [ ] Use consistent error formats
+- [ ] Use pagination for list endpoints
+- [ ] Implement filtering and sorting
+- [ ] Use appropriate status codes
+- [ ] Document rate limits
+- [ ] Use versioning in URLs
+- [ ]
+
+### Validation
+- [ ] Implement automated linting in CI/CD
+- [ ] Use Spectral for OpenAPI validation
+- [ ] Define custom organization rules
+- [ ] Check for breaking changes
+- [ ] Validate all operations have descriptions
+- [ ] Validate all parameters have descriptions
+- [ ] Validate all responses have schemas
+- [ ] Ensure examples are provided
+- [ ] Check for security schemes
+- [ ] Validate consistent naming conventions
+- [ ]
+
+### Documentation
+- [ ] Use OpenAPI spec as source of truth
+- [ ] Auto-generate documentation
+- [ ] Use Swagger UI for interactive docs
+- [ ] Use ReDoc for beautiful static docs
+- [ ] Keep documentation in sync with code
+- [ ]
+
+### Breaking Changes
+- [ ] Use semantic versioning
+- [ ] Communicate breaking changes early
+- [ ] Provide migration guides
+- [ ] Hold breaking change meetings
+- [ ] Create data contracts with consumers
+- [ ] Document breaking changes clearly
+- [ ] Use multi-step migrations
+- [ ] Use zero-downtime migration pattern
+- [ ]
+
+### Governance
+- [ ] Create API review board
+- [ ] Establish API guild
+- [ ] Define API lifecycle
+- [ ] Maintain style guide
+- [ ] Review API designs
+- [ ] Approve breaking changes
+- [ ] Resolve conflicts
+- [ ] Maintain spec registry
+- [ ]
+
+### Tools
+- [ ] Use Spectral for linting
+- [ ] Use openapi-diff for detecting breaking changes
+- [ ] Use graphql-inspector for GraphQL
+- [ ] Use buf for Protobuf
+- [ ] Use Swagger Editor for visual editing
+- [ ] Use Stoplight Studio for design-first
+- [ ] Use openapi-generator for code generation
+- [ ]
+
+### Versioning
+- [ ] Use URL versioning (/v1/, /v2/)
+- [ ] Use header versioning (Accept-Version: v1)
+- [ ] Use semantic versioning (SemVer)
+- [ ] Document version compatibility matrix
+- [ ] Maintain backward compatibility
+- [ ] Deprecate old versions properly
+- [ ] Provide migration guides
+- [ ]
+
+### Monitoring
+- [ ] Monitor spec coverage
+- [ ] Track linting violations
+- [ ] Monitor breaking changes deployed
+- [ ] Set up dashboards for API health
+- [ ] Track consumer adoption
+- [ ]
+
+### Checklist
+- [ ] Define API design standards
+- [ ] Implement automated linting
+- [ ] Set up breaking change detection
+- [ ] Create API review board
+- [ ] Document all breaking changes
+- [ ] Provide migration guides
+- [ ] Use semantic versioning
+- [ ] Maintain backward compatibility
+- [ ] Set up deprecation process
+- [ ] Monitor deprecated endpoint usage
+- [ ] Test backward compatibility
+- [ ] Use design-first approach
+- [ ] Use consistent naming conventions
+- [ ] Provide examples for all endpoints
+- [ ] Document all API changes
+- [ ] Train team on governance

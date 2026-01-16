@@ -126,35 +126,40 @@ This is the most valuable contribution! Follow these steps:
 
 ### Skill Structure
 
-Every skill MUST follow this structure:
+Every skill MUST follow this structure (use `templates/skill-template.md`):
 ````markdown
+---
+name: <Human-readable skill name>
+description: <1 sentence: what it covers + when to use it>
+---
+
 # [Skill Name]
 
 ## Overview
 [2-3 sentences explaining what this skill covers and when to use it]
 
-## [Main Section 1]
-[Content with examples]
+## Why This Matters
+- **Benefit**: Short explanation
 
-### [Subsection if needed]
-[More detailed content]
+## Core Concepts
+### 1. Concept
+[Rules, patterns, examples]
 
-## [Main Section 2]
-[Content with examples]
+## Quick Start
+[Minimal steps + small runnable example if helpful]
 
-## Best Practices
-- [ ] Practice 1
-- [ ] Practice 2
-- [ ] Practice 3
-
-## Common Pitfalls
-- ❌ **Pitfall 1**: Description
-- ❌ **Pitfall 2**: Description
-
-## Checklist
-When implementing this pattern, ensure:
+## Production Checklist
 - [ ] Item 1
 - [ ] Item 2
+
+## Anti-patterns
+1. **Anti-pattern**: Why it’s bad
+
+## Integration Points
+- Related tools/processes/skills
+
+## Further Reading
+- Links
 
 Format: Markdown with [Language] code examples.
 
@@ -165,11 +170,12 @@ Create the file now.
 
 Every skill MUST include:
 
-1. ✅ **Overview** - Brief introduction (2-3 sentences)
-2. ✅ **Code Examples** - Working, production-ready examples
-3. ✅ **Best Practices** - At least 5 best practices
-4. ✅ **Common Pitfalls** - Things to avoid
-5. ✅ **Checklist** - Implementation checklist
+1. ✅ **YAML frontmatter** (`name`, `description`)
+2. ✅ **Overview** - Brief introduction (2-4 sentences)
+3. ✅ **Core Concepts** - The actual guidance/patterns
+4. ✅ **Quick Start** - Minimal “do this first” flow
+5. ✅ **Production Checklist** - Operational checklist
+6. ✅ **Anti-patterns** - Things to avoid
 
 ### Optional Sections (but recommended)
 

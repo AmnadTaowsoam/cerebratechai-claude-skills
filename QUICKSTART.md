@@ -134,8 +134,19 @@ skill [ชื่อ skill] พบปัญหา:
 28-39 - Specialized (E-commerce, Mobile, CRM, etc.)
 40-58 - Enterprise (Resilience, Cost, Data, etc.)
 60 - GitHub MCP (8 skills)
+60 - Infrastructure Patterns (3 skills)
+61 - AI Production (4 skills)
+62 - Scale Operations (3 skills)
+63 - Professional Services (2 skills)
+64 - Meta Standards (7 skills)
+65 - Context & Token Optimization (5 skills)
+66 - Repo Navigation & Knowledge Map (5 skills)
+67 - Codegen & Scaffolding Automation (6 skills)
+68 - Quality Gates & CI Policies (6 skills)
+69 - Platform Engineering Lite (5 skills)
+70 - Data Platform Governance (5 skills)
 
-Total: 376+ Skills | 60 Categories
+Total: 473+ Skills | 73 Categories
 ```
 
 ### Popular Skills
