@@ -1180,3 +1180,233 @@ Month 7-8: Procurement
 Month 9-10: Technical onboarding
 Month 11-12: Training + Rollout
 ```
+
+## Best Practices
+
+### Preparation Best Practices
+- **Start Early**: Begin preparing for enterprise onboarding before your first enterprise customer. Getting SOC2, ISO 27001, and other certifications takes 6-12 months.
+- **Build Standard Contracts**: Create and maintain standard contract templates (MSA, DPA, SLA, BAA). This reduces negotiation time from weeks to days.
+- **Create Trust Center**: Build a public trust center with security documentation, compliance certifications, and subprocessor list. This reduces security review time by 50%.
+- **Develop Onboarding Documentation**: Create step-by-step guides for SSO, SCIM, and other technical setup. This reduces technical onboarding time.
+- **Hire Customer Success Team**: Build a team dedicated to onboarding and customer success. This improves onboarding experience and reduces time to value.
+
+### Sales Qualification Best Practices
+- **Qualify Early**: Identify customer requirements (SOC2, SSO, custom contracts) early in sales process. This prevents surprises later.
+- **Understand Customer Size**: Tailor onboarding approach based on customer size (SMB, mid-market, enterprise).
+- **Know Decision Makers**: Identify who makes security, legal, and procurement decisions. This helps navigate the process.
+- **Set Realistic Expectations**: Communicate realistic timelines for each stage. Enterprise onboarding takes 3-12 months, not 3-12 weeks.
+- **Document Requirements**: Capture all customer requirements early and share with relevant teams.
+
+### Security Review Best Practices
+- **Standard Response Library**: Maintain comprehensive library of standard responses to common security questions. This reduces completion time from 20-40 hours to 5-10 hours.
+- **Pre-Approved Documentation**: Have SOC2 reports, penetration test results, and security policies ready to share under NDA.
+- **Security Team Involvement**: Involve security team early in the process. They own security review and should build relationships with customer security teams.
+- **Honesty with Mitigation**: Be honest about past incidents but emphasize your response and remediation. Honesty builds trust.
+- **Evidence-Ready Responses**: Reference supporting evidence for each claim. For example, "See our SOC2 Type II report for audit findings."
+
+### Legal Review Best Practices
+- **Standard Templates**: Start with your standard MSA, DPA, and SLA templates. This provides a baseline for negotiation.
+- **Know Your Limits**: Identify deal-breakers and non-negotiable terms before starting negotiations.
+- **Liability Caps**: Set reasonable liability caps based on contract value (e.g., 1x ACV, $1M, $5M). Never accept unlimited liability.
+- **Quick Turnaround**: Respond to legal comments within 48 hours. This keeps momentum and prevents delays.
+- **Legal Team Involvement**: Involve legal team early. They should build relationships with customer legal teams.
+
+### Procurement Best Practices
+- **Vendor Registration**: Complete vendor registration proactively in customer portals when possible.
+- **Required Documents Ready**: Have W-9 forms, certificates of insurance, and banking details ready.
+- **Flexible Payment Terms**: Offer standard payment terms but be flexible for large enterprises (e.g., Net 30, Net 60).
+- **Invoice Format**: Provide invoices in customer's preferred format (PDF, specific fields, purchase order references).
+- **Finance Team Involvement**: Involve finance team early. They should build relationships with customer procurement teams.
+
+### Technical Onboarding Best Practices
+- **SSO First**: Configure SSO before any other technical setup. This is often the first technical requirement.
+- **Test Accounts**: Create test accounts in customer's IdP for testing before go-live.
+- **Step-by-Step Guides**: Provide detailed, screenshot-based guides for each technical setup step.
+- **Video Walkthroughs**: Create video walkthroughs of technical setup processes. This reduces support burden.
+- **Implementation Engineer**: Assign a dedicated implementation engineer for enterprise customers. This provides single point of contact.
+
+### Training and Rollout Best Practices
+- **Admin Training First**: Train customer admins before end users. Admins will train their own teams.
+- **Train-the-Trainer**: Create train-the-trainer materials. This scales training for large organizations.
+- **Pilot Rollout**: Start with a small pilot group (10-50 users) before full rollout. This identifies issues early.
+- **Quick Wins**: Focus on quick wins in initial training. Show users how to complete their first task quickly.
+- **Ongoing Support**: Provide ongoing support during rollout period. This ensures smooth adoption.
+
+### Communication Best Practices
+- **Single Point of Contact**: Designate a single point of contact for the customer. This reduces confusion.
+- **Regular Updates**: Provide weekly status updates during onboarding. This keeps customer informed and builds trust.
+- **Clear Milestones**: Define clear milestones with dates. Celebrate each milestone completion.
+- **Proactive Communication**: Anticipate and address issues before customer raises them. This shows proactive approach.
+- **Stakeholder Updates**: Keep all stakeholders (customer and internal) aligned on progress.
+
+### Acceleration Best Practices
+- **Self-Service for SMB**: Provide self-service onboarding for small customers. This scales infinitely.
+- **Pre-Filled Responses**: Share your standard response library with customers. Ask them to copy relevant answers.
+- **Standard Contracts**: Use take-it-or-leave-it contracts for SMB and mid-market customers.
+- **Automation Tools**: Use tools like DocuSign for contract signing and SafeBase for security documentation.
+- **White-Glove for Enterprise**: Provide dedicated CSM for enterprise customers. This improves experience and adoption.
+
+### Post-Onboarding Best Practices
+- **Week 1 Check-In**: Schedule daily check-ins during first week. This is critical period for adoption.
+- **Time to Value Tracking**: Measure and optimize time to value (first meaningful action). Target <30 days.
+- **Adoption Monitoring**: Track user adoption metrics (active users, feature usage). Identify and address low adoption.
+- **Quarterly Business Reviews**: Schedule QBRs to review progress, gather feedback, and identify expansion opportunities.
+- **Success Metrics**: Define and track success metrics (time to value, adoption rate, customer satisfaction, renewal rate).
+
+## Checklist
+
+### Preparation Checklist
+- [ ] Obtain SOC2 Type II certification
+- [ ] Obtain ISO 27001 certification (if applicable)
+- [ ] Create standard MSA template
+- [ ] Create standard DPA template
+- [ ] Create standard SLA template
+- [ ] Create BAA template (if HIPAA)
+- [ ] Create security policy document
+- [ ] Create privacy policy
+- [ ] Create incident response plan
+- [ ] Create disaster recovery plan
+- [ ] Create data retention policy
+- [ ] Create vendor management policy
+- [ ] Create subprocessor list
+- [ ] Obtain cyber liability insurance
+- [ ] Build public trust center
+- [ ] Create SSO configuration guide
+- [ ] Create SCIM configuration guide
+- [ ] Create admin training materials
+- [ ] Create end user training materials
+- [ ] Hire customer success team
+
+### Sales Qualification Checklist
+- [ ] Identify customer size (SMB, mid-market, enterprise)
+- [ ] Identify security requirements (SOC2, ISO, pen tests)
+- [ ] Identify technical requirements (SSO, SCIM, integrations)
+- [ ] Identify legal requirements (MSA, DPA, SLA, BAA)
+- [ ] Identify procurement requirements (PO, vendor registration)
+- [ ] Identify decision makers
+- [ ] Set realistic timeline expectations
+- [ ] Document all customer requirements
+- [ ] Share requirements with relevant teams
+
+### Security Review Checklist
+- [ ] Create standard response library (200+ questions)
+- [ ] Collect all evidence files
+- [ ] Assign security team member to customer
+- [ ] Schedule security review calls
+- [ ] Complete security questionnaire
+- [ ] Share SOC2 report under NDA
+- [ ] Share penetration test results
+- [ ] Address security concerns
+- [ ] Obtain security approval
+- [ ] Document lessons learned
+
+### Legal Review Checklist
+- [ ] Prepare standard MSA template
+- [ ] Prepare standard DPA template
+- [ ] Prepare standard SLA template
+- [ ] Prepare BAA template (if HIPAA)
+- [ ] Identify non-negotiable terms
+- [ ] Set liability cap limits
+- [ ] Assign legal team member to customer
+- [ ] Send initial contract package
+- [ ] Respond to legal comments within 48 hours
+- [ ] Negotiate terms
+- [ ] Obtain legal approval
+- [ ] Execute contracts via DocuSign
+- [ ] Store executed contracts
+
+### Procurement Checklist
+- [ ] Complete vendor registration (if required)
+- [ ] Prepare W-9 form (US vendors)
+- [ ] Obtain certificate of insurance
+- [ ] Prepare banking details
+- [ ] Understand invoice format requirements
+- [ ] Understand payment terms
+- [ ] Assign finance team member to customer
+- [ ] Submit vendor registration
+- [ ] Receive Purchase Order (PO)
+- [ ] Send invoice
+- [ ] Receive payment
+
+### Technical Onboarding Checklist
+- [ ] Assign implementation engineer
+- [ ] Schedule kickoff call
+- [ ] Configure SSO (SAML or OIDC)
+- [ ] Test SSO with test account
+- [ ] Configure SCIM (if required)
+- [ ] Test SCIM provisioning
+- [ ] Configure IP whitelisting (if required)
+- [ ] Configure subdomain/vanity URL (if required)
+- [ ] Configure integrations
+- [ ] Perform data migration (if required)
+- [ ] Create test users
+- [ ] Validate technical setup
+- [ ] Document technical configuration
+
+### Training Checklist
+- [ ] Schedule admin training
+- [ ] Prepare admin training materials
+- [ ] Conduct admin training
+- [ ] Prepare end user training materials
+- [ ] Create video walkthroughs
+- [ ] Schedule end user training
+- [ ] Conduct end user training
+- [ ] Identify pilot users
+- [ ] Conduct pilot rollout
+- [ ] Gather pilot feedback
+- [ ] Address pilot issues
+- [ ] Plan full rollout
+- [ ] Execute full rollout
+- [ ] Monitor adoption
+
+### Communication Checklist
+- [ ] Designate single point of contact
+- [ ] Create communication plan
+- [ ] Schedule weekly status updates
+- [ ] Define milestones and dates
+- [ ] Set up stakeholder updates
+- [ ] Create status report template
+- [ ] Send weekly updates
+- [ ] Celebrate milestone completions
+- [ ] Address issues proactively
+- [ ] Maintain communication log
+
+### Post-Onboarding Checklist
+- [ ] Schedule Week 1 daily check-ins
+- [ ] Schedule Week 2-4 weekly check-ins
+- [ ] Schedule Month 1 check-in
+- [ ] Define time to value metric
+- [ ] Track time to value
+- [ ] Set up adoption monitoring
+- [ ] Monitor active users
+- [ ] Monitor feature usage
+- [ ] Address low adoption
+- [ ] Schedule QBRs
+- [ ] Prepare QBR agenda
+- [ ] Conduct QBRs
+- [ ] Track customer satisfaction (NPS, CSAT)
+- [ ] Track renewal rate
+- [ ] Identify expansion opportunities
+
+### Documentation Checklist
+- [ ] Create onboarding project plan template
+- [ ] Create onboarding checklist
+- [ ] Document customer requirements
+- [ ] Document technical configuration
+- [ ] Document security responses
+- [ ] Document legal negotiations
+- [ ] Document procurement process
+- [ ] Document training materials
+- [ ] Create troubleshooting guide
+- [ ] Create FAQ document
+
+### Tools Setup Checklist
+- [ ] Configure CRM (Salesforce, HubSpot)
+- [ ] Set up deal stages
+- [ ] Configure project management tool (Asana, Monday.com)
+- [ ] Create onboarding project template
+- [ ] Set up document signing (DocuSign, PandaDoc)
+- [ ] Configure security portal (SafeBase, Whistic)
+- [ ] Set up monitoring dashboards
+- [ ] Configure error alerts
+- [ ] Set up analytics tracking

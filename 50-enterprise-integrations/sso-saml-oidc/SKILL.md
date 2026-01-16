@@ -1330,3 +1330,176 @@ export default function Login() {
 - JWT decoder (jwt.io)
 - Mock IdP (development)
 - Automated tests (Puppeteer)
+
+## Best Practices
+
+### SAML Implementation Best Practices
+- **Use Established Libraries**: Leverage existing SAML libraries (passport-saml for Node.js, python3-saml for Python, ruby-saml for Ruby) instead of implementing from scratch. This reduces bugs and speeds up development.
+- **Validate Signatures**: Always verify SAML assertion signatures using the IdP's public certificate. Never trust unsigned assertions.
+- **Check Expiration**: Validate assertion expiration time (`notOnOrAfter`) and reject expired assertions. This prevents replay attacks.
+- **Audience Validation**: Verify that the assertion's audience matches your application's entity ID. This prevents assertion reuse across applications.
+- **Clock Synchronization**: Ensure your server clocks are synchronized with NTP to prevent clock skew issues (assertions expire too quickly or appear expired).
+
+### OIDC Implementation Best Practices
+- **Use Discovery Endpoint**: Fetch OIDC configuration from the `.well-known/openid-configuration` endpoint instead of hardcoding URLs. This ensures you always use current endpoints.
+- **Validate JWT Signatures**: Verify ID token signatures using the IdP's public keys from the JWKS endpoint. Never trust unsigned tokens.
+- **Check Token Expiration**: Validate JWT `exp` claim and reject expired tokens. Implement refresh token flow for long-lived sessions.
+- **Audience and Issuer Validation**: Verify that the token's `aud` matches your client ID and `iss` matches the expected issuer.
+- **Secure Token Storage**: Store tokens securely on the client-side (httpOnly cookies, secure storage). Never store tokens in localStorage.
+
+### SSO Configuration Best Practices
+- **Metadata Exchange**: Use SAML metadata exchange for configuration. This reduces manual errors and ensures correct certificate and endpoint configuration.
+- **Certificate Rotation**: Implement certificate rotation with overlap period. Add new certificate before removing old one to prevent downtime.
+- **Redirect URI Whitelist**: Configure allowed redirect URIs in your IdP. Never redirect to untrusted URLs.
+- **Attribute Mapping**: Map IdP attributes to your user model consistently. Handle missing attributes gracefully.
+- **Error Handling**: Return clear, user-friendly error messages for SSO failures. Log detailed errors for debugging.
+
+### JIT Provisioning Best Practices
+- **Create on First Login**: Implement JIT provisioning to create users on first SSO login. This reduces manual user management.
+- **Update on Each Login**: Sync user attributes from SSO on each login to keep data current.
+- **Default Roles**: Assign default roles based on user attributes or group membership. Allow manual override if needed.
+- **Handle Existing Users**: If user already exists, update their attributes instead of creating duplicate.
+- **Log Provisioning**: Audit log all JIT provisioning events (user creation, attribute updates).
+
+### Group/Role Mapping Best Practices
+- **Map IdP Groups to App Roles**: Configure mapping between IdP groups and application roles. This allows IT admins to control access through their IdP.
+- **Handle Multiple Groups**: Users may belong to multiple groups. Combine permissions from all mapped roles.
+- **Default Role Fallback**: If no groups match, assign a default role (e.g., 'member'). Never leave users without any role.
+- **Sync on Each Login**: Update user roles on each SSO login based on current group membership.
+- **Document Mapping**: Maintain clear documentation of group-to-role mappings for customer reference.
+
+### Multi-Tenancy Best Practices
+- **Tenant-Specific SSO Config**: Store SAML/OIDC configuration per tenant. Each customer can have their own IdP.
+- **Tenant Identification**: Identify tenant from subdomain, email domain, or explicit selection before redirecting to IdP.
+- **Isolate User Data**: Ensure users from different tenants cannot access each other's data. Always filter by tenant ID.
+- **Separate Sessions**: Use tenant-specific session cookies or include tenant ID in session to prevent cross-tenant access.
+- **Audit by Tenant**: Maintain separate audit logs per tenant for compliance and troubleshooting.
+
+### Security Best Practices
+- **HTTPS Only**: Enforce HTTPS for all SSO endpoints. Never use HTTP for authentication flows.
+- **Secure Session Management**: Use secure, httpOnly cookies with SameSite protection. Set appropriate session timeouts.
+- **Validate All Inputs**: Validate all SAML/OIDC inputs (assertions, tokens, parameters) to prevent injection attacks.
+- **Rate Limiting**: Implement rate limiting on SSO endpoints to prevent brute force attacks.
+- **Monitor Suspicious Activity**: Alert on failed login attempts, unusual login patterns, or access from unusual locations.
+
+### Testing Best Practices
+- **Test with Real IdPs**: Test your SSO implementation with actual IdPs (Okta, Azure AD, Google Workspace, OneLogin).
+- **Use SAML Tracer**: Install SAML-tracer browser extension to debug SAML flows. This shows assertions, signatures, and errors.
+- **Use JWT Decoder**: Use jwt.io to decode and verify JWT tokens. This helps debug OIDC flows.
+- **Test Edge Cases**: Test scenarios like expired tokens, invalid signatures, clock skew, and network failures.
+- **Automated Testing**: Create automated tests for SSO flows using headless browsers (Puppeteer, Playwright).
+
+### User Experience Best Practices
+- **Clear Login Options**: Display clear SSO login buttons with IdP logos. Provide email/password as fallback.
+- **Error Messages**: Show user-friendly error messages for SSO failures. Provide clear next steps (contact support, try again).
+- **Loading States**: Show loading indicators during SSO redirect and token exchange. Users should know the system is working.
+- **Session Persistence**: Maintain user session across browser tabs. Use consistent cookie domains and paths.
+- **Logout Handling**: Implement proper logout (both local session and IdP logout) for complete sign-out.
+
+## Checklist
+
+### SAML Implementation Checklist
+- [ ] Install SAML library for your platform
+- [ ] Configure SAML strategy with IdP metadata
+- [ ] Implement SAML assertion validation (signature, expiration, audience)
+- [ ] Implement SAML callback endpoint
+- [ ] Implement JIT provisioning for new users
+- [ ] Implement user attribute mapping
+- [ ] Implement group/role mapping
+- [ ] Add error handling for SAML failures
+- [ ] Add logging for SAML operations
+- [ ] Test with Okta
+- [ ] Test with Azure AD
+- [ ] Test with OneLogin
+
+### OIDC Implementation Checklist
+- [ ] Install OIDC library for your platform
+- [ ] Configure OIDC strategy with client credentials
+- [ ] Implement authorization code flow
+- [ ] Implement token exchange endpoint
+- [ ] Implement JWT validation (signature, expiration, audience, issuer)
+- [ ] Implement refresh token flow
+- [ ] Implement JIT provisioning for new users
+- [ ] Implement user attribute mapping
+- [ ] Implement group/role mapping
+- [ ] Add error handling for OIDC failures
+- [ ] Add logging for OIDC operations
+- [ ] Test with Google
+- [ ] Test with Auth0
+
+### SSO Configuration Checklist
+- [ ] Obtain IdP metadata (SAML) or client credentials (OIDC)
+- [ ] Configure redirect URIs in IdP
+- [ ] Set up certificate rotation plan
+- [ ] Configure attribute mapping
+- [ ] Configure group/role mapping
+- [ ] Set up error handling
+- [ ] Configure HTTPS for all endpoints
+- [ ] Document SSO configuration process
+
+### JIT Provisioning Checklist
+- [ ] Implement user creation on first login
+- [ ] Implement user update on subsequent logins
+- [ ] Assign default roles based on attributes/groups
+- [ ] Handle existing users correctly
+- [ ] Log all provisioning events
+- [ ] Test JIT provisioning flow
+
+### Multi-Tenancy Checklist
+- [ ] Design tenant-specific SSO configuration storage
+- [ ] Implement tenant identification (subdomain, email, selection)
+- [ ] Ensure tenant data isolation
+- [ ] Implement tenant-specific sessions
+- [ ] Add tenant filtering to all queries
+- [ ] Test multi-tenant SSO flows
+
+### Security Checklist
+- [ ] Enforce HTTPS for all SSO endpoints
+- [ ] Implement secure session cookies (httpOnly, secure, SameSite)
+- [ ] Validate all SAML assertions
+- [ ] Validate all JWT tokens
+- [ ] Implement rate limiting on SSO endpoints
+- [ ] Set up monitoring for suspicious activity
+- [ ] Implement proper logout (local + IdP)
+
+### Testing Checklist
+- [ ] Install SAML-tracer browser extension
+- [ ] Install JWT decoder (jwt.io)
+- [ ] Create test accounts in each IdP
+- [ ] Test SAML flow with Okta
+- [ ] Test SAML flow with Azure AD
+- [ ] Test OIDC flow with Google
+- [ ] Test OIDC flow with Auth0
+- [ ] Test edge cases (expired tokens, invalid signatures)
+- [ ] Create automated tests for SSO flows
+- [ ] Test multi-tenant scenarios
+
+### User Experience Checklist
+- [ ] Design clear SSO login buttons
+- [ ] Add IdP logos to login buttons
+- [ ] Provide email/password fallback
+- [ ] Implement loading indicators
+- [ ] Write user-friendly error messages
+- [ ] Test cross-tab session persistence
+- [ ] Test logout flow (local + IdP)
+- [ ] Test on mobile browsers
+
+### Deployment Checklist
+- [ ] Configure production IdP connections
+- [ ] Set up SSL certificates
+- [ ] Configure monitoring dashboards
+- [ ] Set up error alerts
+- [ ] Train support team on SSO issues
+- [ ] Create troubleshooting guide
+- [ ] Document SSO configuration for customers
+- [ ] Test with production IdP before go-live
+
+### Maintenance Checklist
+- [ ] Monitor SSO success rates
+- [ ] Monitor SSO error rates
+- [ ] Track certificate expiration dates
+- [ ] Review and update attribute mappings
+- [ ] Review and update group/role mappings
+- [ ] Schedule periodic SSO testing
+- [ ] Keep libraries updated
+- [ ] Review IdP configuration changes
