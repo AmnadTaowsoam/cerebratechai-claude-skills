@@ -51,7 +51,56 @@ This repository contains specialized skills that help Claude understand and impl
 
 ## 🚀 Quick Start
 
-### For Claude Desktop/CLI Users
+### 🎯 Recommended: GitHub MCP Server Setup
+
+**The easiest way to use these skills with Claude Desktop!**
+
+📖 **Setup Guides:**
+- 🇬🇧 **English**: [GITHUB_MCP_SETUP.md](./GITHUB_MCP_SETUP.md) - Complete setup guide (15-20 min)
+- 🇹🇭 **ภาษาไทย**: [SETUP_TH.md](./SETUP_TH.md) - คู่มือภาษาไทยฉบับเต็ม (15-20 นาที)
+- ⚡ **Quick Start**: [QUICKSTART_MCP.md](./QUICKSTART_MCP.md) - 5-minute setup (English/Thai)
+
+**What you'll get:**
+- ✅ Automatic sync across all devices
+- ✅ Always up-to-date skills from GitHub
+- ✅ Works with Claude Desktop & Claude Code (VS Code)
+- ✅ No manual file copying needed
+
+---
+
+### 🤖 All AI Platforms Setup
+
+**Use these skills with ANY AI coding assistant!**
+
+📖 **Multi-Platform Guides:**
+- 🌐 **All Platforms (English)**: [SETUP_ALL_PLATFORMS.md](./SETUP_ALL_PLATFORMS.md)
+  - Claude Desktop (MCP)
+  - Claude Code (VS Code)
+  - GitHub Codex (Copilot)
+  - Roo Code (Cursor)
+  - Antigravity (Google DeepMind)
+
+- 🇹🇭 **ทุก Platform (ภาษาไทย)**: [SETUP_ALL_PLATFORMS_TH.md](./SETUP_ALL_PLATFORMS_TH.md)
+  - Claude Desktop (MCP)
+  - Claude Code (VS Code)
+  - GitHub Codex (Copilot)
+  - Roo Code (Cursor)
+  - Antigravity (Google DeepMind)
+
+**Comparison:**
+| Platform | Setup | Auto-sync | Best For |
+|----------|-------|-----------|----------|
+| Claude Desktop | ⭐⭐ Easy | ✅ Yes | Standalone use |
+| Claude Code | ⭐ Very Easy | ✅ Yes | VS Code users |
+| GitHub Codex | ⭐⭐⭐ Medium | ⚠️ Manual | Copilot users |
+| Roo Code | ⭐⭐ Easy | ⚠️ Manual | Cursor users |
+| Antigravity | ⭐⭐ Easy | ✅ Yes | Multi-IDE |
+
+---
+
+### Alternative: Manual Setup
+
+#### For Claude Desktop/CLI Users
 
 1. **Clone the repository**
 ```bash
@@ -74,7 +123,7 @@ User: "Create a Next.js API endpoint following our nextjs-patterns skill"
 Claude: [reads skill and implements according to best practices]
 ```
 
-### For Claude.ai Web Users
+#### For Claude.ai Web Users
 
 Simply reference skills in your conversations:
 ```

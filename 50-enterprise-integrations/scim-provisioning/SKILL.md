@@ -1089,3 +1089,166 @@ cron.schedule('0 2 * * *', async () => {
 - Success rate (>99%)
 - Failed operations (log and alert)
 - Sync status (periodic check)
+
+## Best Practices
+
+### SCIM Implementation Best Practices
+- **Use Established Libraries**: Leverage existing SCIM libraries (scim2-server for Node.js, django-scim2 for Python) instead of implementing from scratch. This reduces bugs and speeds up development.
+- **Support All Required Endpoints**: Implement all mandatory SCIM 2.0 endpoints (GET/POST/PATCH/DELETE for Users and Groups, ServiceProviderConfig, Schemas, ResourceTypes).
+- **Return Proper Error Responses**: Always return SCIM-compliant error responses with correct `schemas`, `status`, and `detail` fields.
+- **Handle Pagination**: Implement pagination for list endpoints using `startIndex` and `count` parameters. Return `totalResults` in response.
+- **Support Filtering**: Implement SCIM filter syntax for querying users and groups. This is required by many IdPs.
+
+### Authentication Best Practices
+- **Use OAuth 2.0 Bearer Tokens**: Require OAuth 2.0 bearer tokens for authentication. This is the most secure and widely supported method.
+- **Token Per Tenant**: Generate unique bearer tokens for each tenant. This prevents cross-tenant access and improves security.
+- **Token Rotation**: Implement token rotation policies (e.g., rotate tokens every 90 days) to reduce security risks.
+- **Secure Token Storage**: Store tokens securely using encryption at rest. Never log tokens or include them in error messages.
+- **Token Validation**: Validate tokens on every request and check for expiration, revocation, and proper scope.
+
+### User Management Best Practices
+- **Soft Delete for Deactivation**: Set `active=false` instead of hard deleting users. This preserves audit history and allows for reactivation.
+- **Prevent Duplicate Users**: Return 409 Conflict error when attempting to create a user with a `userName` that already exists.
+- **Handle Email Changes**: Validate that new email addresses are not already in use before updating. Return 409 Conflict if email is taken.
+- **Maintain User Attributes**: Keep user attributes in sync with IdP on every update. Update name, email, and other fields from SCIM request.
+- **Log All Changes**: Audit log all user creation, update, and deactivation operations with timestamps and actor information.
+
+### Group Management Best Practices
+- **Auto-Create Groups**: Create groups automatically when referenced in user updates if they don't exist. This prevents sync failures.
+- **Handle Group Membership**: Support adding and removing users from groups via PATCH operations on both users and groups.
+- **Group Display Names**: Use `displayName` field from IdP when creating groups. Maintain consistency with IdP's group naming.
+- **Nested Groups**: If your application supports nested groups, ensure SCIM operations properly handle group hierarchies.
+- **Group Synchronization**: Sync group memberships from IdP on every user update to ensure consistency.
+
+### Multi-Tenancy Best Practices
+- **Tenant Isolation**: Always filter queries by tenant ID. Never return users or groups from other tenants.
+- **Tenant-Specific Tokens**: Use bearer tokens that include tenant information to identify the tenant making the request.
+- **Tenant Configuration**: Store SCIM configuration per tenant (endpoint URLs, certificates, attribute mappings).
+- **Separate Databases**: Use separate database schemas or tables for each tenant's users and groups.
+- **Audit by Tenant**: Maintain separate audit logs per tenant for compliance and troubleshooting.
+
+### Error Handling Best Practices
+- **SCIM-Compliant Errors**: Return errors in SCIM format with `schemas: ['urn:ietf:params:scim:api:messages:2.0:Error']`.
+- **Descriptive Error Messages**: Provide clear, actionable error messages that help IdP administrators understand and fix issues.
+- **Appropriate HTTP Status Codes**: Use correct HTTP status codes (400 for bad request, 401 for unauthorized, 404 for not found, 409 for conflict, 500 for server errors).
+- **Log All Errors**: Log all SCIM errors with request details, error messages, and timestamps. This is crucial for debugging.
+- **Monitor Error Rates**: Track error rates and set up alerts when error rates exceed thresholds (e.g., >5%).
+
+### Performance Best Practices
+- **Database Indexing**: Index frequently queried fields like `userName`, `tenantId`, and `active` to improve query performance.
+- **Response Time Targets**: Aim for sub-second response times for SCIM operations. IdPs may timeout on slow responses.
+- **Pagination Limits**: Limit maximum number of results per request (e.g., 100-1000) to prevent large queries from impacting performance.
+- **Async Operations**: Consider async processing for bulk operations like group membership updates to prevent blocking.
+- **Caching**: Cache frequently accessed data like tenant configurations and role mappings to reduce database load.
+
+### Testing Best Practices
+- **Test with Real IdPs**: Test your SCIM implementation with actual IdPs (Okta, Azure AD, OneLogin) to ensure compatibility.
+- **Test Edge Cases**: Test scenarios like duplicate users, non-existent groups, invalid tokens, and malformed requests.
+- **Use SCIM Validators**: Use SCIM validation tools like Runscope SCIM Validator to verify compliance.
+- **Automated Testing**: Create automated tests for all SCIM endpoints and run them in CI/CD pipeline.
+- **Load Testing**: Perform load testing to ensure your SCIM endpoints can handle high volumes of requests from large enterprises.
+
+### Monitoring Best Practices
+- **Track Success Rate**: Monitor percentage of successful SCIM requests. Target >99% success rate.
+- **Monitor Sync Status**: Periodically compare your user database with IdP's user list to identify sync discrepancies.
+- **Alert on Failures**: Set up alerts for SCIM failures, especially for critical operations like user creation and deactivation.
+- **Log Response Times**: Track response times for all SCIM operations and investigate slow endpoints.
+- **Monitor Token Usage**: Track token usage patterns and detect unusual activity that may indicate compromised tokens.
+
+## Checklist
+
+### SCIM Implementation Checklist
+- [ ] Choose and install SCIM library for your platform
+- [ ] Implement GET /scim/v2/Users (list users with pagination)
+- [ ] Implement POST /scim/v2/Users (create user)
+- [ ] Implement GET /scim/v2/Users/:id (get user)
+- [ ] Implement PUT /scim/v2/Users/:id (replace user)
+- [ ] Implement PATCH /scim/v2/Users/:id (update user)
+- [ ] Implement DELETE /scim/v2/Users/:id (deactivate user)
+- [ ] Implement GET /scim/v2/Groups (list groups with pagination)
+- [ ] Implement POST /scim/v2/Groups (create group)
+- [ ] Implement GET /scim/v2/Groups/:id (get group)
+- [ ] Implement PATCH /scim/v2/Groups/:id (update group)
+- [ ] Implement DELETE /scim/v2/Groups/:id (delete group)
+- [ ] Implement GET /scim/v2/ServiceProviderConfig
+- [ ] Implement GET /scim/v2/Schemas
+- [ ] Implement GET /scim/v2/ResourceTypes
+- [ ] Implement SCIM filter support
+- [ ] Return SCIM-compliant error responses
+
+### Authentication Checklist
+- [ ] Implement OAuth 2.0 bearer token authentication
+- [ ] Generate unique tokens per tenant
+- [ ] Implement token validation middleware
+- [ ] Store tokens securely (encrypted at rest)
+- [ ] Set up token rotation policy
+- [ ] Return 401 for invalid or expired tokens
+- [ ] Never log tokens in plain text
+
+### User Management Checklist
+- [ ] Implement soft delete (active=false instead of hard delete)
+- [ ] Return 409 Conflict for duplicate userName
+- [ ] Validate email uniqueness before updates
+- [ ] Sync user attributes from SCIM requests
+- [ ] Handle PATCH operations correctly (add, replace, remove)
+- [ ] Log all user creation, update, deactivation
+- [ ] Test user creation with IdP
+
+### Group Management Checklist
+- [ ] Auto-create groups when referenced
+- [ ] Support adding users to groups via PATCH
+- [ ] Support removing users from groups via PATCH
+- [ ] Use displayName from IdP for group names
+- [ ] Handle nested groups if applicable
+- [ ] Sync group memberships from user updates
+- [ ] Test group operations with IdP
+
+### Multi-Tenancy Checklist
+- [ ] Filter all queries by tenant ID
+- [ ] Store tenant information in bearer tokens
+- [ ] Store SCIM configuration per tenant
+- [ ] Use separate database tables/schemas per tenant
+- [ ] Maintain separate audit logs per tenant
+- [ ] Test tenant isolation (verify no cross-tenant data access)
+
+### Error Handling Checklist
+- [ ] Return SCIM-compliant error responses
+- [ ] Use appropriate HTTP status codes
+- [ ] Provide descriptive error messages
+- [ ] Log all errors with request details
+- [ ] Monitor error rates and set up alerts
+- [ ] Test error handling with invalid requests
+
+### Performance Checklist
+- [ ] Index userName, tenantId, active fields
+- [ ] Measure response times for all endpoints
+- [ ] Implement pagination limits
+- [ ] Consider async processing for bulk operations
+- [ ] Cache frequently accessed data
+- [ ] Perform load testing
+
+### Testing Checklist
+- [ ] Test with Okta
+- [ ] Test with Azure AD
+- [ ] Test with OneLogin
+- [ ] Use SCIM validator tool
+- [ ] Create automated tests for all endpoints
+- [ ] Test edge cases (duplicates, non-existent resources)
+- [ ] Perform load testing
+
+### Monitoring Checklist
+- [ ] Track success rate (>99% target)
+- [ ] Monitor response times
+- [ ] Set up alerts for failures
+- [ ] Implement periodic sync checks
+- [ ] Monitor token usage patterns
+- [ ] Create dashboards for SCIM metrics
+
+### Deployment Checklist
+- [ ] Document SCIM API endpoints
+- [ ] Create IdP configuration guide
+- [ ] Set up monitoring dashboards
+- [ ] Configure error alerts
+- [ ] Train support team on SCIM issues
+- [ ] Create incident response process for SCIM failures
+- [ ] Test with production IdP before go-live

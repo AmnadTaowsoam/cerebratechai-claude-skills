@@ -2116,3 +2116,128 @@ def send_templated_email(to_email, from_email, template_name, template_data):
 - [MJML Documentation](https://documentation.mjml.io/)
 - [CAN-SPAM Act](https://www.ftc.gov/tips-advice/business-center/guidance/can-spam-act-compliance-guide-business)
 - [GDPR Email Marketing Guide](https://gdpr.eu/email-marketing/)
+
+## Best Practices
+
+### Email Design
+
+- **Use responsive templates**: Ensure emails render correctly on all devices
+- **Keep subject lines concise**: Under 50 characters for optimal display
+- **Use clear CTAs**: Make action buttons prominent and descriptive
+- **Include alt text**: Ensure accessibility for images
+- **Test across clients**: Verify rendering in Gmail, Outlook, Apple Mail
+
+### Deliverability
+
+- **Configure SPF, DKIM, DMARC**: Essential for email authentication
+- **Warm up IP addresses**: Gradually increase sending volume
+- **Monitor bounce rates**: Address issues promptly
+- **Maintain low complaint rates**: Keep below 0.1%
+- **Use dedicated IPs**: Separate transactional and marketing emails
+
+### List Management
+
+- **Use double opt-in**: Confirm email subscriptions
+- **Clean lists regularly**: Remove invalid emails
+- **Segment your audience**: Target relevant content to segments
+- **Respect unsubscribe requests**: Process immediately
+- **Validate emails before sending**: Check format and deliverability
+
+### Content Strategy
+
+- **Personalize content**: Use recipient names and relevant data
+- **A/B test subject lines**: Optimize for higher open rates
+- **Provide value**: Ensure content is useful to recipients
+- **Include unsubscribe link**: Make it easy to opt out
+- **Add physical address**: Required for CAN-SPAM compliance
+
+### Compliance
+
+- **Follow CAN-SPAM rules**: Include physical address and unsubscribe
+- **Obtain consent**: Get explicit permission for marketing emails
+- **Honor opt-out requests**: Process within 10 business days
+- **GDPR compliance**: Allow data access and deletion
+- **Document consent**: Keep records of opt-in consent
+
+### Technical Implementation
+
+- **Use webhooks for tracking**: Handle opens, clicks, bounces
+- **Implement retry logic**: Handle transient failures
+- **Queue emails for bulk sending**: Respect rate limits
+- **Use templates**: Maintain consistent branding
+- **Monitor API usage**: Track quotas and limits
+
+### Analytics and Optimization
+
+- **Track key metrics**: Monitor open rates, click rates, conversions
+- **Set up alerts**: Notify on unusual activity
+- **Analyze campaign performance**: Identify best practices
+- **Test before sending**: Use preview and test emails
+- **Iterate based on data**: Continuously improve campaigns
+
+### Security
+
+- **Secure API keys**: Use environment variables
+- **Rotate credentials**: Update keys regularly
+- **Use HTTPS**: Encrypt all API communications
+- **Validate webhooks**: Verify sender signatures
+- **Limit access**: Use least-privilege principle
+
+## Checklist
+
+### Setup and Configuration
+- [ ] Choose email provider (SendGrid/Mailchimp/SES)
+- [ ] Configure API credentials
+- [ ] Set up SPF records
+- [ ] Configure DKIM signing
+- [ ] Set up DMARC policy
+
+### Template Design
+- [ ] Create responsive HTML templates
+- [ ] Design subject lines
+- [ ] Add personalization fields
+- [ ] Include unsubscribe links
+- [ ] Add physical address
+- [ ] Test across email clients
+
+### List Management
+- [ ] Implement double opt-in
+- [ ] Set up email validation
+- [ ] Create audience segments
+- [ ] Configure suppression lists
+- [ ] Set up bounce handling
+
+### Compliance
+- [ ] Implement consent tracking
+- [ ] Add unsubscribe mechanism
+- [ ] Include required headers
+- [ ] Document data processing
+- [ ] Set up GDPR compliance
+
+### Sending Strategy
+- [ ] Configure rate limiting
+- [ ] Set up email queue
+- [ ] Implement retry logic
+- [ ] Schedule optimal send times
+- [ ] Configure warmup schedule
+
+### Tracking and Analytics
+- [ ] Enable open tracking
+- [ ] Enable click tracking
+- [ ] Set up webhooks
+- [ ] Configure analytics dashboard
+- [ ] Set up alerting
+
+### Testing
+- [ ] Set up test environment
+- [ ] Test email rendering
+- [ ] Test spam score
+- [ ] Send test emails
+- [ ] Verify link functionality
+
+### Production
+- [ ] Configure production credentials
+- [ ] Set up monitoring
+- [ ] Configure error handling
+- [ ] Set up logging
+- [ ] Document procedures

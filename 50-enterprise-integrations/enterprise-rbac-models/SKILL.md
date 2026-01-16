@@ -1116,3 +1116,101 @@ requirePermission('project:delete')
 - Casbin (policy engine)
 - Oso (authorization library)
 - Custom implementation (recommended)
+
+## Best Practices
+
+### RBAC Design Best Practices
+- **Principle of Least Privilege**: Grant users only the minimum permissions needed to perform their job functions. Start with read-only access and escalate only when necessary.
+- **Role Hierarchy**: Design a clear role hierarchy where higher-level roles inherit permissions from lower-level roles. This reduces duplication and simplifies management.
+- **Permission Granularity**: Use fine-grained permissions (e.g., `project:create`, `project:edit_own`, `project:edit_all`) rather than coarse-grained ones (e.g., `project:manage`).
+- **Separation of Duties**: Implement role separation for critical operations. For example, different users should be able to create invoices and approve invoices to prevent fraud.
+- **Default Deny**: Always deny access by default and explicitly grant permissions. This prevents accidental access from missing permission checks.
+
+### Implementation Best Practices
+- **Database Design**: Use normalized schema with separate tables for users, roles, permissions, and their relationships. This allows for flexible querying and auditing.
+- **Permission Caching**: Cache user permissions after initial lookup to avoid repeated database queries. Invalidate cache when roles or permissions change.
+- **Middleware Pattern**: Implement permission checking as middleware in your API framework. This ensures consistent enforcement across all endpoints.
+- **UI Integration**: Create reusable UI components (e.g., `<CanAccess>`) that conditionally render based on user permissions. This provides a better user experience.
+- **Audit Logging**: Log all permission changes and access attempts. This is essential for security audits and compliance.
+
+### Multi-Level RBAC Best Practices
+- **Organization-Level Roles**: Define org-wide roles (Owner, Admin, Member) for administrative functions like billing and user management.
+- **Project-Level Roles**: Define project-specific roles (Admin, Member, Viewer) for resource access within projects.
+- **Resource-Level Permissions**: Implement resource ownership checks where users can always access resources they created, regardless of their role.
+- **Permission Inheritance**: Ensure that org admins automatically have admin access to all projects, and project members can view all project resources.
+
+### SSO Integration Best Practices
+- **Group-to-Role Mapping**: Map SSO groups to application roles automatically. This allows IT admins to control access through their IdP.
+- **JIT Provisioning**: Create users on first SSO login with default roles based on their group membership.
+- **Role Synchronization**: Sync roles from SSO on each login to ensure users always have the correct permissions.
+- **Override Capability**: Allow manual role overrides for special cases where SSO-assigned roles need adjustment.
+
+### Testing Best Practices
+- **Test Each Role**: Write tests for each role to verify they have expected permissions and are denied access to unauthorized resources.
+- **Test Inheritance**: Verify that role inheritance works correctly and that higher-level roles have all permissions of lower-level roles.
+- **Test API Endpoints**: Test that API endpoints properly enforce permissions and return appropriate error codes (403 Forbidden) for unauthorized access.
+- **Test UI Components**: Verify that UI elements are shown/hidden based on user permissions.
+- **Test Edge Cases**: Test resource ownership, time-based access, and approval-based access flows.
+
+### Security Best Practices
+- **Never Trust Client-Side**: Always validate permissions on the server-side, even if UI hides certain actions.
+- **Secure Session Management**: Use secure, HTTP-only cookies with SameSite protection to prevent session hijacking.
+- **Rate Limiting**: Implement rate limiting on permission checks to prevent brute force attacks.
+- **Regular Access Reviews**: Conduct quarterly reviews of who has what permissions and revoke access that is no longer needed.
+- **Log Suspicious Activity**: Alert on repeated permission denials, access from unusual locations, or access attempts outside business hours.
+
+## Checklist
+
+### RBAC Design Checklist
+- [ ] Define user types and their access requirements
+- [ ] Create a clear role hierarchy with inheritance
+- [ ] Design fine-grained permissions using `resource:action` format
+- [ ] Implement separation of duties for critical operations
+- [ ] Apply principle of least privilege for all roles
+- [ ] Document all roles and their permissions
+
+### Implementation Checklist
+- [ ] Design normalized database schema for users, roles, permissions
+- [ ] Implement permission checking function with caching
+- [ ] Create middleware for API permission enforcement
+- [ ] Build UI components for conditional rendering
+- [ ] Implement audit logging for permission changes
+- [ ] Add error handling for unauthorized access (403)
+
+### Multi-Level RBAC Checklist
+- [ ] Define organization-level roles (Owner, Admin, Member)
+- [ ] Define project-level roles (Admin, Member, Viewer)
+- [ ] Implement resource ownership checks
+- [ ] Configure permission inheritance between levels
+- [ ] Test cross-level access permissions
+
+### SSO Integration Checklist
+- [ ] Configure SSO group-to-role mapping
+- [ ] Implement JIT provisioning for new users
+- [ ] Set up role synchronization on login
+- [ ] Allow manual role overrides if needed
+- [ ] Test SSO login with different group memberships
+
+### Testing Checklist
+- [ ] Write tests for each role's permissions
+- [ ] Test role inheritance behavior
+- [ ] Test API endpoint permission enforcement
+- [ ] Test UI component visibility based on permissions
+- [ ] Test edge cases (resource owner, time-based access)
+- [ ] Run tests in CI/CD pipeline
+
+### Security Checklist
+- [ ] Validate all permissions on server-side
+- [ ] Use secure, HTTP-only session cookies
+- [ ] Implement rate limiting on permission checks
+- [ ] Set up regular access review process
+- [ ] Configure alerts for suspicious activity
+- [ ] Review and update permissions quarterly
+
+### Deployment Checklist
+- [ ] Document RBAC model for users
+- [ ] Create admin guide for role management
+- [ ] Set up monitoring for permission errors
+- [ ] Configure backup and restore for role data
+- [ ] Train support team on common RBAC issues
+- [ ] Create incident response process for permission issues

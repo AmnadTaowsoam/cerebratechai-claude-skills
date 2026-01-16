@@ -1,0 +1,580 @@
+# 🤖 คู่มือตั้งค่าสำหรับ AI Coding Assistants ทุกตัว
+
+คู่มือครบวงจรสำหรับการใช้ CerebraTechAI Skills กับ AI coding platforms ต่างๆ
+
+**รองรับ:**
+- 🟣 **Claude Desktop** (ผ่าน MCP)
+- 🔵 **Claude Code** (VS Code extension)
+- 🟢 **GitHub Codex** (ผ่าน GitHub Copilot)
+- 🟠 **Roo Code** (Cursor IDE)
+- 🔴 **Antigravity** (Google DeepMind)
+
+---
+
+## 📋 สารบัญ
+
+1. [Claude Desktop (MCP)](#1-claude-desktop-mcp)
+2. [Claude Code (VS Code)](#2-claude-code-vs-code)
+3. [GitHub Codex (Copilot)](#3-github-codex-copilot)
+4. [Roo Code (Cursor)](#4-roo-code-cursor)
+5. [Antigravity (Google DeepMind)](#5-antigravity-google-deepmind)
+6. [ตารางเปรียบเทียบ](#ตารางเปรียบเทียบ)
+
+---
+
+## 1. 🟣 Claude Desktop (MCP)
+
+### ภาพรวม
+ใช้ Model Context Protocol (MCP) เชื่อมต่อ Claude Desktop กับ GitHub repository นี้โดยตรง
+
+### สิ่งที่ต้องเตรียม
+- Claude Desktop ติดตั้งแล้ว
+- Node.js 18+
+- GitHub Personal Access Token
+
+### ขั้นตอนการตั้งค่า
+
+#### ขั้นที่ 1: สร้าง GitHub Token
+1. ไปที่: https://github.com/settings/tokens
+2. สร้าง **Fine-grained token**:
+   - ชื่อ: `Claude MCP - Skills`
+   - Repository: `cerebratechai-claude-skills`
+   - สิทธิ์: `Contents: Read-only`
+3. คัดลอก token (ขึ้นต้นด้วย `github_pat_`)
+
+#### ขั้นที่ 2: ตั้งค่า Claude Desktop
+
+**Windows:**
+```powershell
+notepad "$env:APPDATA\Claude\claude_desktop_config.json"
+```
+
+**macOS:**
+```bash
+nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
+```
+
+**Linux:**
+```bash
+nano ~/.config/Claude/claude_desktop_config.json
+```
+
+**โค้ดตั้งค่า:**
+```json
+{
+  "mcpServers": {
+    "cerebratechai-skills": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
+        "GITHUB_OWNER": "AmnadTaowsoam",
+        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_BRANCH": "main"
+      }
+    }
+  }
+}
+```
+
+#### ขั้นที่ 3: Restart Claude Desktop
+
+**Windows:** ปิดจาก System Tray → เปิดใหม่  
+**macOS:** `killall Claude && open -a Claude`  
+**Linux:** `pkill -f claude && claude &`
+
+### วิธีใช้งาน
+```
+Using skills from cerebratechai-skills:
+- typescript-standards
+- nextjs-patterns
+
+Create a Next.js API endpoint
+```
+
+### เอกสารเพิ่มเติม
+- 🇹🇭 [SETUP_TH.md](./SETUP_TH.md) - คู่มือภาษาไทยฉบับเต็ม
+- ⚡ [QUICKSTART_MCP.md](./QUICKSTART_MCP.md) - ตั้งค่าใน 5 นาที
+
+---
+
+## 2. 🔵 Claude Code (VS Code)
+
+### ภาพรวม
+Claude Code extension สำหรับ VS Code ใช้การตั้งค่า MCP เดียวกับ Claude Desktop
+
+### สิ่งที่ต้องเตรียม
+- VS Code ติดตั้งแล้ว
+- Claude Code extension
+- ตั้งค่าเหมือน Claude Desktop
+
+### ขั้นตอนการตั้งค่า
+
+#### ขั้นที่ 1: ติดตั้ง Extension
+1. เปิด VS Code
+2. กด `Cmd+Shift+X` (macOS) หรือ `Ctrl+Shift+X` (Windows/Linux)
+3. ค้นหา: **"Claude Code"**
+4. คลิก **Install**
+
+#### ขั้นที่ 2: การตั้งค่า
+**ข่าวดี!** Claude Code ใช้**ไฟล์ config เดียวกัน**กับ Claude Desktop
+
+ถ้าคุณตั้งค่า Claude Desktop แล้ว (ส่วนที่ 1) ก็เสร็จแล้ว! ✅
+
+ถ้ายัง ให้ทำตามขั้นตอนเดียวกับส่วนที่ 1
+
+#### ขั้นที่ 3: Reload VS Code
+```
+Cmd+Shift+P (หรือ Ctrl+Shift+P)
+→ "Developer: Reload Window"
+```
+
+### วิธีใช้งาน
+
+**เปิด Claude Code:**
+- `Cmd+Shift+/` (macOS)
+- `Ctrl+Shift+/` (Windows/Linux)
+
+**ตัวอย่าง:**
+```
+Using cerebratechai-skills:
+- prisma-guide
+- typescript-standards
+
+Create a Prisma schema for a blog
+```
+
+---
+
+## 3. 🟢 GitHub Codex (Copilot)
+
+### ภาพรวม
+ใช้ repository นี้เป็น context สำหรับ GitHub Copilot ผ่าน workspace indexing
+
+### สิ่งที่ต้องเตรียม
+- GitHub Copilot subscription
+- VS Code พร้อม Copilot extension
+- Clone repository มาไว้ local
+
+### ขั้นตอนการตั้งค่า
+
+#### ขั้นที่ 1: Clone Repository
+```bash
+cd ~/projects
+git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+cd cerebratechai-claude-skills
+```
+
+#### ขั้นที่ 2: เปิดใน VS Code
+```bash
+code .
+```
+
+#### ขั้นที่ 3: ตั้งค่า Copilot Workspace
+
+สร้างไฟล์ `.vscode/settings.json`:
+```json
+{
+  "github.copilot.advanced": {
+    "contextFiles": [
+      "**/*.md",
+      "**/SKILL.md"
+    ]
+  },
+  "github.copilot.enable": {
+    "*": true,
+    "markdown": true
+  }
+}
+```
+
+#### ขั้นที่ 4: Index Skills
+
+สร้างไฟล์ `.copilot-instructions.md` ใน root:
+```markdown
+# Copilot Instructions
+
+## Context
+Repository นี้มี coding skills และ best practices สำหรับ production
+
+## ตำแหน่ง Skills
+Skills จัดเรียงในโฟลเดอร์:
+- 00-meta-skills/ - แนวทางสถาปัตยกรรม
+- 01-foundations/ - มาตรฐานพื้นฐาน
+- 02-frontend/ - Frontend patterns
+- 03-backend-api/ - Backend patterns
+- [ฯลฯ...]
+
+## การใช้งาน
+เมื่อสร้างโค้ด ให้อ้างอิง skills จากโฟลเดอร์ที่เหมาะสม
+ปฏิบัติตาม patterns และ best practices ที่กำหนดในไฟล์ SKILL.md
+
+## ตัวอย่าง
+สำหรับ TypeScript: 01-foundations/typescript-standards/SKILL.md
+สำหรับ Next.js: 02-frontend/nextjs-patterns/SKILL.md
+```
+
+### วิธีใช้งาน
+
+**วิธีที่ 1: ใช้ Comment**
+```typescript
+// ปฏิบัติตาม typescript-standards และ nextjs-patterns skills
+// สร้าง Next.js API route สำหรับ user authentication
+
+// Copilot จะแนะนำโค้ดตาม skills
+```
+
+**วิธีที่ 2: Copilot Chat**
+```
+@workspace ใช้ typescript-standards skill
+สร้าง type-safe API client
+```
+
+### เคล็ดลับ
+- เปิด repository ไว้ใน workspace
+- อ้างอิงไฟล์ skill เฉพาะใน comments
+- ใช้ `@workspace` ใน Copilot Chat
+
+---
+
+## 4. 🟠 Roo Code (Cursor)
+
+### ภาพรวม
+Cursor IDE (Roo Code) สามารถ index repository นี้สำหรับ AI-assisted coding
+
+### สิ่งที่ต้องเตรียม
+- Cursor IDE ติดตั้งแล้ว
+- Clone repository มาไว้ local
+
+### ขั้นตอนการตั้งค่า
+
+#### ขั้นที่ 1: Clone Repository
+```bash
+cd ~/projects
+git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+```
+
+#### ขั้นที่ 2: เปิดใน Cursor
+```bash
+cursor cerebratechai-claude-skills
+```
+
+หรือ: File → Open Folder → เลือก `cerebratechai-claude-skills`
+
+#### ขั้นที่ 3: ตั้งค่า Cursor Rules
+
+สร้างไฟล์ `.cursorrules` ใน root:
+```markdown
+# CerebraTechAI Skills - Cursor Rules
+
+## Context
+Repository นี้มี 473+ production-ready coding skills ใน 73 หมวดหมู่
+
+## โครงสร้าง Skill
+แต่ละ skill อยู่ในโฟลเดอร์พร้อม SKILL.md ที่มี:
+- Best practices
+- ตัวอย่างโค้ด
+- Anti-patterns
+- กลยุทธ์การทดสอบ
+
+## แนวทางการใช้งาน
+
+### เมื่อเขียน TypeScript:
+- อ้างอิง: 01-foundations/typescript-standards/SKILL.md
+- ใช้ strict typing
+- ปฏิบัติตาม naming conventions
+
+### เมื่อเขียน Next.js:
+- อ้างอิง: 02-frontend/nextjs-patterns/SKILL.md
+- ใช้ App Router patterns
+- ปฏิบัติตาม file structure conventions
+
+### เมื่อเขียน APIs:
+- อ้างอิง: 03-backend-api/nodejs-api/SKILL.md หรือ fastapi-patterns/SKILL.md
+- ใช้ error handling ที่เหมาะสม
+- ใช้ validation patterns
+
+### เมื่อทำงานกับ databases:
+- อ้างอิง: 04-database/prisma-guide/SKILL.md
+- ปฏิบัติตาม schema best practices
+- ใช้ migrations ที่เหมาะสม
+
+## กฎทั่วไป
+1. ตรวจสอบไฟล์ skill ที่เกี่ยวข้องก่อนสร้างโค้ด
+2. ปฏิบัติตาม patterns ที่กำหนดใน skills
+3. ใช้ security best practices จาก skills
+4. ใช้ testing patterns จาก 16-testing/ skills
+
+## หมวดหมู่ Skills
+- 00-meta-skills: สถาปัตยกรรม & การตัดสินใจ
+- 01-foundations: มาตรฐานพื้นฐาน (TypeScript, Python, Git)
+- 02-frontend: React, Next.js, Tailwind
+- 03-backend-api: Node.js, FastAPI, Express
+- 04-database: Prisma, MongoDB, Redis
+- 05-ai-ml-core: PyTorch, YOLO, training
+- 06-ai-ml-production: LLM, RAG, embeddings
+- [... ดูรายการเต็มใน README.md]
+```
+
+#### ขั้นที่ 4: Index Repository
+
+1. เปิด Cursor Settings (`Cmd+,` หรือ `Ctrl+,`)
+2. ไปที่ **Features** → **Codebase Indexing**
+3. เปิด **"Index entire workspace"**
+4. คลิก **"Reindex"**
+
+### วิธีใช้งาน
+
+**วิธีที่ 1: Cmd+K (Inline Edit)**
+```typescript
+// เลือกโค้ดหรือวางเคอร์เซอร์
+// กด Cmd+K (หรือ Ctrl+K)
+// พิมพ์: "Refactor ตาม typescript-standards skill"
+```
+
+**วิธีที่ 2: Cmd+L (Chat)**
+```
+ใช้ skills จาก repository นี้:
+- typescript-standards
+- nextjs-patterns
+- jwt-authentication
+
+สร้างระบบ auth สำหรับ Next.js
+```
+
+**วิธีที่ 3: @ Mentions**
+```
+@cerebratechai-claude-skills/01-foundations/typescript-standards/SKILL.md
+
+ใช้มาตรฐานเหล่านี้กับไฟล์ปัจจุบัน
+```
+
+### เคล็ดลับ
+- ใช้ `@Docs` เพื่ออ้างอิงไฟล์ skill
+- เปิด skills repo ไว้ใน workspace
+- ใช้ Cmd+K สำหรับ refactoring เร็ว
+- ใช้ Cmd+L สำหรับงานซับซ้อน
+
+---
+
+## 5. 🔴 Antigravity (Google DeepMind)
+
+### ภาพรวม
+Antigravity สามารถเข้าถึง repository นี้ผ่าน MCP หรือการเข้าถึงไฟล์โดยตรง
+
+### สิ่งที่ต้องเตรียม
+- Antigravity ติดตั้งแล้ว
+- Node.js 18+ (สำหรับ MCP)
+- สิทธิ์เข้าถึง repository
+
+### วิธีที่ 1: MCP (แนะนำ)
+
+#### ขั้นที่ 1: สร้าง GitHub Token
+เหมือนกับ Claude Desktop (ส่วนที่ 1, ขั้นที่ 1)
+
+#### ขั้นที่ 2: ตั้งค่า Antigravity
+
+**Windows:**
+```powershell
+notepad "$env:APPDATA\Antigravity\config.json"
+```
+
+**macOS:**
+```bash
+nano ~/Library/Application\ Support/Antigravity/config.json
+```
+
+**Linux:**
+```bash
+nano ~/.config/Antigravity/config.json
+```
+
+**โค้ดตั้งค่า:**
+```json
+{
+  "mcpServers": {
+    "cerebratechai-skills": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
+        "GITHUB_OWNER": "AmnadTaowsoam",
+        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_BRANCH": "main"
+      }
+    }
+  }
+}
+```
+
+#### ขั้นที่ 3: Restart Antigravity
+
+### วิธีที่ 2: ไฟล์ Local
+
+#### ขั้นที่ 1: Clone Repository
+```bash
+cd ~/projects
+git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+```
+
+#### ขั้นที่ 2: ตั้งค่า Skills Path
+
+สร้างไฟล์ `~/.antigravity/skills.json`:
+```json
+{
+  "skillsRepositories": [
+    {
+      "name": "cerebratechai-skills",
+      "path": "/Users/YOUR_USERNAME/projects/cerebratechai-claude-skills",
+      "enabled": true
+    }
+  ]
+}
+```
+
+แทนที่ `/Users/YOUR_USERNAME/projects/` ด้วย path จริงของคุณ
+
+### วิธีใช้งาน
+
+**วิธีที่ 1: อ้างอิงโดยตรง**
+```
+Using skills from cerebratechai-skills:
+- typescript-standards
+- nextjs-patterns
+- prisma-guide
+
+Create a Next.js app with Prisma
+```
+
+**วิธีที่ 2: เรียกใช้ Skill**
+```
+@skill typescript-standards
+@skill nextjs-patterns
+
+สร้าง type-safe API client
+```
+
+**วิธีที่ 3: โหลด Context**
+```
+Load context from cerebratechai-skills:
+- 01-foundations/
+- 02-frontend/
+- 03-backend-api/
+
+ช่วยสร้าง full-stack app
+```
+
+---
+
+## 📊 ตารางเปรียบเทียบ
+
+| คุณสมบัติ | Claude Desktop | Claude Code | GitHub Codex | Roo Code | Antigravity |
+|---------|---------------|-------------|--------------|----------|-------------|
+| **ความยากในการตั้งค่า** | ⭐⭐ ง่าย | ⭐ ง่ายมาก | ⭐⭐⭐ ปานกลาง | ⭐⭐ ง่าย | ⭐⭐ ง่าย |
+| **รองรับ MCP** | ✅ ใช่ | ✅ ใช่ | ❌ ไม่ | ❌ ไม่ | ✅ ใช่ |
+| **Auto-sync** | ✅ ใช่ | ✅ ใช่ | ⚠️ Manual | ⚠️ Manual | ✅ ใช่ |
+| **โหมด Offline** | ❌ ไม่ | ❌ ไม่ | ✅ ใช่ | ✅ ใช่ | ⚠️ บางส่วน |
+| **รวมกับ IDE** | ❌ ไม่ | ✅ VS Code | ✅ VS Code | ✅ Cursor | ✅ หลาย IDE |
+| **Skill Indexing** | ✅ อัตโนมัติ | ✅ อัตโนมัติ | ⚠️ Manual | ✅ อัตโนมัติ | ✅ อัตโนมัติ |
+| **Context Window** | ใหญ่ | ใหญ่ | ปานกลาง | ใหญ่ | ใหญ่มาก |
+| **เหมาะสำหรับ** | ใช้แยก | VS Code | ผู้ใช้ GitHub | ผู้ใช้ Cursor | หลาย IDE |
+
+### สัญลักษณ์
+- ✅ รองรับเต็มรูปแบบ
+- ⚠️ รองรับบางส่วน / ตั้งค่าเอง
+- ❌ ไม่รองรับ
+- ⭐ ความยาก (1-5 ดาว)
+
+---
+
+## 🎯 คำแนะนำ
+
+### เลือก Claude Desktop/Code ถ้า:
+- ✅ ต้องการ sync อัตโนมัติจาก GitHub
+- ✅ ชอบใช้ MCP protocol
+- ✅ ใช้ VS Code
+- ✅ ต้องการตั้งค่าง่ายที่สุด
+
+### เลือก GitHub Codex ถ้า:
+- ✅ ใช้ GitHub Copilot อยู่แล้ว
+- ✅ ทำงานใน VS Code เป็นหลัก
+- ✅ ต้องการ inline suggestions
+- ✅ คุ้นเคยกับ workspace indexing
+
+### เลือก Roo Code (Cursor) ถ้า:
+- ✅ ใช้ Cursor IDE
+- ✅ ต้องการ AI editing ที่ทรงพลัง
+- ✅ ชอบใช้ Cmd+K inline edits
+- ✅ ต้องการ AI ที่เข้าใจ codebase
+
+### เลือก Antigravity ถ้า:
+- ✅ ใช้หลาย IDE
+- ✅ ต้องการความยืดหยุ่นสูงสุด
+- ✅ ต้องการ context window ใหญ่มาก
+- ✅ ต้องการความสามารถ AI ขั้นสูง
+
+---
+
+## 🔄 ตั้งค่าหลาย Platform
+
+คุณสามารถใช้**หลาย platforms พร้อมกัน**ได้!
+
+### แนะนำให้ใช้ร่วมกัน:
+1. **Claude Desktop** (MCP) - สำหรับถามคำถามทั่วไปและวางแผน
+2. **Claude Code** (VS Code) - สำหรับเขียนโค้ดใน VS Code
+3. **Roo Code** (Cursor) - สำหรับแก้ไขด้วย AI ใน Cursor
+
+ทั้งสามตัวสามารถใช้ GitHub repository เดียวกันและ sync กันได้!
+
+### ลำดับการตั้งค่า:
+1. ตั้งค่า Claude Desktop (MCP) ก่อน
+2. Claude Code ใช้งานได้ทันที (config เดียวกัน)
+3. Clone repo มาไว้ local สำหรับ Roo Code/Codex
+4. ตั้งค่า Antigravity ถ้าต้องการ
+
+---
+
+## 📚 แหล่งข้อมูลเพิ่มเติม
+
+### เอกสาร
+- 🇹🇭 [SETUP_TH.md](./SETUP_TH.md) - คู่มือภาษาไทยฉบับเต็ม
+- 📖 [GITHUB_MCP_SETUP.md](./GITHUB_MCP_SETUP.md) - คู่มือ MCP ภาษาอังกฤษ
+- ⚡ [QUICKSTART_MCP.md](./QUICKSTART_MCP.md) - ตั้งค่า 5 นาที
+- ✅ [MCP_DEPLOYMENT_CHECKLIST.md](./MCP_DEPLOYMENT_CHECKLIST.md) - Checklist
+
+### Skills
+- 📋 [README.md](./README.md) - ภาพรวม 473+ skills
+- 📑 [SKILL_INDEX.md](./SKILL_INDEX.md) - ดัชนี skill ทั้งหมด
+
+### ชุมชน
+- 🐛 [Issues](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills/issues)
+- 💬 [Discussions](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills/discussions)
+- 🤝 [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+---
+
+## 🆘 แก้ปัญหา
+
+### ปัญหาที่พบบ่อย
+
+#### MCP เชื่อมต่อไม่ได้ (Claude/Antigravity)
+- ตรวจสอบ Node.js 18+: `node --version`
+- ตรวจสอบ token ยังไม่หมดอายุ
+- ตรวจสอบ JSON syntax
+- Restart แอปพลิเคชัน
+
+#### Skills ไม่ถูก Index (Codex/Roo Code)
+- ตรวจสอบ repository อยู่ใน workspace
+- Index ใหม่ด้วยตนเอง
+- ตรวจสอบ `.vscode/settings.json` หรือ `.cursorrules`
+- Restart IDE
+
+#### Skills ไม่ทันสมัย
+- **ผู้ใช้ MCP**: Sync อัตโนมัติ (ไม่ต้องทำอะไร)
+- **ผู้ใช้ Local**: `git pull` เพื่ออัปเดต
+
+---
+
+**อัปเดตล่าสุด**: 16 มกราคม 2026  
+**Repository**: https://github.com/AmnadTaowsoam/cerebratechai-claude-skills  
+**License**: MIT
