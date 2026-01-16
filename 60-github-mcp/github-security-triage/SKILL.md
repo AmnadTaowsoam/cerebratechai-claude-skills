@@ -1,6 +1,6 @@
 ---
 name: github-security-triage
-description: Triage GitHub security alerts via GitHub MCP: assess severity, validate exposure, coordinate fixes, and close Dependabot/CodeQL/secret scanning alerts with documented rationale.
+description: "Triage GitHub security alerts via GitHub MCP: assess severity, validate exposure, coordinate fixes, and close Dependabot/CodeQL/secret scanning alerts with documented rationale."
 ---
 
 # GitHub Security Triage

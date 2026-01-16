@@ -1,6 +1,6 @@
 ---
 name: github-repo-navigation
-description: Navigate GitHub repositories via GitHub MCP: locate files, search code, read directory trees, summarize repo structure, map questions to paths or owners, and fetch file contents for analysis.
+description: "Navigate GitHub repositories via GitHub MCP: locate files, search code, read directory trees, summarize repo structure, map questions to paths or owners, and fetch file contents for analysis."
 ---
 
 # GitHub Repo Navigation

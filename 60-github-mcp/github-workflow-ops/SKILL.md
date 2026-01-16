@@ -1,6 +1,6 @@
 ---
 name: github-workflow-ops
-description: Operate GitHub Actions via GitHub MCP: inspect workflow runs, diagnose failures, fetch logs and annotations, re-run jobs, and summarize root causes.
+description: "Operate GitHub Actions via GitHub MCP: inspect workflow runs, diagnose failures, fetch logs and annotations, re-run jobs, and summarize root causes."
 ---
 
 # GitHub Workflow Ops

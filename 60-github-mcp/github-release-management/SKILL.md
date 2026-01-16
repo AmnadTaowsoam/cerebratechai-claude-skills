@@ -1,6 +1,6 @@
 ---
 name: github-release-management
-description: Manage GitHub releases via GitHub MCP: create tags and releases, draft release notes, validate artifacts, and coordinate changelog updates.
+description: "Manage GitHub releases via GitHub MCP: create tags and releases, draft release notes, validate artifacts, and coordinate changelog updates."
 ---
 
 # GitHub Release Management

@@ -1,6 +1,6 @@
 ---
 name: github-code-review
-description: Review GitHub pull requests via GitHub MCP: analyze diffs, identify risks and regressions, verify tests, and provide actionable review feedback with references to files and lines.
+description: "Review GitHub pull requests via GitHub MCP: analyze diffs, identify risks and regressions, verify tests, and provide actionable review feedback with references to files and lines."
 ---
 
 # GitHub Code Review

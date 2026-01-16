@@ -1,6 +1,6 @@
 ---
 name: github-issue-triage
-description: Triage GitHub issues via GitHub MCP: label, assign, detect duplicates, request repro info, prioritize severity, and close or route issues with clear rationale.
+description: "Triage GitHub issues via GitHub MCP: label, assign, detect duplicates, request repro info, prioritize severity, and close or route issues with clear rationale."
 ---
 
 # GitHub Issue Triage

@@ -1,6 +1,6 @@
 ---
 name: github-repo-governance
-description: Configure and audit GitHub repository governance via GitHub MCP: branch protection, rulesets, CODEOWNERS, permissions, and repository settings to enforce engineering policy.
+description: "Configure and audit GitHub repository governance via GitHub MCP: branch protection, rulesets, CODEOWNERS, permissions, and repository settings to enforce engineering policy."
 ---
 
 # GitHub Repo Governance
