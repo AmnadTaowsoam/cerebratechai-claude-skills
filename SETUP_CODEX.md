@@ -1,31 +1,106 @@
-# 🟢 GitHub Codex (Copilot) Setup Guide
+# 🟢 OpenAI Codex & GitHub Copilot Setup Guide
 
-Complete guide for using CerebraTechAI Skills with GitHub Copilot
+Complete guide for using CerebraTechAI Skills with OpenAI Codex and GitHub Copilot
 
 ---
 
 ## 📋 Overview
 
-GitHub Copilot can use this skills repository as context through workspace indexing and custom instructions.
+**Two ways to use skills:**
+1. **OpenAI Codex** - Uses MCP (Model Context Protocol) for direct GitHub integration ⭐ **Recommended**
+2. **GitHub Copilot** - Uses workspace indexing and custom instructions
 
 ### What You'll Get
 - ✅ Skills-aware code suggestions
 - ✅ Context from 473+ production-ready skills
 - ✅ Best practices in inline suggestions
-- ✅ Works offline once indexed
+- ✅ Auto-sync (Codex MCP) or Manual sync (Copilot)
 
 ---
 
-## 🔧 Prerequisites
+## 🎯 Method 1: OpenAI Codex with MCP (Recommended)
+
+### Prerequisites
+- ✅ OpenAI Codex installed
+- ✅ Node.js 18+
+- ✅ GitHub Personal Access Token
+
+### Setup Steps
+
+#### Step 1: Create GitHub Token
+
+1. Go to: https://github.com/settings/tokens
+2. Create **Fine-grained token**:
+   - Name: `Codex MCP - Skills`
+   - Repository: `cerebratechai-claude-skills`
+   - Permissions: `Contents: Read-only`
+3. Copy token (starts with `github_pat_`)
+
+#### Step 2: Configure Codex MCP
+
+**Option A: Using CLI (Easiest)**
+
+```bash
+codex mcp add cerebratechai-skills \
+  --env GITHUB_PERSONAL_ACCESS_TOKEN=YOUR_TOKEN_HERE \
+  --env GITHUB_OWNER=AmnadTaowsoam \
+  --env GITHUB_REPO=cerebratechai-claude-skills \
+  --env GITHUB_BRANCH=main \
+  -- npx -y @modelcontextprotocol/server-github
+```
+
+**Option B: Edit config.toml**
+
+Location: `~/.codex/config.toml`
+
+```toml
+[mcp_servers.cerebratechai-skills]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-github"]
+
+[mcp_servers.cerebratechai-skills.env]
+GITHUB_PERSONAL_ACCESS_TOKEN = "YOUR_TOKEN_HERE"
+GITHUB_OWNER = "AmnadTaowsoam"
+GITHUB_REPO = "cerebratechai-claude-skills"
+GITHUB_BRANCH = "main"
+```
+
+#### Step 3: Verify Connection
+
+```bash
+# In Codex TUI
+codex
+
+# Check MCP servers
+/mcp
+```
+
+You should see `cerebratechai-skills` in the list.
+
+### Usage with Codex MCP
+
+```
+Using skills from cerebratechai-skills:
+- typescript-standards
+- nextjs-patterns
+
+Create a Next.js API endpoint
+```
+
+### Benefits of Codex MCP
+- ✅ **Auto-sync**: Always up-to-date from GitHub
+- ✅ **No cloning**: Works without local repository
+- ✅ **Easy setup**: One command configuration
+- ✅ **Shared config**: Works in CLI and IDE extension
+
+---
+
+## 🔧 Method 2: GitHub Copilot with Workspace Indexing
 
 - ✅ GitHub Copilot subscription (Individual or Business)
 - ✅ VS Code installed
 - ✅ GitHub Copilot extension installed
 - ✅ Repository cloned locally
-
----
-
-## 🚀 Setup Steps
 
 ### Step 1: Install GitHub Copilot
 
@@ -344,16 +419,22 @@ git pull origin main
 
 ---
 
-## 🆚 Comparison with Other Methods
+## 🆚 Comparison: Codex MCP vs Copilot vs Other Methods
 
-| Feature | Copilot | MCP (Claude/Cursor) |
-|---------|---------|---------------------|
-| Setup | Medium | Easy |
-| Auto-sync | Manual (git pull) | Automatic |
-| Offline | ✅ Yes | ❌ No (MCP) |
-| Inline suggestions | ✅ Yes | ⚠️ Limited |
-| Chat integration | ✅ Yes | ✅ Yes |
-| Context awareness | ⚠️ Workspace only | ✅ Always |
+| Feature | Codex MCP | Copilot | Claude/Cursor MCP |
+|---------|-----------|---------|-------------------|
+| Setup | ⭐⭐ Easy | ⭐⭐⭐ Medium | ⭐⭐ Easy |
+| Auto-sync | ✅ Yes | ⚠️ Manual (git pull) | ✅ Yes |
+| Offline | ❌ No | ✅ Yes | ❌ No |
+| Inline suggestions | ✅ Yes | ✅ Yes | ⚠️ Limited |
+| Chat integration | ✅ Yes | ✅ Yes | ✅ Yes |
+| Context awareness | ✅ Always | ⚠️ Workspace only | ✅ Always |
+| Requires cloning | ❌ No | ✅ Yes | ❌ No |
+
+### Recommendation
+- **Use Codex MCP** if you have OpenAI Codex (easiest, auto-sync)
+- **Use Copilot** if you only have GitHub Copilot subscription
+- **Use Claude/Cursor MCP** for non-coding AI assistance
 
 ---
 

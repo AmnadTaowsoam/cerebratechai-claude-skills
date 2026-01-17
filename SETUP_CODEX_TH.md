@@ -1,31 +1,101 @@
-# 🟢 คู่มือตั้งค่า GitHub Codex (Copilot)
+# 🟢 คู่มือตั้งค่า OpenAI Codex & GitHub Copilot
 
-คู่มือครบวงจรสำหรับการใช้ CerebraTechAI Skills กับ GitHub Copilot
+คู่มือครบวงจรสำหรับการใช้ CerebraTechAI Skills กับ OpenAI Codex และ GitHub Copilot
 
 ---
 
 ## 📋 ภาพรวม
 
-GitHub Copilot สามารถใช้ skills repository นี้เป็น context ผ่าน workspace indexing และ custom instructions
+**สองวิธีในการใช้ skills:**
+1. **OpenAI Codex** - ใช้ MCP (Model Context Protocol) เชื่อมต่อ GitHub โดยตรง ⭐ **แนะนำ**
+2. **GitHub Copilot** - ใช้ workspace indexing และ custom instructions
 
 ### สิ่งที่คุณจะได้รับ
 - ✅ Code suggestions ที่รู้จัก skills
 - ✅ Context จาก 473+ production-ready skills
 - ✅ Best practices ใน inline suggestions
-- ✅ ใช้งาน offline ได้หลัง index แล้ว
+- ✅ Auto-sync (Codex MCP) หรือ Manual sync (Copilot)
 
 ---
 
-## 🔧 สิ่งที่ต้องเตรียม
+## 🎯 วิธีที่ 1: OpenAI Codex กับ MCP (แนะนำ)
 
-- ✅ GitHub Copilot subscription (Individual หรือ Business)
-- ✅ VS Code ติดตั้งแล้ว
-- ✅ GitHub Copilot extension ติดตั้งแล้ว
-- ✅ Clone repository มาไว้ local
+### สิ่งที่ต้องเตรียม
+- ✅ OpenAI Codex ติดตั้งแล้ว
+- ✅ Node.js 18+
+- ✅ GitHub Personal Access Token
+
+### ขั้นตอนการตั้งค่า
+
+#### ขั้นที่ 1: สร้าง GitHub Token
+
+1. ไปที่: https://github.com/settings/tokens
+2. สร้าง **Fine-grained token**:
+   - ชื่อ: `Codex MCP - Skills`
+   - Repository: `cerebratechai-claude-skills`
+   - สิทธิ์: `Contents: Read-only`
+3. คัดลอก token (ขึ้นต้นด้วย `github_pat_`)
+
+#### ขั้นที่ 2: ตั้งค่า Codex MCP
+
+**ตัวเลือก A: ใช้ CLI (ง่ายที่สุด)**
+
+```bash
+codex mcp add cerebratechai-skills \
+  --env GITHUB_PERSONAL_ACCESS_TOKEN=YOUR_TOKEN_HERE \
+  --env GITHUB_OWNER=AmnadTaowsoam \
+  --env GITHUB_REPO=cerebratechai-claude-skills \
+  --env GITHUB_BRANCH=main \
+  -- npx -y @modelcontextprotocol/server-github
+```
+
+**ตัวเลือก B: แก้ไข config.toml**
+
+ตำแหน่ง: `~/.codex/config.toml`
+
+```toml
+[mcp_servers.cerebratechai-skills]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-github"]
+
+[mcp_servers.cerebratechai-skills.env]
+GITHUB_PERSONAL_ACCESS_TOKEN = "YOUR_TOKEN_HERE"
+GITHUB_OWNER = "AmnadTaowsoam"
+GITHUB_REPO = "cerebratechai-claude-skills"
+GITHUB_BRANCH = "main"
+```
+
+#### ขั้นที่ 3: ตรวจสอบการเชื่อมต่อ
+
+```bash
+# ใน Codex TUI
+codex
+
+# ตรวจสอบ MCP servers
+/mcp
+```
+
+ควรเห็น `cerebratechai-skills` ในรายการ
+
+### การใช้งาน Codex MCP
+
+```
+Using skills from cerebratechai-skills:
+- typescript-standards
+- nextjs-patterns
+
+Create a Next.js API endpoint
+```
+
+### ข้อดีของ Codex MCP
+- ✅ **Auto-sync**: ทันสมัยเสมอจาก GitHub
+- ✅ **ไม่ต้อง clone**: ทำงานได้โดยไม่ต้องมี local repository
+- ✅ **ตั้งค่าง่าย**: ใช้คำสั่งเดียว
+- ✅ **Config ร่วมกัน**: ใช้ได้ทั้ง CLI และ IDE extension
 
 ---
 
-## 🚀 ขั้นตอนการตั้งค่า
+## 🔧 วิธีที่ 2: GitHub Copilot กับ Workspace Indexing
 
 ### ขั้นที่ 1: ติดตั้ง GitHub Copilot
 
