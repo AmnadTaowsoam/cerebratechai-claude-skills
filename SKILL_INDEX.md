@@ -701,12 +701,12 @@
 | [github-security-triage](60-github-mcp/github-security-triage/SKILL.md) | Triage GitHub security alerts via GitHub MCP: assess severity, validate exposure, coordinate fixes, and close Dependabot/CodeQL/secret scanning alerts with documented rationale. |
 | [github-workflow-ops](60-github-mcp/github-workflow-ops/SKILL.md) | Operate GitHub Actions via GitHub MCP: inspect workflow runs, diagnose failures, fetch logs and annotations, re-run jobs, and summarize root causes. |
 
-### 60. Infrastructure Patterns
+### 71. Infrastructure Patterns
 | Skill | Description |
 |---|---|
-| [api-design-contracts](60-infrastructure-patterns/api-design-contracts/SKILL.md) | API Design & Contracts |
-| [caching-strategies](60-infrastructure-patterns/caching-strategies/SKILL.md) | Caching Strategies |
-| [secrets-key-management](60-infrastructure-patterns/secrets-key-management/SKILL.md) | Secrets & Key Management |
+| [api-design-contracts](71-infrastructure-patterns/api-design-contracts/SKILL.md) | API Design & Contracts |
+| [caching-strategies](71-infrastructure-patterns/caching-strategies/SKILL.md) | Caching Strategies |
+| [secrets-key-management](71-infrastructure-patterns/secrets-key-management/SKILL.md) | Secrets & Key Management |
 
 ### 61. AI Production
 | Skill | Description |
@@ -947,7 +947,7 @@
 - [animation](02-frontend/animation/SKILL.md)
 - [anti-bloat-checklist](65-context-token-optimization/anti-bloat-checklist/SKILL.md)
 - [api-design](01-foundations/api-design/SKILL.md)
-- [api-design-contracts](60-infrastructure-patterns/api-design-contracts/SKILL.md)
+- [api-design-contracts](71-infrastructure-patterns/api-design-contracts/SKILL.md)
 - [api-documentation](21-documentation/api-documentation/SKILL.md)
 - [api-gateway](09-microservices/api-gateway/SKILL.md)
 - [api-key-management](10-authentication-authorization/api-key-management/SKILL.md)
@@ -974,7 +974,7 @@
 - [business-intelligence](23-business-analytics/business-intelligence/SKILL.md)
 - [cache-invalidation](04-database/cache-invalidation/SKILL.md)
 - [caching-strategies (47-performance-engineering)](47-performance-engineering/caching-strategies/SKILL.md)
-- [caching-strategies (60-infrastructure-patterns)](60-infrastructure-patterns/caching-strategies/SKILL.md)
+- [caching-strategies (71-infrastructure-patterns)](71-infrastructure-patterns/caching-strategies/SKILL.md)
 - [campaign-management](28-marketing-integration/campaign-management/SKILL.md)
 - [canary-deployment](26-deployment-strategies/canary-deployment/SKILL.md)
 - [cdn-delivery](37-video-streaming/cdn-delivery/SKILL.md)
@@ -1315,7 +1315,7 @@
 - [schema-management](43-data-reliability/schema-management/SKILL.md)
 - [scim-provisioning](50-enterprise-integrations/scim-provisioning/SKILL.md)
 - [scoring-and-prioritization](57-skill-orchestration/scoring-and-prioritization/SKILL.md)
-- [secrets-key-management](60-infrastructure-patterns/secrets-key-management/SKILL.md)
+- [secrets-key-management](71-infrastructure-patterns/secrets-key-management/SKILL.md)
 - [secrets-management (15-devops-infrastructure)](15-devops-infrastructure/secrets-management/SKILL.md)
 - [secrets-management (24-security-practices)](24-security-practices/secrets-management/SKILL.md)
 - [secure-coding](24-security-practices/secure-coding/SKILL.md)
