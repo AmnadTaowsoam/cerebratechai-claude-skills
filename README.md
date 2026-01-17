@@ -87,14 +87,19 @@ This repository contains specialized skills that help Claude understand and impl
   - Roo Code (Cursor)
   - Antigravity (Google DeepMind)
 
+📖 **Platform-Specific Guides:**
+- 🟢 **GitHub Codex (Copilot)**:
+  - 🇬🇧 English: [SETUP_CODEX.md](./SETUP_CODEX.md) - Complete Copilot guide
+  - 🇹🇭 ภาษาไทย: [SETUP_CODEX_TH.md](./SETUP_CODEX_TH.md) - คู่มือ Copilot ฉบับเต็ม
+
 **Comparison:**
 | Platform | Setup | Auto-sync | Best For |
 |----------|-------|-----------|----------|
 | Claude Desktop | ⭐⭐ Easy | ✅ Yes | Standalone use |
 | Claude Code | ⭐ Very Easy | ✅ Yes | VS Code users |
 | GitHub Codex | ⭐⭐⭐ Medium | ⚠️ Manual | Copilot users |
-| Roo Code | ⭐⭐ Easy | ⚠️ Manual | Cursor users |
-| Antigravity | ⭐⭐ Easy | ✅ Yes | Multi-IDE |
+| Roo Code | ⭐⭐ Easy | ✅ Yes (MCP) | Cursor users |
+| Antigravity | ⭐⭐ Easy | ⚠️ Manual | Local skills |
 
 ---
 
