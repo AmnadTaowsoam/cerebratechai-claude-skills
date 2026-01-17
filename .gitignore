@@ -105,3 +105,7 @@ site/
 # Local development
 .local/
 *.local.md
+
+# Roo Code / Cursor config (contains secrets)
+.roo/
+.cursor/
