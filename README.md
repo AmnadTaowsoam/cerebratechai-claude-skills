@@ -1044,7 +1044,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 <!-- SKILLS-START -->
 ## Skills Overview
 
-**Total Skills:** 473
+**Total Skills:** 465
 
 
 ### 00. Meta Skills
@@ -1766,27 +1766,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [feature-flags-experimentation](59-release-engineering/feature-flags-experimentation/SKILL.md) | Feature Flags & Experimentation |
 | [release-management](59-release-engineering/release-management/SKILL.md) | Release Management |
 
-### 60. Github Mcp
-
-| Skill | Description |
-|-------|-------------|
-| [github-code-review](60-github-mcp/github-code-review/SKILL.md) | GitHub Code Review |
-| [github-issue-triage](60-github-mcp/github-issue-triage/SKILL.md) | GitHub Issue Triage |
-| [github-pr-lifecycle](60-github-mcp/github-pr-lifecycle/SKILL.md) | GitHub PR Lifecycle |
-| [github-release-management](60-github-mcp/github-release-management/SKILL.md) | GitHub Release Management |
-| [github-repo-governance](60-github-mcp/github-repo-governance/SKILL.md) | GitHub Repo Governance |
-| [github-repo-navigation](60-github-mcp/github-repo-navigation/SKILL.md) | GitHub Repo Navigation |
-| [github-security-triage](60-github-mcp/github-security-triage/SKILL.md) | GitHub Security Triage |
-| [github-workflow-ops](60-github-mcp/github-workflow-ops/SKILL.md) | GitHub Workflow Ops |
-
-### 60. Infrastructure Patterns
-
-| Skill | Description |
-|-------|-------------|
-| [api-design-contracts](60-infrastructure-patterns/api-design-contracts/SKILL.md) | API Design & Contracts |
-| [caching-strategies](60-infrastructure-patterns/caching-strategies/SKILL.md) | Caching Strategies |
-| [secrets-key-management](60-infrastructure-patterns/secrets-key-management/SKILL.md) | Secrets & Key Management |
-
 ### 61. Ai Production
 
 | Skill | Description |
@@ -1884,4 +1863,12 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [lineage-and-provenance](70-data-platform-governance/lineage-and-provenance/SKILL.md) | Lineage and Provenance |
 | [pii-policy-enforcement](70-data-platform-governance/pii-policy-enforcement/SKILL.md) | PII Policy Enforcement |
 | [retention-archival](70-data-platform-governance/retention-archival/SKILL.md) | Retention and Archival |
+
+### 71. Infrastructure Patterns
+
+| Skill | Description |
+|-------|-------------|
+| [api-design-contracts](71-infrastructure-patterns/api-design-contracts/SKILL.md) | API Design & Contracts |
+| [caching-strategies](71-infrastructure-patterns/caching-strategies/SKILL.md) | Caching Strategies |
+| [secrets-key-management](71-infrastructure-patterns/secrets-key-management/SKILL.md) | Secrets & Key Management |
 <!-- SKILLS-END -->
