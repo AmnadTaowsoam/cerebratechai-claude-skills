@@ -128,12 +128,12 @@ A high-level view for stakeholders:
 
 ## 9. DQ Monitoring Checklist
 
-- [ ] **Completeness**: Are there checks for `NULL` values in primary keys?
-- [ ] **Freshness**: Do we have alerts for data that hasn't arrived in X hours?
-- [ ] **Volume**: Sudden drop or spike in row count (e.g., < 50% of typical volume)?
-- [ ] **Distribution**: Has the average or median value shifted significantly today?
-- [ ] **Schema**: Have any columns been renamed or dropped?
-- [ ] **Downstream blocking**: Does a failure stop downstream tasks automatically?
+* [ ] **Completeness**: Are there checks for `NULL` values in primary keys?
+* [ ] **Freshness**: Do we have alerts for data that hasn't arrived in X hours?
+* [ ] **Volume**: Sudden drop or spike in row count (e.g., < 50% of typical volume)?
+* [ ] **Distribution**: Has the average or median value shifted significantly today?
+* [ ] **Schema**: Have any columns been renamed or dropped?
+* [ ] **Downstream blocking**: Does a failure stop downstream tasks automatically?
 
 ---
 

@@ -214,6 +214,6 @@ aws cloudwatch get-metric-statistics \
 ---
 
 ## Related Skills
-* `42-cost-engineering/cloud-cost-models`
-* `42-cost-engineering/cost-observability`
-* `43-data-reliability/data-retention-archiving`
+- `42-cost-engineering/cloud-cost-models`
+- `42-cost-engineering/cost-observability`
+- `43-data-reliability/data-retention-archiving`

@@ -478,6 +478,6 @@ function calculateReviewQuality() {
 ---
 
 ## Related Skills
-* `45-developer-experience/lint-format-typecheck`
-* `45-developer-experience/commit-conventions`
-* `45-developer-experience/onboarding-docs`
+- `45-developer-experience/lint-format-typecheck`
+- `45-developer-experience/commit-conventions`
+- `45-developer-experience/onboarding-docs`

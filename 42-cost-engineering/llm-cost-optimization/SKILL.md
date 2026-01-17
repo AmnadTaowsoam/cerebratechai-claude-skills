@@ -194,6 +194,6 @@ graph TD
 ---
 
 ## Related Skills
-* `42-cost-engineering/cloud-cost-models`
-* `44-ai-governance/ai-cost-management`
-* `43-data-reliability/vector-db-performance`
+- `42-cost-engineering/cloud-cost-models`
+- `44-ai-governance/ai-cost-management`
+- `43-data-reliability/vector-db-performance`

@@ -165,6 +165,6 @@ When implementing UBP, you must track your **Cost of Goods Sold (COGS)** relativ
 ---
 
 ## Related Skills
-* `42-cost-engineering/cloud-cost-models`
-* `42-cost-engineering/cost-observability`
-* `45-product-thinking/pricing-strategies`
+- `42-cost-engineering/cloud-cost-models`
+- `42-cost-engineering/cost-observability`
+- `45-product-thinking/pricing-strategies`

@@ -158,6 +158,6 @@ npx openapi-diff old-spec.yaml new-spec.yaml --fail-on-breaking
 ---
 
 ## Related Skills
-* `43-data-reliability/data-contracts`
-* `43-data-reliability/data-quality-monitoring`
-* `41-incident-management/oncall-playbooks`
+- `43-data-reliability/data-contracts`
+- `43-data-reliability/data-quality-monitoring`
+- `41-incident-management/oncall-playbooks`

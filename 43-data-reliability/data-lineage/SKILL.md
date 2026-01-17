@@ -117,11 +117,11 @@ This allows security teams to identify which S3 buckets or BigQuery datasets req
 
 ## 9. Data Lineage Checklist
 
-- [ ] **Completeness**: Does our lineage cover cross-system boundaries (e.g., Salesforce to Snowflake)?
-- [ ] **Granularity**: Do we have column-level lineage for our most sensitive data?
-- [ ] **Orchestration**: Is lineage captured automatically from every Airflow/dbt run?
-- [ ] **Impact Analysis**: Is there a standard process to check lineage before a schema change?
-- [ ] **Ownership**: Does every table in the lineage graph have a defined team/individual owner?
+* [ ] **Completeness**: Does our lineage cover cross-system boundaries (e.g., Salesforce to Snowflake)?
+* [ ] **Granularity**: Do we have column-level lineage for our most sensitive data?
+* [ ] **Orchestration**: Is lineage captured automatically from every Airflow/dbt run?
+* [ ] **Impact Analysis**: Is there a standard process to check lineage before a schema change?
+* [ ] **Ownership**: Does every table in the lineage graph have a defined team/individual owner?
 
 ---
 

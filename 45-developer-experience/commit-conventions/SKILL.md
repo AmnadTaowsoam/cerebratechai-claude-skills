@@ -164,5 +164,5 @@ npx standard-version
 ---
 
 ## Related Skills
-* `45-developer-experience/release-workflow`
-* `45-developer-experience/lint-format-typecheck`
+- `45-developer-experience/release-workflow`
+- `45-developer-experience/lint-format-typecheck`

@@ -140,6 +140,6 @@ If a regulator asks for data from 5 years ago:
 ---
 
 ## Related Skills
-* `42-cost-engineering/cloud-cost-models`
-* `43-data-reliability/data-quality-monitoring`
-* `40-system-resilience/disaster-recovery`
+- `42-cost-engineering/cloud-cost-models`
+- `43-data-reliability/data-quality-monitoring`
+- `40-system-resilience/disaster-recovery`

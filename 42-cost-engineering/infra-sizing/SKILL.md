@@ -162,6 +162,6 @@ Never size based on assumptions. Use tools like **k6**, **Locust**, or **JMeter*
 ---
 
 ## Related Skills
-* `40-system-resilience/graceful-degradation`
-* `42-cost-engineering/cloud-cost-models`
-* `42-cost-engineering/budget-guardrails`
+- `40-system-resilience/graceful-degradation`
+- `42-cost-engineering/cloud-cost-models`
+- `42-cost-engineering/budget-guardrails`

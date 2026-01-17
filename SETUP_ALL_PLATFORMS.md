@@ -241,13 +241,87 @@ create a type-safe API client
 ## 4. 🟠 Roo Code (Cursor)
 
 ### Overview
-Cursor IDE (Roo Code) can index this repository for AI-assisted coding.
+Cursor IDE (Roo Code) now supports **MCP (Model Context Protocol)** for seamless GitHub integration, plus local repository indexing.
 
 ### Prerequisites
 - Cursor IDE installed
-- Repository cloned locally
+- Node.js 18+ (for MCP method)
+- GitHub Personal Access Token (for MCP method)
 
-### Setup Steps
+---
+
+### Setup Method 1: MCP (Recommended) ⭐
+
+#### Step 1: Create GitHub Token
+Same as Claude Desktop (Section 1, Step 1)
+
+#### Step 2: Configure Cursor MCP
+
+1. **Open Cursor Settings**
+   - Press `Cmd+,` (macOS) or `Ctrl+,` (Windows/Linux)
+   - Or: Click gear icon → Settings
+
+2. **Navigate to MCP Servers**
+   - In left sidebar, click **"MCP Servers"**
+
+3. **Edit Global MCP**
+   - Click **"Edit Global MCP"** button
+   - This opens `.cursor/mcp.json` file
+
+4. **Add Configuration**
+   ```json
+   {
+     "mcpServers": {
+       "cerebratechai-skills": {
+         "command": "npx",
+         "args": ["-y", "@modelcontextprotocol/server-github"],
+         "env": {
+           "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
+           "GITHUB_OWNER": "AmnadTaowsoam",
+           "GITHUB_REPO": "cerebratechai-claude-skills",
+           "GITHUB_BRANCH": "main"
+         }
+       }
+     }
+   }
+   ```
+
+5. **Replace Token**
+   - Replace `YOUR_TOKEN_HERE` with your actual GitHub token
+
+6. **Save and Refresh**
+   - Save the file (`Cmd+S` or `Ctrl+S`)
+   - Click **"Refresh MCP Servers"** button
+
+#### Step 3: Verify MCP Connection
+
+1. Start a new chat (`Cmd+L` or `Ctrl+L`)
+2. Type: `List available MCP servers`
+3. You should see `cerebratechai-skills` in the list
+
+### Usage (MCP Method)
+
+**Direct Reference:**
+```
+Using skills from cerebratechai-skills:
+- typescript-standards
+- nextjs-patterns
+
+Create a Next.js API endpoint
+```
+
+**With Cmd+L Chat:**
+```
+@cerebratechai-skills
+
+Show me the typescript-standards skill
+```
+
+---
+
+### Setup Method 2: Local Repository Indexing
+
+If you prefer local files or want offline access:
 
 #### Step 1: Clone Repository
 ```bash
@@ -324,7 +398,7 @@ Each skill is in a folder with SKILL.md containing:
 3. Enable **"Index entire workspace"**
 4. Click **"Reindex"**
 
-### Usage
+### Usage (Local Method)
 
 **Method 1: Cmd+K (Inline Edit)**
 ```typescript
@@ -351,8 +425,9 @@ Apply these standards to my current file
 ```
 
 ### Tips
+- **MCP Method**: Auto-syncs, always up-to-date, works from any project
+- **Local Method**: Offline access, faster for large codebases
 - Use `@Docs` to reference skill files
-- Keep skills repo in workspace
 - Use Cmd+K for quick refactoring
 - Use Cmd+L for complex tasks
 
@@ -361,79 +436,88 @@ Apply these standards to my current file
 ## 5. 🔴 Antigravity (Google DeepMind)
 
 ### Overview
-Antigravity can access this repository through MCP or direct file access.
+Antigravity uses **Skills** feature to access this repository locally.
+
+> ⚠️ **Note**: Antigravity's MCP implementation currently has Docker dependency issues. Use the **Skills** method below instead.
 
 ### Prerequisites
 - Antigravity installed
-- Node.js 18+ (for MCP)
-- Repository access
+- Git installed
+- Repository cloned locally
 
-### Setup Method 1: MCP (Recommended)
+### Setup Steps
 
-#### Step 1: Create GitHub Token
-Same as Claude Desktop (Section 1, Step 1)
+#### Step 1: Clone Repository
 
-#### Step 2: Configure Antigravity
+```bash
+# Windows (PowerShell)
+cd $HOME\Documents
+git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+
+# macOS/Linux
+cd ~/Documents
+git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+```
+
+#### Step 2: Add as Skill in Antigravity
+
+1. **Open Antigravity**
+2. **Go to Settings** (gear icon or `Ctrl+,`)
+3. **Navigate to "Skills"** section
+4. **Click "Add Skill"** or "Add Folder"
+5. **Browse and select** the cloned folder:
+   - Windows: `C:\Users\YOUR_USERNAME\Documents\cerebratechai-claude-skills`
+   - macOS/Linux: `/Users/YOUR_USERNAME/Documents/cerebratechai-claude-skills`
+6. **Name it**: `cerebratechai-skills`
+7. **Enable** the skill
+8. **Save** settings
+
+#### Step 3: Verify Skill is Loaded
+
+1. Start a new conversation
+2. Type: `List available skills`
+3. You should see `cerebratechai-skills` in the list
+
+### Alternative: Manual Configuration
+
+If Antigravity supports config files, create `.antigravity/config.json`:
 
 **Windows:**
 ```powershell
-notepad "$env:APPDATA\Antigravity\config.json"
+# Create directory
+New-Item -ItemType Directory -Force -Path "$env:APPDATA\.antigravity"
+
+# Edit config
+notepad "$env:APPDATA\.antigravity\config.json"
 ```
 
-**macOS:**
+**macOS/Linux:**
 ```bash
-nano ~/Library/Application\ Support/Antigravity/config.json
-```
+# Create directory
+mkdir -p ~/.antigravity
 
-**Linux:**
-```bash
-nano ~/.config/Antigravity/config.json
+# Edit config
+nano ~/.antigravity/config.json
 ```
 
 **Configuration:**
 ```json
 {
-  "mcpServers": {
-    "cerebratechai-skills": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
-        "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
-        "GITHUB_BRANCH": "main"
-      }
-    }
-  }
-}
-```
-
-#### Step 3: Restart Antigravity
-
-### Setup Method 2: Local Files
-
-#### Step 1: Clone Repository
-```bash
-cd ~/projects
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
-```
-
-#### Step 2: Configure Skills Path
-
-Create `~/.antigravity/skills.json`:
-```json
-{
-  "skillsRepositories": [
+  "skills": [
     {
       "name": "cerebratechai-skills",
-      "path": "/Users/YOUR_USERNAME/projects/cerebratechai-claude-skills",
-      "enabled": true
+      "path": "C:\\Users\\YOUR_USERNAME\\Documents\\cerebratechai-claude-skills",
+      "enabled": true,
+      "autoLoad": true
     }
   ]
 }
 ```
 
-Replace `/Users/YOUR_USERNAME/projects/` with your actual path.
+Replace path with your actual path:
+- Windows: `C:\\Users\\YOUR_USERNAME\\Documents\\cerebratechai-claude-skills`
+- macOS: `/Users/YOUR_USERNAME/Documents/cerebratechai-claude-skills`
+- Linux: `/home/YOUR_USERNAME/Documents/cerebratechai-claude-skills`
 
 ### Usage
 
@@ -447,12 +531,12 @@ Using skills from cerebratechai-skills:
 Create a Next.js app with Prisma
 ```
 
-**Method 2: Skill Invocation**
+**Method 2: Skill File Reference**
 ```
-@skill typescript-standards
-@skill nextjs-patterns
+Reference the skill file:
+cerebratechai-skills/01-foundations/typescript-standards/SKILL.md
 
-Generate a type-safe API client
+Apply these TypeScript standards to my code
 ```
 
 **Method 3: Context Loading**
@@ -465,6 +549,20 @@ Load context from cerebratechai-skills:
 Now help me build a full-stack app
 ```
 
+### Updating Skills
+
+To get the latest skills:
+
+```bash
+# Navigate to repository
+cd ~/Documents/cerebratechai-claude-skills  # or your path
+
+# Pull latest changes
+git pull origin main
+```
+
+Antigravity will automatically use the updated files.
+
 ---
 
 ## 📊 Comparison Table
@@ -472,19 +570,20 @@ Now help me build a full-stack app
 | Feature | Claude Desktop | Claude Code | GitHub Codex | Roo Code | Antigravity |
 |---------|---------------|-------------|--------------|----------|-------------|
 | **Setup Difficulty** | ⭐⭐ Easy | ⭐ Very Easy | ⭐⭐⭐ Medium | ⭐⭐ Easy | ⭐⭐ Easy |
-| **MCP Support** | ✅ Yes | ✅ Yes | ❌ No | ❌ No | ✅ Yes |
-| **Auto-sync** | ✅ Yes | ✅ Yes | ⚠️ Manual | ⚠️ Manual | ✅ Yes |
-| **Offline Mode** | ❌ No | ❌ No | ✅ Yes | ✅ Yes | ⚠️ Partial |
+| **MCP Support** | ✅ Yes | ✅ Yes | ❌ No | ✅ Yes | ❌ No* |
+| **Auto-sync** | ✅ Yes | ✅ Yes | ⚠️ Manual | ✅ Yes (MCP) | ⚠️ Manual |
+| **Offline Mode** | ❌ No | ❌ No | ✅ Yes | ✅ Yes (Local) | ✅ Yes |
 | **IDE Integration** | ❌ No | ✅ VS Code | ✅ VS Code | ✅ Cursor | ✅ Multiple |
 | **Skill Indexing** | ✅ Automatic | ✅ Automatic | ⚠️ Manual | ✅ Automatic | ✅ Automatic |
 | **Context Window** | Large | Large | Medium | Large | Very Large |
-| **Best For** | Standalone | VS Code | GitHub users | Cursor users | Multi-IDE |
+| **Best For** | Standalone | VS Code | GitHub users | Cursor users | Local skills |
 
 ### Legend
 - ✅ Full support
 - ⚠️ Partial support / Manual setup
 - ❌ Not supported
 - ⭐ Difficulty (1-5 stars)
+- \* Antigravity has MCP but with Docker dependency issues; use Skills method instead
 
 ---
 
@@ -504,15 +603,17 @@ Now help me build a full-stack app
 
 ### Choose Roo Code (Cursor) if:
 - ✅ You use Cursor IDE
-- ✅ You want powerful AI editing
-- ✅ You prefer Cmd+K inline edits
-- ✅ You want codebase-aware AI
+- ✅ You want MCP auto-sync OR local indexing (both supported!)
+- ✅ You want powerful AI editing with Cmd+K
+- ✅ You prefer codebase-aware AI
+- ✅ You want the best of both worlds (MCP + local files)
 
 ### Choose Antigravity if:
-- ✅ You use multiple IDEs
-- ✅ You want maximum flexibility
+- ✅ You want to use skills locally (offline)
+- ✅ You prefer file-based skill management
 - ✅ You need very large context windows
 - ✅ You want advanced AI capabilities
+- ⚠️ Note: Requires manual `git pull` to update skills
 
 ---
 

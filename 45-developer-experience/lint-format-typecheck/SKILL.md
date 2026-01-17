@@ -321,6 +321,6 @@ jobs:
 ---
 
 ## Related Skills
-* `45-developer-experience/commit-conventions`
-* `45-developer-experience/code-review-standards`
-* `45-developer-experience/local-dev-standard`
+- `45-developer-experience/commit-conventions`
+- `45-developer-experience/code-review-standards`
+- `45-developer-experience/local-dev-standard`

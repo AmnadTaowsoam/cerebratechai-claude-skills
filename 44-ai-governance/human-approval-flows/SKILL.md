@@ -610,7 +610,7 @@ def loan_approval_hitl(application):
 ---
 
 ## Related Skills
-* `44-ai-governance/confidence-scoring`
-* `44-ai-governance/override-mechanisms`
-* `44-ai-governance/explainability`
-* `44-ai-governance/auditability`
+- `44-ai-governance/confidence-scoring`
+- `44-ai-governance/override-mechanisms`
+- `44-ai-governance/explainability`
+- `44-ai-governance/auditability`

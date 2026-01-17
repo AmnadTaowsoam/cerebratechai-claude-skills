@@ -26,6 +26,6 @@ That skill covers:
 ---
 
 ## Related Skills
-* `44-ai-governance/model-explainability` (Main skill)
-* `44-ai-governance/auditability`
-* `44-ai-governance/human-approval-flows`
+- `44-ai-governance/model-explainability` (Main skill)
+- `44-ai-governance/auditability`
+- `44-ai-governance/human-approval-flows`

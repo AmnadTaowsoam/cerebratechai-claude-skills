@@ -449,6 +449,6 @@ ALTER TABLE users DROP COLUMN user_id;
 ---
 
 ## Related Skills
-* `43-data-reliability/data-contracts`
-* `43-data-reliability/schema-management`
-* `43-data-reliability/data-quality-checks`
+- `43-data-reliability/data-contracts`
+- `43-data-reliability/schema-management`
+- `43-data-reliability/data-quality-checks`

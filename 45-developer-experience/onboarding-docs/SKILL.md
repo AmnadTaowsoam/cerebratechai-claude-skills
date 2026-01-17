@@ -444,6 +444,6 @@ Help new developer succeed in first 2 weeks.
 ---
 
 ## Related Skills
-* `45-developer-experience/local-dev-standard`
-* `45-developer-experience/dev-environment-setup`
-* `45-developer-experience/code-review-standards`
+- `45-developer-experience/local-dev-standard`
+- `45-developer-experience/dev-environment-setup`
+- `45-developer-experience/code-review-standards`

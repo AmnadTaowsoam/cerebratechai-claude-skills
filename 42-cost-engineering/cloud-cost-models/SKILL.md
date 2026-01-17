@@ -236,13 +236,13 @@ Avoid the "Sticker Price" trap. TCO includes:
 
 ## 12. Optimization Checklist
 
-- [ ] **Tagging**: Are 100% of resources tagged with `CostCenter`?
-- [ ] **Right-Sizing**: Do any instances have < 10% average CPU over 7 days?
-- [ ] **Orphans**: Are there unattached EBS volumes or ELBs?
-- [ ] **Storage**: Are S3 lifecycle policies active for `logs/` buckets?
-- [ ] **Compute**: Are we using Spot instances for CI/CD runners?
-- [ ] **Networking**: Are we transferring data across regions unnecessarily?
-- [ ] **Commitment**: Do we have 1-year Savings Plans for our "baseline" load?
+* [ ] **Tagging**: Are 100% of resources tagged with `CostCenter`?
+* [ ] **Right-Sizing**: Do any instances have < 10% average CPU over 7 days?
+* [ ] **Orphans**: Are there unattached EBS volumes or ELBs?
+* [ ] **Storage**: Are S3 lifecycle policies active for `logs/` buckets?
+* [ ] **Compute**: Are we using Spot instances for CI/CD runners?
+* [ ] **Networking**: Are we transferring data across regions unnecessarily?
+* [ ] **Commitment**: Do we have 1-year Savings Plans for our "baseline" load?
 
 ## Related Skills
 * `42-cost-engineering/infra-sizing`

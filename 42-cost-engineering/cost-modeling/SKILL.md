@@ -23,6 +23,6 @@ That skill covers:
 ---
 
 ## Related Skills
-* `42-cost-engineering/cloud-cost-models` (Main skill)
-* `42-cost-engineering/cost-observability`
-* `42-cost-engineering/infra-sizing`
+- `42-cost-engineering/cloud-cost-models` (Main skill)
+- `42-cost-engineering/cost-observability`
+- `42-cost-engineering/infra-sizing`

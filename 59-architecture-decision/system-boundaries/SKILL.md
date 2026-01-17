@@ -261,6 +261,6 @@ describe('OrderService', () => {
 ---
 
 ## Related Skills
-* `59-architecture-decision/adr-templates`
-* `40-system-resilience/service-mesh`
-* `51-contracts-governance/api-contracts`
+- `59-architecture-decision/adr-templates`
+- `40-system-resilience/service-mesh`
+- `51-contracts-governance/api-contracts`

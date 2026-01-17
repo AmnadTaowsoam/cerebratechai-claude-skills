@@ -240,13 +240,87 @@ Skills จัดเรียงในโฟลเดอร์:
 ## 4. 🟠 Roo Code (Cursor)
 
 ### ภาพรวม
-Cursor IDE (Roo Code) สามารถ index repository นี้สำหรับ AI-assisted coding
+Cursor IDE (Roo Code) ตอนนี้รองรับ **MCP (Model Context Protocol)** สำหรับการเชื่อมต่อ GitHub แบบไร้รอยต่อ พร้อมทั้ง local repository indexing
 
 ### สิ่งที่ต้องเตรียม
 - Cursor IDE ติดตั้งแล้ว
-- Clone repository มาไว้ local
+- Node.js 18+ (สำหรับวิธี MCP)
+- GitHub Personal Access Token (สำหรับวิธี MCP)
 
-### ขั้นตอนการตั้งค่า
+---
+
+### วิธีที่ 1: MCP (แนะนำ) ⭐
+
+#### ขั้นที่ 1: สร้าง GitHub Token
+เหมือนกับ Claude Desktop (ส่วนที่ 1, ขั้นที่ 1)
+
+#### ขั้นที่ 2: ตั้งค่า Cursor MCP
+
+1. **เปิด Cursor Settings**
+   - กด `Cmd+,` (macOS) หรือ `Ctrl+,` (Windows/Linux)
+   - หรือ: คลิกไอคอนเฟือง → Settings
+
+2. **ไปที่ MCP Servers**
+   - ใน sidebar ด้านซ้าย คลิก **"MCP Servers"**
+
+3. **แก้ไข Global MCP**
+   - คลิกปุ่ม **"Edit Global MCP"**
+   - จะเปิดไฟล์ `.cursor/mcp.json`
+
+4. **เพิ่มการตั้งค่า**
+   ```json
+   {
+     "mcpServers": {
+       "cerebratechai-skills": {
+         "command": "npx",
+         "args": ["-y", "@modelcontextprotocol/server-github"],
+         "env": {
+           "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
+           "GITHUB_OWNER": "AmnadTaowsoam",
+           "GITHUB_REPO": "cerebratechai-claude-skills",
+           "GITHUB_BRANCH": "main"
+         }
+       }
+     }
+   }
+   ```
+
+5. **แทนที่ Token**
+   - แทนที่ `YOUR_TOKEN_HERE` ด้วย GitHub token จริงของคุณ
+
+6. **บันทึกและ Refresh**
+   - บันทึกไฟล์ (`Cmd+S` หรือ `Ctrl+S`)
+   - คลิกปุ่ม **"Refresh MCP Servers"**
+
+#### ขั้นที่ 3: ตรวจสอบการเชื่อมต่อ MCP
+
+1. เริ่ม chat ใหม่ (`Cmd+L` หรือ `Ctrl+L`)
+2. พิมพ์: `List available MCP servers`
+3. ควรเห็น `cerebratechai-skills` ในรายการ
+
+### วิธีใช้งาน (วิธี MCP)
+
+**อ้างอิงโดยตรง:**
+```
+Using skills from cerebratechai-skills:
+- typescript-standards
+- nextjs-patterns
+
+Create a Next.js API endpoint
+```
+
+**ใช้กับ Cmd+L Chat:**
+```
+@cerebratechai-skills
+
+แสดง typescript-standards skill
+```
+
+---
+
+### วิธีที่ 2: Local Repository Indexing
+
+ถ้าต้องการใช้ไฟล์ local หรือต้องการใช้งาน offline:
 
 #### ขั้นที่ 1: Clone Repository
 ```bash
@@ -323,7 +397,7 @@ Repository นี้มี 473+ production-ready coding skills ใน 73 หม�
 3. เปิด **"Index entire workspace"**
 4. คลิก **"Reindex"**
 
-### วิธีใช้งาน
+### วิธีใช้งาน (วิธี Local)
 
 **วิธีที่ 1: Cmd+K (Inline Edit)**
 ```typescript
@@ -350,8 +424,9 @@ Repository นี้มี 473+ production-ready coding skills ใน 73 หม�
 ```
 
 ### เคล็ดลับ
+- **วิธี MCP**: Auto-sync, ทันสมัยเสมอ, ใช้ได้จากทุก project
+- **วิธี Local**: ใช้งาน offline ได้, เร็วกว่าสำหรับ codebase ใหญ่
 - ใช้ `@Docs` เพื่ออ้างอิงไฟล์ skill
-- เปิด skills repo ไว้ใน workspace
 - ใช้ Cmd+K สำหรับ refactoring เร็ว
 - ใช้ Cmd+L สำหรับงานซับซ้อน
 
@@ -360,79 +435,88 @@ Repository นี้มี 473+ production-ready coding skills ใน 73 หม�
 ## 5. 🔴 Antigravity (Google DeepMind)
 
 ### ภาพรวม
-Antigravity สามารถเข้าถึง repository นี้ผ่าน MCP หรือการเข้าถึงไฟล์โดยตรง
+Antigravity ใช้ฟีเจอร์ **Skills** เพื่อเข้าถึง repository นี้แบบ local
+
+> ⚠️ **หมายเหตุ**: MCP ของ Antigravity มีปัญหาเรื่อง Docker dependency ให้ใช้วิธี **Skills** ด้านล่างแทน
 
 ### สิ่งที่ต้องเตรียม
 - Antigravity ติดตั้งแล้ว
-- Node.js 18+ (สำหรับ MCP)
-- สิทธิ์เข้าถึง repository
+- Git ติดตั้งแล้ว
+- Clone repository มาไว้ local
 
-### วิธีที่ 1: MCP (แนะนำ)
+### ขั้นตอนการตั้งค่า
 
-#### ขั้นที่ 1: สร้าง GitHub Token
-เหมือนกับ Claude Desktop (ส่วนที่ 1, ขั้นที่ 1)
+#### ขั้นที่ 1: Clone Repository
 
-#### ขั้นที่ 2: ตั้งค่า Antigravity
+```bash
+# Windows (PowerShell)
+cd $HOME\Documents
+git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+
+# macOS/Linux
+cd ~/Documents
+git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+```
+
+#### ขั้นที่ 2: เพิ่มเป็น Skill ใน Antigravity
+
+1. **เปิด Antigravity**
+2. **ไปที่ Settings** (ไอคอนเฟือง หรือ `Ctrl+,`)
+3. **ไปที่ส่วน "Skills"**
+4. **คลิก "Add Skill"** หรือ "Add Folder"
+5. **เลือกโฟลเดอร์** ที่ clone มา:
+   - Windows: `C:\Users\YOUR_USERNAME\Documents\cerebratechai-claude-skills`
+   - macOS/Linux: `/Users/YOUR_USERNAME/Documents/cerebratechai-claude-skills`
+6. **ตั้งชื่อ**: `cerebratechai-skills`
+7. **เปิดใช้งาน** skill
+8. **บันทึก** การตั้งค่า
+
+#### ขั้นที่ 3: ตรวจสอบว่า Skill โหลดแล้ว
+
+1. เริ่มการสนทนาใหม่
+2. พิมพ์: `List available skills`
+3. ควรเห็น `cerebratechai-skills` ในรายการ
+
+### ทางเลือก: ตั้งค่าด้วยไฟล์ Config
+
+ถ้า Antigravity รองรับไฟล์ config ให้สร้าง `.antigravity/config.json`:
 
 **Windows:**
 ```powershell
-notepad "$env:APPDATA\Antigravity\config.json"
+# สร้างโฟลเดอร์
+New-Item -ItemType Directory -Force -Path "$env:APPDATA\.antigravity"
+
+# แก้ไข config
+notepad "$env:APPDATA\.antigravity\config.json"
 ```
 
-**macOS:**
+**macOS/Linux:**
 ```bash
-nano ~/Library/Application\ Support/Antigravity/config.json
-```
+# สร้างโฟลเดอร์
+mkdir -p ~/.antigravity
 
-**Linux:**
-```bash
-nano ~/.config/Antigravity/config.json
+# แก้ไข config
+nano ~/.antigravity/config.json
 ```
 
 **โค้ดตั้งค่า:**
 ```json
 {
-  "mcpServers": {
-    "cerebratechai-skills": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
-        "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
-        "GITHUB_BRANCH": "main"
-      }
-    }
-  }
-}
-```
-
-#### ขั้นที่ 3: Restart Antigravity
-
-### วิธีที่ 2: ไฟล์ Local
-
-#### ขั้นที่ 1: Clone Repository
-```bash
-cd ~/projects
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
-```
-
-#### ขั้นที่ 2: ตั้งค่า Skills Path
-
-สร้างไฟล์ `~/.antigravity/skills.json`:
-```json
-{
-  "skillsRepositories": [
+  "skills": [
     {
       "name": "cerebratechai-skills",
-      "path": "/Users/YOUR_USERNAME/projects/cerebratechai-claude-skills",
-      "enabled": true
+      "path": "C:\\Users\\YOUR_USERNAME\\Documents\\cerebratechai-claude-skills",
+      "enabled": true,
+      "autoLoad": true
     }
   ]
 }
 ```
 
-แทนที่ `/Users/YOUR_USERNAME/projects/` ด้วย path จริงของคุณ
+แทนที่ path ด้วย path จริงของคุณ:
+- Windows: `C:\\Users\\YOUR_USERNAME\\Documents\\cerebratechai-claude-skills`
+- macOS: `/Users/YOUR_USERNAME/Documents/cerebratechai-claude-skills`
+- Linux: `/home/YOUR_USERNAME/Documents/cerebratechai-claude-skills`
 
 ### วิธีใช้งาน
 
@@ -446,12 +530,12 @@ Using skills from cerebratechai-skills:
 Create a Next.js app with Prisma
 ```
 
-**วิธีที่ 2: เรียกใช้ Skill**
+**วิธีที่ 2: อ้างอิงไฟล์ Skill**
 ```
-@skill typescript-standards
-@skill nextjs-patterns
+อ้างอิงไฟล์ skill:
+cerebratechai-skills/01-foundations/typescript-standards/SKILL.md
 
-สร้าง type-safe API client
+ใช้มาตรฐาน TypeScript เหล่านี้กับโค้ดของฉัน
 ```
 
 **วิธีที่ 3: โหลด Context**
@@ -464,6 +548,20 @@ Load context from cerebratechai-skills:
 ช่วยสร้าง full-stack app
 ```
 
+### อัปเดต Skills
+
+เพื่อรับ skills ล่าสุด:
+
+```bash
+# ไปที่ repository
+cd ~/Documents/cerebratechai-claude-skills  # หรือ path ของคุณ
+
+# Pull การเปลี่ยนแปลงล่าสุด
+git pull origin main
+```
+
+Antigravity จะใช้ไฟล์ที่อัปเดตแล้วโดยอัตโนมัติ
+
 ---
 
 ## 📊 ตารางเปรียบเทียบ
@@ -471,19 +569,20 @@ Load context from cerebratechai-skills:
 | คุณสมบัติ | Claude Desktop | Claude Code | GitHub Codex | Roo Code | Antigravity |
 |---------|---------------|-------------|--------------|----------|-------------|
 | **ความยากในการตั้งค่า** | ⭐⭐ ง่าย | ⭐ ง่ายมาก | ⭐⭐⭐ ปานกลาง | ⭐⭐ ง่าย | ⭐⭐ ง่าย |
-| **รองรับ MCP** | ✅ ใช่ | ✅ ใช่ | ❌ ไม่ | ❌ ไม่ | ✅ ใช่ |
-| **Auto-sync** | ✅ ใช่ | ✅ ใช่ | ⚠️ Manual | ⚠️ Manual | ✅ ใช่ |
-| **โหมด Offline** | ❌ ไม่ | ❌ ไม่ | ✅ ใช่ | ✅ ใช่ | ⚠️ บางส่วน |
+| **รองรับ MCP** | ✅ ใช่ | ✅ ใช่ | ❌ ไม่ | ✅ ใช่ | ❌ ไม่* |
+| **Auto-sync** | ✅ ใช่ | ✅ ใช่ | ⚠️ Manual | ✅ ใช่ (MCP) | ⚠️ Manual |
+| **โหมด Offline** | ❌ ไม่ | ❌ ไม่ | ✅ ใช่ | ✅ ใช่ (Local) | ✅ ใช่ |
 | **รวมกับ IDE** | ❌ ไม่ | ✅ VS Code | ✅ VS Code | ✅ Cursor | ✅ หลาย IDE |
 | **Skill Indexing** | ✅ อัตโนมัติ | ✅ อัตโนมัติ | ⚠️ Manual | ✅ อัตโนมัติ | ✅ อัตโนมัติ |
 | **Context Window** | ใหญ่ | ใหญ่ | ปานกลาง | ใหญ่ | ใหญ่มาก |
-| **เหมาะสำหรับ** | ใช้แยก | VS Code | ผู้ใช้ GitHub | ผู้ใช้ Cursor | หลาย IDE |
+| **เหมาะสำหรับ** | ใช้แยก | VS Code | ผู้ใช้ GitHub | ผู้ใช้ Cursor | Skills แบบ local |
 
 ### สัญลักษณ์
 - ✅ รองรับเต็มรูปแบบ
 - ⚠️ รองรับบางส่วน / ตั้งค่าเอง
 - ❌ ไม่รองรับ
 - ⭐ ความยาก (1-5 ดาว)
+- \* Antigravity มี MCP แต่มีปัญหา Docker dependency ให้ใช้วิธี Skills แทน
 
 ---
 
@@ -503,15 +602,17 @@ Load context from cerebratechai-skills:
 
 ### เลือก Roo Code (Cursor) ถ้า:
 - ✅ ใช้ Cursor IDE
-- ✅ ต้องการ AI editing ที่ทรงพลัง
-- ✅ ชอบใช้ Cmd+K inline edits
+- ✅ ต้องการ MCP auto-sync หรือ local indexing (รองรับทั้งสอง!)
+- ✅ ต้องการ AI editing ที่ทรงพลังด้วย Cmd+K
 - ✅ ต้องการ AI ที่เข้าใจ codebase
+- ✅ ต้องการทั้งสองวิธี (MCP + local files)
 
 ### เลือก Antigravity ถ้า:
-- ✅ ใช้หลาย IDE
-- ✅ ต้องการความยืดหยุ่นสูงสุด
+- ✅ ต้องการใช้ skills แบบ local (offline)
+- ✅ ชอบการจัดการ skill แบบไฟล์
 - ✅ ต้องการ context window ใหญ่มาก
 - ✅ ต้องการความสามารถ AI ขั้นสูง
+- ⚠️ หมายเหตุ: ต้อง `git pull` เองเพื่ออัปเดต skills
 
 ---
 

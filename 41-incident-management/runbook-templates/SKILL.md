@@ -20,6 +20,6 @@ That skill covers:
 ---
 
 ## Related Skills
-* `41-incident-management/oncall-playbooks` (Main skill with runbook templates)
-* `41-incident-management/incident-triage`
-* `40-system-resilience/disaster-recovery`
+- `41-incident-management/oncall-playbooks` (Main skill with runbook templates)
+- `41-incident-management/incident-triage`
+- `40-system-resilience/disaster-recovery`

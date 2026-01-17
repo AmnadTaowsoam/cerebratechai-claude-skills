@@ -27,6 +27,6 @@ That skill covers:
 ---
 
 ## Related Skills
-* `43-data-reliability/freshness-latency` (Main skill)
-* `43-data-reliability/data-quality-monitoring`
-* `43-data-reliability/data-contracts`
+- `43-data-reliability/freshness-latency` (Main skill)
+- `43-data-reliability/data-quality-monitoring`
+- `43-data-reliability/data-contracts`

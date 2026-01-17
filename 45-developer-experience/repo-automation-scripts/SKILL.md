@@ -264,36 +264,36 @@ echo "✅ All checks passed!"
 .PHONY: setup dev test lint clean
 
 setup:
-	@./scripts/setup.sh
+  @./scripts/setup.sh
 
 dev:
-	@npm run dev
+  @npm run dev
 
 test:
-	@npm test
+  @npm test
 
 lint:
-	@npm run lint
-	@npm run type-check
+  @npm run lint
+  @npm run type-check
 
 clean:
-	@./scripts/cleanup.sh
+  @./scripts/cleanup.sh
 
 db-reset:
-	@./scripts/db-reset.sh
+  @./scripts/db-reset.sh
 
 update-deps:
-	@./scripts/update-deps.sh
+  @./scripts/update-deps.sh
 
 help:
-	@echo "Available commands:"
-	@echo "  make setup       - Setup development environment"
-	@echo "  make dev         - Start development server"
-	@echo "  make test        - Run tests"
-	@echo "  make lint        - Run linting and type checking"
-	@echo "  make clean       - Clean up environment"
-	@echo "  make db-reset    - Reset database"
-	@echo "  make update-deps - Update dependencies"
+  @echo "Available commands:"
+  @echo "  make setup       - Setup development environment"
+  @echo "  make dev         - Start development server"
+  @echo "  make test        - Run tests"
+  @echo "  make lint        - Run linting and type checking"
+  @echo "  make clean       - Clean up environment"
+  @echo "  make db-reset    - Reset database"
+  @echo "  make update-deps - Update dependencies"
 ```
 
 ---
@@ -342,5 +342,5 @@ jobs:
 ---
 
 ## Related Skills
-* `45-developer-experience/local-dev-standard`
-* `45-developer-experience/release-workflow`
+- `45-developer-experience/local-dev-standard`
+- `45-developer-experience/release-workflow`

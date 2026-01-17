@@ -565,8 +565,8 @@ contract:
 ---
 
 ## Related Skills
-* `41-incident-management/incident-triage`
-* `41-incident-management/incident-retrospective`
-* `43-data-reliability/data-quality-checks`
-* `43-data-reliability/schema-drift`
-* `40-system-resilience/disaster-recovery`
+- `41-incident-management/incident-triage`
+- `41-incident-management/incident-retrospective`
+- `43-data-reliability/data-quality-checks`
+- `43-data-reliability/schema-drift`
+- `40-system-resilience/disaster-recovery`

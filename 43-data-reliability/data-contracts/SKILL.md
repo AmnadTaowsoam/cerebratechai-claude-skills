@@ -139,11 +139,11 @@ A data platform should always be able to process `v1.0.0` data even if `v1.5.0` 
 
 ## 9. Data Contract Checklist
 
-- [ ] **Owner**: Is there a specific team responsible for this contract?
-- [ ] **PII Identification**: Are sensitive fields (SSN, Email) tagged for encryption?
-- [ ] **Validation**: Is the data validated *at the source*?
-- [ ] **Alerting**: Does the consumer get alerted if an SLA (Freshness) is breached?
-- [ ] **Documentation**: Is the `description` field filled out for every column?
+* [ ] **Owner**: Is there a specific team responsible for this contract?
+* [ ] **PII Identification**: Are sensitive fields (SSN, Email) tagged for encryption?
+* [ ] **Validation**: Is the data validated *at the source*?
+* [ ] **Alerting**: Does the consumer get alerted if an SLA (Freshness) is breached?
+* [ ] **Documentation**: Is the `description` field filled out for every column?
 
 ---
 

@@ -21,6 +21,6 @@ That skill covers:
 ---
 
 ## Related Skills
-* `41-incident-management/incident-triage` (Main skill with triage workflows)
-* `41-incident-management/severity-levels`
-* `41-incident-management/escalation-paths`
+- `41-incident-management/incident-triage` (Main skill with triage workflows)
+- `41-incident-management/severity-levels`
+- `41-incident-management/escalation-paths`

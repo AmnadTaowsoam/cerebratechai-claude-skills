@@ -516,6 +516,6 @@ def get_dashboard_data():
 ---
 
 ## Related Skills
-* `43-data-reliability/data-quality-monitoring`
-* `43-data-reliability/data-contracts`
-* `42-cost-engineering/infra-sizing`
+- `43-data-reliability/data-quality-monitoring`
+- `43-data-reliability/data-contracts`
+- `42-cost-engineering/infra-sizing`

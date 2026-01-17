@@ -550,6 +550,6 @@ ssh-add ~/.ssh/id_ed25519
 ---
 
 ## Related Skills
-* `45-developer-experience/local-dev-standard`
-* `45-developer-experience/onboarding-docs`
-* `45-developer-experience/hot-reload-fast-feedback`
+- `45-developer-experience/local-dev-standard`
+- `45-developer-experience/onboarding-docs`
+- `45-developer-experience/hot-reload-fast-feedback`

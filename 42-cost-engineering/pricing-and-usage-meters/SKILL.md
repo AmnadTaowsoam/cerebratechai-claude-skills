@@ -24,6 +24,6 @@ That skill covers:
 ---
 
 ## Related Skills
-* `42-cost-engineering/usage-based-pricing` (Main skill)
-* `42-cost-engineering/cost-observability`
-* `45-product-thinking/metrics-north-star`
+- `42-cost-engineering/usage-based-pricing` (Main skill)
+- `42-cost-engineering/cost-observability`
+- `45-product-thinking/metrics-north-star`

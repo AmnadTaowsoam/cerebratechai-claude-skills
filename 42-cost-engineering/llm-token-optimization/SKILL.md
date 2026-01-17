@@ -24,6 +24,6 @@ That skill covers:
 ---
 
 ## Related Skills
-* `42-cost-engineering/llm-cost-optimization` (Main skill)
-* `44-ai-governance/model-risk-management`
-* `42-cost-engineering/cost-observability`
+- `42-cost-engineering/llm-cost-optimization` (Main skill)
+- `44-ai-governance/model-risk-management`
+- `42-cost-engineering/cost-observability`

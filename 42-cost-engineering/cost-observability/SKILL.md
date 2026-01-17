@@ -169,6 +169,6 @@ Forecasting helps avoid end-of-quarter budget surprises.
 ---
 
 ## Related Skills
-* `42-cost-engineering/cloud-cost-models`
-* `42-cost-engineering/budget-guardrails`
-* `40-system-resilience/chaos-engineering` (using chaos to test cost stability)
+- `42-cost-engineering/cloud-cost-models`
+- `42-cost-engineering/budget-guardrails`
+- `40-system-resilience/chaos-engineering` (using chaos to test cost stability)

@@ -499,6 +499,6 @@ def override_fraud_decision(transaction_id, agent_id, customer_verification):
 ---
 
 ## Related Skills
-* `44-ai-governance/human-approval-flows`
-* `44-ai-governance/auditability`
-* `44-ai-governance/model-explainability`
+- `44-ai-governance/human-approval-flows`
+- `44-ai-governance/auditability`
+- `44-ai-governance/model-explainability`

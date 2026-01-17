@@ -23,6 +23,6 @@ That skill covers:
 ---
 
 ## Related Skills
-* `43-data-reliability/data-validation-rules` (Main skill)
-* `43-data-reliability/data-quality-checks`
-* `43-data-reliability/data-contracts`
+- `43-data-reliability/data-validation-rules` (Main skill)
+- `43-data-reliability/data-quality-checks`
+- `43-data-reliability/data-contracts`

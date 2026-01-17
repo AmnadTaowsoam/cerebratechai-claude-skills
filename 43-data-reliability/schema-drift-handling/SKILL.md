@@ -25,6 +25,6 @@ That skill covers:
 ---
 
 ## Related Skills
-* `43-data-reliability/schema-drift` (Main skill)
-* `43-data-reliability/schema-management`
-* `43-data-reliability/data-contracts`
+- `43-data-reliability/schema-drift` (Main skill)
+- `43-data-reliability/schema-management`
+- `43-data-reliability/data-contracts`

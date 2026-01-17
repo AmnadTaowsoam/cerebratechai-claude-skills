@@ -1318,71 +1318,71 @@ if __name__ == '__main__':
 package main
 
 import (
-	"context"
-	"log"
-	"net"
-	"time"
+  "context"
+  "log"
+  "net"
+  "time"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/timestamppb"
+  "google.golang.org/grpc"
+  "google.golang.org/grpc/codes"
+  "google.golang.org/grpc/status"
+  "google.golang.org/protobuf/types/known/timestamppb"
 
-	pb "path/to/proto/user/v1"
+  pb "path/to/proto/user/v1"
 )
 
 type server struct {
-	pb.UnimplementedUserServiceServer
-	users map[string]*pb.User
+  pb.UnimplementedUserServiceServer
+  users map[string]*pb.User
 }
 
 func (s *server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.User, error) {
-	user, ok := s.users[req.Id]
-	if !ok {
-		return nil, status.Error(codes.NotFound, "User not found")
-	}
-	return user, nil
+  user, ok := s.users[req.Id]
+  if !ok {
+    return nil, status.Error(codes.NotFound, "User not found")
+  }
+  return user, nil
 }
 
 func (s *server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.User, error) {
-	user := &pb.User{
-		Id:        generateID(),
-		Name:      req.Name,
-		Email:     req.Email,
-		CreatedAt: timestamppb.Now(),
-	}
-	s.users[user.Id] = user
-	return user, nil
+  user := &pb.User{
+    Id:        generateID(),
+    Name:      req.Name,
+    Email:     req.Email,
+    CreatedAt: timestamppb.Now(),
+  }
+  s.users[user.Id] = user
+  return user, nil
 }
 
 func (s *server) ListUsers(req *pb.ListUsersRequest, stream pb.UserService_ListUsersServer) error {
-	for _, user := range s.users {
-		if err := stream.Send(user); err != nil {
-			return err
-		}
-	}
-	return nil
+  for _, user := range s.users {
+    if err := stream.Send(user); err != nil {
+      return err
+    }
+  }
+  return nil
 }
 
 func generateID() string {
-	return "user-" + time.Now().Format("20060102150405")
+  return "user-" + time.Now().Format("20060102150405")
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		log.Fatalf("Failed to listen: %v", err)
-	}
+  lis, err := net.Listen("tcp", ":50051")
+  if err != nil {
+    log.Fatalf("Failed to listen: %v", err)
+  }
 
-	s := grpc.NewServer()
-	pb.RegisterUserServiceServer(s, &server{
-		users: make(map[string]*pb.User),
-	})
+  s := grpc.NewServer()
+  pb.RegisterUserServiceServer(s, &server{
+    users: make(map[string]*pb.User),
+  })
 
-	log.Println("Server started on port 50051")
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("Failed to serve: %v", err)
-	}
+  log.Println("Server started on port 50051")
+  if err := s.Serve(lis); err != nil {
+    log.Fatalf("Failed to serve: %v", err)
+  }
 }
 ```
 
@@ -1392,56 +1392,56 @@ func main() {
 package main
 
 import (
-	"context"
-	"log"
-	"time"
+  "context"
+  "log"
+  "time"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+  "google.golang.org/grpc"
+  "google.golang.org/grpc/credentials/insecure"
 
-	pb "path/to/proto/user/v1"
+  pb "path/to/proto/user/v1"
 )
 
 func main() {
-	conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("Failed to connect: %v", err)
-	}
-	defer conn.Close()
+  conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+  if err != nil {
+    log.Fatalf("Failed to connect: %v", err)
+  }
+  defer conn.Close()
 
-	client := pb.NewUserServiceClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+  client := pb.NewUserServiceClient(conn)
+  ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+  defer cancel()
 
-	// Create user
-	createResp, err := client.CreateUser(ctx, &pb.CreateUserRequest{
-		Name:  "John Doe",
-		Email: "john@example.com",
-	})
-	if err != nil {
-		log.Fatalf("Failed to create user: %v", err)
-	}
-	log.Printf("Created user: %s", createResp.Id)
+  // Create user
+  createResp, err := client.CreateUser(ctx, &pb.CreateUserRequest{
+    Name:  "John Doe",
+    Email: "john@example.com",
+  })
+  if err != nil {
+    log.Fatalf("Failed to create user: %v", err)
+  }
+  log.Printf("Created user: %s", createResp.Id)
 
-	// Get user
-	getResp, err := client.GetUser(ctx, &pb.GetUserRequest{Id: createResp.Id})
-	if err != nil {
-		log.Fatalf("Failed to get user: %v", err)
-	}
-	log.Printf("Found user: %s", getResp.Name)
+  // Get user
+  getResp, err := client.GetUser(ctx, &pb.GetUserRequest{Id: createResp.Id})
+  if err != nil {
+    log.Fatalf("Failed to get user: %v", err)
+  }
+  log.Printf("Found user: %s", getResp.Name)
 
-	// List users
-	listResp, err := client.ListUsers(ctx, &pb.ListUsersRequest{})
-	if err != nil {
-		log.Fatalf("Failed to list users: %v", err)
-	}
-	for {
-		user, err := listResp.Recv()
-		if err != nil {
-			break
-		}
-		log.Printf("User: %s (%s)", user.Name, user.Email)
-	}
+  // List users
+  listResp, err := client.ListUsers(ctx, &pb.ListUsersRequest{})
+  if err != nil {
+    log.Fatalf("Failed to list users: %v", err)
+  }
+  for {
+    user, err := listResp.Recv()
+    if err != nil {
+      break
+    }
+    log.Printf("User: %s (%s)", user.Name, user.Email)
+  }
 }
 ```
 

@@ -577,6 +577,6 @@ lighthouse https://example.com --output=json --output-path=./report.json
 ---
 
 ## Related Skills
-* `45-developer-experience/dev-environment-setup`
-* `45-developer-experience/hot-reload-fast-feedback`
-* `40-system-resilience/observability`
+- `45-developer-experience/dev-environment-setup`
+- `45-developer-experience/hot-reload-fast-feedback`
+- `40-system-resilience/observability`

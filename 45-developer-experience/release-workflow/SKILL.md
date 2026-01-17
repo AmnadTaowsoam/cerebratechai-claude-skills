@@ -241,5 +241,5 @@ git merge hotfix/1.0.1
 ---
 
 ## Related Skills
-* `45-developer-experience/commit-conventions`
-* `45-developer-experience/repo-automation-scripts`
+- `45-developer-experience/commit-conventions`
+- `45-developer-experience/repo-automation-scripts`

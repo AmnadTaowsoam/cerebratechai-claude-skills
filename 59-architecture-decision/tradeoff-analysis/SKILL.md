@@ -241,6 +241,6 @@ To address the downsides of our choice:
 ---
 
 ## Related Skills
-* `59-architecture-decision/adr-templates`
-* `59-architecture-decision/tech-stack-selection`
-* `00-meta-skills/decision-making`
+- `59-architecture-decision/adr-templates`
+- `59-architecture-decision/tech-stack-selection`
+- `00-meta-skills/decision-making`
