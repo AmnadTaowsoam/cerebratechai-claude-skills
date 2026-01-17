@@ -1044,7 +1044,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 <!-- SKILLS-START -->
 ## Skills Overview
 
-**Total Skills:** 465
+**Total Skills:** 476
 
 
 ### 00. Meta Skills
@@ -1146,11 +1146,15 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 | Skill | Description |
 |-------|-------------|
+| [document-ingestion-pipeline](07-document-processing/document-ingestion-pipeline/SKILL.md) | Document Ingestion Pipeline |
 | [document-parsing](07-document-processing/document-parsing/SKILL.md) | Document Parsing |
 | [image-preprocessing](07-document-processing/image-preprocessing/SKILL.md) | Image Preprocessing |
 | [ocr-paddleocr](07-document-processing/ocr-paddleocr/SKILL.md) | OCR PaddleOCR |
 | [ocr-tesseract](07-document-processing/ocr-tesseract/SKILL.md) | OCR with Tesseract |
 | [pdf-processing](07-document-processing/pdf-processing/SKILL.md) | PDF Processing |
+| [rag-architecture-patterns](07-document-processing/rag-architecture-patterns/SKILL.md) | RAG Architecture Patterns |
+| [rag-chunking-metadata-strategy](07-document-processing/rag-chunking-metadata-strategy/SKILL.md) | RAG Chunking Metadata Strategy |
+| [rag-citations-grounding](07-document-processing/rag-citations-grounding/SKILL.md) | RAG Citations Grounding |
 
 ### 08. Messaging Queue
 
@@ -1688,7 +1692,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 | Skill | Description |
 |-------|-------------|
-| [53-data-engineering](53-data-engineering/SKILL.md) | Data Engineering |
 | [data-quality-checks](53-data-engineering/data-quality-checks/SKILL.md) | Data Quality Checks |
 | [dbt-patterns](53-data-engineering/dbt-patterns/SKILL.md) | dbt Patterns |
 | [elt-modeling](53-data-engineering/elt-modeling/SKILL.md) | ELT Modeling |
@@ -1765,6 +1768,19 @@ MIT License - see [LICENSE](LICENSE) file for details.
 |-------|-------------|
 | [feature-flags-experimentation](59-release-engineering/feature-flags-experimentation/SKILL.md) | Feature Flags & Experimentation |
 | [release-management](59-release-engineering/release-management/SKILL.md) | Release Management |
+
+### 60. Github Mcp
+
+| Skill | Description |
+|-------|-------------|
+| [github-code-review](60-github-mcp/github-code-review/SKILL.md) | GitHub Code Review |
+| [github-issue-triage](60-github-mcp/github-issue-triage/SKILL.md) | GitHub Issue Triage |
+| [github-pr-lifecycle](60-github-mcp/github-pr-lifecycle/SKILL.md) | GitHub Pull Request Lifecycle |
+| [github-release-management](60-github-mcp/github-release-management/SKILL.md) | GitHub Release Management |
+| [github-repo-governance](60-github-mcp/github-repo-governance/SKILL.md) | GitHub Repository Governance |
+| [github-repo-navigation](60-github-mcp/github-repo-navigation/SKILL.md) | GitHub Repository Navigation |
+| [github-security-triage](60-github-mcp/github-security-triage/SKILL.md) | GitHub Security Triage |
+| [github-workflow-ops](60-github-mcp/github-workflow-ops/SKILL.md) | GitHub Workflow Operations |
 
 ### 61. Ai Production
 
