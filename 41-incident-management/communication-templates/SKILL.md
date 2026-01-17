@@ -11,6 +11,90 @@ Communication Templates are pre-written, customizable messages designed for rapi
 
 **Core Principle**: "In a crisis, clear communication is as important as technical resolution."
 
+## Best Practices
+
+- Use one source of truth: link every message to the incident doc/war-room.
+- Separate audiences: internal can be technical; external must be plain-language and empathetic.
+- Communicate facts: explicitly state **what’s known**, **what’s unknown**, and **what’s next**.
+- Timebox updates: commit to an update cadence for SEV0/1; update sooner when status changes.
+- Protect sensitive details: avoid customer-identifiable data, security details, and internal hostnames.
+
+## Quick Start
+
+1. Pick the correct template (internal/external, severity, channel).
+2. Fill variables consistently (use UTC timestamps).
+3. Post internal first (Slack/Teams + incident doc), then external (status page/social/email) if needed.
+4. Set the next-update time and stick to the cadence.
+5. At resolution, publish a clear summary + next steps (postmortem link/timeframe).
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+from enum import Enum
+from string import Template
+
+
+class Severity(str, Enum):
+    SEV0 = "SEV0"
+    SEV1 = "SEV1"
+    SEV2 = "SEV2"
+    SEV3 = "SEV3"
+    SEV4 = "SEV4"
+
+
+@dataclass(frozen=True)
+class IncidentContext:
+    service_name: str
+    impact: str
+    started_utc: str
+    incident_id: str
+    incident_commander: str
+    severity: Severity
+
+
+INTERNAL_INITIAL_ALERT = Template(
+    """🚨 **INCIDENT DETECTED** - $severity
+
+**Service**: $service_name
+**Impact**: $impact
+**Started**: $started_utc
+**Incident Commander**: @$incident_commander
+**War Room**: #incident-$incident_id
+
+**Current Status**: Investigating
+
+**Next Update**: in 30 minutes or when status changes
+"""
+)
+
+
+def render_internal_initial_alert(ctx: IncidentContext) -> str:
+    return INTERNAL_INITIAL_ALERT.substitute(
+        severity=ctx.severity.value,
+        service_name=ctx.service_name,
+        impact=ctx.impact,
+        started_utc=ctx.started_utc,
+        incident_commander=ctx.incident_commander,
+        incident_id=ctx.incident_id,
+    )
+```
+
+## Production Checklist
+
+- [ ] Templates stored in a single, searchable location (wiki/repo/Slack workflow).
+- [ ] Variables standardized (UTC timestamps, incident ID format, severity scale).
+- [ ] Update cadence defined per severity (and enforced by the IC).
+- [ ] External comms have an approval/ownership path (on-call comms owner).
+- [ ] Post-incident: publish customer-facing summary + internal postmortem process.
+
+## Anti-patterns
+
+1. **Speculating publicly**: creates trust debt and complicates follow-up messaging.
+2. **Overpromising ETAs**: use time-bounded updates (“next update at…”) instead.
+3. **Inconsistent wording across channels**: stakeholders lose confidence; keep a canonical update.
+4. **Leaking sensitive details**: never include PII or security-relevant specifics in external posts.
+
 ---
 
 ## 1. Initial Incident Notification

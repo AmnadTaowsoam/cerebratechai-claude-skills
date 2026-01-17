@@ -435,16 +435,88 @@ Repository นี้มี 473+ production-ready coding skills ใน 73 หม�
 ## 5. 🔴 Antigravity (Google DeepMind)
 
 ### ภาพรวม
-Antigravity ใช้ฟีเจอร์ **Skills** เพื่อเข้าถึง repository นี้แบบ local
-
-> ⚠️ **หมายเหตุ**: MCP ของ Antigravity มีปัญหาเรื่อง Docker dependency ให้ใช้วิธี **Skills** ด้านล่างแทน
+Antigravity รองรับ **MCP (Model Context Protocol)** สำหรับการเชื่อมต่อกับ GitHub repositories และแหล่งข้อมูลอื่นๆ
 
 ### สิ่งที่ต้องเตรียม
-- Antigravity ติดตั้งแล้ว
-- Git ติดตั้งแล้ว
-- Clone repository มาไว้ local
+- Antigravity IDE ติดตั้งแล้ว
+- Node.js 18+
+- GitHub Personal Access Token
 
-### ขั้นตอนการตั้งค่า
+---
+
+### วิธีที่ 1: MCP กับ GitHub (แนะนำ) ⭐
+
+#### ขั้นที่ 1: สร้าง GitHub Token
+
+เหมือนกับ Claude Desktop (ส่วนที่ 1, ขั้นที่ 1)
+
+#### ขั้นที่ 2: ตั้งค่า MCP
+
+**ตำแหน่งไฟล์ config:**
+- Windows: `%APPDATA%\Antigravity\mcp_config.json`
+- macOS: `~/Library/Application Support/Antigravity/mcp_config.json`
+- Linux: `~/.config/Antigravity/mcp_config.json`
+
+**สร้าง/แก้ไข `mcp_config.json`:**
+
+```json
+{
+  "mcpServers": {
+    "cerebratechai-skills": {
+      "command": "npx",
+      "arguments": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
+        "GITHUB_OWNER": "AmnadTaowsoam",
+        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_BRANCH": "main"
+      }
+    }
+  }
+}
+```
+
+**Windows PowerShell:**
+```powershell
+# สร้างโฟลเดอร์ถ้าจำเป็น
+New-Item -ItemType Directory -Force -Path "$env:APPDATA\Antigravity"
+
+# แก้ไข config
+notepad "$env:APPDATA\Antigravity\mcp_config.json"
+```
+
+**macOS/Linux:**
+```bash
+# สร้างโฟลเดอร์ถ้าจำเป็น
+mkdir -p ~/Library/Application\ Support/Antigravity
+
+# แก้ไข config
+nano ~/Library/Application\ Support/Antigravity/mcp_config.json
+```
+
+#### ขั้นที่ 3: Restart Antigravity
+
+ปิดและเปิด Antigravity ใหม่เพื่อโหลด MCP server
+
+#### ขั้นที่ 4: ตรวจสอบการเชื่อมต่อ
+
+ใน Antigravity คุณควรสามารถเข้าถึง repository ผ่านคำสั่ง MCP ได้
+
+### การใช้งานกับ MCP
+
+```
+Using skills from cerebratechai-skills repository:
+- typescript-standards
+- nextjs-patterns
+
+Create a Next.js API endpoint
+```
+
+---
+
+### วิธีที่ 2: Local Skills (Offline)
+
+ถ้าต้องการใช้ไฟล์ local หรือต้องการใช้งาน offline:
 
 #### ขั้นที่ 1: Clone Repository
 
@@ -477,48 +549,7 @@ git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
 2. พิมพ์: `List available skills`
 3. ควรเห็น `cerebratechai-skills` ในรายการ
 
-### ทางเลือก: ตั้งค่าด้วยไฟล์ Config
-
-ถ้า Antigravity รองรับไฟล์ config ให้สร้าง `.antigravity/config.json`:
-
-**Windows:**
-```powershell
-# สร้างโฟลเดอร์
-New-Item -ItemType Directory -Force -Path "$env:APPDATA\.antigravity"
-
-# แก้ไข config
-notepad "$env:APPDATA\.antigravity\config.json"
-```
-
-**macOS/Linux:**
-```bash
-# สร้างโฟลเดอร์
-mkdir -p ~/.antigravity
-
-# แก้ไข config
-nano ~/.antigravity/config.json
-```
-
-**โค้ดตั้งค่า:**
-```json
-{
-  "skills": [
-    {
-      "name": "cerebratechai-skills",
-      "path": "C:\\Users\\YOUR_USERNAME\\Documents\\cerebratechai-claude-skills",
-      "enabled": true,
-      "autoLoad": true
-    }
-  ]
-}
-```
-
-แทนที่ path ด้วย path จริงของคุณ:
-- Windows: `C:\\Users\\YOUR_USERNAME\\Documents\\cerebratechai-claude-skills`
-- macOS: `/Users/YOUR_USERNAME/Documents/cerebratechai-claude-skills`
-- Linux: `/home/YOUR_USERNAME/Documents/cerebratechai-claude-skills`
-
-### วิธีใช้งาน
+### การใช้งาน (วิธี Local)
 
 **วิธีที่ 1: อ้างอิงโดยตรง**
 ```
@@ -550,11 +581,12 @@ Load context from cerebratechai-skills:
 
 ### อัปเดต Skills
 
-เพื่อรับ skills ล่าสุด:
+**วิธี MCP:** Auto-sync จาก GitHub (ไม่ต้องทำอะไร)
 
+**วิธี Local:**
 ```bash
 # ไปที่ repository
-cd ~/Documents/cerebratechai-claude-skills  # หรือ path ของคุณ
+cd ~/Documents/cerebratechai-claude-skills
 
 # Pull การเปลี่ยนแปลงล่าสุด
 git pull origin main
@@ -569,20 +601,19 @@ Antigravity จะใช้ไฟล์ที่อัปเดตแล้ว�
 | คุณสมบัติ | Claude Desktop | Claude Code | GitHub Codex | Roo Code | Antigravity |
 |---------|---------------|-------------|--------------|----------|-------------|
 | **ความยากในการตั้งค่า** | ⭐⭐ ง่าย | ⭐ ง่ายมาก | ⭐⭐⭐ ปานกลาง | ⭐⭐ ง่าย | ⭐⭐ ง่าย |
-| **รองรับ MCP** | ✅ ใช่ | ✅ ใช่ | ❌ ไม่ | ✅ ใช่ | ❌ ไม่* |
-| **Auto-sync** | ✅ ใช่ | ✅ ใช่ | ⚠️ Manual | ✅ ใช่ (MCP) | ⚠️ Manual |
-| **โหมด Offline** | ❌ ไม่ | ❌ ไม่ | ✅ ใช่ | ✅ ใช่ (Local) | ✅ ใช่ |
-| **รวมกับ IDE** | ❌ ไม่ | ✅ VS Code | ✅ VS Code | ✅ Cursor | ✅ หลาย IDE |
+| **รองรับ MCP** | ✅ ใช่ | ✅ ใช่ | ❌ ไม่ | ✅ ใช่ | ✅ ใช่ |
+| **Auto-sync** | ✅ ใช่ | ✅ ใช่ | ⚠️ Manual | ✅ ใช่ (MCP) | ✅ ใช่ (MCP) |
+| **โหมด Offline** | ❌ ไม่ | ❌ ไม่ | ✅ ใช่ | ✅ ใช่ (Local) | ✅ ใช่ (Local) |
+| **รวมกับ IDE** | ❌ ไม่ | ✅ VS Code | ✅ VS Code | ✅ Cursor | ✅ Antigravity IDE |
 | **Skill Indexing** | ✅ อัตโนมัติ | ✅ อัตโนมัติ | ⚠️ Manual | ✅ อัตโนมัติ | ✅ อัตโนมัติ |
 | **Context Window** | ใหญ่ | ใหญ่ | ปานกลาง | ใหญ่ | ใหญ่มาก |
-| **เหมาะสำหรับ** | ใช้แยก | VS Code | ผู้ใช้ GitHub | ผู้ใช้ Cursor | Skills แบบ local |
+| **เหมาะสำหรับ** | ใช้แยก | VS Code | ผู้ใช้ Copilot | ผู้ใช้ Cursor | พัฒนา AI agent |
 
 ### สัญลักษณ์
 - ✅ รองรับเต็มรูปแบบ
 - ⚠️ รองรับบางส่วน / ตั้งค่าเอง
 - ❌ ไม่รองรับ
 - ⭐ ความยาก (1-5 ดาว)
-- \* Antigravity มี MCP แต่มีปัญหา Docker dependency ให้ใช้วิธี Skills แทน
 
 ---
 
@@ -608,11 +639,11 @@ Antigravity จะใช้ไฟล์ที่อัปเดตแล้ว�
 - ✅ ต้องการทั้งสองวิธี (MCP + local files)
 
 ### เลือก Antigravity ถ้า:
-- ✅ ต้องการใช้ skills แบบ local (offline)
-- ✅ ชอบการจัดการ skill แบบไฟล์
+- ✅ กำลังสร้าง AI agents
+- ✅ ต้องการ MCP auto-sync หรือ local files (รองรับทั้งสอง!)
 - ✅ ต้องการ context window ใหญ่มาก
-- ✅ ต้องการความสามารถ AI ขั้นสูง
-- ⚠️ หมายเหตุ: ต้อง `git pull` เองเพื่ออัปเดต skills
+- ✅ ต้องการความสามารถ AI agent ขั้นสูง
+- ✅ ชอบเทคโนโลยี AI จาก Google DeepMind
 
 ---
 

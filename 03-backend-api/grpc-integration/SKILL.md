@@ -1534,6 +1534,14 @@ describe('UserService', () => {
    - Enable tracing with OpenTelemetry
    - Set up health checks
 
+## Production Checklist
+
+- [ ] Define and enforce deadlines/timeouts for every RPC (client and server).
+- [ ] Standardize status codes + error details, and avoid leaking internals in messages.
+- [ ] Use TLS everywhere; prefer mTLS for service-to-service traffic.
+- [ ] Add observability: metrics, structured logs, and distributed tracing with correlation IDs.
+- [ ] Add health checks and graceful shutdown; verify under load and deploy conditions.
+
 ## Related Skills
 
 - `09-microservices/service-design`

@@ -11,6 +11,65 @@ Data Lineage is the process of tracking what happens to data as it flows through
 
 **Core Principle**: "To trust the data, you must know where it came from and how it changed."
 
+## Best Practices
+
+- Capture lineage automatically at orchestration boundaries (Airflow, Spark, dbt) instead of manual docs.
+- Standardize dataset naming (`namespace` + `name`) and keep it stable across environments.
+- Enrich events with run context (job version/git SHA, run ID, owner/team, and environment).
+- Prioritize column-level lineage for PII and business-critical metrics; keep table-level for everything else.
+- Make lineage actionable: use it in schema change reviews and incident RCA/impact analysis.
+
+## Quick Start
+
+1. Choose a lineage standard/tooling (e.g., OpenLineage + Marquez/DataHub).
+2. Instrument your orchestrator to emit lineage events for each job run.
+3. Register stable dataset identifiers (warehouse tables, S3 paths, Kafka topics).
+4. Visualize lineage and validate it during schema changes.
+5. Alert on missing lineage for critical pipelines (treat as a reliability issue).
+
+```python
+from __future__ import annotations
+
+import json
+from datetime import datetime, timezone
+from uuid import uuid4
+
+
+def build_openlineage_run_event(
+    *,
+    job_namespace: str,
+    job_name: str,
+    input_dataset: tuple[str, str],
+    output_dataset: tuple[str, str],
+    event_type: str = "COMPLETE",
+) -> dict:
+    event_time = datetime.now(tz=timezone.utc).isoformat()
+    run_id = str(uuid4())
+    input_ns, input_name = input_dataset
+    output_ns, output_name = output_dataset
+
+    return {
+        "eventType": event_type,
+        "eventTime": event_time,
+        "run": {"runId": run_id},
+        "job": {"namespace": job_namespace, "name": job_name},
+        "inputs": [{"namespace": input_ns, "name": input_name}],
+        "outputs": [{"namespace": output_ns, "name": output_name}],
+        "producer": "https://openlineage.io/",
+        "schemaURL": "https://openlineage.io/spec/1-0-0/OpenLineage.json",
+    }
+
+
+if __name__ == "__main__":
+    event = build_openlineage_run_event(
+        job_namespace="prod-etl",
+        job_name="clean_orders_job",
+        input_dataset=("db_raw", "raw_orders"),
+        output_dataset=("db_prod", "clean_orders"),
+    )
+    print(json.dumps(event, indent=2))
+```
+
 ---
 
 ## 1. Why Data Lineage Matters
@@ -117,11 +176,11 @@ This allows security teams to identify which S3 buckets or BigQuery datasets req
 
 ## 9. Data Lineage Checklist
 
-* [ ] **Completeness**: Does our lineage cover cross-system boundaries (e.g., Salesforce to Snowflake)?
-* [ ] **Granularity**: Do we have column-level lineage for our most sensitive data?
-* [ ] **Orchestration**: Is lineage captured automatically from every Airflow/dbt run?
-* [ ] **Impact Analysis**: Is there a standard process to check lineage before a schema change?
-* [ ] **Ownership**: Does every table in the lineage graph have a defined team/individual owner?
+- [ ] **Completeness**: Does our lineage cover cross-system boundaries (e.g., Salesforce to Snowflake)?
+- [ ] **Granularity**: Do we have column-level lineage for our most sensitive data?
+- [ ] **Orchestration**: Is lineage captured automatically from every Airflow/dbt run?
+- [ ] **Impact Analysis**: Is there a standard process to check lineage before a schema change?
+- [ ] **Ownership**: Does every table in the lineage graph have a defined team/individual owner?
 
 ---
 

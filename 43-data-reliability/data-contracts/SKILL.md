@@ -11,6 +11,57 @@ A Data Contract is a formal agreement between a data producer (e.g., a microserv
 
 **Core Principle**: "Data should be treated as a product, and products need specifications."
 
+## Best Practices
+
+- Treat the contract as an API: version it, review it, and publish changelogs for consumers.
+- Validate at the producer boundary (before publish) and make violations visible (metrics + alerts).
+- Separate **schema** from **quality/SLA** checks so compatibility and correctness are independently testable.
+- Define and enforce compatibility rules (SemVer + deprecation windows) instead of ad-hoc changes.
+- Tag sensitive fields (PII) and enforce policy (masking/encryption/retention) as part of the contract lifecycle.
+
+## Quick Start
+
+1. Co-author a contract (producer + consumers) with ownership and SemVer.
+2. Convert the schema portion into a machine-checkable format (JSON Schema/Avro/Protobuf).
+3. Validate events at publish-time (producer gatekeeper) and fail fast on violations.
+4. Add CI checks for compatibility when contracts change (block breaking changes).
+5. Monitor contract violations and treat them as incidents.
+
+```python
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any
+
+import yaml
+from jsonschema import Draft202012Validator
+
+
+def load_contract_schema(contract_path: Path) -> dict[str, Any]:
+    contract = yaml.safe_load(contract_path.read_text(encoding="utf-8"))
+    schema = contract.get("schema")
+    if not isinstance(schema, dict):
+        raise ValueError("contract.schema must be an object")
+    return schema
+
+
+def validate_event(*, schema: dict[str, Any], event: dict[str, Any]) -> None:
+    validator = Draft202012Validator(schema)
+    errors = sorted(validator.iter_errors(event), key=lambda e: e.json_path)
+    if errors:
+        messages = "; ".join(f"{e.json_path}: {e.message}" for e in errors)
+        raise ValueError(f"Data contract violation: {messages}")
+
+
+if __name__ == "__main__":
+    # pip install pyyaml jsonschema
+    schema = load_contract_schema(Path("customer_onboarded_contract.yaml"))
+    event = json.loads(Path("event.json").read_text(encoding="utf-8"))
+    validate_event(schema=schema, event=event)
+    print("✅ Contract validation passed")
+```
+
 ---
 
 ## 1. Why Data Contracts Matter
@@ -139,11 +190,11 @@ A data platform should always be able to process `v1.0.0` data even if `v1.5.0` 
 
 ## 9. Data Contract Checklist
 
-* [ ] **Owner**: Is there a specific team responsible for this contract?
-* [ ] **PII Identification**: Are sensitive fields (SSN, Email) tagged for encryption?
-* [ ] **Validation**: Is the data validated *at the source*?
-* [ ] **Alerting**: Does the consumer get alerted if an SLA (Freshness) is breached?
-* [ ] **Documentation**: Is the `description` field filled out for every column?
+- [ ] **Owner**: Is there a specific team responsible for this contract?
+- [ ] **PII Identification**: Are sensitive fields (SSN, Email) tagged for encryption?
+- [ ] **Validation**: Is the data validated *at the source*?
+- [ ] **Alerting**: Does the consumer get alerted if an SLA (Freshness) is breached?
+- [ ] **Documentation**: Is the `description` field filled out for every column?
 
 ---
 
