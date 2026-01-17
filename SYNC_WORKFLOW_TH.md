@@ -1,0 +1,221 @@
+# คู่มือการ Sync Skills (ภาษาไทย)
+
+## ภาพรวม
+
+ระบบนี้ใช้ 2 directory แยกกัน:
+
+- **Development (พัฒนา)**: `D:\Cerebra\cerebratechai-claude-skills`
+  - ที่นี่คุณแก้ไขและพัฒนา skills
+  - เชื่อมต่อกับ GitHub
+  
+- **Production (ใช้งานจริง)**: `D:\AgentSkill\cerebratechai-claude-skills`
+  - ที่นี่ multi-agent ดึงข้อมูล skills ไปใช้
+  - ดึงข้อมูลจาก GitHub เท่านั้น (อ่านอย่างเดียว)
+
+## Junction Links Setup (แนะนำ)
+
+### ทำไมต้องใช้ Junction Links?
+
+เพื่อให้ Agent เข้าถึง skills ได้จากทุก project โดยไม่ต้อง config ซ้ำ
+
+### วิธีตั้งค่าสำหรับแต่ละ Project
+
+**รันใน project directory:**
+
+```batch
+# ต้องรันด้วย Administrator
+setup-project-links.bat
+```
+
+**หรือสร้างเอง:**
+
+```batch
+mkdir .agentskills
+mklink /J .agentskills\skills D:\AgentSkill\cerebratechai-claude-skills
+mklink /J .codex .agentskills
+```
+
+**ผลลัพธ์:**
+```
+your-project/
+├── .agentskills/
+│   └── skills/  → D:\AgentSkill\cerebratechai-claude-skills
+└── .codex/      → .agentskills/
+```
+
+**เพิ่มใน .gitignore:**
+```gitignore
+.agentskills/
+.codex/
+```
+
+---
+
+## Best Practices
+
+1. **Always commit meaningful changes**: Use descriptive commit messages
+2. **Test before pushing**: Ensure your skills work correctly before syncing to production
+3. **Pull before editing**: Run `update-skills.bat` before starting new edits to avoid conflicts
+4. **Keep production clean**: Never edit files directly in `D:\AgentSkill\cerebratechai-claude-skills`
+5. **Use junction links**: Set up junction links for each project to avoid config repetition
+
+## ขั้นตอนการทำงาน
+
+### 1. แก้ไข Skills (Local)
+
+แก้ไขไฟล์ใน directory พัฒนา:
+```
+D:\Cerebra\cerebratechai-claude-skills
+```
+
+### 2. Push ขึ้น GitHub
+
+เมื่อพร้อมแล้ว ให้รัน:
+
+```batch
+cd D:\Cerebra\cerebratechai-claude-skills
+sync-to-production.bat
+```
+
+Script นี้จะ:
+- แสดง git status
+- Add ไฟล์ทั้งหมด
+- ถามข้อความ commit
+- Commit การเปลี่ยนแปลง
+- Push ขึ้น GitHub
+
+**หรือทำด้วยตัวเอง:**
+```batch
+cd D:\Cerebra\cerebratechai-claude-skills
+git add .
+git commit -m "ข้อความอธิบายการเปลี่ยนแปลง"
+git push origin main
+```
+
+### 3. ตรวจสอบบน GitHub
+
+เข้าไปดูที่ GitHub ว่า push สำเร็จหรือไม่:
+```
+https://github.com/AmnadTaowsoam/cerebratechai-claude-skills
+```
+
+### 4. Pull มาที่ Production
+
+ดึงข้อมูลล่าสุดมาที่ production directory:
+
+```batch
+update-skills.bat
+```
+
+Script นี้จะ:
+- Fetch ข้อมูลล่าสุดจาก GitHub
+- Checkout main branch
+- Pull การเปลี่ยนแปลง
+- แจ้งผลสำเร็จ
+
+**หรือทำด้วยตัวเอง:**
+```batch
+cd D:\AgentSkill\cerebratechai-claude-skills
+git fetch origin
+git checkout main
+git pull --ff-only origin main
+```
+
+### 5. Multi-Agent ใช้งานได้เลย
+
+ตอนนี้ multi-agent สามารถเข้าถึง skills ล่าสุดได้จาก:
+```
+D:\AgentSkill\cerebratechai-claude-skills
+```
+
+## สรุปขั้นตอน
+
+```
+แก้ไข (D:\Cerebra) 
+  ↓
+Push (sync-to-production.bat) 
+  ↓
+GitHub 
+  ↓
+Pull (update-skills.bat) 
+  ↓
+ใช้งาน (D:\AgentSkill)
+```
+
+## ไฟล์ Batch ที่ใช้
+
+| ไฟล์ | ที่อยู่ | ไว้ทำอะไร |
+|------|---------|-----------|
+| `sync-to-production.bat` | `D:\Cerebra\cerebratechai-claude-skills\` | Push ขึ้น GitHub |
+| `update-skills.bat` | `D:\Cerebra\cerebratechai-claude-skills\` | Pull จาก GitHub มา Production |
+
+## ข้อควรระวัง
+
+1. **อย่าแก้ไขไฟล์ใน D:\AgentSkill โดยตรง** - ให้แก้ไขใน D:\Cerebra เท่านั้น
+2. **ใช้ commit message ที่มีความหมาย** - เพื่อให้ติดตามการเปลี่ยนแปลงได้ง่าย
+3. **ทดสอบก่อน push** - ให้แน่ใจว่า skills ทำงานถูกต้องก่อน sync
+4. **Pull ก่อนแก้ไข** - เพื่อหลีกเลี่ยง conflict
+
+## แก้ปัญหา
+
+### ถ้ามี Merge Conflict
+```batch
+cd D:\Cerebra\cerebratechai-claude-skills
+git status
+# แก้ไข conflict ด้วยตัวเอง
+git add .
+git commit -m "แก้ไข merge conflicts"
+git push origin main
+```
+
+### ถ้า Production มีการเปลี่ยนแปลงที่ไม่ต้องการ
+```batch
+cd D:\AgentSkill\cerebratechai-claude-skills
+git reset --hard origin/main
+git pull origin main
+```
+
+### ถ้า Push ไม่ผ่าน
+```batch
+cd D:\Cerebra\cerebratechai-claude-skills
+git pull --rebase origin main
+git push origin main
+```
+
+## ตัวอย่างการใช้งานจริง
+
+### เช้าวันจันทร์ - เริ่มทำงาน
+```batch
+# Pull ข้อมูลล่าสุดมาก่อน
+cd D:\Cerebra\cerebratechai-claude-skills
+git pull origin main
+
+# เริ่มแก้ไข skills...
+```
+
+### เย็นวันจันทร์ - เสร็จงานแล้ว
+```batch
+# Push งานที่ทำเสร็จขึ้น GitHub
+cd D:\Cerebra\cerebratechai-claude-skills
+sync-to-production.bat
+# (ใส่ commit message: "เพิ่ม skill ใหม่สำหรับ multi-agent")
+
+# Update production
+update-skills.bat
+```
+
+### ตอนนี้ multi-agent ใช้งาน skills ใหม่ได้แล้ว! 🎉
+
+## คำถามที่พบบ่อย
+
+**Q: ทำไมต้องใช้ 2 directory?**
+A: เพื่อแยก environment ระหว่างการพัฒนากับการใช้งานจริง ป้องกันไม่ให้ multi-agent อ่านไฟล์ที่กำลังแก้ไขอยู่
+
+**Q: ถ้าลืม push ขึ้น GitHub จะเกิดอะไรขึ้น?**
+A: Production จะไม่ได้รับการอัพเดท multi-agent จะใช้ skills เวอร์ชันเก่าอยู่
+
+**Q: ต้อง pull ทุกครั้งก่อนใช้ multi-agent หรือไม่?**
+A: ไม่จำเป็น แต่แนะนำให้ pull เป็นระยะเพื่อให้ได้ skills ล่าสุดเสมอ
+
+**Q: สามารถ automate ได้ไหม?**
+A: ได้ แต่ไม่แนะนำสำหรับ production เพราะอาจ push code ที่ยังไม่พร้อมขึ้นไป
