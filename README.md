@@ -1061,7 +1061,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 <!-- SKILLS-START -->
 ## Skills Overview
 
-**Total Skills:** 476
+**Total Skills:** 486
 
 
 ### 00. Meta Skills
@@ -1091,7 +1091,9 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [animation](02-frontend/animation/SKILL.md) | Animation Patterns in React |
 | [error-boundaries-react](02-frontend/error-boundaries-react/SKILL.md) | Error Boundaries in React |
 | [form-handling](02-frontend/form-handling/SKILL.md) | Form Handling with React Hook Form and Zod |
+| [infinite-scroll](02-frontend/infinite-scroll/SKILL.md) | Infinite Scroll Patterns |
 | [mui-material](02-frontend/mui-material/SKILL.md) | Material-UI (MUI) Best Practices |
+| [multi-step-forms](02-frontend/multi-step-forms/SKILL.md) | Multi-Step Form Patterns |
 | [nextjs-patterns](02-frontend/nextjs-patterns/SKILL.md) | Next.js 14+ App Router Patterns |
 | [react-best-practices](02-frontend/react-best-practices/SKILL.md) | React Best Practices and Patterns |
 | [shadcn-ui](02-frontend/shadcn-ui/SKILL.md) | shadcn/ui Component Patterns |
@@ -1190,6 +1192,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [api-gateway](09-microservices/api-gateway/SKILL.md) | API Gateway |
 | [circuit-breaker](09-microservices/circuit-breaker/SKILL.md) | Circuit Breaker Pattern |
 | [cqrs-pattern](09-microservices/cqrs-pattern/SKILL.md) | CQRS Pattern (Command Query Responsibility Segregation) |
+| [escrow-workflow](09-microservices/escrow-workflow/SKILL.md) | Escrow Workflow Patterns |
 | [event-driven](09-microservices/event-driven/SKILL.md) | Event-Driven Architecture |
 | [event-sourcing](09-microservices/event-sourcing/SKILL.md) | Event Sourcing |
 | [saga-pattern](09-microservices/saga-pattern/SKILL.md) | Saga Pattern |
@@ -1264,6 +1267,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [load-balancing](15-devops-infrastructure/load-balancing/SKILL.md) | Load Balancing Strategies |
 | [multi-cloud-patterns](15-devops-infrastructure/multi-cloud-patterns/SKILL.md) | Multi-Cloud Patterns |
 | [secrets-management](15-devops-infrastructure/secrets-management/SKILL.md) | Secrets Management |
+| [service-orchestration](15-devops-infrastructure/service-orchestration/SKILL.md) | Service Orchestration |
 | [terraform-infrastructure](15-devops-infrastructure/terraform-infrastructure/SKILL.md) | Terraform Infrastructure |
 
 ### 16. Testing
@@ -1272,6 +1276,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 |-------|-------------|
 | [contract-testing-pact](16-testing/contract-testing-pact/SKILL.md) | Contract Testing with Pact |
 | [e2e-playwright](16-testing/e2e-playwright/SKILL.md) | E2E Testing with Playwright |
+| [event-driven-testing](16-testing/event-driven-testing/SKILL.md) | Event-Driven Testing |
 | [integration-testing](16-testing/integration-testing/SKILL.md) | Integration Testing |
 | [jest-patterns](16-testing/jest-patterns/SKILL.md) | Jest Patterns |
 | [load-testing](16-testing/load-testing/SKILL.md) | Load Testing |
@@ -1290,7 +1295,9 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [multi-tenancy](17-domain-specific/multi-tenancy/SKILL.md) | Multi-Tenancy Architecture |
 | [multi-tenancy-advanced](17-domain-specific/multi-tenancy-advanced/SKILL.md) | Multi-Tenancy Advanced Patterns |
 | [notification-system](17-domain-specific/notification-system/SKILL.md) | Notification System |
+| [qr-code-features](17-domain-specific/qr-code-features/SKILL.md) | QR Code Features |
 | [rate-limiting](17-domain-specific/rate-limiting/SKILL.md) | Rate Limiting |
+| [thai-cultural-events](17-domain-specific/thai-cultural-events/SKILL.md) | Thai Cultural Event Planning |
 
 ### 18. Project Management
 
@@ -1324,6 +1331,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [ai-search](20-ai-integration/ai-search/SKILL.md) | AI Search |
 | [chatbot-integration](20-ai-integration/chatbot-integration/SKILL.md) | Chatbot Integration |
 | [conversational-ui](20-ai-integration/conversational-ui/SKILL.md) | Conversational UI |
+| [line-platform-integration](20-ai-integration/line-platform-integration/SKILL.md) | LINE Platform Integration |
 | [llm-txt-protocol](20-ai-integration/llm-txt-protocol/SKILL.md) | llm.txt Protocol |
 
 ### 21. Documentation
@@ -1345,6 +1353,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [design-handoff](22-ux-ui-design/design-handoff/SKILL.md) | Design Handoff |
 | [design-systems](22-ux-ui-design/design-systems/SKILL.md) | Design Systems |
 | [responsive-design](22-ux-ui-design/responsive-design/SKILL.md) | Responsive Design |
+| [thai-ux-patterns](22-ux-ui-design/thai-ux-patterns/SKILL.md) | Thai UI/UX Patterns |
 | [user-research](22-ux-ui-design/user-research/SKILL.md) | User Research |
 | [wireframing](22-ux-ui-design/wireframing/SKILL.md) | Wireframing |
 
@@ -1904,4 +1913,5 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [api-design-contracts](71-infrastructure-patterns/api-design-contracts/SKILL.md) | API Design & Contracts |
 | [caching-strategies](71-infrastructure-patterns/caching-strategies/SKILL.md) | Caching Strategies |
 | [secrets-key-management](71-infrastructure-patterns/secrets-key-management/SKILL.md) | Secrets & Key Management |
+| [thai-payment-integration](71-infrastructure-patterns/thai-payment-integration/SKILL.md) | Thai Payment Integration |
 <!-- SKILLS-END -->
