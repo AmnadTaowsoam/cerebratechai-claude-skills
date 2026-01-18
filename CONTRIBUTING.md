@@ -577,6 +577,16 @@ We're particularly looking for contributions in these areas:
 - [x] GitOps ArgoCD - `15-devops-infrastructure/gitops-argocd`
 - [x] Contract Testing Pact - `16-testing/contract-testing-pact`
 - [x] Multi-Cloud Patterns - `15-devops-infrastructure/multi-cloud-patterns`
+- [x] Multi-Step Forms - `02-frontend/multi-step-forms`
+- [x] Infinite Scroll - `02-frontend/infinite-scroll`
+- [x] Escrow Workflow - `09-microservices/escrow-workflow`
+- [x] Service Orchestration - `15-devops-infrastructure/service-orchestration`
+- [x] Event-Driven Testing - `16-testing/event-driven-testing`
+- [x] QR Code Features - `17-domain-specific/qr-code-features`
+- [x] Thai Cultural Events - `17-domain-specific/thai-cultural-events`
+- [x] LINE Platform Integration - `20-ai-integration/line-platform-integration`
+- [x] Thai UX Patterns - `22-ux-ui-design/thai-ux-patterns`
+- [x] Thai Payment Integration - `71-infrastructure-patterns/thai-payment-integration`
 
 ### Still Needed
 - [ ] CI/CD with GitLab

@@ -2,9 +2,9 @@
 
 > **Comprehensive skill library for Claude AI to build production-ready applications**
 
-A curated collection of **473+ specialized skills** across **73 categories** covering everything from core development to advanced features like AI/ML, blockchain, IoT, system resilience, platform engineering, governance, and more. Each skill provides detailed implementation guides, best practices, and production-ready code examples.
+A curated collection of **483+ specialized skills** across **73 categories** covering everything from core development to advanced features like AI/ML, blockchain, IoT, system resilience, platform engineering, governance, and more. Each skill provides detailed implementation guides, best practices, and production-ready code examples.
 
-[![Skills](https://img.shields.io/badge/Skills-473+-blue)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
+[![Skills](https://img.shields.io/badge/Skills-483+-blue)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
 [![Categories](https://img.shields.io/badge/Categories-73-purple)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -37,7 +37,7 @@ This repository contains specialized skills that help Claude understand and impl
 
 ### 🌟 Key Features
 
-- **473+ Skills** covering full-stack development across **73 categories**
+- **483+ Skills** covering full-stack development across **73 categories**
 - **Production-Ready** patterns and examples
 - **Language Support**: TypeScript, Python, SQL, and more
 - **Framework Coverage**: Next.js, React, FastAPI, Express, and more
@@ -158,7 +158,7 @@ Strategic thinking and architectural practices.
 - [System Thinking](00-meta-skills/system-thinking/SKILL.md) - Holistic system analysis
 - [Technical Debt Management](00-meta-skills/technical-debt-management/SKILL.md) - Managing tech debt
 
-### 02. 🎨 Frontend Development (10 skills)
+### 02. 🎨 Frontend Development (12 skills)
 Modern frontend frameworks and patterns.
 
 - [Next.js Patterns](02-frontend/nextjs-patterns/SKILL.md) - Next.js 14+ App Router
@@ -167,8 +167,10 @@ Modern frontend frameworks and patterns.
 - [Material-UI](02-frontend/mui-material/SKILL.md) - MUI components
 - [shadcn/ui](02-frontend/shadcn-ui/SKILL.md) - shadcn/ui patterns
 - [Form Handling](02-frontend/form-handling/SKILL.md) - React Hook Form + Zod
+- [Multi-Step Forms](02-frontend/multi-step-forms/SKILL.md) - Wizard patterns, validation, progress tracking
 - [State Management](02-frontend/state-management/SKILL.md) - Zustand, Redux, TanStack Query
 - [Animation](02-frontend/animation/SKILL.md) - Framer Motion, CSS animations
+- [Infinite Scroll](02-frontend/infinite-scroll/SKILL.md) - Virtual scrolling, Intersection Observer
 - [Error Boundaries React](02-frontend/error-boundaries-react/SKILL.md) - React error boundaries
 - [State Machines XState](02-frontend/state-machines-xstate/SKILL.md) - XState state machines
 
@@ -246,7 +248,7 @@ Message queuing systems.
 - [Redis Queue](08-messaging-queue/redis-queue/SKILL.md) - Bull/BullMQ
 - [Queue Monitoring](08-messaging-queue/queue-monitoring/SKILL.md) - Observability
 
-### 09. 🔧 Microservices (9 skills)
+### 09. 🔧 Microservices (10 skills)
 Microservices architecture.
 
 - [Service Design](09-microservices/service-design/SKILL.md) - Design principles
@@ -255,6 +257,7 @@ Microservices architecture.
 - [Circuit Breaker](09-microservices/circuit-breaker/SKILL.md) - Resilience patterns
 - [Service Discovery](09-microservices/service-discovery/SKILL.md) - Consul, etcd
 - [Event-Driven](09-microservices/event-driven/SKILL.md) - Event sourcing, CQRS
+- [Escrow Workflow](09-microservices/escrow-workflow/SKILL.md) - Milestone payments, state machines
 - [Saga Pattern](09-microservices/saga-pattern/SKILL.md) - Distributed transactions
 - [Event Sourcing](09-microservices/event-sourcing/SKILL.md) - Event sourcing patterns
 - [CQRS Pattern](09-microservices/cqrs-pattern/SKILL.md) - Command Query Responsibility Segregation
@@ -308,12 +311,13 @@ Application monitoring and logging.
 - [Error Tracking](14-monitoring-observability/error-tracking/SKILL.md) - Sentry
 - [Performance Monitoring](14-monitoring-observability/performance-monitoring/SKILL.md) - APM
 
-### 15. 🐳 DevOps & Infrastructure (10 skills)
+### 15. 🐳 DevOps & Infrastructure (11 skills)
 Infrastructure as code and CI/CD.
 
 - [Docker Patterns](15-devops-infrastructure/docker-patterns/SKILL.md) - Docker
 - [Docker Compose](15-devops-infrastructure/docker-compose/SKILL.md) - Multi-container
 - [Kubernetes](15-devops-infrastructure/kubernetes-deployment/SKILL.md) - K8s deployment
+- [Service Orchestration](15-devops-infrastructure/service-orchestration/SKILL.md) - Service discovery, deployment strategies
 - [Helm Charts](15-devops-infrastructure/helm-charts/SKILL.md) - Helm
 - [GitHub Actions](15-devops-infrastructure/ci-cd-github-actions/SKILL.md) - CI/CD
 - [Terraform](15-devops-infrastructure/terraform-infrastructure/SKILL.md) - IaC
@@ -322,19 +326,20 @@ Infrastructure as code and CI/CD.
 - [GitOps ArgoCD](15-devops-infrastructure/gitops-argocd/SKILL.md) - GitOps with ArgoCD
 - [Multi-Cloud Patterns](15-devops-infrastructure/multi-cloud-patterns/SKILL.md) - Multi-cloud strategies
 
-### 16. 🧪 Testing (8 skills)
+### 16. 🧪 Testing (9 skills)
 Testing strategies and frameworks.
 
 - [Jest Patterns](16-testing/jest-patterns/SKILL.md) - Jest testing
 - [Pytest Patterns](16-testing/pytest-patterns/SKILL.md) - Python testing
 - [E2E Playwright](16-testing/e2e-playwright/SKILL.md) - End-to-end testing
 - [Integration Testing](16-testing/integration-testing/SKILL.md) - Integration tests
+- [Event-Driven Testing](16-testing/event-driven-testing/SKILL.md) - Saga testing, event replay
 - [Load Testing](16-testing/load-testing/SKILL.md) - k6, Artillery
 - [ML Model Testing](16-testing/ml-model-testing/SKILL.md) - Model validation
 - [Test Data Factory](16-testing/test-data-factory/SKILL.md) - Test data
 - [Contract Testing Pact](16-testing/contract-testing-pact/SKILL.md) - Consumer-driven contract testing
 
-### 17. 🎯 Domain-Specific (8 skills)
+### 17. 🎯 Domain-Specific (10 skills)
 Cross-cutting concerns.
 
 - [Multi-Tenancy](17-domain-specific/multi-tenancy/SKILL.md) - Multi-tenant architecture
@@ -345,6 +350,8 @@ Cross-cutting concerns.
 - [Feature Flags](17-domain-specific/feature-flags/SKILL.md) - Feature toggles
 - [Analytics Tracking](17-domain-specific/analytics-tracking/SKILL.md) - Analytics
 - [Notification System](17-domain-specific/notification-system/SKILL.md) - Notifications
+- [QR Code Features](17-domain-specific/qr-code-features/SKILL.md) - QR generation, scanning, security
+- [Thai Cultural Events](17-domain-specific/thai-cultural-events/SKILL.md) - Thai weddings, ordinations, merit-making
 
 ### 18. 📋 Project Management (7 skills)
 Agile and project planning.
@@ -368,7 +375,7 @@ Search engine optimization.
 - [Page Speed](19-seo-optimization/page-speed/SKILL.md) - Performance
 - [Core Web Vitals](19-seo-optimization/core-web-vitals/SKILL.md) - Web vitals
 
-### 20. 🤖 AI Integration (5 skills)
+### 20. 🤖 AI Integration (6 skills)
 AI-powered features.
 
 - [llm.txt Protocol](20-ai-integration/llm-txt-protocol/SKILL.md) - llm.txt
@@ -376,6 +383,7 @@ AI-powered features.
 - [Chatbot](20-ai-integration/chatbot-integration/SKILL.md) - Chatbot UI
 - [AI Search](20-ai-integration/ai-search/SKILL.md) - Semantic search
 - [Conversational UI](20-ai-integration/conversational-ui/SKILL.md) - Chat interfaces
+- [LINE Platform Integration](20-ai-integration/line-platform-integration/SKILL.md) - LINE Messaging API, LIFF, Rich Menus
 
 ### 21. 📝 Documentation (6 skills)
 Technical documentation.
@@ -387,12 +395,13 @@ Technical documentation.
 - [Runbooks](21-documentation/runbooks/SKILL.md) - Operational runbooks
 - [Changelog](21-documentation/changelog-management/SKILL.md) - Changelog management
 
-### 22. 🎨 UX/UI Design (6 skills)
+### 22. 🎨 UX/UI Design (7 skills)
 User experience and design.
 
 - [Design Systems](22-ux-ui-design/design-systems/SKILL.md) - Design systems
 - [Accessibility](22-ux-ui-design/accessibility/SKILL.md) - Web accessibility
 - [Responsive Design](22-ux-ui-design/responsive-design/SKILL.md) - Responsive design
+- [Thai UX Patterns](22-ux-ui-design/thai-ux-patterns/SKILL.md) - Thai typography, colors, cultural UX
 - [User Research](22-ux-ui-design/user-research/SKILL.md) - User research
 - [Wireframing](22-ux-ui-design/wireframing/SKILL.md) - Wireframing
 - [Design Handoff](22-ux-ui-design/design-handoff/SKILL.md) - Design to dev
@@ -741,6 +750,14 @@ Investment and ROI analysis.
 - [Proposal Pack](58-investment-estimation/proposal-pack/SKILL.md) - Proposal templates
 - [ROI Modeling](58-investment-estimation/roi-modeling/SKILL.md) - ROI calculation
 - [Sensitivity Analysis](58-investment-estimation/sensitivity-analysis/SKILL.md) - Sensitivity modeling
+
+### 71. 🏗️ Infrastructure Patterns (4 skills)
+Core infrastructure patterns and integrations.
+
+- [API Design & Contracts](71-infrastructure-patterns/api-design-contracts/SKILL.md) - API design standards
+- [Caching Strategies](71-infrastructure-patterns/caching-strategies/SKILL.md) - Cache patterns
+- [Secrets & Key Management](71-infrastructure-patterns/secrets-key-management/SKILL.md) - Secrets handling
+- [Thai Payment Integration](71-infrastructure-patterns/thai-payment-integration/SKILL.md) - PromptPay, Thai QR, Omise, 2C2P
 
 ### 60. 🧩 GitHub MCP (8 skills)
 GitHub repository automation via MCP.

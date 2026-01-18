@@ -55,7 +55,9 @@
 | [animation](02-frontend/animation/SKILL.md) | Animation Patterns in React |
 | [error-boundaries-react](02-frontend/error-boundaries-react/SKILL.md) | Implementing error boundaries for graceful error handling and improved user experience in React applications. |
 | [form-handling](02-frontend/form-handling/SKILL.md) | Form Handling with React Hook Form and Zod |
+| [infinite-scroll](02-frontend/infinite-scroll/SKILL.md) | Infinite scroll and virtual scrolling patterns using Intersection Observer API |
 | [mui-material](02-frontend/mui-material/SKILL.md) | Material-UI (MUI) Best Practices |
+| [multi-step-forms](02-frontend/multi-step-forms/SKILL.md) | Multi-step form patterns with state management, validation, and progress tracking |
 | [nextjs-patterns](02-frontend/nextjs-patterns/SKILL.md) | Next.js 14+ App Router Patterns |
 | [react-best-practices](02-frontend/react-best-practices/SKILL.md) | React Best Practices and Patterns |
 | [shadcn-ui](02-frontend/shadcn-ui/SKILL.md) | shadcn/ui Component Patterns |
@@ -143,6 +145,7 @@
 | [api-gateway](09-microservices/api-gateway/SKILL.md) | API Gateway |
 | [circuit-breaker](09-microservices/circuit-breaker/SKILL.md) | Circuit Breaker Pattern |
 | [cqrs-pattern](09-microservices/cqrs-pattern/SKILL.md) | Implementing Command Query Responsibility Segregation for separating read and write operations in distributed systems. |
+| [escrow-workflow](09-microservices/escrow-workflow/SKILL.md) | Escrow and milestone-based payment workflows with state machines and dispute resolution |
 | [event-driven](09-microservices/event-driven/SKILL.md) | Event-Driven Architecture |
 | [event-sourcing](09-microservices/event-sourcing/SKILL.md) | Implementing event sourcing pattern for maintaining application state as a sequence of immutable events. |
 | [saga-pattern](09-microservices/saga-pattern/SKILL.md) | Implementing distributed transactions across microservices using the Saga pattern with choreography and orchestration approaches. |
@@ -211,6 +214,7 @@
 | [load-balancing](15-devops-infrastructure/load-balancing/SKILL.md) | Comprehensive guide to load balancing algorithms, health checks, and high-availability patterns. |
 | [multi-cloud-patterns](15-devops-infrastructure/multi-cloud-patterns/SKILL.md) | Architecture patterns and strategies for multi-cloud deployments to avoid vendor lock-in. |
 | [secrets-management](15-devops-infrastructure/secrets-management/SKILL.md) | Secrets Management |
+| [service-orchestration](15-devops-infrastructure/service-orchestration/SKILL.md) | Service orchestration with Docker Compose, Kubernetes, service discovery, and deployment strategies |
 | [terraform-infrastructure](15-devops-infrastructure/terraform-infrastructure/SKILL.md) | Terraform Infrastructure |
 
 ### 16. Testing
@@ -218,6 +222,7 @@
 |---|---|
 | [contract-testing-pact](16-testing/contract-testing-pact/SKILL.md) | Implementing consumer-driven contract testing for microservices using Pact. |
 | [e2e-playwright](16-testing/e2e-playwright/SKILL.md) | E2E Testing with Playwright |
+| [event-driven-testing](16-testing/event-driven-testing/SKILL.md) | Testing patterns for event-driven architectures including saga testing and event replay |
 | [integration-testing](16-testing/integration-testing/SKILL.md) | Integration Testing |
 | [jest-patterns](16-testing/jest-patterns/SKILL.md) | Jest Patterns |
 | [load-testing](16-testing/load-testing/SKILL.md) | Load Testing |
@@ -235,7 +240,9 @@
 | [multi-tenancy](17-domain-specific/multi-tenancy/SKILL.md) | Multi-Tenancy Architecture |
 | [multi-tenancy-advanced](17-domain-specific/multi-tenancy-advanced/SKILL.md) | Advanced patterns for building scalable multi-tenant SaaS applications. |
 | [notification-system](17-domain-specific/notification-system/SKILL.md) | Notification System |
+| [qr-code-features](17-domain-specific/qr-code-features/SKILL.md) | QR code generation, scanning, validation, and security for events and payments |
 | [rate-limiting](17-domain-specific/rate-limiting/SKILL.md) | Rate Limiting |
+| [thai-cultural-events](17-domain-specific/thai-cultural-events/SKILL.md) | Thai cultural event planning including weddings, ordinations, and merit-making ceremonies |
 
 ### 18. Project Management
 | Skill | Description |
@@ -266,6 +273,7 @@
 | [ai-search](20-ai-integration/ai-search/SKILL.md) | AI Search |
 | [chatbot-integration](20-ai-integration/chatbot-integration/SKILL.md) | Chatbot Integration |
 | [conversational-ui](20-ai-integration/conversational-ui/SKILL.md) | Conversational UI |
+| [line-platform-integration](20-ai-integration/line-platform-integration/SKILL.md) | LINE Platform integration including Messaging API, LIFF, Rich Menus, and LINE Login |
 | [llm-txt-protocol](20-ai-integration/llm-txt-protocol/SKILL.md) | llm.txt Protocol |
 
 ### 21. Documentation
@@ -285,6 +293,7 @@
 | [design-handoff](22-ux-ui-design/design-handoff/SKILL.md) | Design Handoff |
 | [design-systems](22-ux-ui-design/design-systems/SKILL.md) | Design Systems |
 | [responsive-design](22-ux-ui-design/responsive-design/SKILL.md) | Responsive Design |
+| [thai-ux-patterns](22-ux-ui-design/thai-ux-patterns/SKILL.md) | Thai UI/UX patterns including typography, color symbolism, and cultural considerations |
 | [user-research](22-ux-ui-design/user-research/SKILL.md) | User Research |
 | [wireframing](22-ux-ui-design/wireframing/SKILL.md) | Wireframing |
 
@@ -707,6 +716,7 @@
 | [api-design-contracts](71-infrastructure-patterns/api-design-contracts/SKILL.md) | API Design & Contracts |
 | [caching-strategies](71-infrastructure-patterns/caching-strategies/SKILL.md) | Caching Strategies |
 | [secrets-key-management](71-infrastructure-patterns/secrets-key-management/SKILL.md) | Secrets & Key Management |
+| [thai-payment-integration](71-infrastructure-patterns/thai-payment-integration/SKILL.md) | Thai payment integration including PromptPay, Thai QR, Omise, and 2C2P |
 
 ### 61. AI Production
 | Skill | Description |
