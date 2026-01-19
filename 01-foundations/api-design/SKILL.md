@@ -1,8 +1,55 @@
+---
+id: api-design
+title: RESTful API Design Principles
+description: RESTful API design principles, best practices, and patterns for building consistent, scalable, and developer-friendly APIs
+category: 01-foundations
+tags:
+  - api
+  - rest
+  - http
+  - design
+  - backend
+lastUpdated: 2024-01-19
+---
+
 # RESTful API Design Principles
 
 ## Overview
 
 This skill covers RESTful API design principles, best practices, and patterns for building consistent, scalable, and developer-friendly APIs.
+
+## Core Principles
+
+### REST Architectural Constraints
+
+REST (Representational State Transfer) is an architectural style based on six key constraints that guide API design:
+
+1. **Client-Server Separation** - Client and server are independent; client handles UI/UX while server handles data storage and business logic
+2. **Statelessness** - Each request contains all information needed to process it; server doesn't store client session state
+3. **Cacheability** - Responses must define themselves as cacheable or non-cacheable to reduce client-server interactions
+4. **Uniform Interface** - Consistent way to interact with resources using URIs, self-descriptive messages, and HATEOAS
+5. **Layered System** - Client cannot tell if connected directly to server; enables load balancing, caching, and security layers
+6. **Code on Demand (Optional)** - Server can extend client functionality by transferring executable code
+
+### API Design Fundamentals
+
+- **Resource-First Thinking**: Design APIs around resources (nouns), not actions (verbs)
+- **Consistency is King**: Maintain consistent naming conventions, response formats, and error handling
+- **Pragmatic REST**: Balance RESTful purity with practical developer experience
+- **Version from Day One**: Plan for evolution by including versioning from the start
+- **Security by Default**: Use HTTPS, validate inputs, implement proper authentication/authorization
+- **Performance Matters**: Implement caching, pagination, and efficient data structures
+- **Developer Experience**: Provide clear documentation, meaningful error messages, and intuitive URLs
+
+### HTTP Semantics
+
+Use HTTP methods and status codes according to their intended semantic meaning:
+- **GET**: Retrieve resources (idempotent, safe)
+- **POST**: Create resources (non-idempotent, unsafe)
+- **PUT**: Replace entire resource (idempotent, unsafe)
+- **PATCH**: Partial update (non-idempotent, unsafe)
+- **DELETE**: Remove resource (idempotent, unsafe)
+
 
 ## Table of Contents
 
@@ -1181,3 +1228,274 @@ X-RateLimit-Remaining: 999
 X-RateLimit-Reset: 1705312800
 Cache-Control: no-cache, private
 ```
+
+---
+
+## Common Pitfalls
+
+### Anti-Patterns to Avoid
+
+#### 1. Using Verbs in URLs
+
+```http
+# Bad - Actions in URL
+GET /api/v1/getUsers
+POST /api/v1/createUser
+DELETE /api/v1/deleteUser/123
+
+# Good - Resources with HTTP methods
+GET /api/v1/users
+POST /api/v1/users
+DELETE /api/v1/users/123
+```
+
+#### 2. Inconsistent Naming Conventions
+
+```http
+# Bad - Mixed conventions
+GET /api/v1/users
+GET /api/v1/UserProfile
+GET /api/v1/order_items
+GET /api/v1/productCategories
+
+# Good - Consistent kebab-case, plural
+GET /api/v1/users
+GET /api/v1/user-profiles
+GET /api/v1/order-items
+GET /api/v1/product-categories
+```
+
+#### 3. Deep URL Nesting
+
+```http
+# Bad - Too many levels
+GET /api/v1/users/123/orders/456/items/789/details
+
+# Good - Flatten with query params or separate endpoints
+GET /api/v1/order-items/789
+GET /api/v1/orders/456/items?include=details
+```
+
+#### 4. Returning Wrong Status Codes
+
+```typescript
+// Bad - Using 200 for errors
+res.status(200).json({ error: "User not found" });
+
+// Bad - Using 500 for client errors
+res.status(500).json({ error: "Invalid email format" });
+
+// Good - Use appropriate status codes
+res.status(404).json({ error: { code: "USER_NOT_FOUND", message: "User not found" } });
+res.status(422).json({ error: { code: "VALIDATION_ERROR", message: "Invalid email format" } });
+```
+
+#### 5. Missing Pagination on List Endpoints
+
+```typescript
+// Bad - Returns all records (performance issue)
+GET /api/v1/users
+// Returns 100,000+ users in one response
+
+// Good - Paginated response
+GET /api/v1/users?page=1&limit=20
+{
+  "data": [...],
+  "meta": { "total": 100000, "page": 1, "limit": 20, "totalPages": 5000 }
+}
+```
+
+#### 6. Over-Using POST for Everything
+
+```http
+# Bad - POST for retrieval
+POST /api/v1/getUser
+{ "userId": 123 }
+
+# Good - GET for retrieval
+GET /api/v1/users/123
+```
+
+#### 7. Inconsistent Error Responses
+
+```typescript
+// Bad - Different error formats
+{ "error": "User not found" }
+{ "message": "Invalid email" }
+{ "status": "error", "details": "..." }
+
+// Good - Consistent error envelope
+{
+  "error": {
+    "code": "USER_NOT_FOUND",
+    "message": "User not found",
+    "requestId": "req-abc-123"
+  }
+}
+```
+
+#### 8. Ignoring Idempotency
+
+```typescript
+// Bad - POST for updates (non-idempotent)
+POST /api/v1/users/123/update
+{ "name": "New Name" }
+
+// Good - PUT or PATCH (idempotent)
+PUT /api/v1/users/123
+{ "name": "New Name" }
+```
+
+#### 9. Exposing Internal Implementation
+
+```http
+# Bad - Database structure exposed
+GET /api/v1/user_profiles
+GET /api/v1/user_roles_map
+
+# Good - Domain-focused resources
+GET /api/v1/users
+GET /api/v1/roles
+```
+
+#### 10. No Versioning Strategy
+
+```http
+# Bad - Breaking changes without version
+GET /api/users  // Changes break all clients
+
+# Good - Versioned from start
+GET /api/v1/users
+GET /api/v2/users  // New version, v1 still works
+```
+
+### Security Pitfalls
+
+#### 1. Missing HTTPS Enforcement
+
+```typescript
+// Bad - Accepts HTTP
+app.listen(80);
+
+// Good - Redirect HTTP to HTTPS
+app.use((req, res, next) => {
+  if (req.protocol !== 'https') {
+    return res.redirect(301, `https://${req.headers.host}${req.url}`);
+  }
+  next();
+});
+```
+
+#### 2. Exposing Sensitive Data in URLs
+
+```http
+# Bad - Sensitive data in URL (logged, cached)
+GET /api/v1/users?api_key=SECRET_KEY
+GET /api/v1/users?password=secret123
+
+# Good - Sensitive data in headers/body
+GET /api/v1/users
+Authorization: Bearer SECRET_KEY
+```
+
+#### 3. Not Validating Input
+
+```typescript
+// Bad - No validation
+app.post('/users', (req, res) => {
+  db.insert(req.body);  // SQL injection risk
+});
+
+// Good - Validate input
+app.post('/users', validateUserSchema, (req, res) => {
+  db.insert(req.body);  // Safe, validated data
+});
+```
+
+#### 4. Weak Rate Limiting
+
+```typescript
+// Bad - No rate limiting or per-IP only
+app.use(rateLimit({ windowMs: 60000, max: 1000 }));
+
+// Good - Per-user rate limiting with authentication
+app.use((req, res, next) => {
+  const userId = req.user?.id || req.ip;
+  const limit = req.user?.plan === 'enterprise' ? 10000 : 1000;
+  checkRateLimit(userId, limit).then(next);
+});
+```
+
+### Performance Pitfalls
+
+#### 1. N+1 Query Problem
+
+```typescript
+// Bad - N+1 queries
+const users = await db.users.findMany();
+for (const user of users) {
+  user.orders = await db.orders.findMany({ where: { userId: user.id } });
+}
+
+// Good - Eager loading
+const users = await db.users.findMany({
+  include: { orders: true }
+});
+```
+
+#### 2. Returning Too Much Data
+
+```typescript
+// Bad - Returns all fields
+GET /api/v1/users
+// Returns: id, name, email, phone, address, ssn, ...
+
+// Good - Field selection
+GET /api/v1/users?fields=id,name,email
+// Returns only requested fields
+```
+
+#### 3. No Caching Strategy
+
+```typescript
+// Bad - No cache headers
+res.json({ data: users });
+
+// Good - Cache headers for GET requests
+res.set('Cache-Control', 'public, max-age=300');
+res.json({ data: users });
+```
+
+---
+
+## Additional Resources
+
+### Official Documentation
+
+- [REST API Tutorial](https://restfulapi.net/) - Comprehensive REST API tutorial and best practices
+- [MDN Web Docs - HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP) - Complete HTTP reference
+- [OpenAPI Specification](https://swagger.io/specification/) - OpenAPI 3.0 specification
+- [RFC 7231 - HTTP Semantics](https://tools.ietf.org/html/rfc7231) - Official HTTP semantics RFC
+
+### Design Guides
+
+- [API Design Guide (Google)](https://cloud.google.com/apis/design) - Google's API design principles
+- [Microsoft REST API Guidelines](https://github.com/Microsoft/api-guidelines) - Microsoft's REST API guidelines
+- [Zalando RESTful API Guidelines](https://github.com/zalando/restful-api-guidelines) - Comprehensive REST guidelines
+- [Heroku Platform API Style Guide](https://github.com/heroku/platform-api-style-guide) - Heroku's API style guide
+
+### Tools and Libraries
+
+- [Swagger/OpenAPI Tools](https://swagger.io/tools/) - API documentation and testing tools
+- [Postman](https://www.postman.com/) - API development and testing platform
+- [Insomnia](https://insomnia.rest/) - REST client for API testing
+- [HTTPie](https://httpie.io/) - User-friendly command-line HTTP client
+
+### Related Skills
+
+- [`express-rest`](03-backend-api/express-rest/SKILL.md) - Express.js REST API patterns
+- [`error-handling`](03-backend-api/error-handling/SKILL.md) - Backend error handling patterns
+- [`validation`](03-backend-api/validation/SKILL.md) - API request validation patterns
+- [`jwt-authentication`](10-authentication-authorization/jwt-authentication/SKILL.md) - JWT authentication implementation
+- [`api-style-guide`](64-meta-standards/api-style-guide/SKILL.md) - Organization-wide API conventions
+- [`error-shape-taxonomy`](64-meta-standards/error-shape-taxonomy/SKILL.md) - Standard error response taxonomy

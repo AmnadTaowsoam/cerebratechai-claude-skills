@@ -36,6 +36,7 @@
 |---|---|
 | [architectural-reviews](00-meta-skills/architectural-reviews/SKILL.md) | Architectural Reviews |
 | [decision-records](00-meta-skills/decision-records/SKILL.md) | Technical Decision Records (ADRs) |
+| [problem-framing](00-meta-skills/problem-framing/SKILL.md) | Problem Framing & Ambiguity Resolution - Detect vague requirements, ask clarifying questions, and restate problems before solving |
 | [risk-assessment](00-meta-skills/risk-assessment/SKILL.md) | Risk Assessment |
 | [system-thinking](00-meta-skills/system-thinking/SKILL.md) | System Thinking |
 | [technical-debt-management](00-meta-skills/technical-debt-management/SKILL.md) | Technical Debt Management |
@@ -47,6 +48,7 @@
 | [code-review](01-foundations/code-review/SKILL.md) | Code Review Best Practices |
 | [git-workflow](01-foundations/git-workflow/SKILL.md) | Git Workflow and Best Practices |
 | [python-standards](01-foundations/python-standards/SKILL.md) | Python Coding Standards |
+| [refactoring-strategies](01-foundations/refactoring-strategies/SKILL.md) | Safe Refactoring Patterns - Modify existing code safely using Strangler Fig and Parallel Change patterns with verification between changes |
 | [typescript-standards](01-foundations/typescript-standards/SKILL.md) | TypeScript Coding Standards |
 
 ### 02. Frontend
@@ -229,6 +231,7 @@
 | [ml-model-testing](16-testing/ml-model-testing/SKILL.md) | ML Model Testing |
 | [pytest-patterns](16-testing/pytest-patterns/SKILL.md) | Pytest Patterns |
 | [test-data-factory](16-testing/test-data-factory/SKILL.md) | Test Data Factory |
+| [test-driven-development-agentic](16-testing/test-driven-development-agentic/SKILL.md) | TDD for Agents - Standardize the Red-Green-Refactor loop for AI, writing tests before implementation |
 
 ### 17. Domain Specific
 | Skill | Description |
@@ -281,6 +284,7 @@
 |---|---|
 | [api-documentation](21-documentation/api-documentation/SKILL.md) | API Documentation |
 | [changelog-management](21-documentation/changelog-management/SKILL.md) | Changelog Management |
+| [code-commentary-standards](21-documentation/code-commentary-standards/SKILL.md) | Code Commentary Standards - Guidelines for writing clear, maintainable code comments that help both humans and AI agents understand code intent and context |
 | [runbooks](21-documentation/runbooks/SKILL.md) | Operational Runbooks |
 | [system-architecture-docs](21-documentation/system-architecture-docs/SKILL.md) | System Architecture Documentation |
 | [technical-writing](21-documentation/technical-writing/SKILL.md) | Technical Writing |
@@ -556,6 +560,7 @@
 | [commit-conventions](45-developer-experience/commit-conventions/SKILL.md) | Standardized commit message formats and conventions for clear, searchable, and automated-friendly version control history. |
 | [debugging-tools](45-developer-experience/debugging-tools/SKILL.md) | Comprehensive debugging strategies, tools, and techniques for efficiently identifying and fixing bugs across different environments. |
 | [dev-environment-setup](45-developer-experience/dev-environment-setup/SKILL.md) | Standardized development environment configuration including tools, IDE settings, and automation for consistent developer experience. |
+| [env-diagnosis](45-developer-experience/env-diagnosis/SKILL.md) | Environment Diagnosis & Repair - Protocol for diagnosing and fixing development environment issues including version conflicts, permission problems, and port conflicts |
 | [hot-reload-fast-feedback](45-developer-experience/hot-reload-fast-feedback/SKILL.md) | Implementing fast feedback loops with hot reload, live reload, and rapid iteration to maximize developer productivity. |
 | [lint-format-typecheck](45-developer-experience/lint-format-typecheck/SKILL.md) | Automated code quality enforcement through linting, formatting, and type checking to maintain consistent, error-free codebases. |
 | [local-dev-standard](45-developer-experience/local-dev-standard/SKILL.md) | Standardized local development environment setup ensuring consistency across team members and reducing "works on my machine" issues. |
@@ -641,6 +646,7 @@
 | [prompt-versioning](54-agentops/prompt-versioning/SKILL.md) | Comprehensive guide to versioning, testing, and managing prompts for AI agents including A/B testing, rollback strategies, and prompt registries |
 | [rollout-and-kill-switch](54-agentops/rollout-and-kill-switch/SKILL.md) | Comprehensive guide to safe agent deployment strategies including canary releases, feature flags, kill switches, and automated rollback mechanisms |
 | [sandboxing](54-agentops/sandboxing/SKILL.md) | Comprehensive guide to sandboxing AI agents including code execution isolation, resource limits, security boundaries, and safe tool execution |
+| [tool-creation-patterns](54-agentops/tool-creation-patterns/SKILL.md) | MCP Tool Creation Patterns - When to create tools, tool types, design patterns, implementation, and testing strategies |
 | [tool-permission-model](54-agentops/tool-permission-model/SKILL.md) | Comprehensive guide to implementing permission systems for AI agent tools including RBAC, approval workflows, and security policies |
 
 ### 55. UX Writing
@@ -696,6 +702,7 @@
 | Skill | Description |
 |---|---|
 | [feature-flags-experimentation](59-release-engineering/feature-flags-experimentation/SKILL.md) | Feature Flags & Experimentation |
+| [legacy-migration-playbook](59-release-engineering/legacy-migration-playbook/SKILL.md) | Legacy Migration Playbook - Zero-downtime strategies for migrating legacy systems including snapshot testing, dependency analysis, and rollback planning |
 | [release-management](59-release-engineering/release-management/SKILL.md) | Release Management |
 
 ### 60. GitHub MCP
@@ -763,6 +770,7 @@
 | Skill | Description |
 |---|---|
 | [change-impact-map](66-repo-navigation-knowledge-map/change-impact-map/SKILL.md) | A practical framework to map change dependencies and blast radius, including who/what is affected, what to test, rollout/rollback strategies, and stakeholder ownership |
+| [codebase-learning](66-repo-navigation-knowledge-map/codebase-learning/SKILL.md) | Codebase Absorption Strategy - Protocol for reading code to build mental maps using Outside-In approach, identifying God Objects and Utility Bags |
 | [docs-indexing-strategy](66-repo-navigation-knowledge-map/docs-indexing-strategy/SKILL.md) | How to organize and index documentation for humans and AI: taxonomy, metadata, cross-linking, freshness reviews, and automated index generation |
 | [naming-and-folder-conventions](66-repo-navigation-knowledge-map/naming-and-folder-conventions/SKILL.md) | Conventions for naming files, folders, variables, functions, types, tests, and configs to keep a codebase predictable, searchable, and consistent |
 | [repo-map-ssot](66-repo-navigation-knowledge-map/repo-map-ssot/SKILL.md) | Single source of truth for repository structure and entry points, including key directories, domain boundaries, shared code, integrations, and build/deploy references |
@@ -805,6 +813,16 @@
 | [lineage-and-provenance](70-data-platform-governance/lineage-and-provenance/SKILL.md) | Track data lineage และ provenance เพื่อเข้าใจ data flow, dependencies และ impact analysis |
 | [pii-policy-enforcement](70-data-platform-governance/pii-policy-enforcement/SKILL.md) | Policy และ mechanisms สำหรับ detect, classify และ protect PII data ใน data platform |
 | [retention-archival](70-data-platform-governance/retention-archival/SKILL.md) | Policy และ automation สำหรับ data retention, archival และ deletion ตาม compliance requirements |
+
+| [retention-archival](70-data-platform-governance/retention-archival/SKILL.md) | Policy และ automation สำหรับ data retention, archival และ deletion ตาม compliance requirements |
+
+### 72. Metacognitive Skill Architect
+| Skill | Description |
+|---|---|
+| [agent-self-correction](72-metacognitive-skill-architect/agent-self-correction/SKILL.md) | Protocols for the agent to autonomously detect failures, analyze root causes, and attempt recovery strategies. |
+| [skill-architect](72-metacognitive-skill-architect/skill-architect/SKILL.md) | The master skill for analyzing, designing, and standardizing the creation of new AI skills. |
+| [skill-discovery-and-chaining](72-metacognitive-skill-architect/skill-discovery-and-chaining/SKILL.md) | Protocols for efficiently identifying, retrieving, and combining relevant skills from the index to solve complex problems without context overload. |
+| [task-decomposition-strategy](72-metacognitive-skill-architect/task-decomposition-strategy/SKILL.md) | Systematic approach for breaking down complex, high-level requests into atomic, executable steps. |
 
 ---
 
@@ -923,6 +941,7 @@
 ### Testing
 - `jest-patterns` - JavaScript tests
 - `pytest-patterns` - Python tests
+- `test-driven-development-agentic` - TDD for AI agents
 - `e2e-playwright` - E2E tests
 - `integration-testing` - Integration
 
@@ -946,6 +965,7 @@
 - [adaptive-bitrate](37-video-streaming/adaptive-bitrate/SKILL.md)
 - [adr-templates](59-architecture-decision/adr-templates/SKILL.md)
 - [agent-patterns](06-ai-ml-production/agent-patterns/SKILL.md)
+- [agent-self-correction](72-metacognitive-skill-architect/agent-self-correction/SKILL.md)
 - [agile-scrum](18-project-management/agile-scrum/SKILL.md)
 - [ai-agents](20-ai-integration/ai-agents/SKILL.md)
 - [ai-data-privacy](44-ai-governance/ai-data-privacy/SKILL.md)
@@ -1347,6 +1367,8 @@
 - [shipping-integration](30-ecommerce/shipping-integration/SKILL.md)
 - [shopping-cart](30-ecommerce/shopping-cart/SKILL.md)
 - [sitemap-robots](19-seo-optimization/sitemap-robots/SKILL.md)
+- [skill-architect](72-metacognitive-skill-architect/skill-architect/SKILL.md)
+- [skill-discovery-and-chaining](72-metacognitive-skill-architect/skill-discovery-and-chaining/SKILL.md)
 - [skill-improvement-loop](57-skill-orchestration/skill-improvement-loop/SKILL.md)
 - [sla-slo-slis](47-performance-engineering/sla-slo-slis/SKILL.md)
 - [smart-contracts](35-blockchain-web3/smart-contracts/SKILL.md)
@@ -1367,6 +1389,7 @@
 - [system-boundaries](59-architecture-decision/system-boundaries/SKILL.md)
 - [system-thinking](00-meta-skills/system-thinking/SKILL.md)
 - [tailwind-patterns](02-frontend/tailwind-patterns/SKILL.md)
+- [task-decomposition-strategy](72-metacognitive-skill-architect/task-decomposition-strategy/SKILL.md)
 - [tech-stack-selection](59-architecture-decision/tech-stack-selection/SKILL.md)
 - [technical-debt-management](00-meta-skills/technical-debt-management/SKILL.md)
 - [technical-seo](19-seo-optimization/technical-seo/SKILL.md)
@@ -1414,6 +1437,6 @@
 
 ## Statistics
 
-- **Total Skills**: 473+
+- **Total Skills**: 477+
 - **Categories**: 73
-- **Last Updated**: January 2026
+- **Last Updated**: January 19, 2026
