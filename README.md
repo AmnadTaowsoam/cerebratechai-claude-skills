@@ -1061,7 +1061,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 <!-- SKILLS-START -->
 ## Skills Overview
 
-**Total Skills:** 486
+**Total Skills:** 498
 
 
 ### 00. Meta Skills
@@ -1070,6 +1070,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 |-------|-------------|
 | [architectural-reviews](00-meta-skills/architectural-reviews/SKILL.md) | Architectural Reviews |
 | [decision-records](00-meta-skills/decision-records/SKILL.md) | Technical Decision Records (ADRs) |
+| [problem-framing](00-meta-skills/problem-framing/SKILL.md) | Problem Framing & Ambiguity Resolution |
 | [risk-assessment](00-meta-skills/risk-assessment/SKILL.md) | Risk Assessment |
 | [system-thinking](00-meta-skills/system-thinking/SKILL.md) | System Thinking |
 | [technical-debt-management](00-meta-skills/technical-debt-management/SKILL.md) | Technical Debt Management |
@@ -1082,6 +1083,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [code-review](01-foundations/code-review/SKILL.md) | Code Review Best Practices |
 | [git-workflow](01-foundations/git-workflow/SKILL.md) | Git Workflow and Best Practices |
 | [python-standards](01-foundations/python-standards/SKILL.md) | Python Coding Standards |
+| [refactoring-strategies](01-foundations/refactoring-strategies/SKILL.md) | Safe Refactoring Patterns |
 | [typescript-standards](01-foundations/typescript-standards/SKILL.md) | TypeScript Coding Standards |
 
 ### 02. Frontend
@@ -1283,6 +1285,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [ml-model-testing](16-testing/ml-model-testing/SKILL.md) | ML Model Testing |
 | [pytest-patterns](16-testing/pytest-patterns/SKILL.md) | Pytest Patterns |
 | [test-data-factory](16-testing/test-data-factory/SKILL.md) | Test Data Factory |
+| [test-driven-development-agentic](16-testing/test-driven-development-agentic/SKILL.md) | Test-Driven Development for Agents |
 
 ### 17. Domain Specific
 
@@ -1340,6 +1343,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 |-------|-------------|
 | [api-documentation](21-documentation/api-documentation/SKILL.md) | API Documentation |
 | [changelog-management](21-documentation/changelog-management/SKILL.md) | Changelog Management |
+| [code-commentary-standards](21-documentation/code-commentary-standards/SKILL.md) | Code Commentary Standards |
 | [runbooks](21-documentation/runbooks/SKILL.md) | Operational Runbooks |
 | [system-architecture-docs](21-documentation/system-architecture-docs/SKILL.md) | System Architecture Documentation |
 | [technical-writing](21-documentation/technical-writing/SKILL.md) | Technical Writing |
@@ -1639,6 +1643,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [commit-conventions](45-developer-experience/commit-conventions/SKILL.md) | Commit Conventions |
 | [debugging-tools](45-developer-experience/debugging-tools/SKILL.md) | Debugging Tools and Techniques |
 | [dev-environment-setup](45-developer-experience/dev-environment-setup/SKILL.md) | Development Environment Setup |
+| [env-diagnosis](45-developer-experience/env-diagnosis/SKILL.md) | Environment Diagnosis & Repair |
 | [hot-reload-fast-feedback](45-developer-experience/hot-reload-fast-feedback/SKILL.md) | Hot Reload and Fast Feedback Loops |
 | [lint-format-typecheck](45-developer-experience/lint-format-typecheck/SKILL.md) | Lint, Format, and Type Check |
 | [local-dev-standard](45-developer-experience/local-dev-standard/SKILL.md) | Local Development Standard |
@@ -1732,6 +1737,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [prompt-versioning](54-agentops/prompt-versioning/SKILL.md) | Prompt Versioning |
 | [rollout-and-kill-switch](54-agentops/rollout-and-kill-switch/SKILL.md) | Rollout and Kill Switch |
 | [sandboxing](54-agentops/sandboxing/SKILL.md) | Sandboxing |
+| [tool-creation-patterns](54-agentops/tool-creation-patterns/SKILL.md) | MCP Tool Creation Patterns |
 | [tool-permission-model](54-agentops/tool-permission-model/SKILL.md) | Tool Permission Model |
 
 ### 55. Ux Writing
@@ -1793,6 +1799,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | Skill | Description |
 |-------|-------------|
 | [feature-flags-experimentation](59-release-engineering/feature-flags-experimentation/SKILL.md) | Feature Flags & Experimentation |
+| [legacy-migration-playbook](59-release-engineering/legacy-migration-playbook/SKILL.md) | Legacy Migration Playbook |
 | [release-management](59-release-engineering/release-management/SKILL.md) | Release Management |
 
 ### 60. Github Mcp
@@ -1859,6 +1866,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | Skill | Description |
 |-------|-------------|
 | [change-impact-map](66-repo-navigation-knowledge-map/change-impact-map/SKILL.md) | Change Impact Map |
+| [codebase-learning](66-repo-navigation-knowledge-map/codebase-learning/SKILL.md) | Codebase Absorption Strategy |
 | [docs-indexing-strategy](66-repo-navigation-knowledge-map/docs-indexing-strategy/SKILL.md) | Docs Indexing Strategy |
 | [naming-and-folder-conventions](66-repo-navigation-knowledge-map/naming-and-folder-conventions/SKILL.md) | Naming & Folder Conventions |
 | [repo-map-ssot](66-repo-navigation-knowledge-map/repo-map-ssot/SKILL.md) | Repo Map SSOT |
@@ -1914,4 +1922,13 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [caching-strategies](71-infrastructure-patterns/caching-strategies/SKILL.md) | Caching Strategies |
 | [secrets-key-management](71-infrastructure-patterns/secrets-key-management/SKILL.md) | Secrets & Key Management |
 | [thai-payment-integration](71-infrastructure-patterns/thai-payment-integration/SKILL.md) | Thai Payment Integration |
+
+### 72. Metacognitive Skill Architect
+
+| Skill | Description |
+|-------|-------------|
+| [agent-self-correction](72-metacognitive-skill-architect/agent-self-correction/SKILL.md) | Agent Self-Correction |
+| [skill-architect](72-metacognitive-skill-architect/skill-architect/SKILL.md) | Skill Architect |
+| [skill-discovery-and-chaining](72-metacognitive-skill-architect/skill-discovery-and-chaining/SKILL.md) | Skill Discovery & Chaining |
+| [task-decomposition-strategy](72-metacognitive-skill-architect/task-decomposition-strategy/SKILL.md) | Task Decomposition Strategy |
 <!-- SKILLS-END -->
