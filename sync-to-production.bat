@@ -20,6 +20,15 @@ cd /d %DEV_DIR% || (
     exit /b 1
 )
 
+echo.
+echo [0/5] Running Gap Analysis...
+python "%~dp0scripts\skill_watcher.py" --target .
+if errorlevel 1 (
+    echo WARNING: Gap detection failed, but proceeding with sync...
+) else (
+    echo Gap analysis complete. Check GAP_REPORT.md for details.
+)
+
 echo [1/5] Checking git status...
 git status
 

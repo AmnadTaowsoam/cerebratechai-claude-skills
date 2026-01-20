@@ -669,6 +669,7 @@
 ### 57. Skill Orchestration
 | Skill | Description |
 |---|---|
+| [autonomous-gap-detector](57-skill-orchestration/autonomous-gap-detector/SKILL.md) | Autonomous agent script for detecting skill gaps by analyzing project dependencies and codebase patterns in real-time. |
 | [baseline-policy](57-skill-orchestration/baseline-policy/SKILL.md) | Baseline Policy |
 | [output-templates](57-skill-orchestration/output-templates/SKILL.md) | Output Templates |
 | [routing-rules](57-skill-orchestration/routing-rules/SKILL.md) | Routing Rules |
@@ -991,6 +992,7 @@
 - [audit-trails-for-agents](54-agentops/audit-trails-for-agents/SKILL.md)
 - [auditability](44-ai-governance/auditability/SKILL.md)
 - [automl](39-data-science-ml/automl/SKILL.md)
+- [autonomous-gap-detector](57-skill-orchestration/autonomous-gap-detector/SKILL.md)
 - [autoscaling-and-rightsizing](42-cost-engineering/autoscaling-and-rightsizing/SKILL.md)
 - [backfill-and-reconciliation-playbook](70-data-platform-governance/backfill-and-reconciliation-playbook/SKILL.md)
 - [backward-compat-rules](51-contracts-governance/backward-compat-rules/SKILL.md)

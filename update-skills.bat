@@ -59,4 +59,8 @@ echo.
 echo Production directory is now up to date.
 echo Multi-agent systems can now access the latest skills.
 echo.
+echo [Final Check] Running Gap Analysis on Production...
+REM We run this against the current directory (Production)
+python "%~dp0scripts\skill_watcher.py" --target .
+echo.
 pause

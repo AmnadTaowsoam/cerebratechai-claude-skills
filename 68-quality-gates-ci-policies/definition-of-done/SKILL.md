@@ -36,6 +36,10 @@ description: เกณฑ์ที่ชัดเจนว่า "งานเ�
 ☐ All CI checks pass
 ☐ Build succeeds
 ☐ No breaking changes (or documented)
+
+### Skill Stewardship (ใหม่!)
+☐ Skill Gap Analysis performed (Check `GAP_REPORT.md`)
+☐ New skills drafted/updated if required
 ```
 
 ---
@@ -245,6 +249,7 @@ How to verify:
 ### Verification
 - [ ] Acceptance criteria met
 - [ ] No regressions
+- [ ] Skill Gap Analysis completed (No red gaps in `GAP_REPORT.md` related to this task)
 - [ ] Stakeholders notified
 
 ## Testing
