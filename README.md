@@ -1061,7 +1061,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 <!-- SKILLS-START -->
 ## Skills Overview
 
-**Total Skills:** 498
+**Total Skills:** 499
 
 
 ### 00. Meta Skills
@@ -1763,6 +1763,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 | Skill | Description |
 |-------|-------------|
+| [autonomous-gap-detector](57-skill-orchestration/autonomous-gap-detector/SKILL.md) | Autonomous Gap Detector Protocol |
 | [baseline-policy](57-skill-orchestration/baseline-policy/SKILL.md) | Baseline Policy |
 | [output-templates](57-skill-orchestration/output-templates/SKILL.md) | Output Templates |
 | [routing-rules](57-skill-orchestration/routing-rules/SKILL.md) | Routing Rules |
