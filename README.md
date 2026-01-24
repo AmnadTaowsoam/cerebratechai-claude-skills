@@ -1061,30 +1061,30 @@ MIT License - see [LICENSE](LICENSE) file for details.
 <!-- SKILLS-START -->
 ## Skills Overview
 
-**Total Skills:** 499
+**Total Skills:** 556
 
 
 ### 00. Meta Skills
 
 | Skill | Description |
 |-------|-------------|
-| [architectural-reviews](00-meta-skills/architectural-reviews/SKILL.md) | Architectural Reviews |
-| [decision-records](00-meta-skills/decision-records/SKILL.md) | Technical Decision Records (ADRs) |
-| [problem-framing](00-meta-skills/problem-framing/SKILL.md) | Problem Framing & Ambiguity Resolution |
-| [risk-assessment](00-meta-skills/risk-assessment/SKILL.md) | Risk Assessment |
-| [system-thinking](00-meta-skills/system-thinking/SKILL.md) | System Thinking |
-| [technical-debt-management](00-meta-skills/technical-debt-management/SKILL.md) | Technical Debt Management |
+| [architectural-reviews](00-meta-skills/architectural-reviews/SKILL.md) | Architecture Review: [Project Name] |
+| [decision-records](00-meta-skills/decision-records/SKILL.md) | ADR-001: [Short Title] |
+| [problem-framing](00-meta-skills/problem-framing/SKILL.md) | Untitled |
+| [risk-assessment](00-meta-skills/risk-assessment/SKILL.md) | Risk Register: [Project Name] |
+| [system-thinking](00-meta-skills/system-thinking/SKILL.md) | Untitled |
+| [technical-debt-management](00-meta-skills/technical-debt-management/SKILL.md) | Install |
 
 ### 01. Foundations
 
 | Skill | Description |
 |-------|-------------|
-| [api-design](01-foundations/api-design/SKILL.md) | RESTful API Design Principles |
-| [code-review](01-foundations/code-review/SKILL.md) | Code Review Best Practices |
-| [git-workflow](01-foundations/git-workflow/SKILL.md) | Git Workflow and Best Practices |
-| [python-standards](01-foundations/python-standards/SKILL.md) | Python Coding Standards |
-| [refactoring-strategies](01-foundations/refactoring-strategies/SKILL.md) | Safe Refactoring Patterns |
-| [typescript-standards](01-foundations/typescript-standards/SKILL.md) | TypeScript Coding Standards |
+| [api-design](01-foundations/api-design/SKILL.md) | Get all users (with pagination) |
+| [code-review](01-foundations/code-review/SKILL.md) | BAD: Vague and unhelpful |
+| [git-workflow](01-foundations/git-workflow/SKILL.md) | GOOD: Descriptive, lowercase, hyphen-separated |
+| [python-standards](01-foundations/python-standards/SKILL.md) | ❌ Bad |
+| [refactoring-strategies](01-foundations/refactoring-strategies/SKILL.md) | verify.sh - Run after each refactoring step |
+| [typescript-standards](01-foundations/typescript-standards/SKILL.md) | Untitled |
 
 ### 02. Frontend
 
@@ -1115,7 +1115,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [grpc-integration](03-backend-api/grpc-integration/SKILL.md) | gRPC Integration |
 | [middleware](03-backend-api/middleware/SKILL.md) | Backend Middleware Patterns |
 | [nodejs-api](03-backend-api/nodejs-api/SKILL.md) | Node.js REST API Patterns |
-| [validation](03-backend-api/validation/SKILL.md) | API Request Validation Patterns |
+| [validation](03-backend-api/validation/SKILL.md) | API Request Validation |
 | [websocket-patterns](03-backend-api/websocket-patterns/SKILL.md) | WebSocket Patterns |
 
 ### 04. Database
@@ -1132,7 +1132,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [prisma-guide](04-database/prisma-guide/SKILL.md) | Prisma ORM Guide |
 | [redis-caching](04-database/redis-caching/SKILL.md) | Redis Caching Patterns |
 | [timescaledb](04-database/timescaledb/SKILL.md) | TimescaleDB (Time-Series Database) Patterns |
-| [vector-database](04-database/vector-database/SKILL.md) | Vector Database Patterns (Pinecone, Qdrant, Weaviate) |
+| [vector-database](04-database/vector-database/SKILL.md) | Vector Database Patterns |
 
 ### 05. Ai Ml Core
 
@@ -1142,7 +1142,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [data-preprocessing](05-ai-ml-core/data-preprocessing/SKILL.md) | Data Preprocessing |
 | [label-studio-setup](05-ai-ml-core/label-studio-setup/SKILL.md) | Label Studio Setup |
 | [model-optimization](05-ai-ml-core/model-optimization/SKILL.md) | Model Optimization |
-| [model-training](05-ai-ml-core/model-training/SKILL.md) | Model Training Workflows |
+| [model-training](05-ai-ml-core/model-training/SKILL.md) | Model Training |
 | [model-versioning](05-ai-ml-core/model-versioning/SKILL.md) | Model Versioning |
 | [pytorch-deployment](05-ai-ml-core/pytorch-deployment/SKILL.md) | PyTorch Deployment |
 | [yolo-integration](05-ai-ml-core/yolo-integration/SKILL.md) | YOLO Integration |
@@ -1170,7 +1170,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [document-ingestion-pipeline](07-document-processing/document-ingestion-pipeline/SKILL.md) | Document Ingestion Pipeline |
 | [document-parsing](07-document-processing/document-parsing/SKILL.md) | Document Parsing |
 | [image-preprocessing](07-document-processing/image-preprocessing/SKILL.md) | Image Preprocessing |
-| [ocr-paddleocr](07-document-processing/ocr-paddleocr/SKILL.md) | OCR PaddleOCR |
+| [ocr-paddleocr](07-document-processing/ocr-paddleocr/SKILL.md) | OCR with PaddleOCR |
 | [ocr-tesseract](07-document-processing/ocr-tesseract/SKILL.md) | OCR with Tesseract |
 | [pdf-processing](07-document-processing/pdf-processing/SKILL.md) | PDF Processing |
 | [rag-architecture-patterns](07-document-processing/rag-architecture-patterns/SKILL.md) | RAG Architecture Patterns |
@@ -1335,7 +1335,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [chatbot-integration](20-ai-integration/chatbot-integration/SKILL.md) | Chatbot Integration |
 | [conversational-ui](20-ai-integration/conversational-ui/SKILL.md) | Conversational UI |
 | [line-platform-integration](20-ai-integration/line-platform-integration/SKILL.md) | LINE Platform Integration |
-| [llm-txt-protocol](20-ai-integration/llm-txt-protocol/SKILL.md) | llm.txt Protocol |
+| [llm-txt-protocol](20-ai-integration/llm-txt-protocol/SKILL.md) | LLM Text Protocol |
 
 ### 21. Documentation
 
@@ -1394,14 +1394,14 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [currency-timezone](25-internationalization/currency-timezone/SKILL.md) | Currency and Timezone |
 | [i18n-setup](25-internationalization/i18n-setup/SKILL.md) | i18n (Internationalization) Setup |
 | [localization](25-internationalization/localization/SKILL.md) | Localization (l10n) |
-| [multi-language](25-internationalization/multi-language/SKILL.md) | Untitled |
+| [multi-language](25-internationalization/multi-language/SKILL.md) | Multi-language Support |
 | [rtl-support](25-internationalization/rtl-support/SKILL.md) | RTL (Right-to-Left) Support |
 
 ### 26. Deployment Strategies
 
 | Skill | Description |
 |-------|-------------|
-| [blue-green-deployment](26-deployment-strategies/blue-green-deployment/SKILL.md) | Untitled |
+| [blue-green-deployment](26-deployment-strategies/blue-green-deployment/SKILL.md) | Blue-Green Deployment |
 | [canary-deployment](26-deployment-strategies/canary-deployment/SKILL.md) | Canary Deployment |
 | [feature-toggles](26-deployment-strategies/feature-toggles/SKILL.md) | Feature Toggles (Feature Flags) |
 | [rollback-strategies](26-deployment-strategies/rollback-strategies/SKILL.md) | Rollback Strategies |
@@ -1919,7 +1919,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 | Skill | Description |
 |-------|-------------|
-| [api-design-contracts](71-infrastructure-patterns/api-design-contracts/SKILL.md) | API Design & Contracts |
+| [api-design-contracts](71-infrastructure-patterns/api-design-contracts/SKILL.md) | API Design Contracts |
 | [caching-strategies](71-infrastructure-patterns/caching-strategies/SKILL.md) | Caching Strategies |
 | [secrets-key-management](71-infrastructure-patterns/secrets-key-management/SKILL.md) | Secrets & Key Management |
 | [thai-payment-integration](71-infrastructure-patterns/thai-payment-integration/SKILL.md) | Thai Payment Integration |
@@ -1932,4 +1932,141 @@ MIT License - see [LICENSE](LICENSE) file for details.
 | [skill-architect](72-metacognitive-skill-architect/skill-architect/SKILL.md) | Skill Architect |
 | [skill-discovery-and-chaining](72-metacognitive-skill-architect/skill-discovery-and-chaining/SKILL.md) | Skill Discovery & Chaining |
 | [task-decomposition-strategy](72-metacognitive-skill-architect/task-decomposition-strategy/SKILL.md) | Task Decomposition Strategy |
+
+### 73. Iot Fleet Management
+
+| Skill | Description |
+|-------|-------------|
+| [atomic-ab-partitioning](73-iot-fleet-management/atomic-ab-partitioning/SKILL.md) | Atomic AB Partitioning |
+| [differential-ota-updates](73-iot-fleet-management/differential-ota-updates/SKILL.md) | Differential OTA Updates |
+| [fleet-campaign-management](73-iot-fleet-management/fleet-campaign-management/SKILL.md) | Fleet Campaign Management |
+
+### 74. Iot Zero Trust Security
+
+| Skill | Description |
+|-------|-------------|
+| [hardware-rooted-identity](74-iot-zero-trust-security/hardware-rooted-identity/SKILL.md) | Hardware Rooted Identity |
+| [micro-segmentation-policy](74-iot-zero-trust-security/micro-segmentation-policy/SKILL.md) | Micro Segmentation Policy |
+| [mtls-pki-management](74-iot-zero-trust-security/mtls-pki-management/SKILL.md) | mTLS PKI Management |
+
+### 75. Edge Computing
+
+| Skill | Description |
+|-------|-------------|
+| [edge-cloud-sync](75-edge-computing/edge-cloud-sync/SKILL.md) | Edge Cloud Sync |
+| [lightweight-kubernetes](75-edge-computing/lightweight-kubernetes/SKILL.md) | Lightweight Kubernetes |
+
+### 76. Iot Infrastructure
+
+| Skill | Description |
+|-------|-------------|
+| [advanced-iac-iot](76-iot-infrastructure/advanced-iac-iot/SKILL.md) | Advanced IaC for IoT |
+| [chaos-engineering-iot](76-iot-infrastructure/chaos-engineering-iot/SKILL.md) | Chaos Engineering for IoT |
+| [disaster-recovery-iot](76-iot-infrastructure/disaster-recovery-iot/SKILL.md) | Disaster Recovery for IoT |
+| [gitops-iot-infrastructure](76-iot-infrastructure/gitops-iot-infrastructure/SKILL.md) | GitOps for IoT Infrastructure |
+| [multi-cloud-iot](76-iot-infrastructure/multi-cloud-iot/SKILL.md) | Multi-Cloud IoT Strategy |
+
+### 77. Mlops Data Engineering
+
+| Skill | Description |
+|-------|-------------|
+| [drift-detection-retraining](77-mlops-data-engineering/drift-detection-retraining/SKILL.md) | Drift Detection and Retraining |
+| [feature-store-implementation](77-mlops-data-engineering/feature-store-implementation/SKILL.md) | Feature Store Implementation |
+| [model-registry-versioning](77-mlops-data-engineering/model-registry-versioning/SKILL.md) | Model Registry and Versioning |
+
+### 78. Inference Model Serving
+
+| Skill | Description |
+|-------|-------------|
+| [high-performance-inference](78-inference-model-serving/high-performance-inference/SKILL.md) | High Performance Inference |
+| [model-optimization-quantization](78-inference-model-serving/model-optimization-quantization/SKILL.md) | Model Optimization and Quantization |
+| [serverless-inference](78-inference-model-serving/serverless-inference/SKILL.md) | Serverless Inference |
+
+### 79. Edge Ai Tinyml
+
+| Skill | Description |
+|-------|-------------|
+| [edge-ai-development-workflow](79-edge-ai-tinyml/edge-ai-development-workflow/SKILL.md) | Edge AI Development Workflow |
+| [edge-model-compression](79-edge-ai-tinyml/edge-model-compression/SKILL.md) | Edge Model Compression |
+| [hybrid-inference-architecture](79-edge-ai-tinyml/hybrid-inference-architecture/SKILL.md) | Hybrid Inference Architecture |
+| [on-device-model-training](79-edge-ai-tinyml/on-device-model-training/SKILL.md) | On-Device Model Training |
+| [tinyml-microcontroller-ai](79-edge-ai-tinyml/tinyml-microcontroller-ai/SKILL.md) | TinyML Microcontroller AI |
+
+### 80. Agentic Ai Advanced Learning
+
+| Skill | Description |
+|-------|-------------|
+| [agentic-ai-frameworks](80-agentic-ai-advanced-learning/agentic-ai-frameworks/SKILL.md) | Agentic AI Frameworks |
+
+### 81. Saas Finops Pricing
+
+| Skill | Description |
+|-------|-------------|
+| [cloud-unit-economics](81-saas-finops-pricing/cloud-unit-economics/SKILL.md) | Cloud Unit Economics |
+| [hybrid-pricing-strategy](81-saas-finops-pricing/hybrid-pricing-strategy/SKILL.md) | Hybrid Pricing Strategy |
+| [usage-based-pricing](81-saas-finops-pricing/usage-based-pricing/SKILL.md) | Usage-Based Pricing |
+
+### 82. Technical Product Management
+
+| Skill | Description |
+|-------|-------------|
+| [api-first-product-strategy](82-technical-product-management/api-first-product-strategy/SKILL.md) | API-First Product Strategy |
+| [business-to-technical-spec](82-technical-product-management/business-to-technical-spec/SKILL.md) | Business to Technical Specification |
+| [competitive-intelligence](82-technical-product-management/competitive-intelligence/SKILL.md) | Competitive Intelligence |
+| [cross-functional-leadership](82-technical-product-management/cross-functional-leadership/SKILL.md) | Cross-Functional Leadership |
+| [feature-prioritization](82-technical-product-management/feature-prioritization/SKILL.md) | Feature Prioritization |
+| [platform-product-design](82-technical-product-management/platform-product-design/SKILL.md) | Platform Product Design |
+| [product-analytics-implementation](82-technical-product-management/product-analytics-implementation/SKILL.md) | Product Analytics Implementation |
+| [product-discovery-validation](82-technical-product-management/product-discovery-validation/SKILL.md) | Product Discovery & Validation |
+| [product-roadmap-communication](82-technical-product-management/product-roadmap-communication/SKILL.md) | Product Roadmap Communication |
+| [technical-debt-prioritization](82-technical-product-management/technical-debt-prioritization/SKILL.md) | Technical Debt Prioritization |
+
+### 83. Go To Market Tech
+
+| Skill | Description |
+|-------|-------------|
+| [analyst-relations](83-go-to-market-tech/analyst-relations/SKILL.md) | Analyst Relations |
+| [customer-success-automation](83-go-to-market-tech/customer-success-automation/SKILL.md) | Customer Success Automation |
+| [demand-generation-automation](83-go-to-market-tech/demand-generation-automation/SKILL.md) | Demand Generation Automation |
+| [developer-relations-community](83-go-to-market-tech/developer-relations-community/SKILL.md) | Developer Relations & Community |
+| [enterprise-sales-alignment](83-go-to-market-tech/enterprise-sales-alignment/SKILL.md) | Enterprise Sales Alignment |
+| [go-to-market-analytics](83-go-to-market-tech/go-to-market-analytics/SKILL.md) | Go-to-Market Analytics |
+| [launch-strategy-execution](83-go-to-market-tech/launch-strategy-execution/SKILL.md) | Launch Strategy & Execution |
+| [partner-program-design](83-go-to-market-tech/partner-program-design/SKILL.md) | Partner Program Design |
+| [revenue-operations-revops](83-go-to-market-tech/revenue-operations-revops/SKILL.md) | Revenue Operations (RevOps) |
+| [sales-engineering](83-go-to-market-tech/sales-engineering/SKILL.md) | Sales Engineering |
+| [sales-operations-automation](83-go-to-market-tech/sales-operations-automation/SKILL.md) | Sales Operations Automation |
+| [technical-content-marketing](83-go-to-market-tech/technical-content-marketing/SKILL.md) | Technical Content Marketing |
+
+### 85. Future Compliance
+
+| Skill | Description |
+|-------|-------------|
+| [ai-audit-trail](85-future-compliance/ai-audit-trail/SKILL.md) | AI Audit Trail & Accountability |
+| [algorithmic-accountability](85-future-compliance/algorithmic-accountability/SKILL.md) | Algorithmic Accountability |
+| [cross-border-data-transfer](85-future-compliance/cross-border-data-transfer/SKILL.md) | Cross-border Data Transfer Compliance |
+
+### 86. Sustainable Ai
+
+| Skill | Description |
+|-------|-------------|
+| [green-computing-finops](86-sustainable-ai/green-computing-finops/SKILL.md) | Sustainable AI & Green Computing (FinOps 2.0) |
+
+### 87. Multi Agent Governance
+
+| Skill | Description |
+|-------|-------------|
+| [multi-agent-orchestration](87-multi-agent-governance/multi-agent-orchestration/SKILL.md) | Multi-Agent Orchestration & Governance |
+
+### 88. Ai Supply Chain Security
+
+| Skill | Description |
+|-------|-------------|
+| [model-bom-security](88-ai-supply-chain-security/model-bom-security/SKILL.md) | AI Supply Chain Security (Model BOM) |
+
+### 89. Post Quantum Cryptography
+
+| Skill | Description |
+|-------|-------------|
+| [pqc-for-iot](89-post-quantum-cryptography/pqc-for-iot/SKILL.md) | Post-Quantum Cryptography (PQC) for IoT |
 <!-- SKILLS-END -->
