@@ -1,8 +1,20 @@
+---
+name: A/B Testing Analysis
+description: Running controlled experiments comparing two variants to determine which performs better for specific metrics, with statistical significance testing and data-driven decision making.
+---
+
 # A/B Testing Analysis
 
-## What is A/B Testing
+> **Current Level:** Intermediate  
+> **Domain:** Business Analytics / Experimentation
 
-A/B testing (also known as split testing) is a controlled experiment where two variants (A and B) are compared to determine which performs better for a specific metric.
+---
+
+## Overview
+
+A/B testing (also known as split testing) is a controlled experiment where two variants (A and B) are compared to determine which performs better for a specific metric. Effective A/B testing uses proper randomization, statistical significance, and clear success metrics to make data-driven decisions.
+
+## What is A/B Testing
 
 - **Variant A (Control)**: The existing version
 - **Variant B (Treatment)**: The modified version being tested
@@ -1145,6 +1157,138 @@ print(f"Total sample: {result['total_sample']:,}")
 ### After A/B Test
 
 - [ ] Verify sample size achieved
+- [ ] Calculate statistical significance
+- [ ] Analyze results
+- [ ] Make decision
+- [ ] Document findings
+```
+
+---
+
+## Quick Start
+
+### Basic A/B Test Setup
+
+```javascript
+// A/B test assignment
+function assignVariant(userId) {
+  const hash = hashUserId(userId)
+  return hash % 2 === 0 ? 'A' : 'B'
+}
+
+// Track conversion
+function trackConversion(userId, variant, converted) {
+  analytics.track('ab_test_conversion', {
+    userId,
+    variant,
+    converted,
+    testName: 'button-color-test'
+  })
+}
+
+// Calculate results
+function calculateResults(variantA, variantB) {
+  const rateA = variantA.conversions / variantA.visitors
+  const rateB = variantB.conversions / variantB.visitors
+  const lift = ((rateB - rateA) / rateA) * 100
+  
+  return {
+    rateA,
+    rateB,
+    lift,
+    significant: isStatisticallySignificant(variantA, variantB)
+  }
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Hypothesis**: Clear hypothesis and success metric
+- [ ] **Sample Size**: Calculate required sample size
+- [ ] **Randomization**: Proper random assignment
+- [ ] **Tracking**: Set up conversion tracking
+- [ ] **Guardrail Metrics**: Monitor guardrail metrics
+- [ ] **Statistical Significance**: Use proper statistical tests
+- [ ] **Duration**: Run test for sufficient duration
+- [ ] **No Peeking**: Don't peek at results early
+- [ ] **Documentation**: Document test setup and results
+- [ ] **Decision**: Make data-driven decision
+- [ ] **Implementation**: Implement winning variant
+- [ ] **Learning**: Document learnings for future tests
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Peek Early
+
+```javascript
+// ❌ Bad - Check results too early
+if (day === 1) {
+  checkResults()  // Too early!
+}
+```
+
+```javascript
+// ✅ Good - Wait for sample size
+const requiredSampleSize = calculateSampleSize(alpha, power, effectSize)
+if (totalVisitors >= requiredSampleSize) {
+  checkResults()
+}
+```
+
+### ❌ Don't: No Statistical Significance
+
+```javascript
+// ❌ Bad - No significance test
+if (variantB.rate > variantA.rate) {
+  return 'B wins'  // Could be random!
+}
+```
+
+```javascript
+// ✅ Good - Statistical significance
+const pValue = calculatePValue(variantA, variantB)
+if (pValue < 0.05 && variantB.rate > variantA.rate) {
+  return 'B wins (statistically significant)'
+}
+```
+
+### ❌ Don't: Ignore Guardrail Metrics
+
+```javascript
+// ❌ Bad - Only check conversion
+if (conversionRateB > conversionRateA) {
+  return 'B wins'  // But what about revenue?
+}
+```
+
+```javascript
+// ✅ Good - Check guardrail metrics
+if (conversionRateB > conversionRateA && 
+    revenueB >= revenueA && 
+    bounceRateB <= bounceRateA) {
+  return 'B wins'
+}
+```
+
+---
+
+## Integration Points
+
+- **Dashboard Design** (`23-business-analytics/dashboard-design/`) - Test results visualization
+- **KPI Metrics** (`23-business-analytics/kpi-metrics/`) - Success metrics
+- **SQL for Analytics** (`23-business-analytics/sql-for-analytics/`) - Results analysis
+
+---
+
+## Further Reading
+
+- [A/B Testing Guide](https://www.optimizely.com/optimization-glossary/ab-testing/)
+- [Statistical Significance](https://www.investopedia.com/terms/s/statistical-significance.asp)
+- [Sequential Testing](https://www.evanmiller.org/sequential-ab-testing.html)
 - [ ] Calculate statistical significance
 - [ ] Check confidence intervals
 - [ ] Analyze segments

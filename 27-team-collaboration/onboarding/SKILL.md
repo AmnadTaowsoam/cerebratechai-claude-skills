@@ -1,4 +1,18 @@
+---
+name: Developer Onboarding
+description: Creating effective onboarding processes that help new developers become productive quickly, understand the codebase, and integrate smoothly into the team.
+---
+
 # Developer Onboarding
+
+> **Current Level:** Intermediate  
+> **Domain:** Team Collaboration / People
+
+---
+
+## Overview
+
+Developer onboarding is the process of helping new team members become productive quickly. Effective onboarding includes clear documentation, mentorship, hands-on tasks, and a structured program that reduces time-to-productivity and improves retention.
 
 ## Why Good Onboarding Matters
 
@@ -78,6 +92,149 @@ Please complete the following:
 If you have any questions before you start, please reach out to:
 - [Manager Name]: [Email]
 - [Buddy Name]: [Email]
+```
+
+---
+
+## Quick Start
+
+### Onboarding Checklist Template
+
+```markdown
+# Onboarding Checklist: [Name]
+
+## Pre-Day 1
+- [ ] Send welcome email
+- [ ] Prepare equipment
+- [ ] Create accounts (GitHub, Slack, etc.)
+- [ ] Assign buddy/mentor
+
+## Day 1
+- [ ] Welcome meeting
+- [ ] Team introduction
+- [ ] Development environment setup
+- [ ] First commit (setup task)
+
+## Week 1
+- [ ] Codebase walkthrough
+- [ ] First real task
+- [ ] Code review participation
+- [ ] Documentation review
+
+## Month 1
+- [ ] Complete onboarding tasks
+- [ ] Attend team meetings
+- [ ] Contribute to codebase
+- [ ] Feedback session
+```
+
+### Onboarding Documentation
+
+```markdown
+# Developer Onboarding Guide
+
+## Getting Started
+1. Clone repository
+2. Run setup script: `./scripts/setup.sh`
+3. Read CONTRIBUTING.md
+4. Complete first task
+
+## Resources
+- Architecture docs: `/docs/architecture`
+- API docs: `/docs/api`
+- Team wiki: [link]
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Welcome Package**: Prepare welcome materials
+- [ ] **Equipment**: Set up development equipment
+- [ ] **Accounts**: Create all necessary accounts
+- [ ] **Documentation**: Onboarding documentation ready
+- [ ] **Mentor**: Assign mentor/buddy
+- [ ] **First Task**: Prepare first task (not too hard)
+- [ ] **Environment Setup**: Development environment setup guide
+- [ ] **Codebase Tour**: Codebase overview session
+- [ ] **Team Introduction**: Introduce to team members
+- [ ] **Processes**: Explain team processes (standup, reviews)
+- [ ] **Feedback**: Regular check-ins and feedback
+- [ ] **Resources**: Provide learning resources
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Information Overload
+
+```markdown
+# ❌ Bad - Too much at once
+## Day 1
+- Read all 50 documentation files
+- Understand entire codebase
+- Learn all tools
+# Overwhelming!
+```
+
+```markdown
+# ✅ Good - Gradual introduction
+## Day 1
+- Welcome and team intro
+- Setup development environment
+- First simple task
+
+## Week 1
+- Codebase overview
+- First real feature
+- Code review participation
+```
+
+### ❌ Don't: No Structure
+
+```markdown
+# ❌ Bad - No plan
+"Just start coding and ask questions"
+```
+
+```markdown
+# ✅ Good - Structured program
+## Week 1: Setup and Orientation
+- Day 1: Environment setup
+- Day 2: Codebase tour
+- Day 3: First task
+- Day 4: Code review
+- Day 5: Feedback session
+```
+
+### ❌ Don't: No Mentor
+
+```markdown
+# ❌ Bad - No support
+"Figure it out yourself"
+```
+
+```markdown
+# ✅ Good - Mentor assigned
+- Buddy: [Name]
+- Available for questions
+- Regular check-ins scheduled
+```
+
+---
+
+## Integration Points
+
+- **Code Review Culture** (`27-team-collaboration/code-review-culture/`) - Review process
+- **Knowledge Sharing** (`27-team-collaboration/knowledge-sharing/`) - Knowledge transfer
+- **Documentation** (`21-documentation/`) - Onboarding docs
+
+---
+
+## Further Reading
+
+- [Developer Onboarding Best Practices](https://www.atlassian.com/agile/software-development/onboarding)
+- [First 90 Days](https://www.amazon.com/First-90-Days-Updated-Strategies/dp/1422188612)
 
 We're looking forward to working with you!
 

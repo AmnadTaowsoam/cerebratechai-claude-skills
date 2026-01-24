@@ -1,8 +1,18 @@
+---
+name: Contact Management
+description: Organizing and tracking interactions with customers and prospects including data models, segmentation, enrichment, GDPR compliance, and contact lifecycle management.
+---
+
 # Contact Management
+
+> **Current Level:** Intermediate  
+> **Domain:** CRM / Sales
+
+---
 
 ## Overview
 
-Contact management organizes and tracks interactions with customers and prospects. This guide covers data models, segmentation, enrichment, and GDPR compliance.
+Contact management organizes and tracks interactions with customers and prospects. This guide covers data models, segmentation, enrichment, and GDPR compliance for managing customer relationships effectively.
 
 ## Contact Data Model
 
@@ -564,6 +574,121 @@ interface ContactDataExport {
 8. **Tags** - Use tags for organization
 9. **Lists** - Support static and dynamic lists
 10. **Audit Trail** - Track all changes
+
+---
+
+## Quick Start
+
+### Contact Model
+
+```typescript
+interface Contact {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone?: string
+  company?: string
+  tags: string[]
+  customFields: Record<string, any>
+  createdAt: Date
+  updatedAt: Date
+}
+
+async function createContact(contact: Contact) {
+  // Check for duplicates
+  const existing = await findDuplicateContact(contact.email)
+  if (existing) {
+    return await mergeContacts(existing.id, contact)
+  }
+  
+  return await db.contacts.create({ data: contact })
+}
+```
+
+### Contact Segmentation
+
+```typescript
+async function segmentContacts(): Promise<ContactSegment[]> {
+  const contacts = await db.contacts.findMany()
+  
+  return {
+    highValue: contacts.filter(c => c.totalRevenue > 10000),
+    active: contacts.filter(c => c.lastContactDate > subDays(new Date(), 30)),
+    inactive: contacts.filter(c => c.lastContactDate < subDays(new Date(), 90))
+  }
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Data Model**: Flexible contact data model
+- [ ] **Deduplication**: Prevent and merge duplicates
+- [ ] **Enrichment**: Auto-enrich contact data
+- [ ] **Segmentation**: Contact segmentation
+- [ ] **Custom Fields**: Support custom fields
+- [ ] **GDPR Compliance**: GDPR compliance
+- [ ] **Import/Export**: Bulk import/export
+- [ ] **Search**: Full-text search
+- [ ] **Integration**: Integrate with CRM
+- [ ] **Documentation**: Document contact structure
+- [ ] **Validation**: Validate contact data
+- [ ] **Privacy**: Respect privacy settings
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Deduplication
+
+```typescript
+// ❌ Bad - Allow duplicates
+await db.contacts.create({ data: contact })
+// Same email multiple times!
+```
+
+```typescript
+// ✅ Good - Check duplicates
+const existing = await findDuplicateContact(contact.email)
+if (existing) {
+  await mergeContacts(existing.id, contact)
+} else {
+  await db.contacts.create({ data: contact })
+}
+```
+
+### ❌ Don't: Ignore GDPR
+
+```typescript
+// ❌ Bad - No GDPR compliance
+await db.contacts.create({ data: contact })
+// No consent tracking!
+```
+
+```typescript
+// ✅ Good - GDPR compliant
+if (contact.consentGiven) {
+  await db.contacts.create({ data: contact })
+  await trackConsent(contact.id, 'data_processing')
+}
+```
+
+---
+
+## Integration Points
+
+- **Lead Management** (`32-crm-integration/lead-management/`) - Lead to contact
+- **Salesforce Integration** (`32-crm-integration/salesforce-integration/`) - CRM sync
+- **Marketing Automation** (`28-marketing-integration/marketing-automation/`) - Marketing
+
+---
+
+## Further Reading
+
+- [Contact Management Best Practices](https://www.salesforce.com/resources/articles/contact-management/)
+- [GDPR Compliance](https://gdpr.eu/)
 
 ## Resources
 

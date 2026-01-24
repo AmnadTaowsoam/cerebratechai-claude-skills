@@ -96,7 +96,7 @@ npm --version
 
 1. Go to [github.com/new](https://github.com/new)
 2. Fill in repository details:
-   - **Repository name**: `cerebratechai-claude-skills`
+   - **Repository name**: `cerebraSkills`
    - **Description**: `Production-ready skills for Claude AI development`
    - **Visibility**:
      - ✅ **Public** (recommended for easy sharing)
@@ -114,10 +114,10 @@ npm --version
 cd ~/projects
 
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/cerebratechai-claude-skills.git
+git clone https://github.com/YOUR_USERNAME/cerebraSkills.git
 
 # Enter the directory
-cd cerebratechai-claude-skills
+cd cerebraSkills
 ```
 
 Replace `YOUR_USERNAME` with your actual GitHub username.
@@ -340,7 +340,7 @@ Skills are comprehensive markdown documents that teach Claude best practices, pa
 ## 🗂️ Repository Structure
 
 ````
-cerebratechai-claude-skills/
+cerebraSkills/
 ├── 01-foundations/          # Core development standards
 ├── 02-frontend/             # Frontend frameworks & patterns
 ├── 03-backend-api/          # Backend API development
@@ -415,7 +415,7 @@ git push origin main
 
 **✅ Checkpoint**: Your skills repository is now on GitHub!
 
-Visit `https://github.com/YOUR_USERNAME/cerebratechai-claude-skills` to verify.
+Visit `https://github.com/YOUR_USERNAME/cerebraSkills` to verify.
 
 ---
 
@@ -446,7 +446,7 @@ GitHub tokens allow Claude to read your skills repository securely without requi
 
 4. **Repository access**:
    - Select: **Only select repositories**
-   - Choose: `cerebratechai-claude-skills`
+   - Choose: `cerebraSkills`
 
 5. **Permissions** → **Repository permissions**:
    - **Contents**: Select `Read-only` ✅
@@ -572,7 +572,7 @@ Copy and paste this configuration, replacing the placeholders:
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_TOKEN_HERE",
         "GITHUB_OWNER": "YOUR_GITHUB_USERNAME",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }
@@ -599,7 +599,7 @@ Copy and paste this configuration, replacing the placeholders:
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "github_pat_11ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
         "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }
@@ -845,7 +845,7 @@ nano ~/.config/Claude/claude_desktop_config.json
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_SAME_TOKEN",
         "GITHUB_OWNER": "YOUR_USERNAME",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }
@@ -881,10 +881,10 @@ List skills in cerebratechai-skills
 ```bash
 # 1. Clone repo (if not already)
 cd ~/projects
-git clone https://github.com/YOUR_USERNAME/cerebratechai-claude-skills.git
+git clone https://github.com/YOUR_USERNAME/cerebraSkills.git
 
 # 2. Make changes
-cd cerebratechai-claude-skills
+cd cerebraSkills
 # ... edit skills ...
 
 # 3. Commit and push
@@ -940,13 +940,13 @@ Error: Failed to connect to GitHub: Authentication failed
 
 **Symptom:**
 ```
-Error: Repository cerebratechai-claude-skills not found
+Error: Repository cerebraSkills not found
 ```
 
 **Solutions:**
 
 1. **Check repository exists:**
-   - Visit `https://github.com/YOUR_USERNAME/cerebratechai-claude-skills`
+   - Visit `https://github.com/YOUR_USERNAME/cerebraSkills`
    - If 404 → repository name is wrong or doesn't exist
 
 2. **Verify GITHUB_OWNER is correct:**
@@ -1171,7 +1171,7 @@ You can connect multiple skills repositories:
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "your_token",
         "GITHUB_OWNER": "YourUsername",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     },
@@ -1219,7 +1219,7 @@ Use different branches for development and production:
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "your_token",
         "GITHUB_OWNER": "YourUsername",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     },
@@ -1229,7 +1229,7 @@ Use different branches for development and production:
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "your_token",
         "GITHUB_OWNER": "YourUsername",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "develop"
       }
     }
@@ -1250,7 +1250,7 @@ Mix cloud and local skills:
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "your_token",
         "GITHUB_OWNER": "YourUsername",
-        "GITHUB_REPO": "cerebratechai-claude-skills"
+        "GITHUB_REPO": "cerebraSkills"
       }
     },
     "local-skills": {
@@ -1293,7 +1293,7 @@ npm link
       "command": "cerebratechai-mcp",
       "env": {
         "GITHUB_TOKEN": "your_token",
-        "SKILLS_REPO": "YourUsername/cerebratechai-claude-skills"
+        "SKILLS_REPO": "YourUsername/cerebraSkills"
       }
     }
   }
@@ -1387,7 +1387,7 @@ npm link
 1. **Update Workflow**
    ```bash
    # On any device
-   cd ~/cerebratechai-claude-skills
+   cd ~/cerebraSkills
    git pull                          # Get latest
    # ... make changes ...
    git add .
@@ -1457,7 +1457,7 @@ cat ~/Library/Application\ Support/Claude/claude_desktop_config.json | python3 -
 curl -H "Authorization: token YOUR_TOKEN" https://api.github.com/user
 
 # Update skills
-cd ~/cerebratechai-claude-skills
+cd ~/cerebraSkills
 git pull && git add . && git commit -m "Update" && git push
 
 # Restart Claude (macOS)
@@ -1555,7 +1555,7 @@ For each new device:
 ### Community
 
 - [Claude Discord](https://discord.gg/claude) (check claude.ai for invite)
-- [GitHub Discussions](https://github.com/YOUR_USERNAME/cerebratechai-claude-skills/discussions)
+- [GitHub Discussions](https://github.com/YOUR_USERNAME/cerebraSkills/discussions)
 
 ### Related Guides
 
@@ -1714,7 +1714,7 @@ Copy and paste this configuration:
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
         "GITHUB_OWNER": "YOUR_USERNAME",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }
@@ -1739,7 +1739,7 @@ Copy and paste this configuration:
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_AbCdEfGhIjKlMnOpQrStUvWxYz1234567890",
         "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }
@@ -1958,7 +1958,7 @@ cat > config.template.json << 'EOF'
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
         "GITHUB_OWNER": "YOUR_USERNAME",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }
@@ -2014,7 +2014,7 @@ List available MCP servers
 
 ```bash
 # On any device where you have the repo
-cd ~/projects/cerebratechai-claude-skills
+cd ~/projects/cerebraSkills
 
 # Make changes
 nano 01-foundations/typescript-standards/SKILL.md
@@ -2064,7 +2064,7 @@ open -a Claude
 ```bash
 # 1. Test token manually
 curl -H "Authorization: token YOUR_TOKEN" \
-  https://api.github.com/repos/YOUR_USERNAME/cerebratechai-claude-skills
+  https://api.github.com/repos/YOUR_USERNAME/cerebraSkills
 
 # If 401 error: Token expired or invalid
 # → Create new token (Part 2)
@@ -2091,7 +2091,7 @@ nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
 **Solution:**
 ```bash
 # 1. Verify repository exists
-# Open: https://github.com/YOUR_USERNAME/cerebratechai-claude-skills
+# Open: https://github.com/YOUR_USERNAME/cerebraSkills
 
 # 2. Check repository visibility
 # Private repo? Token must have "repo" access
@@ -2102,7 +2102,7 @@ nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
 
 # 4. Check branch name
 # Default is "main" but might be "master"
-git ls-remote --heads https://github.com/YOUR_USERNAME/cerebratechai-claude-skills
+git ls-remote --heads https://github.com/YOUR_USERNAME/cerebraSkills
 ```
 
 ### Problem 4: Skills not updating
@@ -2116,7 +2116,7 @@ git ls-remote --heads https://github.com/YOUR_USERNAME/cerebratechai-claude-skil
 # MCP fetches from GitHub each time, but may cache
 
 # 1. Make sure changes are pushed
-cd ~/projects/cerebratechai-claude-skills
+cd ~/projects/cerebraSkills
 git status
 git push
 
@@ -2197,7 +2197,7 @@ nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
 **Solution:**
 ```bash
 # 1. Check repository size
-du -sh ~/projects/cerebratechai-claude-skills
+du -sh ~/projects/cerebraSkills
 # If > 100MB, might be slow
 
 # 2. Check internet connection
@@ -2210,12 +2210,12 @@ ping github.com
   "args": [
     "-y",
     "@modelcontextprotocol/server-filesystem",
-    "/path/to/cerebratechai-claude-skills"
+    "/path/to/cerebraSkills"
   ]
 }
 
 # Sync periodically:
-cd ~/projects/cerebratechai-claude-skills
+cd ~/projects/cerebraSkills
 git pull
 ```
 
@@ -2257,7 +2257,7 @@ tail -f ~/.local/share/Claude/logs/mcp*.log
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_xxx",
         "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     },
@@ -2307,7 +2307,7 @@ Create an API endpoint.
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_xxx",
         "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     },
@@ -2317,7 +2317,7 @@ Create an API endpoint.
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_xxx",
         "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "develop"
       }
     }
@@ -2341,7 +2341,7 @@ export GITHUB_OWNER="AmnadTaowsoam"
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}",
         "GITHUB_OWNER": "${GITHUB_OWNER}",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }
@@ -2360,7 +2360,7 @@ export GITHUB_OWNER="AmnadTaowsoam"
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "ghp_xxx",
         "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills"
+        "GITHUB_REPO": "cerebraSkills"
       }
     },
     "local-skills": {
@@ -2600,7 +2600,7 @@ tail -f ~/Library/Logs/Claude/mcp*.log
 killall Claude && open -a Claude
 
 # Update skills repo
-cd ~/projects/cerebratechai-claude-skills && git pull
+cd ~/projects/cerebraSkills && git pull
 
 # Push skill changes
 git add . && git commit -m "Update skills" && git push
@@ -2617,7 +2617,7 @@ git add . && git commit -m "Update skills" && git push
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN",
         "GITHUB_OWNER": "YOUR_USERNAME",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }

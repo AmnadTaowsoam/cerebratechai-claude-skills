@@ -1,10 +1,24 @@
+---
+name: Inventory Management
+description: Tracking stock levels, managing reservations, handling stock movements, and providing forecasting for e-commerce operations with real-time updates, multi-warehouse support, and low stock alerts.
+---
+
 # Inventory Management
+
+> **Current Level:** Intermediate  
+> **Domain:** E-commerce / Backend
+
+---
 
 ## Overview
 
-Inventory management tracks stock levels, manages reservations, handles stock movements, and provides forecasting for e-commerce operations.
+Inventory management tracks stock levels, manages reservations, handles stock movements, and provides forecasting for e-commerce operations. Effective inventory systems provide real-time stock updates, support multiple warehouses, handle reservations, and alert on low stock.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Inventory Concepts](#inventory-concepts)
 2. [Stock Tracking](#stock-tracking)
@@ -1784,7 +1798,142 @@ async function setLowStockThreshold(
 
 ---
 
-## Resources
+---
+
+## Quick Start
+
+### Stock Management
+
+```typescript
+async function updateStock(productId: string, quantity: number) {
+  await db.$transaction(async (tx) => {
+    // Check current stock
+    const product = await tx.products.findUnique({
+      where: { id: productId }
+    })
+    
+    if (product.stock + quantity < 0) {
+      throw new Error('Insufficient stock')
+    }
+    
+    // Update stock
+    await tx.products.update({
+      where: { id: productId },
+      data: { stock: { increment: quantity } }
+    })
+    
+    // Log movement
+    await tx.stockMovements.create({
+      data: {
+        productId,
+        quantity,
+        type: quantity > 0 ? 'in' : 'out',
+        reason: 'manual-adjustment'
+      }
+    })
+  })
+}
+```
+
+### Stock Reservation
+
+```typescript
+async function reserveStock(productId: string, quantity: number, orderId: string) {
+  await db.$transaction(async (tx) => {
+    const product = await tx.products.findUnique({
+      where: { id: productId }
+    })
+    
+    const available = product.stock - product.reserved
+    
+    if (available < quantity) {
+      throw new Error('Insufficient available stock')
+    }
+    
+    await tx.products.update({
+      where: { id: productId },
+      data: { reserved: { increment: quantity } }
+    })
+    
+    await tx.stockReservations.create({
+      data: { productId, quantity, orderId, expiresAt: addHours(new Date(), 24) }
+    })
+  })
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Stock Tracking**: Real-time stock tracking
+- [ ] **Reservations**: Stock reservation system
+- [ ] **Multi-Warehouse**: Support multiple warehouses
+- [ ] **Stock Movements**: Log all stock movements
+- [ ] **Low Stock Alerts**: Alert on low stock
+- [ ] **Forecasting**: Stock forecasting
+- [ ] **Adjustments**: Manual stock adjustments
+- [ ] **Synchronization**: Sync with external systems
+- [ ] **Reports**: Inventory reports
+- [ ] **Validation**: Validate stock operations
+- [ ] **Audit Trail**: Complete audit trail
+- [ ] **Performance**: Optimize for high volume
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Race Conditions
+
+```typescript
+// ❌ Bad - Race condition
+const product = await getProduct(productId)
+if (product.stock >= quantity) {
+  await updateStock(productId, -quantity)  // Another order might have taken stock!
+}
+```
+
+```typescript
+// ✅ Good - Transaction with lock
+await db.$transaction(async (tx) => {
+  const product = await tx.products.findUnique({
+    where: { id: productId },
+    lock: { mode: 'update' }  // Lock row
+  })
+  
+  if (product.stock >= quantity) {
+    await tx.products.update({
+      where: { id: productId },
+      data: { stock: { decrement: quantity } }
+    })
+  }
+})
+```
+
+### ❌ Don't: No Reservations
+
+```typescript
+// ❌ Bad - No reservation
+// Stock might be sold to multiple orders!
+```
+
+```typescript
+// ✅ Good - Reserve stock
+await reserveStock(productId, quantity, orderId)
+// Stock reserved, safe to proceed with order
+```
+
+---
+
+## Integration Points
+
+- **Order Management** (`30-ecommerce/order-management/`) - Order processing
+- **Shopping Cart** (`30-ecommerce/shopping-cart/`) - Cart validation
+- **Database Transactions** (`04-database/database-transactions/`) - Transaction patterns
+
+---
+
+## Further Reading
 
 - [Shopify Inventory API](https://shopify.dev/api/admin-graphql/latest/objects/InventoryLevel)
 - [WooCommerce Inventory](https://woocommerce.github.io/woocommerce-rest-api-docs/#products)

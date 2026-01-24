@@ -4,11 +4,11 @@ REM Update Skills from Production (GitHub)
 REM ========================================
 REM This script pulls latest changes from GitHub
 REM to production directory
-REM (D:\AgentSkill\cerebratechai-claude-skills)
+REM (D:\AgentSkill\cerebraSkills)
 REM for multi-agent consumption
 REM ========================================
 
-set PROD_DIR=D:\AgentSkill\cerebratechai-claude-skills
+set PROD_DIR=D:\AgentSkill\cerebraSkills
 
 echo.
 echo ========================================

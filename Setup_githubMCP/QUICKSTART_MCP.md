@@ -14,7 +14,7 @@
 3. ตั้งค่า:
    - Name: `Claude MCP`
    - Expiration: `90 days`
-   - Repository: เลือก `cerebratechai-claude-skills`
+   - Repository: เลือก `cerebraSkills`
    - Permissions: **Contents** = `Read-only`
 4. คลิก **Generate token**
 5. **คัดลอก token** (ขึ้นต้นด้วย `github_pat_...`)
@@ -49,7 +49,7 @@ nano ~/.config/Claude/claude_desktop_config.json
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
         "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }

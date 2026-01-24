@@ -1,12 +1,28 @@
+---
+name: Salesforce Integration
+description: Integrating with Salesforce CRM using REST API, SOAP API, Bulk API, authentication, and common integration patterns for sales, marketing, and customer data.
+---
+
 # Salesforce Integration
+
+> **Current Level:** Intermediate  
+> **Domain:** CRM / Enterprise Integration
+
+---
 
 ## Overview
 
-Salesforce is a leading CRM platform with comprehensive APIs for integration. This guide covers REST API, SOAP API, Bulk API, authentication, and common integration patterns.
+Salesforce is a leading CRM platform with comprehensive APIs for integration. This guide covers REST API, SOAP API, Bulk API, authentication, and common integration patterns for building integrations that sync data, automate workflows, and extend Salesforce functionality.
 
-## Salesforce API Overview
+---
 
-### API Types
+---
+
+## Core Concepts
+
+### Salesforce API Overview
+
+#### API Types
 
 | API | Use Case | Limits |
 |-----|----------|--------|
@@ -450,6 +466,155 @@ interface ConvertResult {
 8. **Security** - Secure credentials
 9. **Pagination** - Handle large query results
 10. **Idempotency** - Use external IDs for upserts
+```
+
+---
+
+## Quick Start
+
+### OAuth 2.0 Authentication
+
+```javascript
+const jsforce = require('jsforce')
+
+const conn = new jsforce.Connection({
+  loginUrl: 'https://login.salesforce.com'
+})
+
+// Username/password login
+await conn.login(process.env.SF_USERNAME, process.env.SF_PASSWORD)
+
+// Or OAuth 2.0
+const oauth2 = new jsforce.OAuth2({
+  clientId: process.env.SF_CLIENT_ID,
+  clientSecret: process.env.SF_CLIENT_SECRET,
+  redirectUri: 'https://app.example.com/callback'
+})
+```
+
+### Query Records
+
+```javascript
+// SOQL query
+const records = await conn.query("SELECT Id, Name, Email FROM Contact LIMIT 10")
+
+records.records.forEach(record => {
+  console.log(record.Name, record.Email)
+})
+```
+
+### Create Record
+
+```javascript
+const contact = await conn.sobject('Contact').create({
+  FirstName: 'John',
+  LastName: 'Doe',
+  Email: 'john@example.com'
+})
+
+console.log('Created contact:', contact.id)
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Authentication**: OAuth 2.0 configured
+- [ ] **API Limits**: Monitor and respect API limits
+- [ ] **Error Handling**: Handle Salesforce errors gracefully
+- [ ] **Rate Limiting**: Implement rate limiting
+- [ ] **Bulk API**: Use Bulk API for large operations
+- [ ] **Field Mapping**: Map external fields to Salesforce
+- [ ] **Testing**: Use Sandbox for testing
+- [ ] **Monitoring**: Monitor API usage and errors
+- [ ] **Security**: Secure credentials (secrets manager)
+- [ ] **Pagination**: Handle large query results
+- [ ] **Idempotency**: Use external IDs for upserts
+- [ ] **Webhooks**: Set up webhooks for real-time sync
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Ignore API Limits
+
+```javascript
+// ❌ Bad - No rate limiting
+for (const record of records) {
+  await conn.sobject('Contact').create(record)  // May hit limits!
+}
+```
+
+```javascript
+// ✅ Good - Rate limiting
+const rateLimiter = require('rate-limiter-flexible')
+const limiter = new rateLimiter.RateLimiter({
+  points: 1000,  // 1000 requests
+  duration: 60   // per 60 seconds
+})
+
+for (const record of records) {
+  await limiter.consume('salesforce')
+  await conn.sobject('Contact').create(record)
+}
+```
+
+### ❌ Don't: No Error Handling
+
+```javascript
+// ❌ Bad - No error handling
+const contact = await conn.sobject('Contact').create(data)
+```
+
+```javascript
+// ✅ Good - Handle errors
+try {
+  const contact = await conn.sobject('Contact').create(data)
+} catch (error) {
+  if (error.errorCode === 'DUPLICATE_VALUE') {
+    // Handle duplicate
+  } else if (error.errorCode === 'REQUIRED_FIELD_MISSING') {
+    // Handle missing field
+  } else {
+    // Handle other errors
+    throw error
+  }
+}
+```
+
+### ❌ Don't: Hardcoded Credentials
+
+```javascript
+// ❌ Bad - Credentials in code
+const conn = new jsforce.Connection({
+  username: 'user@example.com',
+  password: 'password123'  // Exposed!
+})
+```
+
+```javascript
+// ✅ Good - Environment variables
+const conn = new jsforce.Connection({
+  username: process.env.SF_USERNAME,
+  password: process.env.SF_PASSWORD  // From secrets manager
+})
+```
+
+---
+
+## Integration Points
+
+- **OAuth2** (`10-authentication-authorization/oauth2/`) - Authentication
+- **API Design** (`01-foundations/api-design/`) - API patterns
+- **Error Handling** (`03-backend-api/error-handling/`) - Error patterns
+
+---
+
+## Further Reading
+
+- [Salesforce REST API](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/)
+- [jsforce Documentation](https://jsforce.github.io/)
+- [Salesforce Integration Patterns](https://developer.salesforce.com/docs/atlas.en-us.integration_patterns_and_practices.meta/integration_patterns_and_practices/)
 
 ## Resources
 

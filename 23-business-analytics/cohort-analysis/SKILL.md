@@ -1,8 +1,20 @@
+---
+name: Cohort Analysis
+description: Grouping users into cohorts based on shared characteristics and analyzing their behavior over time to track retention, identify patterns, measure LTV, and optimize acquisition channels.
+---
+
 # Cohort Analysis
 
-## What is Cohort Analysis
+> **Current Level:** Intermediate  
+> **Domain:** Business Analytics / Data Science
 
-Cohort analysis is the process of grouping users into cohorts based on shared characteristics and analyzing their behavior over time. This enables apples-to-apples comparison of different user groups to identify patterns and trends.
+---
+
+## Overview
+
+Cohort analysis is the process of grouping users into cohorts based on shared characteristics and analyzing their behavior over time. This enables apples-to-apples comparison of different user groups to identify patterns and trends, track retention, measure lifetime value, and optimize acquisition channels.
+
+## What is Cohort Analysis
 
 ### Key Benefits
 
@@ -1040,6 +1052,111 @@ Insights:
 - [ ] Identify trends
 - [ ] Find drop-off points
 - [ ] Segment by key dimensions
+```
+
+---
+
+## Quick Start
+
+### Cohort Retention Query
+
+```sql
+-- Monthly cohort retention
+WITH first_purchase AS (
+  SELECT 
+    user_id,
+    DATE_TRUNC('month', MIN(created_at)) as cohort_month
+  FROM orders
+  GROUP BY user_id
+),
+cohort_data AS (
+  SELECT 
+    fp.cohort_month,
+    DATE_TRUNC('month', o.created_at) as order_month,
+    COUNT(DISTINCT o.user_id) as users
+  FROM first_purchase fp
+  JOIN orders o ON fp.user_id = o.user_id
+  GROUP BY fp.cohort_month, DATE_TRUNC('month', o.created_at)
+)
+SELECT 
+  cohort_month,
+  order_month,
+  EXTRACT(MONTH FROM AGE(order_month, cohort_month)) as period,
+  users
+FROM cohort_data
+ORDER BY cohort_month, period
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Cohort Definition**: Define cohort criteria (signup date, acquisition channel)
+- [ ] **Data Collection**: Collect user behavior data
+- [ ] **Retention Calculation**: Calculate retention rates
+- [ ] **Visualization**: Create cohort retention tables
+- [ ] **Segmentation**: Segment cohorts by key dimensions
+- [ ] **Trend Analysis**: Identify trends over time
+- [ ] **LTV Calculation**: Calculate lifetime value by cohort
+- [ ] **Documentation**: Document cohort definitions
+- [ ] **Automation**: Automate cohort analysis
+- [ ] **Reporting**: Regular cohort reports
+- [ ] **Action Items**: Act on insights from analysis
+- [ ] **Testing**: Validate cohort calculations
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Too Many Cohorts
+
+```sql
+-- ❌ Bad - Too many cohort dimensions
+SELECT 
+  DATE_TRUNC('day', signup_date) as cohort,
+  acquisition_channel,
+  device_type,
+  country,
+  -- Too many dimensions!
+```
+
+```sql
+-- ✅ Good - Focused cohorts
+SELECT 
+  DATE_TRUNC('month', signup_date) as cohort_month,
+  acquisition_channel
+-- Key dimensions only
+```
+
+### ❌ Don't: No Baseline
+
+```markdown
+# ❌ Bad - No baseline comparison
+Cohort A: 50% retention
+Cohort B: 45% retention
+# Is this good or bad?
+```
+
+```markdown
+# ✅ Good - With baseline
+Cohort A: 50% retention (baseline: 40%) - +25% improvement
+Cohort B: 45% retention (baseline: 40%) - +12.5% improvement
+```
+
+---
+
+## Integration Points
+
+- **KPI Metrics** (`23-business-analytics/kpi-metrics/`) - Retention KPIs
+- **SQL for Analytics** (`23-business-analytics/sql-for-analytics/`) - Query patterns
+- **Dashboard Design** (`23-business-analytics/dashboard-design/`) - Cohort visualization
+
+---
+
+## Further Reading
+
+- [Cohort Analysis Guide](https://www.shopify.com/blog/cohort-analysis)
+- [Retention Metrics](https://www.intercom.com/blog/cohort-analysis-retention/)
 
 ### Action
 

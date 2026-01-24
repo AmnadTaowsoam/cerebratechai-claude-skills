@@ -1,8 +1,18 @@
+---
+name: Video Transcoding
+description: Converting videos to different formats, resolutions, and bitrates using FFmpeg, cloud services, and optimization techniques for efficient video delivery across devices and networks.
+---
+
 # Video Transcoding
+
+> **Current Level:** Advanced  
+> **Domain:** Video Streaming / Media Processing
+
+---
 
 ## Overview
 
-Video transcoding converts videos to different formats, resolutions, and bitrates. This guide covers FFmpeg, cloud services, and optimization.
+Video transcoding converts videos to different formats, resolutions, and bitrates. This guide covers FFmpeg, cloud services, and optimization for building video processing pipelines that create multiple quality levels for adaptive streaming.
 
 ## Transcoding Concepts
 
@@ -463,6 +473,118 @@ export class TranscodingCostOptimizer {
   }
 }
 ```
+
+---
+
+## Quick Start
+
+### FFmpeg Transcoding
+
+```bash
+# Transcode to multiple resolutions
+ffmpeg -i input.mp4 \
+  -c:v libx264 -preset medium -crf 23 \
+  -vf "scale=1920:1080" -b:v 5M \
+  -c:a aac -b:a 128k \
+  output_1080p.mp4
+
+ffmpeg -i input.mp4 \
+  -c:v libx264 -preset medium -crf 23 \
+  -vf "scale=1280:720" -b:v 2.5M \
+  -c:a aac -b:a 128k \
+  output_720p.mp4
+```
+
+### Cloud Transcoding (AWS MediaConvert)
+
+```typescript
+const mediaConvert = new AWS.MediaConvert()
+
+async function transcodeVideo(inputUri: string) {
+  const job = await mediaConvert.createJob({
+    Settings: {
+      Inputs: [{
+        FileInput: inputUri
+      }],
+      OutputGroups: [{
+        Outputs: [
+          { Preset: 'System-Ott_Hls_Ts_Avc_Aac_16x9_1280x720p_30Hz_4.5Mbps' },
+          { Preset: 'System-Ott_Hls_Ts_Avc_Aac_16x9_1920x1080p_30Hz_6Mbps' }
+        ]
+      }]
+    }
+  })
+  
+  return job.Job.Id
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Codec Selection**: Choose appropriate codec (H.264, H.265, VP9)
+- [ ] **Quality Control**: Use CRF for quality control
+- [ ] **Hardware Acceleration**: Use GPU when available
+- [ ] **Multiple Resolutions**: Support adaptive streaming
+- [ ] **Format Support**: Support multiple formats (MP4, WebM)
+- [ ] **Processing**: Efficient processing pipeline
+- [ ] **Storage**: Temporary file management
+- [ ] **Monitoring**: Monitor transcoding jobs
+- [ ] **Error Handling**: Handle transcoding errors
+- [ ] **Testing**: Test output quality
+- [ ] **Documentation**: Document transcoding settings
+- [ ] **Optimization**: Optimize for speed and quality
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Single Resolution
+
+```bash
+# ❌ Bad - One resolution only
+ffmpeg -i input.mp4 output.mp4
+# No adaptive streaming!
+```
+
+```bash
+# ✅ Good - Multiple resolutions
+ffmpeg -i input.mp4 output_1080p.mp4
+ffmpeg -i input.mp4 output_720p.mp4
+ffmpeg -i input.mp4 output_480p.mp4
+# Adaptive streaming support
+```
+
+### ❌ Don't: No Quality Control
+
+```bash
+# ❌ Bad - No quality control
+ffmpeg -i input.mp4 -b:v 5M output.mp4
+# Fixed bitrate, inconsistent quality
+```
+
+```bash
+# ✅ Good - CRF for quality
+ffmpeg -i input.mp4 -c:v libx264 -crf 23 output.mp4
+# Consistent quality, variable bitrate
+```
+
+---
+
+## Integration Points
+
+- **Adaptive Bitrate** (`37-video-streaming/adaptive-bitrate/`) - ABR streaming
+- **Live Streaming** (`37-video-streaming/live-streaming/`) - Live transcoding
+- **CDN Delivery** (`37-video-streaming/cdn-delivery/`) - CDN distribution
+
+---
+
+## Further Reading
+
+- [FFmpeg Documentation](https://ffmpeg.org/documentation.html)
+- [AWS MediaConvert](https://aws.amazon.com/mediaconvert/)
+- [Video Codec Guide](https://www.streamingmedia.com/Articles/Editorial/What-Is-What/What-Is-H.264-78221.aspx)
 
 ## Best Practices
 

@@ -1,8 +1,20 @@
+---
+name: Rolling Deployment
+description: Gradually replacing application instances with new versions one at a time or in small batches, ensuring zero downtime and enabling fast rollback if issues occur.
+---
+
 # Rolling Deployment
 
-## What is Rolling Deployment
+> **Current Level:** Intermediate  
+> **Domain:** DevOps / Deployment
 
-Rolling deployment is a strategy where you gradually replace instances of your application with new versions, one at a time or in small batches, ensuring zero downtime.
+---
+
+## Overview
+
+Rolling deployment is a strategy where you gradually replace instances of your application with new versions, one at a time or in small batches, ensuring zero downtime. This approach minimizes risk by deploying incrementally and allows for fast rollback if issues are detected.
+
+## What is Rolling Deployment
 
 ### Core Concept
 
@@ -610,6 +622,134 @@ cf app web-app
 - [ ] Monitor pod replacement
 - [ ] Check health checks
 - [ ] Monitor metrics
+- [ ] Verify zero downtime
+- [ ] Complete rollout
+```
+
+---
+
+## Quick Start
+
+### Kubernetes Rolling Update
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1        # Allow 1 extra pod during update
+      maxUnavailable: 1  # Allow 1 pod unavailable
+  template:
+    spec:
+      containers:
+      - name: app
+        image: myapp:v2
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+```
+
+### Rolling Update Command
+
+```bash
+# Update deployment
+kubectl set image deployment/myapp app=myapp:v2
+
+# Watch rollout
+kubectl rollout status deployment/myapp
+
+# Rollback if needed
+kubectl rollout undo deployment/myapp
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Strategy**: Rolling update strategy configured
+- [ ] **Health Checks**: Readiness and liveness probes configured
+- [ ] **Max Surge**: Configure max surge (extra pods during update)
+- [ ] **Max Unavailable**: Configure max unavailable pods
+- [ ] **Monitoring**: Monitor deployment progress
+- [ ] **Rollback**: Rollback procedure tested
+- [ ] **Zero Downtime**: Verify zero downtime during rollout
+- [ ] **Testing**: Test rolling update in staging
+- [ ] **Documentation**: Document deployment process
+- [ ] **Automation**: Automate rolling updates in CI/CD
+- [ ] **Validation**: Validate new version before full rollout
+- [ ] **Communication**: Notify team of deployment
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Health Checks
+
+```yaml
+# ❌ Bad - No health checks
+containers:
+- name: app
+  image: myapp:v2
+  # No readiness probe!
+```
+
+```yaml
+# ✅ Good - Health checks
+containers:
+- name: app
+  image: myapp:v2
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 8080
+  livenessProbe:
+    httpGet:
+      path: /live
+      port: 8080
+```
+
+### ❌ Don't: Too Fast Rollout
+
+```yaml
+# ❌ Bad - Replace all at once
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 5  # Replace all at once!
+    maxUnavailable: 5
+```
+
+```yaml
+# ✅ Good - Gradual replacement
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1        # One at a time
+    maxUnavailable: 1  # One unavailable
+```
+
+---
+
+## Integration Points
+
+- **Canary Deployment** (`26-deployment-strategies/canary-deployment/`) - Alternative strategy
+- **Rollback Strategies** (`26-deployment-strategies/rollback-strategies/`) - Rollback procedures
+- **CI/CD** (`15-devops-infrastructure/ci-cd-github-actions/`) - Automated deployments
+
+---
+
+## Further Reading
+
+- [Kubernetes Rolling Updates](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#rolling-update-deployment)
+- [Deployment Strategies](https://martinfowler.com/bliki/BlueGreenDeployment.html)
 - [ ] Verify all pods healthy
 
 ### Rollback

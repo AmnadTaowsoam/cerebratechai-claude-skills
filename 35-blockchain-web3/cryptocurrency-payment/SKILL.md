@@ -1,8 +1,18 @@
+---
+name: Cryptocurrency Payment
+description: Enabling direct peer-to-peer cryptocurrency transactions without intermediaries, including direct wallet payments, payment processors, transaction monitoring, and blockchain confirmation.
+---
+
 # Cryptocurrency Payment
+
+> **Current Level:** Advanced  
+> **Domain:** Blockchain / Payments
+
+---
 
 ## Overview
 
-Cryptocurrency payments enable direct peer-to-peer transactions without intermediaries. This guide covers direct wallet payments, payment processors, and transaction monitoring.
+Cryptocurrency payments enable direct peer-to-peer transactions without intermediaries. This guide covers direct wallet payments, payment processors, and transaction monitoring for accepting crypto payments in applications.
 
 ## Crypto Payment Concepts
 
@@ -576,6 +586,121 @@ async function handleChargePending(data: any): Promise<void> {
   });
 }
 ```
+
+---
+
+## Quick Start
+
+### Payment Request
+
+```typescript
+interface PaymentRequest {
+  orderId: string
+  amount: number  // in crypto (e.g., 0.01 ETH)
+  currency: 'ETH' | 'BTC' | 'USDT'
+  recipientAddress: string
+}
+
+async function createPaymentRequest(request: PaymentRequest) {
+  const payment = await db.payments.create({
+    data: {
+      orderId: request.orderId,
+      amount: request.amount,
+      currency: request.currency,
+      recipientAddress: request.recipientAddress,
+      status: 'pending',
+      expiresAt: addMinutes(new Date(), 15)  // 15 min expiry
+    }
+  })
+  
+  return {
+    address: request.recipientAddress,
+    amount: request.amount,
+    currency: request.currency,
+    qrCode: generateQRCode(`${request.currency}:${request.recipientAddress}?amount=${request.amount}`)
+  }
+}
+```
+
+### Transaction Monitoring
+
+```typescript
+async function monitorTransaction(txHash: string) {
+  const provider = new ethers.providers.JsonRpcProvider(RPC_URL)
+  
+  // Wait for confirmations
+  const receipt = await provider.waitForTransaction(txHash, 3)  // 3 confirmations
+  
+  if (receipt.status === 1) {
+    await updatePaymentStatus(txHash, 'confirmed')
+  } else {
+    await updatePaymentStatus(txHash, 'failed')
+  }
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Wallet Integration**: Support multiple wallets
+- [ ] **Payment Processing**: Payment processor or direct wallet
+- [ ] **Transaction Monitoring**: Monitor blockchain transactions
+- [ ] **Confirmations**: Wait for multiple confirmations
+- [ ] **Amount Verification**: Verify exact payment amount
+- [ ] **Address Verification**: Verify recipient address
+- [ ] **Expiry**: Payment request expiry
+- [ ] **Refunds**: Refund process
+- [ ] **Security**: Secure private keys
+- [ ] **Testing**: Test on testnets first
+- [ ] **Compliance**: Follow local regulations
+- [ ] **Documentation**: Document payment flow
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Confirmations
+
+```typescript
+// ❌ Bad - Accept after 1 confirmation
+const receipt = await provider.waitForTransaction(txHash, 1)
+await completeOrder(orderId)  // Too risky!
+```
+
+```typescript
+// ✅ Good - Wait for multiple confirmations
+const receipt = await provider.waitForTransaction(txHash, 3)  // 3 confirmations
+await completeOrder(orderId)  // Safer
+```
+
+### ❌ Don't: Store Private Keys
+
+```typescript
+// ❌ Bad - Store private keys
+const wallet = new ethers.Wallet('0x...private-key...')  // Exposed!
+```
+
+```typescript
+// ✅ Good - Use payment processor
+// Or hardware wallet
+// Never store private keys in code
+```
+
+---
+
+## Integration Points
+
+- **Wallet Connection** (`35-blockchain-web3/wallet-connection/`) - User wallets
+- **Smart Contracts** (`35-blockchain-web3/smart-contracts/`) - Contract payments
+- **Payment Gateways** (`30-ecommerce/payment-gateways/`) - Payment patterns
+
+---
+
+## Further Reading
+
+- [Ethereum Payment Processing](https://ethereum.org/en/developers/docs/transactions/)
+- [Bitcoin Payment Processing](https://bitcoin.org/en/developer-guide)
 
 ## Best Practices
 

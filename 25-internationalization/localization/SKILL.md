@@ -1,8 +1,18 @@
+---
+name: Localization (l10n)
+description: Adapting internationalized applications to specific languages and regions, going beyond translation to include cultural, regional, and technical adaptations.
+---
+
 # Localization (l10n)
 
-## What is Localization
+> **Current Level:** Intermediate  
+> **Domain:** Internationalization / UX
 
-Localization (l10n) is the process of adapting an internationalized application to specific languages and regions. It goes beyond translation to include cultural, regional, and technical adaptations.
+---
+
+## Overview
+
+Localization (l10n) is the process of adapting an internationalized application to specific languages and regions. It goes beyond translation to include cultural, regional, and technical adaptations like date formats, currency, timezones, and cultural preferences.
 
 ### l10n vs i18n
 
@@ -18,6 +28,10 @@ Localization (l10n) is the process of adapting an internationalized application 
 | Aspect | Description |
 |--------|-------------|
 | **Language** | Translate text content |
+
+---
+
+## Core Concepts
 | **Cultural** | Adapt to cultural norms |
 | **Regional** | Adapt to regional preferences |
 | **Technical** | Format dates, numbers, currencies |
@@ -567,6 +581,163 @@ Thailand Version:
 - [ ] Numbers formatted correctly
 - [ ] Currency displayed correctly
 - [ ] Addresses formatted correctly
+```
+
+---
+
+## Quick Start
+
+### Basic Localization Setup
+
+```javascript
+// i18n configuration
+import i18n from 'i18next'
+import { initReactI18next } from 'react-i18next'
+
+i18n.use(initReactI18next).init({
+  resources: {
+    en: {
+      translation: {
+        welcome: 'Welcome',
+        goodbye: 'Goodbye'
+      }
+    },
+    th: {
+      translation: {
+        welcome: 'ยินดีต้อนรับ',
+        goodbye: 'ลาก่อน'
+      }
+    }
+  },
+  lng: 'en',
+  fallbackLng: 'en'
+})
+```
+
+### Using Translations
+
+```jsx
+import { useTranslation } from 'react-i18next'
+
+function App() {
+  const { t, i18n } = useTranslation()
+  
+  return (
+    <div>
+      <h1>{t('welcome')}</h1>
+      <button onClick={() => i18n.changeLanguage('th')}>
+        Switch to Thai
+      </button>
+    </div>
+  )
+}
+```
+
+### Date/Number Formatting
+
+```javascript
+// Date formatting
+const date = new Date()
+const formatted = new Intl.DateTimeFormat('th-TH', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+}).format(date)
+
+// Number formatting
+const number = 1234.56
+const formatted = new Intl.NumberFormat('th-TH', {
+  style: 'currency',
+  currency: 'THB'
+}).format(number)  // ฿1,234.56
+```
+
+---
+
+## Production Checklist
+
+- [ ] **i18n Setup**: Internationalization framework configured
+- [ ] **Translation Keys**: All text uses translation keys
+- [ ] **Translations**: Content translated for target languages
+- [ ] **Date Formatting**: Dates formatted per locale
+- [ ] **Number Formatting**: Numbers formatted per locale
+- [ ] **Currency**: Currency displayed correctly
+- [ ] **RTL Support**: Right-to-left languages supported
+- [ ] **Cultural Adaptation**: Images and content culturally appropriate
+- [ ] **Testing**: Tested with native speakers
+- [ ] **Fallbacks**: Fallback language configured
+- [ ] **Performance**: Translations loaded efficiently
+- [ ] **Updates**: Translation process for updates
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Hardcoded Text
+
+```jsx
+// ❌ Bad - Hardcoded
+<h1>Welcome</h1>
+<p>Hello, user!</p>
+```
+
+```jsx
+// ✅ Good - Translation keys
+<h1>{t('welcome')}</h1>
+<p>{t('greeting', { name: user.name })}</p>
+```
+
+### ❌ Don't: Ignore Date Formats
+
+```javascript
+// ❌ Bad - US format everywhere
+const date = '01/15/2024'  // Confusing for non-US users
+```
+
+```javascript
+// ✅ Good - Locale-aware
+const date = new Intl.DateTimeFormat(locale, {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+}).format(new Date())
+```
+
+### ❌ Don't: No RTL Support
+
+```css
+/* ❌ Bad - Left-aligned only */
+.text {
+  text-align: left;
+}
+```
+
+```css
+/* ✅ Good - RTL-aware */
+.text {
+  text-align: start;  /* Adapts to direction */
+}
+
+[dir="rtl"] .text {
+  text-align: right;
+}
+```
+
+---
+
+## Integration Points
+
+- **i18n Setup** (`25-internationalization/i18n-setup/`) - Internationalization setup
+- **Multi-language** (`25-internationalization/multi-language/`) - Multi-language support
+- **RTL Support** (`25-internationalization/rtl-support/`) - Right-to-left languages
+
+---
+
+## Further Reading
+
+- [i18next Documentation](https://www.i18next.com/)
+- [React Intl](https://formatjs.io/docs/react-intl/)
+- [Localization Best Practices](https://www.w3.org/International/techniques/developing-specs)
 
 ### Technical
 

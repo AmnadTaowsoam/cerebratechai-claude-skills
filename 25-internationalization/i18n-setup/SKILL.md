@@ -1,8 +1,20 @@
+---
+name: i18n (Internationalization) Setup
+description: Designing software applications to adapt to different languages and regions without requiring engineering changes, using translation keys, pluralization, and locale-aware formatting.
+---
+
 # i18n (Internationalization) Setup
 
-## What is i18n
+> **Current Level:** Intermediate  
+> **Domain:** Internationalization / Frontend
 
-Internationalization (i18n) is the process of designing software applications to adapt to different languages and regions without requiring engineering changes.
+---
+
+## Overview
+
+Internationalization (i18n) is the process of designing software applications to adapt to different languages and regions without requiring engineering changes. Effective i18n uses translation keys, pluralization rules, date/number formatting, and RTL support to create applications that work globally.
+
+## What is i18n
 
 ### i18n vs l10n
 
@@ -1060,6 +1072,147 @@ function LanguageSwitcher() {
 - [ ] RTL support implemented
 - [ ] Date/time formatting
 - [ ] Number/currency formatting
+- [ ] Testing completed
+```
+
+---
+
+## Quick Start
+
+### React i18next Setup
+
+```bash
+npm install i18next react-i18next i18next-browser-languagedetector
+```
+
+```javascript
+// i18n.js
+import i18n from 'i18next'
+import { initReactI18next } from 'react-i18next'
+import LanguageDetector from 'i18next-browser-languagedetector'
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    resources: {
+      en: {
+        translation: {
+          welcome: 'Welcome',
+          goodbye: 'Goodbye'
+        }
+      },
+      th: {
+        translation: {
+          welcome: 'ยินดีต้อนรับ',
+          goodbye: 'ลาก่อน'
+        }
+      }
+    },
+    fallbackLng: 'en',
+    interpolation: {
+      escapeValue: false
+    }
+  })
+```
+
+### Usage in Components
+
+```jsx
+import { useTranslation } from 'react-i18next'
+
+function App() {
+  const { t, i18n } = useTranslation()
+  
+  return (
+    <div>
+      <h1>{t('welcome')}</h1>
+      <button onClick={() => i18n.changeLanguage('th')}>
+        Switch to Thai
+      </button>
+    </div>
+  )
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **i18n Library**: Choose and configure i18n library
+- [ ] **Translation Files**: Organize translation files by namespace
+- [ ] **Translation Keys**: Use descriptive, hierarchical keys
+- [ ] **Pluralization**: Handle plural forms correctly
+- [ ] **Variables**: Support variables in translations
+- [ ] **Date/Time**: Format dates and times per locale
+- [ ] **Numbers**: Format numbers and currency per locale
+- [ ] **RTL Support**: Support right-to-left languages
+- [ ] **Language Detection**: Auto-detect user language
+- [ ] **Language Switcher**: UI for language selection
+- [ ] **Testing**: Test all languages and locales
+- [ ] **Fallback**: Fallback language configured
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Hardcoded Strings
+
+```jsx
+// ❌ Bad - Hardcoded
+<h1>Welcome</h1>
+<p>Hello, user!</p>
+```
+
+```jsx
+// ✅ Good - Translation keys
+<h1>{t('welcome')}</h1>
+<p>{t('greeting', { name: user.name })}</p>
+```
+
+### ❌ Don't: No Pluralization
+
+```jsx
+// ❌ Bad - No pluralization
+{t('item', { count: items.length })}  // Always "item"
+```
+
+```jsx
+// ✅ Good - Pluralization
+{t('item', { count: items.length })}  // "item" or "items"
+```
+
+### ❌ Don't: Ignore RTL
+
+```css
+/* ❌ Bad - Left-aligned only */
+.text {
+  text-align: left;
+}
+```
+
+```css
+/* ✅ Good - RTL-aware */
+.text {
+  text-align: start;  /* Adapts to direction */
+}
+```
+
+---
+
+## Integration Points
+
+- **Localization** (`25-internationalization/localization/`) - Content translation
+- **Multi-language** (`25-internationalization/multi-language/`) - Multi-language support
+- **RTL Support** (`25-internationalization/rtl-support/`) - Right-to-left languages
+
+---
+
+## Further Reading
+
+- [i18next Documentation](https://www.i18next.com/)
+- [React Intl](https://formatjs.io/docs/react-intl/)
+- [i18n Best Practices](https://www.w3.org/International/techniques/developing-specs)
 - [ ] Missing translation fallback
 - [ ] Translation logging
 

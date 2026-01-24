@@ -1,22 +1,144 @@
-# Safe Refactoring Patterns
+### **05: Safe Refactoring Patterns**
+
+> 
+> **Current Level:** Expert (Enterprise Scale) 
+> 
+> 
+> **Domain:** Foundations / Code Quality 
+> 
+
+---
+
+### **1. Executive Summary & Strategic Necessity**
+
+* **Context:** ในโลกปี 2025-2026 การพัฒนาซอฟต์แวร์มีความซับซ้อนเพิ่มขึ้นอย่างมาก การ Refactoring ที่ปลอดภัยเป็นกระบวนการที่ช่วยให้ทีมพัฒนาสามารถปรับปรุงโค้ดที่มีอยู่โดยไม่ทำให้ระบบหยุดชะงัก การ Refactoring ที่ปลอดภัยช่วยลด Technical Debt และเพิ่มความสามารถในการบำรุงรักษา
+* **Business Impact:** การใช้ Refactoring Patterns ที่มีประสิทธิภาพช่วย:
+  - ลดความเสี่ยงในการปรับปรุงโค้ด
+  - เพิ่มความเสถียรของระบบ
+  - ลด Technical Debt ที่สะสมในระยะว
+  - เพิ่มประสิทธิภาพในการพัฒนา
+  - ลดเวลาในการแก้ไข Bug
+  - เพิ่มความสามารถในการทำงานร่วมกัน
+  - เพิ่มความโปร่งใสในการพัฒนา
+* **Product Thinking:** ทักษะนี้ช่วยแก้ปัญหา (Pain Point) ให้กับ:
+  - ทีมพัฒนาที่ต้องการ Refactor Legacy Code
+  - ผู้ทำงานผิดพลาดที่ต้องการ Refactor ที่ปลอดภัย
+  - ทีมพัฒนาที่ต้องการลด Technical Debt
+  - ลูกค้าที่ต้องการความเสถียรของระบบ
+  - ทีม Support ที่ต้องการ Debug ของ Code
+
+### **2. Technical Deep Dive (The "How-to")**
+
+* **Core Logic:** Refactoring Patterns ประกอบด้วย:
+  - **Refactoring Safety Principles:** หลักการ Refactoring ที่ปลอดภัย (Never Break What Works, Change in Small Steps, Verify After Each Step, Maintain Backward Compatibility, Have a Rollback Plan, Document Change)
+  - **The Strangler Fig Pattern:** รูปแบบการแทนที่ระบบเก่าด้วยระบบใหม่ (Create New Implementation, Add Facade/Routing Layer, Migrate Traffic Gradually, Monitor and Verify, Remove Old System)
+  - **The Parallel Change Pattern:** รูปแบบการเปลี่ยนแปลงแบบขนาน (Phase 1: Expand, Phase 2: Migrate, Phase 3: Contract)
+  - **Verification Between Changes:** การตรวจสอบระหว่างการเปลี่ยนแปลง (Unit Verification, Integration Verification, Regression Verification, Performance Verification)
+  - **Refactoring Checklist:** รายการตรวจสอบการ Refactoring (Before Starting, During Refactoring, After Refactoring)
+  - **Common Refactoring Scenarios:** สถานการณ์ทั่วไปของการ Refactoring (Extracting a Function, Renaming a Method, Changing Data Structure)
+
+* **Architecture Diagram Requirements:** แผนผังสถาปัตยกรรมที่ต้องมี:
+  - **Refactoring Safety Protocol Diagram:** แผนผังแสดงกระบวนการ Refactoring ที่ปลอดภัย
+  - **Strangler Fig Pattern Diagram:** แผนผังแสดงรูปแบบ Strangler Fig
+  - **Parallel Change Pattern Diagram:** แผนผังแสดงรูปแบบ Parallel Change
+  - **Verification Protocol Diagram:** แผนผังแสดงกระบวนการ Verification
+  - **Migration Flow Diagram:** แผนผังแสดงกระบวนการ Migration
+
+* **Implementation Workflow:**
+  1. **Identify Refactoring Need:** ระบุความต้องการ Refactoring
+  2. **Understand Current Behavior:** ทำความเข้าใจพฤติกรรมปัจจุบัน
+  3. **Write Tests for Current Behavior:** เขียน Tests สำหรับพฤติกรรมปัจจุบัน
+  4. **Plan Refactoring Steps:** วางแผนขั้นตอนการ Refactoring
+  5. **Execute Steps One by One:** ดำเนินการ Refactoring ทีละขั้น
+  6. **Verify After Each Step:** ตรวจสอบหลังจากแต่ละขั้น
+  7. **Complete Refactoring:** ทำการ Refactoring ให้เสร็จสิ้น
+
+### **3. Tooling & Tech Stack**
+
+* **Enterprise Tools:** เครื่องมือระดับอุตสาหกรรมที่เลือกใช้:
+  - **Version Control:** Git, GitHub, GitLab, Bitbucket
+  - **Testing Frameworks:** Jest, Pytest, JUnit, NUnit
+  - **Code Analysis Tools:** SonarQube, CodeQL, Coverity, Fortify
+  - **CI/CD Platforms:** GitHub Actions, GitLab CI, Azure Pipelines, Jenkins
+  - **Monitoring Tools:** Datadog, New Relic, Prometheus, Grafana
+  - **Documentation Tools:** Confluence, Notion, GitHub Wiki
+
+* **Configuration Essentials:** ส่วนประกอบสำคัญในการตั้งค่า:
+  - **Git Configuration:** การตั้งค่า Git สำหรับ Refactoring (Branch Protection, Required Reviews, Status Checks)
+  - **CI/CD Configuration:** การตั้งค่า CI/CD สำหรับ Automated Testing
+  - **Monitoring Configuration:** การตั้งค่า Monitoring สำหรับ Tracking Changes
+  - **Feature Flags:** การตั้งค่า Feature Flags สำหรับ Gradual Rollout
+  - **Rollback Configuration:** การตั้งค่า Rollback สำหรับ Emergency Reversal
+
+### **4. Standards, Compliance & Security**
+
+* **International Standards:** มาตรฐานที่เกี่ยวข้อง:
+  - **ISO/IEC 25010:** Software Quality Model
+  - **IEEE 730:** Standard for Software Quality Assurance
+  - **Refactoring Best Practices:** แนวทางปฏิบัติที่ดีในการ Refactoring
+  - **Code Quality Standards:** มาตรฐานคุณภาพของโค้ด
+
+* **Security Protocol:** กลไกการป้องกัน:
+  - **Access Control:** การควบคุมการเข้าถึง Code ที่กำลัง Refactor
+  - **Audit Trail:** การบันทึกการเข้าถึงและการเปลี่ยนแปลง
+  - **Security Scanning:** การสแกน Security Vulnerabilities ก่อน Deploy
+  - **Code Review:** การทบทวน Code ก่อน Merge
+  - **Rollback Plan:** แผนการ Rollback สำหรับ Emergency Reversal
+
+* **Explainability:** ความสามารถในการอธิบาย:
+  - **Refactoring Rationale Documentation:** การบันทึกเหตุผลของการ Refactoring
+  - **Change Log:** การบันทึกการเปลี่ยนแปลง
+  - **Before/After Comparison:** การเปรียบเทียบก่อนและหลัง Refactoring
+  - **Migration Documentation:** การบันทึกกระบวนการ Migration
+
+### **5. Unit Economics & Performance Metrics (KPIs)**
+
+* **Cost Calculation:** สูตรการคำนวณต้นทุนต่อหน่วย (COGS):
+  ```
+  Total Cost = (Refactoring Time × Hourly Rate) + 
+               (Testing Time × Hourly Rate) + 
+               (Rollback Time × Hourly Rate) + 
+               (Tooling Cost)
+  
+  ROI = (Productivity Gain - Total Cost) / Total Cost × 100%
+  
+  Productivity Gain = (Time Saved on Bug Fixes) + 
+                      (Time Saved on Maintenance) + 
+                      (Time Saved on New Features)
+  ```
+
+* **Key Performance Indicators:** ตัวชี้วัดความสำเร็จทางเทคนิค:
+  - **Refactoring Success Rate:** % ของ Refactoring ที่สำเร็จ (Target: > 95%)
+  - **Bug Reduction Rate:** % ของ Bugs ที่ลดลง (Target: > 20%)
+  - **Code Quality Score:** คะแนนคุณภาพของโค้ด (Target: > B)
+  - **Technical Debt Reduction:** % ของ Technical Debt ที่ลดลง (Target: > 15%)
+  - **Development Velocity:** จำนวน Features ต่อสัปดาห์ (Target: > 5/week)
+  - **Team Satisfaction:** ความพึงพอใจของทีม (Target: > 4/5)
+
+### **6. Strategic Recommendations (CTO Insights)**
+
+* **Phase Rollout:** คำแนะนำในการทยอยเริ่มใช้งาน:
+  1. **Phase 1 (Months 1-2):** สร้าง Refactoring Standards และ Guidelines, ฝึกอบรมทีม
+  2. **Phase 2 (Months 3-4):** ตั้งค่า Testing Tools และ CI/CD Pipeline
+  3. **Phase 3 (Months 5-6):** ฝึกอบรมทีมเกี่ยวกับ Refactoring Patterns และ Best Practices
+  4. **Phase 4 (Year 2+):** ขยายไปยังทุกทีม, สร้าง Culture ของ Safe Refactoring
+
+* **Pitfalls to Avoid:** ข้อควรระวังที่มักจะผิดพลาด:
+  - **Skipping Verification:** หลีกเลี่ยงการไม่ตรวจสอบหลังจากแต่ละขั้น
+  - **Making Too Many Changes at Once:** หลีกเลี่ยงการทำการเปลี่ยนแปลงมากเกินไปในครั้งเดียว
+  - **Not Having Tests:** หลีกเลี่ยงการไม่มี Tests ก่อน Refactoring
+  - **Breaking Backward Compatibility:** หลีกเลี่ยงการทำลา Backward Compatibility
+  - **No Rollback Plan:** หลีกเลี่ยงการไม่มีแผนการ Rollback
+  - **Refactoring Without Understanding:** หลีกเลี่ยงการ Refactoring โดยไม่ทำความเข้าใจ
+  - **Forgetting to Update Documentation:** หลีกเลี่ยงการลืมอัปเดต Documentation
+
+---
 
 ## Overview
 
 Safe refactoring is the practice of modifying existing code without breaking functionality. This skill teaches patterns and protocols for making changes to production codebases safely, focusing on "brownfield" development where existing systems must remain operational while improvements are made.
 
 **When to use this skill:** When modifying, improving, or restructuring existing code that is currently in use or production.
-
-## Table of Contents
-
-1. [Refactoring Safety Principles](#refactoring-safety-principles)
-2. [The Strangler Fig Pattern](#the-strangler-fig-pattern)
-3. [The Parallel Change Pattern](#the-parallel-change-pattern)
-4. [Verification Between Changes](#verification-between-changes)
-5. [Refactoring Checklist](#refactoring-checklist)
-6. [Common Refactoring Scenarios](#common-refactoring-scenarios)
-7. [Quick Reference](#quick-reference)
-
----
 
 ## Refactoring Safety Principles
 
@@ -27,7 +149,7 @@ Safe refactoring is the practice of modifying existing code without breaking fun
 3. **Verify After Each Step** - Run tests and checks before proceeding
 4. **Maintain Backward Compatibility** - Don't break existing consumers
 5. **Have a Rollback Plan** - Know how to revert if something goes wrong
-6. **Document the Change** - Explain why and what was changed
+6. **Document Change** - Explain why and what was changed
 
 ### The Safety Protocol
 
@@ -53,7 +175,7 @@ graph TD
 ## Pre-Refactoring Checklist
 
 ### Understanding
-- [ ] I understand what the current code does
+- [ ] I understand what current code does
 - [ ] I understand why it was written this way
 - [ ] I know who/what depends on this code
 - [ ] I have identified all entry points and side effects
@@ -70,8 +192,6 @@ graph TD
 - [ ] Dependencies between steps are understood
 - [ ] Time estimate includes testing and verification
 ```
-
----
 
 ## The Strangler Fig Pattern
 
@@ -259,8 +379,6 @@ app.use('/api/*', async (req, res, next) => {
 });
 ```
 
----
-
 ## The Parallel Change Pattern
 
 ### Concept
@@ -346,7 +464,7 @@ describe('UserService - Phase 1', () => {
 
 ### Phase 2: Migrate
 
-**Goal:** Gradually switch consumers to use the new implementation.
+**Goal:** Gradually switch consumers to use new implementation.
 
 ```javascript
 // Migrate consumers one at a time
@@ -469,8 +587,6 @@ class UserService {
 - [ ] Team notified of breaking change
 - [ ] Version bumped (if API)
 ```
-
----
 
 ## Verification Between Changes
 
@@ -633,8 +749,6 @@ After each refactoring step:
 - [ ] Sensitive data protected
 ```
 
----
-
 ## Refactoring Checklist
 
 ### Before Starting
@@ -643,11 +757,11 @@ After each refactoring step:
 ## Pre-Refactoring Checklist
 
 ### Preparation
-- [ ] I understand the current code
+- [ ] I understand current code
 - [ ] I have identified all dependencies
 - [ ] I have written tests for current behavior
 - [ ] I have a clear refactoring plan
-- [ ] I have estimated the work
+- [ ] I have estimated work
 
 ### Safety
 - [ ] I have a backup/branch
@@ -715,8 +829,6 @@ After each refactoring step:
 - [ ] Deployed to staging
 - [ ] Monitored for issues
 ```
-
----
 
 ## Common Refactoring Scenarios
 
@@ -828,7 +940,7 @@ class UserService {
 
 **Phase 2: Migrate**
 ```javascript
-// Migrate one consumer at a time
+// Migrate consumers one at a time
 class OrderController {
   // Still using old
   async getOrdersForUser(userId) {
@@ -955,8 +1067,6 @@ const user = {
 };
 ```
 
----
-
 ## Quick Reference
 
 ### Pattern Selection
@@ -1034,8 +1144,6 @@ git commit -m "refactor: extract tax calculation"
 git push origin refactor/user-service
 gh pr create --title "Refactor user service" --body "..."
 ```
-
----
 
 ## Common Pitfalls
 

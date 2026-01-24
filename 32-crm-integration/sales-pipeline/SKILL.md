@@ -1,8 +1,18 @@
+---
+name: Sales Pipeline
+description: Tracking deals through stages from initial contact to close, including pipeline design, deal progression, forecasting, probability calculation, and sales analytics.
+---
+
 # Sales Pipeline
+
+> **Current Level:** Intermediate  
+> **Domain:** CRM / Sales
+
+---
 
 ## Overview
 
-Sales pipeline management tracks deals through stages from initial contact to close. This guide covers pipeline design, deal progression, forecasting, and analytics.
+Sales pipeline management tracks deals through stages from initial contact to close. This guide covers pipeline design, deal progression, forecasting, and analytics for managing sales processes and predicting revenue.
 
 ## Pipeline Concepts
 
@@ -673,8 +683,120 @@ interface DateRange {
 9. **Reporting** - Generate regular pipeline reports
 10. **Training** - Train team on pipeline management
 
-## Resources
+---
+
+## Quick Start
+
+### Pipeline Stages
+
+```typescript
+const PIPELINE_STAGES = [
+  { name: 'Prospecting', probability: 10, duration: 7 },
+  { name: 'Qualification', probability: 25, duration: 14 },
+  { name: 'Proposal', probability: 50, duration: 7 },
+  { name: 'Negotiation', probability: 75, duration: 14 },
+  { name: 'Closed Won', probability: 100 },
+  { name: 'Closed Lost', probability: 0 }
+]
+
+async function moveDealToStage(dealId: string, stageName: string) {
+  const stage = PIPELINE_STAGES.find(s => s.name === stageName)
+  
+  await db.deals.update({
+    where: { id: dealId },
+    data: {
+      stage: stageName,
+      probability: stage.probability,
+      expectedCloseDate: stage.duration 
+        ? addDays(new Date(), stage.duration)
+        : undefined
+    }
+  })
+}
+```
+
+### Pipeline Forecasting
+
+```typescript
+async function forecastRevenue(pipelineId: string): Promise<number> {
+  const deals = await db.deals.findMany({
+    where: { pipelineId, status: 'open' }
+  })
+  
+  return deals.reduce((sum, deal) => {
+    return sum + (deal.value * deal.probability / 100)
+  }, 0)
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Pipeline Design**: Define pipeline stages
+- [ ] **Stage Properties**: Probability and duration per stage
+- [ ] **Deal Tracking**: Track deals through pipeline
+- [ ] **Forecasting**: Revenue forecasting
+- [ ] **Analytics**: Pipeline analytics and metrics
+- [ ] **Automation**: Automate stage progression
+- [ ] **Reporting**: Regular pipeline reports
+- [ ] **Integration**: Integrate with CRM
+- [ ] **Training**: Train team on pipeline
+- [ ] **Documentation**: Document pipeline process
+- [ ] **Optimization**: Optimize pipeline stages
+- [ ] **Monitoring**: Monitor pipeline health
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Probability
+
+```typescript
+// ❌ Bad - No probability
+const deal = { value: 10000, stage: 'Proposal' }
+// Can't forecast!
+```
+
+```typescript
+// ✅ Good - With probability
+const deal = { 
+  value: 10000, 
+  stage: 'Proposal',
+  probability: 50  // 50% chance
+}
+// Forecast: $5,000
+```
+
+### ❌ Don't: Stale Deals
+
+```markdown
+# ❌ Bad - Deals stuck in pipeline
+Deal 1: In "Proposal" for 6 months
+Deal 2: In "Negotiation" for 1 year
+```
+
+```markdown
+# ✅ Good - Deal hygiene
+- Auto-close stale deals
+- Regular pipeline reviews
+- Deal age tracking
+```
+
+---
+
+## Integration Points
+
+- **Lead Management** (`32-crm-integration/lead-management/`) - Lead to deal
+- **Salesforce Integration** (`32-crm-integration/salesforce-integration/`) - CRM sync
+- **Analytics** (`23-business-analytics/`) - Pipeline analytics
+
+---
+
+## Further Reading
 
 - [Sales Pipeline Management](https://www.salesforce.com/resources/articles/sales-pipeline/)
 - [Pipeline Metrics](https://www.hubspot.com/sales/pipeline-metrics)
+
+## Resources
 - [Sales Forecasting](https://www.pipedrive.com/en/blog/sales-forecasting)

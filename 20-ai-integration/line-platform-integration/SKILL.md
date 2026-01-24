@@ -1,1113 +1,998 @@
+---
+name: LINE Platform Integration
+description: Integrating AI-powered chatbots and services with the LINE platform for messaging, rich menus, and customer engagement in the Thai market.
+---
+
 # LINE Platform Integration
+
+> **Current Level:** Expert (Enterprise Scale)
+> **Domain:** AI Integration / Messaging Platforms
+
+---
 
 ## Overview
 
-Complete integration with LINE ecosystem including LINE Official Account (OA), LIFF (LINE Front-end Framework), Messaging API, LINE Login, and LINE Pay. This skill covers building chatbots, rich menus, flex messages, and seamless user experiences within the LINE platform.
+LINE Platform integration enables AI-powered chatbots and services to leverage LINE's messaging platform, rich menus, and customer engagement features. This is particularly important for the Thai market where LINE is the dominant messaging platform with over 50 million users.
 
 ---
 
-## 1. LINE Platform Architecture
+## 1. Executive Summary & Strategic Necessity
 
-### LINE Ecosystem Components
+* **Context:** ในปี 2025-2026 LINE Platform ด้วย ReAct Pattern และ LLM Integration ช่วย Messaging Platform ที่มีอัตโนมาติการทำงานอัตโนมาติ (LINE Chatbots) ใน Enterprise Scale โดยเฉพาะในตลาดไทย
+
+* **Business Impact:** LINE Platform ช่วยลด Downtime ของระบบ Customer Support ผ่านการตอบคำถามอัตโนมาติการสนทนา (Reduce response time), ลดต้นทุนการจัดการทีม (Increase engagement), เพิ่มอัตรากำไร Gross Margin ผ่านการทำงานอัตโนมาติ (Automated workflows), และปรับประสบทการทำงาน (Consistent experience)
+
+* **Product Thinking:** LINE Platform ช่วยแก้ปัญหา (Pain Point) ความต้องการมีระบบสนทนาอัตโนมาติ (Users need LINE chatbots) ผ่านการทำงานอัตโนมาติ (LINE integration)
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+* **Core Logic:** LINE Platform ใช้ ReAct Pattern และ LLM Integration ช่วย Messaging Platform ทำงานอัตโนมาติ:
+  1. **Webhook Processing**: วิเคคิดความต้องการ (LINE webhook, Event processing)
+  2. **Context Management**: จัดเก็บ Conversation history ด้วย Memory (Short-term, Long-term)
+  3. **Response Generation**: สร้างคำตอบ ด้วย LLM (GPT-4, Claude)
+  4. **LINE API Integration**: ส่งข้อความผ่าน LINE Messaging API (Text, Image, Rich menu)
+  5. **State Management**: จัดการสถานะของ Conversation และ User session
+
+* **Architecture Diagram Requirements:** แผนผังระบบ LINE Platform ต้องมีองค์ประกอบ:
+  1. **LLM Integration**: Language Model สำหรับการคิดคิด (OpenAI GPT-4, Anthropic Claude)
+  2. **Webhook Handler**: LINE webhook สำหรับรับข้อความ (Event processing, Signature verification)
+  3. **Context Management**: Memory system สำหรับการจัดเก็บ Conversation history (Redis, Vector DB)
+  4. **LINE Messaging API**: LINE API สำหรับการส่งข้อความ (Text, Image, Rich menu)
+  5. **API Gateway**: REST API ด้วย Rate limiting และ Authentication
+  6. **Observability**: Logging, Monitoring, Tracing สำหรับการ debug และปรับสิทท
+
+* **Implementation Workflow:** ขั้นตอนการนำ LINE Platform ไปใช้งานจริง:
+  1. **Planning Phase**: กำหนด Requirement และเลือก Model ที่เหมาะสม
+  2. **LINE Developer Console**: สร้าง LINE Channel และ Webhook URL
+  3. **Webhook Handler**: สร้าง Webhook handler สำหรับรับข้อความ
+  4. **LLM Integration**: สร้าง LLM integration สำหรับการสร้างคำตอบ
+  5. **LINE API Integration**: สร้าง LINE API integration สำหรับการส่งข้อความ
+  6. **Testing Phase**: Unit test, Integration test, E2E test ด้วยจริง Scenario
+  7. **Deployment**: Deploy ด้วย API Gateway, Set up Rate limiting, Configure Monitoring
+  8. **Optimization**: Tune prompts, Optimize token usage, Cache embeddings
+  9. **Maintenance**: Monitor performance, Update LINE API integration, Handle edge cases
+
+---
+
+## 3. Tooling & Tech Stack
+
+* **Enterprise Tools:** เครื่องมือระดับอุตสาหกรรมที่เลือกใช้สำหรับ LINE Platform ใน Enterprise Scale:
+  1. **OpenAI**: GPT-4, GPT-3.5-turbo, Embeddings (text-embedding-3-small, text-embedding-3-large)
+  2. **Anthropic**: Claude 3 Opus, Claude 3 Sonnet, Claude 3 Haiku
+  3. **LINE Messaging API**: LINE API สำหรับการส่งข้อความ (Text, Image, Rich menu)
+  4. **LINE Bot SDK**: LINE SDK สำหรับ Python, Node.js, Java
+  5. **LangChain**: Framework สำหรับสร้าง Conversational AI (Python, JavaScript)
+  6. **Redis**: Cache สำหรับ Short-term Memory และ Rate limiting
+  7. **PostgreSQL**: Database สำหรับการจัดเก็บ Conversation History และ User data
+  8. **Prometheus**: Monitoring สำหรับ Metrics (Token usage, Latency, Error rate)
+  9. **Grafana**: Visualization dashboard สำหรับ Observability
+  10. **LINE Analytics**: LINE Analytics สำหรับการวิเคราะห์ User behavior
+
+* **Configuration Essentials:** การตั้งค่าสำคัญสำหรับให้ระบบเสถียร LINE Platform:
+  1. **Model Configuration**: เลือก Model ตาม Use case (GPT-4 สำหรับ Complex reasoning, GPT-3.5-turbo สำหรับ Speed)
+  2. **Token Budget**: ตั้ง max_tokens ตาม Budget และ Context window (4,000-8,000 tokens)
+  3. **Temperature Settings**: 0.0-0.3 สำหรับ Creativity, 0.7 สำหรับ Deterministic
+  4. **Rate Limiting**: 10-100 requests/minute ตาม User tier และ API limits
+  5. **Timeout Configuration**: 30-60 seconds สำหรับ Chatbot execution, 5-10 seconds สำหรับ Tool calls
+  6. **Memory Configuration**: 10-20 messages สำหรับ Short-term, 100-500 documents สำหรับ Vector search
+  7. **Retry Policy**: Exponential backoff (base: 2, max: 5) ด้วย Jitter
+  8. **Logging Level**: INFO สำหรับ Production, DEBUG สำหรับ Development
+  9. **Monitoring**: Track success rate, token usage, latency, error rate ต่อเป้าหลาย
+  10. **Secret Management**: Use Environment variables หรือ Secret Manager (AWS Secrets Manager, HashiCorp Vault)
+
+---
+
+## 4. Standards, Compliance & Security
+
+* **International Standards:** มาตรฐานที่เกี่ยวข้อง:
+  1. **ISO/IEC 27001**: Information Security Management - สำหรับการจัดการ Secrets และ Access Control
+  2. **ISO/IEC 27017**: Code of Practice for Information Security Controls - สำหรับ Secure Development
+  3. **GDPR**: General Data Protection Regulation - สำหรับการจัดการ Personal Data และ User Consent
+  4. **SOC 2 Type II**: Security Controls - สำหรับการ Audit และ Compliance
+  5. **OWASP Top 10**: Web Application Security - สำหรับการป้องกัน Prompt Injection และ Data Exposure
+
+* **Security Protocol:** กลไกการป้องกัน LINE Platform:
+  1. **Input Validation**: Validate และ Sanitize ทุก Input ก่อน LLM หรือ Tools (Prevent prompt injection, SQL injection)
+  2. **Output Sanitization**: Filter sensitive information จาก LLM output (PII, Secrets, Internal URLs)
+  3. **Tool Permission Model**: RBAC (Role-Based Access Control) สำหรับ Tools - บาง Tools Admin permission, บาง Tools เปิดให้ทุก User
+  4. **Audit Trail**: Log ทุก Chatbot action, Tool call, และ Decision ด้วย Timestamp, User ID, และ Result (สำหรับ Forensics และ Compliance)
+  5. **Rate Limiting**: Per-user และ Per-API rate limits สำหรับป้องกัน Abuse (100-1000 requests/hour)
+  6. **Secure Communication**: mTLS สำหรับ internal services, TLS 1.3 สำหรับ external APIs
+  7. **Secret Rotation**: Rotate API keys ทุก 30-90 วัน (Automated key rotation)
+  8. **Sandboxing**: Run Tools ใน isolated environment (Docker containers, Lambda functions)
+  9. **Content Filtering**: Block malicious content, Adult content, และ Violations (Content moderation APIs)
+  10. **Data Encryption**: Encrypt sensitive data ที่ rest ใน Database (AES-256 หรือ Customer-managed keys)
+
+* **Explainability:** (สำหรับ AI) ความสามารถในการอธิบายผลลัพธ์ผ่านเทคนิค:
+  1. **Chain of Thought Logging**: เก็บ Thought process ของ Chatbot สำหรับ Debugging และ Transparency
+  2. **Tool Call Tracing**: Log ทุก Tool call ด้วย Input, Output, และ Execution time
+  3. **Decision Reasoning**: บันทึกเหตุผลการตัดสินใจของ Chatbot (Why chose this response?)
+  4. **Confidence Scoring**: ให้คะแนน (0-1) กับทุก Decision สำหรับการประเมิน
+  5. **Human-in-the-Loop**: จัดการ Approval สำหรับ critical actions ด้วย Audit trail
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+* **Cost Calculation:** สูตรการคำนวณต้นทุนต่อหน่วย LINE Platform:
+  1. **LLM Cost per Request** = (Input Tokens + Output Tokens) × Price per 1K tokens
+     - GPT-4: $0.03/1K input + $0.06/1K output
+     - GPT-3.5-turbo: $0.001/1K input + $0.002/1K output
+     - Claude 3 Opus: $0.015/1K input + $0.075/1K output
+  2. **Tool Execution Cost** = API calls × Cost per call
+     - Database Query: $0.001 per query (PostgreSQL RDS)
+     - External API: $0.01-0.10 per call (varies by service)
+  3. **LINE API Cost** = LINE API calls × Cost per call (Free tier: 1,000 messages/month)
+  4. **Total Cost per Message** = LLM Cost + Tool Costs + LINE API Cost
+  5. **Monthly Cost** = (Cost per Message × Messages per Month) + Infrastructure Costs
+  6. **Infrastructure Costs** = Compute ($20-100/month) + Storage ($0.023/GB/month) + Monitoring ($10/month)
+
+* **Key Performance Indicators:** ตัวชี้วัดความสำเร็จทางเทคนิค:
+  1. **Success Rate**: อัตราการสำเร็จของ Chatbot (Target: >95%)
+  2. **Average Latency**: เวลาการตอบกลับ (Target: <5 seconds สำหรับ single-turn, <30 seconds สำหรับ multi-turn)
+  3. **Token Usage per Request**: เฉลี่ย Token เฉลี่ย Request (Target: <2,000 tokens)
+  4. **Tool Call Success Rate**: อัตราการสำเร็จของ Tool calls (Target: >98%)
+  5. **Average Tool Execution Time**: เวลาการทำงาน Tool (Target: <2 seconds)
+  6. **User Satisfaction Score**: 1-5 rating จาก User feedback (Target: >4.0)
+  7. **Error Rate**: อัตราการ Error (Target: <1%)
+  8. **Concurrent Users**: จำนวยผู้ใช้งานพร้อมกัน (Peak: 100-1,000 concurrent sessions)
+  9. **Cache Hit Rate**: อัตราการ Cache hit (Target: >80% สำหรับ repeated queries)
+  10. **Agent Iterations per Request**: จำนวย iteration เฉลี่ย Request (Target: <5 iterations)
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+* **Phase Rollout:** คำแนะนำในการทยอยเริ่มใช้งาน LINE Platform เพื่อลดความเสี่ยง:
+  1. **Phase 1: MVP (1-2 เดือน)**: Deploy Simple LINE Chatbot ด้วย 1-2 Tools (Text response, Simple menu) สำหรับ Internal team ก่อนเปิดให้ Public
+     - **Goal**: Validate LINE Chatbot architecture และ gather feedback
+     - **Success Criteria**: >80% success rate, <10s latency
+     - **Risk Mitigation**: Rate limiting, Manual review ก่อน Auto-approve
+  2. **Phase 2: Beta (2-3 เดือน)**: Expand ด้วย 5-10 Tools และ Memory system (Rich menu, Quick replies) สำหรับ Selected customers
+     - **Goal**: Test scalability และ Tool reliability
+     - **Success Criteria**: >90% success rate, <5s latency
+     - **Risk Mitigation**: Canary deployment, Feature flags, Gradual rollout
+  3. **Phase 3: GA (3-6 เดือน)**: Full rollout ด้วย 10-20 Tools, Advanced Memory, และ Multi-agent orchestration
+     - **Goal**: Enterprise-grade reliability และ Performance
+     - **Success Criteria**: >95% success rate, <3s latency, 99.9% uptime
+     - **Risk Mitigation**: Load testing, Disaster recovery, Blue-green deployment
+
+* **Pitfalls to Avoid:** ข้อควรระวังที่มักจะผิดพลาดในระดับ Enterprise Scale:
+  1. **Over-engineering**: สร้าง LINE Chatbot ที่ซ้อนเกินไป (Too many tools, Complex memory) → เริ่มจาก Simple และ iterate
+  2. **No Rate Limiting**: ไม่มี Rate limits ทำให้ Cost blowout และ API abuse → Implement per-user และ per-endpoint limits ด้วย Redis
+  3. **Infinite Loops**: Chatbot วนลูปไม่มีทางออก (Max iterations = ∞) → Set max_iterations=10 และ timeout=60s
+  4. **Ignoring Tool Errors**: Tool failures crash Chatbot → Wrap Tools ด้วย try-catch และ return fallback response
+  5. **No Context Management**: ส่งทุก message เป็น Independent → Implement sliding window และ summary
+  6. **Hardcoding API Keys**: Keys ใน code ที่เปิดให้ Public → Use Environment variables หรือ Secret Manager
+  7. **No Observability**: ไม่มี Logging/Tracing → Add structured logging ด้วย correlation IDs
+  8. **Skipping Validation**: ไม่ Validate Tool inputs/outputs → Implement schema validation และ sanitization
+  9. **Poor Prompt Design**: Vague prompts ทำให้ Chatbot hallucinate → Use specific, testable prompts ด้วย examples
+  10. **Single Point of Failure**: ไม่มี Redundancy หรือ Fallback → Deploy multiple instances ด้วย Load balancer
+
+---
+
+## Core Concepts
+
+### 1. LINE Platform Overview
+
+### What is LINE Platform?
 
 ```markdown
-# LINE Platform Components
+# LINE Platform Overview
 
-## Core Services
-1. **LINE Official Account (OA)**: Business account for messaging
-2. **LIFF**: Web apps that run inside LINE
-3. **Messaging API**: Send/receive messages programmatically
-4. **LINE Login**: OAuth 2.0 authentication
-5. **LINE Pay**: Payment integration
-6. **LINE Beacon**: Proximity-based messaging
-7. **LINE Things**: IoT device integration
+## What is LINE?
+LINE is a popular messaging app in Asia, especially in Thailand, Japan, and Taiwan.
 
-## Integration Flow
-```
-User → LINE App → LIFF/Messaging API → Your Backend → Database
-                      ↓
-                  Webhook ← LINE Platform
-                      ↓
-                  Your Backend → Process → Response
-```
+## Key Features
+- **Messaging**: Send and receive messages
+- **Rich Menus**: Custom menu interfaces
+- **Quick Replies**: Suggested responses
+- **Flex Messages**: Rich, interactive messages
+- **Webhooks**: Receive events from LINE
+- **Analytics**: Track user engagement
 
-## Use Cases
-- Customer support chatbots
-- E-commerce in LINE
-- Event registration
-- Appointment booking
-- Loyalty programs
-- Payment processing
+## LINE Bot SDK
+- **Python**: line-bot-sdk
+- **Node.js**: @line/bot-sdk
+- **Java**: line-bot-sdk-java
 ```
 
----
-
-## 2. LINE Official Account Setup
-
-### Creating LINE OA
+### LINE Bot Types
 
 ```markdown
-# LINE Official Account Setup
+# LINE Bot Types
 
-## Steps
-1. Go to [LINE Official Account Manager](https://manager.line.biz/)
-2. Create new account
-3. Choose account type:
-   - **Unverified Account**: Free, limited features
-   - **Verified Account**: Paid, full features, blue badge
-4. Configure account settings:
-   - Profile name
-   - Profile image
-   - Status message
-   - Background image
+## Messaging API Bots
+- **Use Case**: Customer support, Information delivery
+- **Features**: Text, Image, Video, Audio messages
+- **Pros**: Rich features, High engagement
 
-## Channel Settings
-1. Go to [LINE Developers Console](https://developers.line.biz/)
-2. Create new provider
-3. Create Messaging API channel
-4. Get credentials:
-   - Channel ID
-   - Channel Secret
-   - Channel Access Token
+## LIFF (LINE Front-end Framework)
+- **Use Case**: Web apps within LINE
+- **Features**: Custom UI, LINE login integration
+- **Pros**: Seamless user experience
 
-## Webhook Configuration
-1. Enable webhook
-2. Set webhook URL: `https://your-domain.com/webhook/line`
-3. Verify webhook
-4. Enable auto-reply (optional)
-```
+## LINE Login
+- **Use Case**: User authentication
+- **Features**: OAuth 2.0, Social login
+- **Pros**: Easy integration
 
-### Environment Configuration
-
-```typescript
-// .env
-LINE_CHANNEL_ID=your_channel_id
-LINE_CHANNEL_SECRET=your_channel_secret
-LINE_CHANNEL_ACCESS_TOKEN=your_access_token
-LINE_LIFF_ID=your_liff_id
+## LINE Beacon
+- **Use Case**: Location-based services
+- **Features**: Proximity detection
+- **Pros**: Physical-digital integration
 ```
 
 ---
 
-## 3. Messaging API Integration
+## 2. LINE Webhook Setup
 
-### LINE Bot SDK Setup
+### Webhook Handler (Python)
 
-```typescript
-// LINE Bot SDK Configuration
-import { Client, ClientConfig, middleware, WebhookEvent } from '@line/bot-sdk'
-import express from 'express'
+```python
+# LINE Webhook Handler
+from flask import Flask, request, abort
+from linebot import LineBotApi, WebhookHandler
+from linebot.exceptions import InvalidSignatureError
+from linebot.models import MessageEvent, TextMessage
 
-const config: ClientConfig = {
-  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN!,
-  channelSecret: process.env.LINE_CHANNEL_SECRET!,
-}
+app = Flask(__name__)
 
-const client = new Client(config)
-const app = express()
+# Initialize LINE API
+line_bot_api = LineBotApi('YOUR_CHANNEL_ACCESS_TOKEN')
+handler = WebhookHandler('YOUR_CHANNEL_SECRET')
+
+@app.route("/webhook", methods=['POST'])
+def webhook():
+    # Get request body
+    body = request.get_data(as_text=True)
+    signature = request.headers['X-Line-Signature']
+
+    # Verify signature
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        abort(400)
+
+    return 'OK'
+
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    # Get user message
+    user_message = event.message.text
+    
+    # Generate response
+    response = generate_response(user_message)
+    
+    # Send reply
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextMessage(text=response)
+    )
+
+def generate_response(message: str) -> str:
+    # Implement your AI logic here
+    return f"You said: {message}"
+
+if __name__ == "__main__":
+    app.run(port=5000)
+```
+
+### Webhook Handler (Node.js)
+
+```javascript
+// LINE Webhook Handler (Node.js)
+const express = require('express');
+const line = require('@line/bot-sdk');
+const { Client } = require('@line/bot-sdk');
+
+const app = express();
+
+// Initialize LINE API
+const config = {
+    channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
+    channelSecret: process.env.CHANNEL_SECRET
+};
+
+const client = new Client(config);
 
 // Webhook endpoint
-app.post('/webhook/line', middleware(config), async (req, res) => {
-  const events: WebhookEvent[] = req.body.events
+app.post('/webhook', line.middleware(config), (req, res) => {
+    Promise
+        .all(req.body.events.map(handleEvent))
+        .then((result) => res.json(result))
+        .catch((err) => {
+            console.error(err);
+            res.status(500).end();
+        });
+});
 
-  // Process all events
-  await Promise.all(
-    events.map(async (event) => {
-      try {
-        await handleEvent(event)
-      } catch (error) {
-        console.error('Error handling event:', error)
-      }
-    })
-  )
+// Handle events
+async function handleEvent(event) {
+    if (event.type !== 'message' || event.message.type !== 'text') {
+        return Promise.resolve(null);
+    }
 
-  res.status(200).send('OK')
-})
+    // Generate response
+    const response = generateResponse(event.message.text);
 
-async function handleEvent(event: WebhookEvent): Promise<void> {
-  if (event.type === 'message') {
-    await handleMessage(event)
-  } else if (event.type === 'follow') {
-    await handleFollow(event)
-  } else if (event.type === 'unfollow') {
-    await handleUnfollow(event)
-  } else if (event.type === 'postback') {
-    await handlePostback(event)
-  }
+    // Send reply
+    return client.replyMessage(event.replyToken, {
+        type: 'text',
+        text: response
+    });
+}
+
+function generateResponse(message) {
+    // Implement your AI logic here
+    return `You said: ${message}`;
 }
 
 app.listen(3000, () => {
-  console.log('LINE Bot server running on port 3000')
-})
-```
-
-### Message Handling
-
-```typescript
-// Message Event Handler
-import { MessageEvent, TextMessage } from '@line/bot-sdk'
-
-async function handleMessage(event: MessageEvent): Promise<void> {
-  if (event.message.type !== 'text') {
-    return
-  }
-
-  const userId = event.source.userId
-  const messageText = event.message.text
-
-  // Get user profile
-  const profile = await client.getProfile(userId!)
-
-  console.log(`Message from ${profile.displayName}: ${messageText}`)
-
-  // Process message
-  let replyText = ''
-
-  if (messageText.toLowerCase().includes('hello')) {
-    replyText = `สวัสดีครับคุณ ${profile.displayName}! 👋`
-  } else if (messageText.toLowerCase().includes('help')) {
-    replyText = 'ฉันสามารถช่วยคุณได้ดังนี้:\n1. ดูข้อมูลอีเวนต์\n2. จองตั๋ว\n3. ติดต่อเรา'
-  } else {
-    replyText = 'ขอบคุณสำหรับข้อความครับ!'
-  }
-
-  // Reply to user
-  await client.replyMessage(event.replyToken, {
-    type: 'text',
-    text: replyText,
-  })
-}
-```
-
-### Follow/Unfollow Events
-
-```typescript
-// Follow Event Handler
-import { FollowEvent, UnfollowEvent } from '@line/bot-sdk'
-
-async function handleFollow(event: FollowEvent): Promise<void> {
-  const userId = event.source.userId!
-  const profile = await client.getProfile(userId)
-
-  console.log(`New follower: ${profile.displayName}`)
-
-  // Save user to database
-  await saveUser({
-    lineUserId: userId,
-    displayName: profile.displayName,
-    pictureUrl: profile.pictureUrl,
-    statusMessage: profile.statusMessage,
-  })
-
-  // Send welcome message
-  await client.replyMessage(event.replyToken, {
-    type: 'text',
-    text: `ยินดีต้อนรับครับคุณ ${profile.displayName}! 🎉\n\nขอบคุณที่เพิ่มเราเป็นเพื่อน`,
-  })
-}
-
-async function handleUnfollow(event: UnfollowEvent): Promise<void> {
-  const userId = event.source.userId!
-
-  console.log(`User unfollowed: ${userId}`)
-
-  // Update user status in database
-  await updateUserStatus(userId, 'unfollowed')
-}
-
-async function saveUser(user: any): Promise<void> {
-  // Save to database
-}
-
-async function updateUserStatus(userId: string, status: string): Promise<void> {
-  // Update in database
-}
+    console.log('LINE bot is running on port 3000');
+});
 ```
 
 ---
 
-## 4. Rich Messages
+## 3. LINE Message Types
+
+### Text Messages
+
+```python
+# Send Text Message
+from linebot.models import TextMessage
+
+# Simple text message
+line_bot_api.push_message(
+    'USER_ID',
+    TextMessage(text='Hello, World!')
+)
+
+# Multiple text messages
+line_bot_api.push_message(
+    'USER_ID',
+    [
+        TextMessage(text='Hello!'),
+        TextMessage(text='How can I help you?')
+    ]
+)
+```
+
+### Image Messages
+
+```python
+# Send Image Message
+from linebot.models import ImageMessage
+
+# Send image from URL
+line_bot_api.push_message(
+    'USER_ID',
+    ImageMessage(
+        original_content_url='https://example.com/image.jpg',
+        preview_image_url='https://example.com/image-preview.jpg'
+    )
+)
+```
 
 ### Flex Messages
 
-```typescript
-// Flex Message - Event Card
-import { FlexMessage } from '@line/bot-sdk'
+```python
+# Send Flex Message
+from linebot.models import FlexSendMessage
 
-function createEventCard(event: {
-  title: string
-  date: string
-  location: string
-  price: number
-  imageUrl: string
-  eventId: string
-}): FlexMessage {
-  return {
-    type: 'flex',
-    altText: event.title,
-    contents: {
-      type: 'bubble',
-      hero: {
-        type: 'image',
-        url: event.imageUrl,
-        size: 'full',
-        aspectRatio: '20:13',
-        aspectMode: 'cover',
-      },
-      body: {
-        type: 'box',
-        layout: 'vertical',
-        contents: [
-          {
-            type: 'text',
-            text: event.title,
-            weight: 'bold',
-            size: 'xl',
-            wrap: true,
-          },
-          {
-            type: 'box',
-            layout: 'vertical',
-            margin: 'lg',
-            spacing: 'sm',
-            contents: [
-              {
-                type: 'box',
-                layout: 'baseline',
-                spacing: 'sm',
-                contents: [
-                  {
-                    type: 'text',
-                    text: '📅',
-                    size: 'sm',
-                    flex: 0,
-                  },
-                  {
-                    type: 'text',
-                    text: event.date,
-                    size: 'sm',
-                    color: '#666666',
-                    flex: 5,
-                  },
-                ],
-              },
-              {
-                type: 'box',
-                layout: 'baseline',
-                spacing: 'sm',
-                contents: [
-                  {
-                    type: 'text',
-                    text: '📍',
-                    size: 'sm',
-                    flex: 0,
-                  },
-                  {
-                    type: 'text',
-                    text: event.location,
-                    size: 'sm',
-                    color: '#666666',
-                    flex: 5,
-                    wrap: true,
-                  },
-                ],
-              },
-              {
-                type: 'box',
-                layout: 'baseline',
-                spacing: 'sm',
-                contents: [
-                  {
-                    type: 'text',
-                    text: '💰',
-                    size: 'sm',
-                    flex: 0,
-                  },
-                  {
-                    type: 'text',
-                    text: `${event.price.toLocaleString('th-TH')} บาท`,
-                    size: 'sm',
-                    color: '#666666',
-                    flex: 5,
-                  },
-                ],
-              },
-            ],
-          },
+flex_message = FlexSendMessage(
+    alt_text='This is a flex message',
+    contents={
+        "type": "bubble",
+        "body": {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+                {
+                    "type": "text",
+                    "text": "Hello,",
+                    "size": "xl",
+                    "weight": "bold"
+                },
+                {
+                    "type": "text",
+                    "text": "World",
+                    "size": "xl",
+                    "weight": "bold",
+                    "color": "#FF0000"
+                }
+            ]
+        }
+    }
+)
+
+line_bot_api.push_message('USER_ID', flex_message)
+```
+
+---
+
+## 4. Rich Menu
+
+### Create Rich Menu
+
+```python
+# Create Rich Menu
+from linebot.models import RichMenu, RichMenuArea, RichMenuBounds, RichMenuSize, URIAction
+
+# Define rich menu
+rich_menu = RichMenu(
+    size=RichMenuSize(width=2500, height=1686),
+    selected=False,
+    name="Main Menu",
+    chatBarText="Tap to open menu",
+    areas=[
+        RichMenuArea(
+            bounds=RichMenuBounds(x=0, y=0, width=1250, height=843),
+            action=URIAction(label="Website", uri="https://example.com")
+        ),
+        RichMenuArea(
+            bounds=RichMenuBounds(x=1250, y=0, width=1250, height=843),
+            action=URIAction(label="Contact", uri="https://example.com/contact")
+        )
+    ]
+)
+
+# Create rich menu
+rich_menu_id = line_bot_api.create_rich_menu(rich_menu)
+
+# Upload rich menu image
+with open('rich_menu.png', 'rb') as f:
+    line_bot_api.set_rich_menu_image(rich_menu_id, 'image/png', f)
+
+# Set rich menu for all users
+line_bot_api.set_default_rich_menu(rich_menu_id)
+```
+
+### Set Rich Menu for User
+
+```python
+# Set Rich Menu for Specific User
+line_bot_api.link_rich_menu_to_user('USER_ID', 'RICH_MENU_ID')
+
+# Unlink rich menu from user
+line_bot_api.unlink_rich_menu_from_user('USER_ID')
+```
+
+---
+
+## 5. Quick Replies
+
+### Quick Replies
+
+```python
+# Quick Replies
+from linebot.models import QuickReply, QuickReplyButton, MessageAction, PostbackAction
+
+quick_reply = QuickReply(
+    items=[
+        QuickReplyButton(
+            action=MessageAction(label="Yes", text="Yes")
+        ),
+        QuickReplyButton(
+            action=MessageAction(label="No", text="No")
+        ),
+        QuickReplyButton(
+            action=PostbackAction(label="More info", data="info")
+        )
+    ]
+)
+
+line_bot_api.push_message(
+    'USER_ID',
+    TextMessage(text='Do you like this?', quick_reply=quick_reply)
+)
+```
+
+---
+
+## 6. Postback Events
+
+### Handle Postback
+
+```python
+# Handle Postback Event
+from linebot.models import PostbackEvent
+
+@handler.add(PostbackEvent)
+def handle_postback(event):
+    # Get postback data
+    data = event.postback.data
+    
+    # Handle based on data
+    if data == 'info':
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextMessage(text='Here is more information...')
+        )
+    elif data == 'subscribe':
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextMessage(text='You have subscribed!')
+        )
+```
+
+---
+
+## 7. LLM Integration
+
+### OpenAI Integration
+
+```python
+# OpenAI Integration with LINE
+from openai import OpenAI
+from linebot.models import TextMessage
+
+# Initialize OpenAI
+client = OpenAI(api_key='YOUR_OPENAI_API_KEY')
+
+# Generate response with OpenAI
+def generate_response(message: str) -> str:
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant."
+            },
+            {
+                "role": "user",
+                "content": message
+            }
         ],
-      },
-      footer: {
-        type: 'box',
-        layout: 'vertical',
-        spacing: 'sm',
-        contents: [
-          {
-            type: 'button',
-            style: 'primary',
-            action: {
-              type: 'uri',
-              label: 'ดูรายละเอียด',
-              uri: `https://liff.line.me/${process.env.LINE_LIFF_ID}/events/${event.eventId}`,
+        temperature=0.7,
+        max_tokens=500
+    )
+    
+    return response.choices[0].message.content
+
+# Handle message with LLM
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    # Generate response
+    response = generate_response(event.message.text)
+    
+    # Send reply
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextMessage(text=response)
+    )
+```
+
+### Conversation Memory
+
+```python
+# Conversation Memory with Redis
+import redis
+import json
+
+# Initialize Redis
+r = redis.Redis(host='localhost', port=6379, db=0)
+
+# Save message to memory
+def save_message(user_id: str, role: str, content: str):
+    key = f"conversation:{user_id}"
+    message = {
+        'role': role,
+        'content': content,
+        'timestamp': datetime.now().isoformat()
+    }
+    r.lpush(key, json.dumps(message))
+    r.expire(key, 86400)  # Expire after 24 hours
+
+# Get conversation history
+def get_conversation(user_id: str) -> list:
+    key = f"conversation:{user_id}"
+    messages = r.lrange(key, 0, 9)  # Get last 10 messages
+    return [json.loads(msg) for msg in messages]
+
+# Generate response with memory
+def generate_response(user_id: str, message: str) -> str:
+    # Get conversation history
+    history = get_conversation(user_id)
+    
+    # Build messages for LLM
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant."}
+    ]
+    
+    # Add history
+    for msg in reversed(history):
+        messages.append({
+            "role": msg['role'],
+            "content": msg['content']
+        })
+    
+    # Add current message
+    messages.append({"role": "user", "content": message})
+    
+    # Generate response
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        temperature=0.7,
+        max_tokens=500
+    )
+    
+    # Save messages
+    save_message(user_id, 'user', message)
+    save_message(user_id, 'assistant', response.choices[0].message.content)
+    
+    return response.choices[0].message.content
+```
+
+---
+
+## 8. Thai Language Support
+
+### Thai Language Processing
+
+```python
+# Thai Language Support
+from openai import OpenAI
+
+# Initialize OpenAI
+client = OpenAI(api_key='YOUR_OPENAI_API_KEY')
+
+# Generate Thai response
+def generate_thai_response(message: str) -> str:
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": "คุณคือผู้ช่วยที่พูดภาษาไทย ช่วยตอบคำถามของผู้ใช้ด้วยภาษาไทย"
             },
-          },
-          {
-            type: 'button',
-            style: 'secondary',
-            action: {
-              type: 'postback',
-              label: 'จองเลย',
-              data: `action=book&eventId=${event.eventId}`,
-            },
-          },
+            {
+                "role": "user",
+                "content": message
+            }
         ],
-      },
-    },
-  }
-}
+        temperature=0.7,
+        max_tokens=500
+    )
+    
+    return response.choices[0].message.content
 
-// Usage
-const eventCard = createEventCard({
-  title: 'งานแต่งงานริมทะเล',
-  date: '15 มีนาคม 2026',
-  location: 'โรงแรมหรู ภูเก็ต',
-  price: 50000,
-  imageUrl: 'https://example.com/event.jpg',
-  eventId: 'EVENT-001',
-})
-
-await client.pushMessage(userId, eventCard)
+# Example usage
+response = generate_thai_response("สวัสดีครับ")
+print(response)  # "สวัสดีครับ มีอะไรให้ช่วยไหมครับ?"
 ```
 
-### Carousel Messages
+### Thai Quick Replies
 
-```typescript
-// Flex Message - Event Carousel
-import { FlexMessage } from '@line/bot-sdk'
+```python
+# Thai Quick Replies
+quick_reply = QuickReply(
+    items=[
+        QuickReplyButton(
+            action=MessageAction(label="ใช่", text="ใช่")
+        ),
+        QuickReplyButton(
+            action=MessageAction(label="ไม่", text="ไม่")
+        ),
+        QuickReplyButton(
+            action=MessageAction(label="ขอข้อมูลเพิ่มเติม", text="ขอข้อมูลเพิ่มเติม")
+        )
+    ]
+)
 
-function createEventCarousel(events: any[]): FlexMessage {
-  return {
-    type: 'flex',
-    altText: 'รายการอีเวนต์',
-    contents: {
-      type: 'carousel',
-      contents: events.map((event) => ({
-        type: 'bubble',
-        hero: {
-          type: 'image',
-          url: event.imageUrl,
-          size: 'full',
-          aspectRatio: '20:13',
-          aspectMode: 'cover',
-        },
-        body: {
-          type: 'box',
-          layout: 'vertical',
-          contents: [
-            {
-              type: 'text',
-              text: event.title,
-              weight: 'bold',
-              size: 'lg',
-              wrap: true,
-            },
-            {
-              type: 'text',
-              text: `${event.price.toLocaleString('th-TH')} บาท`,
-              size: 'md',
-              color: '#FF6B6B',
-              margin: 'md',
-            },
-          ],
-        },
-        footer: {
-          type: 'box',
-          layout: 'vertical',
-          contents: [
-            {
-              type: 'button',
-              action: {
-                type: 'uri',
-                label: 'ดูเพิ่มเติม',
-                uri: `https://liff.line.me/${process.env.LINE_LIFF_ID}/events/${event.id}`,
-              },
-            },
-          ],
-        },
-      })),
-    },
-  }
-}
-```
-
-### Quick Reply
-
-```typescript
-// Quick Reply Buttons
-import { TextMessage } from '@line/bot-sdk'
-
-const messageWithQuickReply: TextMessage = {
-  type: 'text',
-  text: 'คุณสนใจอีเวนต์ประเภทไหนครับ?',
-  quickReply: {
-    items: [
-      {
-        type: 'action',
-        action: {
-          type: 'message',
-          label: 'งานแต่งงาน',
-          text: 'แสดงงานแต่งงาน',
-        },
-      },
-      {
-        type: 'action',
-        action: {
-          type: 'message',
-          label: 'งานเลี้ยง',
-          text: 'แสดงงานเลี้ยง',
-        },
-      },
-      {
-        type: 'action',
-        action: {
-          type: 'message',
-          label: 'งานบุญ',
-          text: 'แสดงงานบุญ',
-        },
-      },
-      {
-        type: 'action',
-        action: {
-          type: 'postback',
-          label: 'ดูทั้งหมด',
-          data: 'action=view_all_events',
-          displayText: 'ดูอีเวนต์ทั้งหมด',
-        },
-      },
-    ],
-  },
-}
-
-await client.pushMessage(userId, messageWithQuickReply)
+line_bot_api.push_message(
+    'USER_ID',
+    TextMessage(text='คุณชอบสินค้านี้หรือไม่?', quick_reply=quick_reply)
+)
 ```
 
 ---
 
-## 5. Rich Menu
+## 9. Analytics and Monitoring
 
-### Creating Rich Menu
+### LINE Analytics
 
-```typescript
-// Rich Menu Configuration
-import { RichMenu, RichMenuSize, RichMenuArea } from '@line/bot-sdk'
+```python
+# Track LINE Bot Analytics
+import logging
+from datetime import datetime
 
-async function createRichMenu(): Promise<string> {
-  const richMenu: RichMenu = {
-    size: {
-      width: 2500,
-      height: 1686,
-    },
-    selected: true,
-    name: 'Malai Platform Menu',
-    chatBarText: 'เมนู',
-    areas: [
-      {
-        bounds: {
-          x: 0,
-          y: 0,
-          width: 833,
-          height: 843,
-        },
-        action: {
-          type: 'uri',
-          label: 'ค้นหาอีเวนต์',
-          uri: `https://liff.line.me/${process.env.LINE_LIFF_ID}/search`,
-        },
-      },
-      {
-        bounds: {
-          x: 833,
-          y: 0,
-          width: 834,
-          height: 843,
-        },
-        action: {
-          type: 'uri',
-          label: 'อีเวนต์ของฉัน',
-          uri: `https://liff.line.me/${process.env.LINE_LIFF_ID}/my-events`,
-        },
-      },
-      {
-        bounds: {
-          x: 1667,
-          y: 0,
-          width: 833,
-          height: 843,
-        },
-        action: {
-          type: 'uri',
-          label: 'โปรไฟล์',
-          uri: `https://liff.line.me/${process.env.LINE_LIFF_ID}/profile`,
-        },
-      },
-      {
-        bounds: {
-          x: 0,
-          y: 843,
-          width: 1250,
-          height: 843,
-        },
-        action: {
-          type: 'postback',
-          label: 'สร้างอีเวนต์',
-          data: 'action=create_event',
-          displayText: 'สร้างอีเวนต์ใหม่',
-        },
-      },
-      {
-        bounds: {
-          x: 1250,
-          y: 843,
-          width: 1250,
-          height: 843,
-        },
-        action: {
-          type: 'message',
-          label: 'ติดต่อเรา',
-          text: 'ติดต่อเรา',
-        },
-      },
-    ],
-  }
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-  // Create rich menu
-  const richMenuId = await client.createRichMenu(richMenu)
+# Track message
+def track_message(user_id: str, message_type: str, content: str):
+    logger.info({
+        'timestamp': datetime.now().isoformat(),
+        'user_id': user_id,
+        'type': message_type,
+        'content': content
+    })
 
-  // Upload rich menu image
-  const imagePath = './assets/richmenu.png'
-  await client.setRichMenuImage(richMenuId, fs.createReadStream(imagePath))
+# Track response
+def track_response(user_id: str, response: str, latency: float):
+    logger.info({
+        'timestamp': datetime.now().isoformat(),
+        'user_id': user_id,
+        'response': response,
+        'latency': latency
+    })
 
-  // Set as default rich menu
-  await client.setDefaultRichMenu(richMenuId)
-
-  return richMenuId
-}
+# Track error
+def track_error(user_id: str, error: str):
+    logger.error({
+        'timestamp': datetime.now().isoformat(),
+        'user_id': user_id,
+        'error': error
+    })
 ```
 
-### Rich Menu Management
+### Metrics Dashboard
 
-```typescript
-// Rich Menu Manager
-class RichMenuManager {
-  async createUserRichMenu(userId: string, menuType: string): Promise<void> {
-    let richMenuId: string
+```python
+# Metrics with Prometheus
+from prometheus_client import Counter, Histogram, start_http_server
 
-    if (menuType === 'organizer') {
-      richMenuId = await this.createOrganizerMenu()
-    } else {
-      richMenuId = await this.createGuestMenu()
-    }
+# Define metrics
+message_counter = Counter('line_messages_total', 'Total LINE messages', ['type'])
+response_latency = Histogram('line_response_latency_seconds', 'Response latency')
+error_counter = Counter('line_errors_total', 'Total errors', ['error_type'])
 
-    // Link rich menu to user
-    await client.linkRichMenuToUser(userId, richMenuId)
-  }
+# Track message
+def track_message(message_type: str):
+    message_counter.labels(type=message_type).inc()
 
-  async createOrganizerMenu(): Promise<string> {
-    // Create rich menu for event organizers
-    const richMenu: RichMenu = {
-      size: { width: 2500, height: 1686 },
-      selected: true,
-      name: 'Organizer Menu',
-      chatBarText: 'เมนูผู้จัดงาน',
-      areas: [
-        // Define areas for organizer-specific actions
-      ],
-    }
+# Track latency
+def track_latency(latency: float):
+    response_latency.observe(latency)
 
-    return await client.createRichMenu(richMenu)
-  }
+# Track error
+def track_error(error_type: str):
+    error_counter.labels(error_type=error_type).inc()
 
-  async createGuestMenu(): Promise<string> {
-    // Create rich menu for guests
-    const richMenu: RichMenu = {
-      size: { width: 2500, height: 1686 },
-      selected: true,
-      name: 'Guest Menu',
-      chatBarText: 'เมนูแขก',
-      areas: [
-        // Define areas for guest-specific actions
-      ],
-    }
-
-    return await client.createRichMenu(richMenu)
-  }
-
-  async unlinkRichMenu(userId: string): Promise<void> {
-    await client.unlinkRichMenuFromUser(userId)
-  }
-}
+# Start metrics server
+start_http_server(8000)
 ```
 
 ---
 
-## 6. LIFF (LINE Front-end Framework)
+## 10. Testing
 
-### LIFF Setup
+### Unit Testing
 
-```typescript
-// LIFF Configuration
-import liff from '@line/liff'
+```python
+# Unit Testing LINE Bot
+import pytest
+from linebot.models import MessageEvent, TextMessage
 
-// Initialize LIFF
-async function initializeLIFF(): Promise<void> {
-  try {
-    await liff.init({ liffId: process.env.NEXT_PUBLIC_LIFF_ID! })
+def test_generate_response():
+    response = generate_response("Hello")
+    assert len(response) > 0
+    assert "Hello" in response or "hello" in response.lower()
 
-    if (!liff.isLoggedIn()) {
-      liff.login()
-    }
-  } catch (error) {
-    console.error('LIFF initialization failed:', error)
-  }
-}
+def test_thai_response():
+    response = generate_thai_response("สวัสดี")
+    assert len(response) > 0
 
-// Get user profile
-async function getUserProfile() {
-  if (liff.isLoggedIn()) {
-    const profile = await liff.getProfile()
-    return {
-      userId: profile.userId,
-      displayName: profile.displayName,
-      pictureUrl: profile.pictureUrl,
-      statusMessage: profile.statusMessage,
-    }
-  }
-  return null
-}
-
-// Send message to chat
-function sendMessageToChat(message: string): void {
-  if (liff.isInClient()) {
-    liff.sendMessages([
-      {
-        type: 'text',
-        text: message,
-      },
-    ])
-  }
-}
-
-// Close LIFF window
-function closeLIFF(): void {
-  liff.closeWindow()
-}
-```
-
-### LIFF React Component
-
-```typescript
-// LIFF Event Booking Component
-'use client'
-
-import { useEffect, useState } from 'react'
-import liff from '@line/liff'
-
-interface Event {
-  id: string
-  title: string
-  date: string
-  price: number
-}
-
-export default function EventBooking() {
-  const [profile, setProfile] = useState<any>(null)
-  const [event, setEvent] = useState<Event | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    initLIFF()
-  }, [])
-
-  async function initLIFF() {
-    try {
-      await liff.init({ liffId: process.env.NEXT_PUBLIC_LIFF_ID! })
-
-      if (!liff.isLoggedIn()) {
-        liff.login()
-        return
-      }
-
-      // Get user profile
-      const userProfile = await liff.getProfile()
-      setProfile(userProfile)
-
-      // Get event ID from URL
-      const params = new URLSearchParams(window.location.search)
-      const eventId = params.get('eventId')
-
-      if (eventId) {
-        // Fetch event details
-        const eventData = await fetchEvent(eventId)
-        setEvent(eventData)
-      }
-
-      setLoading(false)
-    } catch (error) {
-      console.error('LIFF init failed:', error)
-      setLoading(false)
-    }
-  }
-
-  async function fetchEvent(eventId: string): Promise<Event> {
-    const response = await fetch(`/api/events/${eventId}`)
-    return await response.json()
-  }
-
-  async function handleBooking() {
-    if (!event || !profile) return
-
-    try {
-      // Create booking
-      const response = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          eventId: event.id,
-          userId: profile.userId,
-        }),
-      })
-
-      const booking = await response.json()
-
-      // Send confirmation message to chat
-      if (liff.isInClient()) {
-        await liff.sendMessages([
-          {
-            type: 'text',
-            text: `✅ จองสำเร็จ!\n\nอีเวนต์: ${event.title}\nรหัสการจอง: ${booking.id}`,
-          },
-        ])
-
-        // Close LIFF window
-        liff.closeWindow()
-      }
-    } catch (error) {
-      console.error('Booking failed:', error)
-      alert('เกิดข้อผิดพลาดในการจอง กรุณาลองใหม่อีกครั้ง')
-    }
-  }
-
-  if (loading) {
-    return <div>กำลังโหลด...</div>
-  }
-
-  if (!event) {
-    return <div>ไม่พบข้อมูลอีเวนต์</div>
-  }
-
-  return (
-    <div className="container">
-      <h1>{event.title}</h1>
-      <p>วันที่: {event.date}</p>
-      <p>ราคา: {event.price.toLocaleString('th-TH')} บาท</p>
-
-      {profile && (
-        <div className="profile">
-          <img src={profile.pictureUrl} alt={profile.displayName} />
-          <p>ผู้จอง: {profile.displayName}</p>
-        </div>
-      )}
-
-      <button onClick={handleBooking}>ยืนยันการจอง</button>
-    </div>
-  )
-}
+def test_conversation_memory():
+    user_id = "test_user"
+    save_message(user_id, "user", "Hello")
+    save_message(user_id, "assistant", "Hi there!")
+    
+    history = get_conversation(user_id)
+    assert len(history) == 2
+    assert history[0]['role'] == "assistant"
+    assert history[1]['role'] == "user"
 ```
 
 ---
 
-## 7. LINE Login
+## Quick Start
 
-### LINE Login Integration
+### Minimal LINE Bot Setup
 
-```typescript
-// LINE Login with Next.js
-import { NextApiRequest, NextApiResponse } from 'next'
-import axios from 'axios'
+```python
+# Minimal LINE Bot
+from flask import Flask, request, abort
+from linebot import LineBotApi, WebhookHandler
+from linebot.exceptions import InvalidSignatureError
+from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from openai import OpenAI
 
-// Login endpoint
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'GET') {
-    // Redirect to LINE login
-    const state = generateRandomState()
-    const nonce = generateRandomNonce()
+app = Flask(__name__)
 
-    // Save state and nonce to session
-    req.session.state = state
-    req.session.nonce = nonce
+# Initialize LINE API
+line_bot_api = LineBotApi('YOUR_CHANNEL_ACCESS_TOKEN')
+handler = WebhookHandler('YOUR_CHANNEL_SECRET')
 
-    const authUrl = `https://access.line.me/oauth2/v2.1/authorize?` +
-      `response_type=code&` +
-      `client_id=${process.env.LINE_CHANNEL_ID}&` +
-      `redirect_uri=${encodeURIComponent(process.env.LINE_REDIRECT_URI!)}&` +
-      `state=${state}&` +
-      `scope=profile%20openid%20email&` +
-      `nonce=${nonce}`
+# Initialize OpenAI
+client = OpenAI(api_key='YOUR_OPENAI_API_KEY')
 
-    res.redirect(authUrl)
-  }
-}
+@app.route("/webhook", methods=['POST'])
+def webhook():
+    body = request.get_data(as_text=True)
+    signature = request.headers['X-Line-Signature']
+    
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        abort(400)
+    
+    return 'OK'
 
-// Callback endpoint
-export async function callbackHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { code, state } = req.query
-
-  // Verify state
-  if (state !== req.session.state) {
-    return res.status(400).json({ error: 'Invalid state' })
-  }
-
-  try {
-    // Exchange code for access token
-    const tokenResponse = await axios.post(
-      'https://api.line.me/oauth2/v2.1/token',
-      new URLSearchParams({
-        grant_type: 'authorization_code',
-        code: code as string,
-        redirect_uri: process.env.LINE_REDIRECT_URI!,
-        client_id: process.env.LINE_CHANNEL_ID!,
-        client_secret: process.env.LINE_CHANNEL_SECRET!,
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    # Generate response with OpenAI
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": event.message.text}
+        ]
+    )
+    
+    # Send reply
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=response.choices[0].message.content)
     )
 
-    const { access_token, id_token } = tokenResponse.data
-
-    // Get user profile
-    const profileResponse = await axios.get('https://api.line.me/v2/profile', {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    })
-
-    const profile = profileResponse.data
-
-    // Save user to database
-    await saveUser({
-      lineUserId: profile.userId,
-      displayName: profile.displayName,
-      pictureUrl: profile.pictureUrl,
-      email: profile.email,
-    })
-
-    // Create session
-    req.session.user = profile
-
-    res.redirect('/dashboard')
-  } catch (error) {
-    console.error('LINE login failed:', error)
-    res.status(500).json({ error: 'Login failed' })
-  }
-}
-
-function generateRandomState(): string {
-  return Math.random().toString(36).substring(7)
-}
-
-function generateRandomNonce(): string {
-  return Math.random().toString(36).substring(7)
-}
-
-async function saveUser(user: any): Promise<void> {
-  // Save to database
-}
+if __name__ == "__main__":
+    app.run(port=5000)
 ```
 
----
+### Installation
 
-## 8. Postback Handling
-
-### Postback Event Handler
-
-```typescript
-// Postback Event Handler
-import { PostbackEvent } from '@line/bot-sdk'
-
-async function handlePostback(event: PostbackEvent): Promise<void> {
-  const userId = event.source.userId!
-  const data = parsePostbackData(event.postback.data)
-
-  console.log('Postback data:', data)
-
-  if (data.action === 'book') {
-    await handleBookingPostback(userId, data.eventId, event.replyToken)
-  } else if (data.action === 'create_event') {
-    await handleCreateEventPostback(userId, event.replyToken)
-  } else if (data.action === 'view_all_events') {
-    await handleViewAllEventsPostback(userId, event.replyToken)
-  }
-}
-
-function parsePostbackData(data: string): Record<string, string> {
-  const params = new URLSearchParams(data)
-  const result: Record<string, string> = {}
-
-  params.forEach((value, key) => {
-    result[key] = value
-  })
-
-  return result
-}
-
-async function handleBookingPostback(
-  userId: string,
-  eventId: string,
-  replyToken: string
-): Promise<void> {
-  // Open LIFF for booking
-  const liffUrl = `https://liff.line.me/${process.env.LINE_LIFF_ID}/booking?eventId=${eventId}`
-
-  await client.replyMessage(replyToken, {
-    type: 'text',
-    text: 'กรุณากดปุ่มด้านล่างเพื่อดำเนินการจอง',
-    quickReply: {
-      items: [
-        {
-          type: 'action',
-          action: {
-            type: 'uri',
-            label: 'จองเลย',
-            uri: liffUrl,
-          },
-        },
-      ],
-    },
-  })
-}
-
-async function handleCreateEventPostback(
-  userId: string,
-  replyToken: string
-): Promise<void> {
-  const liffUrl = `https://liff.line.me/${process.env.LINE_LIFF_ID}/create-event`
-
-  await client.replyMessage(replyToken, {
-    type: 'text',
-    text: 'เริ่มสร้างอีเวนต์ใหม่',
-    quickReply: {
-      items: [
-        {
-          type: 'action',
-          action: {
-            type: 'uri',
-            label: 'สร้างอีเวนต์',
-            uri: liffUrl,
-          },
-        },
-      ],
-    },
-  })
-}
-
-async function handleViewAllEventsPostback(
-  userId: string,
-  replyToken: string
-): Promise<void> {
-  // Fetch all events
-  const events = await fetchAllEvents()
-
-  // Create carousel
-  const carousel = createEventCarousel(events)
-
-  await client.replyMessage(replyToken, carousel)
-}
-
-async function fetchAllEvents(): Promise<any[]> {
-  // Fetch from database
-  return []
-}
+```bash
+pip install flask line-bot-sdk openai
+export CHANNEL_ACCESS_TOKEN="your-channel-access-token"
+export CHANNEL_SECRET="your-channel-secret"
+export OPENAI_API_KEY="your-openai-api-key"
 ```
 
----
+### Next Steps
 
-## Best Practices
-
-1. **User Experience**
-   - Use rich messages for better engagement
-   - Implement quick replies for common actions
-   - Design intuitive rich menus
-   - Keep messages concise and in Thai
-
-2. **Performance**
-   - Use webhook efficiently
-   - Implement message queuing for high traffic
-   - Cache user profiles
-   - Optimize LIFF loading time
-
-3. **Security**
-   - Verify webhook signatures
-   - Validate postback data
-   - Secure LIFF endpoints
-   - Implement rate limiting
-
-4. **Error Handling**
-   - Handle webhook timeouts gracefully
-   - Provide fallback messages
-   - Log all errors for debugging
-   - Implement retry mechanisms
-
-5. **Testing**
-   - Test in LINE app on both iOS and Android
-   - Verify rich menu on different screen sizes
-   - Test LIFF on various devices
-   - Use LINE's simulator tools
-
----
-
-## Common Pitfalls
-
-1. **Webhook Timeout**: LINE expects response within 30 seconds
-2. **Rich Menu Image Size**: Must be exactly 2500x1686 or 2500x843 pixels
-3. **LIFF URL**: Must use HTTPS in production
-4. **Message Limits**: Free accounts have monthly message limits
-5. **Flex Message Complexity**: Too complex flex messages may not render properly
+1. Set up LINE Developer Console and webhook URL
+2. Add conversation memory for multi-turn conversations
+3. Implement rich menus and quick replies
+4. Set up analytics and monitoring
+```
 
 ---
 
 ## Production Checklist
 
-- [ ] Webhook endpoint configured and verified
-- [ ] Channel access token secured
-- [ ] Rich menu created and tested
-- [ ] LIFF app registered and tested
-- [ ] Error handling implemented
-- [ ] Logging configured
-- [ ] Rate limiting implemented
-- [ ] User data privacy compliant
-- [ ] Message templates in Thai
-- [ ] Tested on real devices
+- [ ] **Error Handling**: Implement try-catch blocks for all operations
+- [ ] **Rate Limiting**: Add rate limits to prevent API abuse
+- [ ] **Token Budget**: Set maximum token limits per conversation
+- [ ] **Timeout**: Configure timeouts to prevent infinite loops
+- [ ] **Logging**: Set up structured logging for all interactions
+- [ ] **Monitoring**: Add metrics for success rate, latency, token usage
+- [ ] **Security**: Validate and sanitize all inputs
+- [ ] **Cost Tracking**: Monitor API costs per conversation
+- [ ] **Memory Management**: Implement context window for conversation history
+- [ ] **Fallback Strategy**: Implement fallback mechanisms for failures
+- [ ] **Signature Verification**: Verify LINE webhook signatures
+- [ ] **Input Validation**: Validate all inputs before processing
+- [ ] **Output Sanitization**: Filter sensitive data from outputs
+- [ ] **Retry Logic**: Implement exponential backoff for retries
+- [ ] **Observability**: Add tracing and correlation IDs
 
 ---
 
-## Tools & Libraries
+## Anti-patterns
 
-| Tool | Purpose |
-|------|---------|
-| @line/bot-sdk | LINE Messaging API SDK |
-| @line/liff | LIFF SDK for web apps |
-| express | Web server framework |
+### ❌ Don't: No Signature Verification
+
+```python
+# ❌ Bad - No signature verification
+@app.route("/webhook", methods=['POST'])
+def webhook():
+    body = request.get_data(as_text=True)
+    # Process webhook without verifying signature!
+    return 'OK'
+```
+
+```python
+# ✅ Good - Verify signature
+@app.route("/webhook", methods=['POST'])
+def webhook():
+    body = request.get_data(as_text=True)
+    signature = request.headers['X-Line-Signature']
+    
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        abort(400)
+    
+    return 'OK'
+```
+
+### ❌ Don't: No Error Handling
+
+```python
+# ❌ Bad - No error handling
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    response = generate_response(event.message.text)
+    line_bot_api.reply_message(event.reply_token, TextMessage(text=response))
+```
+
+```python
+# ✅ Good - With error handling
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    try:
+        response = generate_response(event.message.text)
+        line_bot_api.reply_message(event.reply_token, TextMessage(text=response))
+    except Exception as e:
+        logger.error(f"Error handling message: {e}")
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextMessage(text="Sorry, something went wrong. Please try again.")
+        )
+```
+
+### ❌ Don't: No Rate Limiting
+
+```python
+# ❌ Bad - No rate limiting
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    # Process message without rate limiting!
+    response = generate_response(event.message.text)
+    line_bot_api.reply_message(event.reply_token, TextMessage(text=response))
+```
+
+```python
+# ✅ Good - Implement rate limiting
+from redis import Redis
+from datetime import timedelta
+
+redis = Redis()
+
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    user_id = event.source.user_id
+    key = f"rate_limit:{user_id}"
+    
+    # Check rate limit
+    if redis.exists(key):
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextMessage(text="Please wait before sending another message.")
+        )
+        return
+    
+    # Set rate limit
+    redis.setex(key, timedelta(seconds=10), "1")
+    
+    # Process message
+    response = generate_response(event.message.text)
+    line_bot_api.reply_message(event.reply_token, TextMessage(text=response))
+```
+
+---
+
+## Integration Points
+
+- **LLM Integration** (`06-ai-ml-production/llm-integration/`) - Setting up LLM providers
+- **Chatbot Integration** (`20-ai-integration/chatbot-integration/`) - Backend chatbot logic
+- **Conversational UI** (`20-ai-integration/conversational-ui/`) - UI patterns
+- **Error Handling** (`03-backend-api/error-handling/`) - Production error patterns
+- **Thai Language Support** (`25-internationalization/multi-language/`) - Localization
 
 ---
 
 ## Further Reading
 
-- [LINE Developers Documentation](https://developers.line.biz/en/docs/)
-- [Messaging API Reference](https://developers.line.biz/en/reference/messaging-api/)
-- [LIFF Documentation](https://developers.line.biz/en/docs/liff/)
-- [Flex Message Simulator](https://developers.line.biz/flex-simulator/)
-- [LINE Official Account Manager](https://manager.line.biz/)
+- [LINE Messaging API Documentation](https://developers.line.biz/en/docs/messaging-api/)
+- [LINE Bot SDK Python](https://github.com/line/line-bot-sdk-python)
+- [LINE Bot SDK Node.js](https://github.com/line/line-bot-sdk-nodejs)
+- [OpenAI API Documentation](https://platform.openai.com/docs/)
+- [Thai NLP Resources](https://github.com/PyThaiNLP/pythainlp)

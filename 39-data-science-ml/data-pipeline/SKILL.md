@@ -1,8 +1,18 @@
+---
+name: Data Pipeline
+description: Automating the flow of data from sources to destinations using ETL/ELT patterns, Apache Airflow orchestration, data transformation, and best practices for scalable data pipelines.
+---
+
 # Data Pipeline
+
+> **Current Level:** Advanced  
+> **Domain:** Data Engineering / ETL
+
+---
 
 ## Overview
 
-Data pipelines automate the flow of data from sources to destinations. This guide covers ETL/ELT, Apache Airflow, orchestration, and best practices.
+Data pipelines automate the flow of data from sources to destinations. This guide covers ETL/ELT, Apache Airflow, orchestration, and best practices for building reliable, scalable data pipelines that process and transform data efficiently.
 
 ## Data Pipeline Architecture
 
@@ -554,9 +564,130 @@ def load_data(context: AssetExecutionContext, transform_data):
 9. **Scheduling** - Choose appropriate schedules
 10. **Alerting** - Set up failure alerts
 
-## Resources
+---
+
+## Quick Start
+
+### Airflow DAG
+
+```python
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime
+
+def extract_data():
+    # Extract from source
+    pass
+
+def transform_data():
+    # Transform data
+    pass
+
+def load_data():
+    # Load to destination
+    pass
+
+dag = DAG(
+    'data_pipeline',
+    start_date=datetime(2024, 1, 1),
+    schedule_interval='@daily'
+)
+
+extract_task = PythonOperator(
+    task_id='extract',
+    python_callable=extract_data,
+    dag=dag
+)
+
+transform_task = PythonOperator(
+    task_id='transform',
+    python_callable=transform_data,
+    dag=dag
+)
+
+load_task = PythonOperator(
+    task_id='load',
+    python_callable=load_data,
+    dag=dag
+)
+
+extract_task >> transform_task >> load_task
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Pipeline Design**: Design pipeline architecture
+- [ ] **Orchestration**: Set up orchestration (Airflow, etc.)
+- [ ] **ETL/ELT**: Choose ETL or ELT pattern
+- [ ] **Error Handling**: Comprehensive error handling
+- [ ] **Retry Logic**: Retry failed tasks
+- [ ] **Data Quality**: Validate data quality
+- [ ] **Documentation**: Document pipeline logic
+- [ ] **Testing**: Test pipelines before production
+- [ ] **Versioning**: Version control DAGs
+- [ ] **Scheduling**: Appropriate schedules
+- [ ] **Alerting**: Failure alerts
+- [ ] **Monitoring**: Monitor pipeline health
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Error Handling
+
+```python
+# ❌ Bad - No error handling
+def extract_data():
+    data = fetch_from_api()  # What if fails?
+    return data
+```
+
+```python
+# ✅ Good - Error handling
+def extract_data():
+    try:
+        data = fetch_from_api()
+        return data
+    except Exception as e:
+        logger.error(f"Extract failed: {e}")
+        send_alert("Extract failed")
+        raise
+```
+
+### ❌ Don't: No Data Validation
+
+```python
+# ❌ Bad - No validation
+def transform_data(data):
+    return process(data)  # Invalid data possible!
+```
+
+```python
+# ✅ Good - Validate
+def transform_data(data):
+    if not validate_data(data):
+        raise ValueError("Invalid data")
+    return process(data)
+```
+
+---
+
+## Integration Points
+
+- **Feature Engineering** (`39-data-science-ml/feature-engineering/`) - Feature pipelines
+- **Model Training** (`05-ai-ml-core/model-training/`) - Training pipelines
+- **CI/CD** (`15-devops-infrastructure/ci-cd-github-actions/`) - Pipeline automation
+
+---
+
+## Further Reading
 
 - [Apache Airflow](https://airflow.apache.org/)
+- [Data Pipeline Best Practices](https://www.astronomer.io/guides/data-pipeline-best-practices)
+
+## Resources
 - [Prefect](https://www.prefect.io/)
 - [Dagster](https://dagster.io/)
 - [dbt](https://www.getdbt.com/)

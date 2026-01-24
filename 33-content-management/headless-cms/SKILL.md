@@ -1,10 +1,26 @@
+---
+name: Headless CMS Integration
+description: Separating content management from presentation by providing content via APIs, enabling omnichannel delivery and developer flexibility with platforms like Contentful, Strapi, and Sanity.
+---
+
 # Headless CMS Integration
+
+> **Current Level:** Intermediate  
+> **Domain:** Content Management / Backend
+
+---
 
 ## Overview
 
-Headless CMS separates content management from presentation, providing content via APIs. This guide covers integration patterns, popular platforms, and best practices.
+Headless CMS separates content management from presentation, providing content via APIs. This guide covers integration patterns, popular platforms, and best practices for building content-driven applications with flexibility and scalability.
 
-## Headless CMS Concepts
+---
+
+---
+
+## Core Concepts
+
+### Headless CMS Concepts
 
 ```
 Traditional CMS:  Content → Template → HTML
@@ -675,7 +691,128 @@ export default async function handler(req: any, res: any) {
 9. **Versioning** - Track content versions
 10. **Security** - Secure API keys and webhooks
 
-## Resources
+---
+
+## Quick Start
+
+### Contentful Integration
+
+```javascript
+const contentful = require('contentful')
+
+const client = contentful.createClient({
+  space: process.env.CONTENTFUL_SPACE_ID,
+  accessToken: process.env.CONTENTFUL_ACCESS_TOKEN
+})
+
+// Fetch entries
+const entries = await client.getEntries({
+  content_type: 'blogPost'
+})
+```
+
+### Strapi Integration
+
+```javascript
+// Fetch from Strapi API
+const response = await fetch('http://localhost:1337/api/posts', {
+  headers: {
+    'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`
+  }
+})
+
+const posts = await response.json()
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Content Model**: Design flexible content models
+- [ ] **API Keys**: Secure API keys and tokens
+- [ ] **Caching**: Cache content appropriately
+- [ ] **Webhooks**: Set up webhooks for content updates
+- [ ] **Preview**: Preview mode for draft content
+- [ ] **Localization**: Multi-language content support
+- [ ] **Versioning**: Content versioning if needed
+- [ ] **Media**: Media asset management
+- [ ] **Performance**: Optimize API calls
+- [ ] **Error Handling**: Handle API failures
+- [ ] **Testing**: Test content fetching
+- [ ] **Documentation**: Document content structure
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Fetch on Every Render
+
+```tsx
+// ❌ Bad - Fetches every render
+function BlogPost({ id }) {
+  const [post, setPost] = useState(null)
+  
+  useEffect(() => {
+    fetchPost(id).then(setPost)  // Fetches every time
+  })
+}
+```
+
+```tsx
+// ✅ Good - Cache and memoize
+const postCache = new Map()
+
+function BlogPost({ id }) {
+  const [post, setPost] = useState(postCache.get(id))
+  
+  useEffect(() => {
+    if (!post) {
+      fetchPost(id).then(p => {
+        postCache.set(id, p)
+        setPost(p)
+      })
+    }
+  }, [id])
+}
+```
+
+### ❌ Don't: Expose API Keys
+
+```javascript
+// ❌ Bad - API key in client code
+const client = contentful.createClient({
+  space: 'public-space-id',
+  accessToken: 'secret-token'  // Exposed!
+})
+```
+
+```javascript
+// ✅ Good - Use backend proxy
+// Frontend
+fetch('/api/contentful/posts')
+
+// Backend
+app.get('/api/contentful/posts', async (req, res) => {
+  const client = contentful.createClient({
+    space: process.env.CONTENTFUL_SPACE_ID,
+    accessToken: process.env.CONTENTFUL_ACCESS_TOKEN
+  })
+  const posts = await client.getEntries()
+  res.json(posts)
+})
+```
+
+---
+
+## Integration Points
+
+- **API Design** (`01-foundations/api-design/`) - API patterns
+- **Caching** (`04-database/redis-caching/`) - Content caching
+- **Contentful Integration** (`33-content-management/contentful-integration/`) - Specific platform
+
+---
+
+## Further Reading
 
 - [Contentful](https://www.contentful.com/developers/docs/)
 - [Strapi](https://docs.strapi.io/)

@@ -1,8 +1,18 @@
+---
+name: AutoML
+description: Automating machine learning pipeline creation including feature engineering, model selection, hyperparameter tuning, and ensemble creation using Auto-sklearn, H2O, TPOT, and AutoKeras.
+---
+
 # AutoML
+
+> **Current Level:** Advanced  
+> **Domain:** Data Science / ML / Automation
+
+---
 
 ## Overview
 
-AutoML automates machine learning pipeline creation. This guide covers Auto-sklearn, H2O, TPOT, AutoKeras, and when to use AutoML.
+AutoML automates machine learning pipeline creation. This guide covers Auto-sklearn, H2O, TPOT, AutoKeras, and when to use AutoML for accelerating ML development by automating repetitive tasks.
 
 ## AutoML Concepts
 
@@ -456,6 +466,116 @@ loaded_model.download_mojo(path='./mojo')
 8. **Monitoring** - Monitor in production
 9. **Documentation** - Document AutoML config
 10. **Hybrid** - Combine AutoML with manual tuning
+
+---
+
+## Quick Start
+
+### Auto-sklearn
+
+```python
+from autosklearn.classification import AutoSklearnClassifier
+
+# Create AutoML classifier
+automl = AutoSklearnClassifier(
+    time_left_for_this_task=3600,  # 1 hour
+    per_run_time_limit=300,  # 5 min per model
+    memory_limit=4096  # 4GB
+)
+
+# Fit
+automl.fit(X_train, y_train)
+
+# Get best model
+best_model = automl.get_models_with_weights()[0][1]
+print(f"Best model: {best_model}")
+```
+
+### H2O AutoML
+
+```python
+import h2o
+from h2o.automl import H2OAutoML
+
+h2o.init()
+
+# Load data
+df = h2o.import_file("data.csv")
+
+# AutoML
+aml = H2OAutoML(max_models=10, seed=1)
+aml.train(y="target", training_frame=df)
+
+# Get leaderboard
+print(aml.leaderboard)
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Tool Selection**: Choose AutoML tool
+- [ ] **Time Budget**: Set time budget
+- [ ] **Resource Limits**: Set resource limits
+- [ ] **Feature Engineering**: Review auto features
+- [ ] **Model Selection**: Review selected models
+- [ ] **Hyperparameter Tuning**: Review hyperparameters
+- [ ] **Validation**: Validate AutoML results
+- [ ] **Iteration**: Iterate on results
+- [ ] **Custom Features**: Add domain features
+- [ ] **Monitoring**: Monitor in production
+- [ ] **Documentation**: Document AutoML config
+- [ ] **Hybrid**: Combine with manual tuning
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Blind Trust
+
+```python
+# ❌ Bad - Use without review
+best_model = automl.fit(X, y)
+deploy(best_model)  # No understanding!
+```
+
+```python
+# ✅ Good - Review and understand
+best_model = automl.fit(X, y)
+review_model(best_model)  # Understand model
+validate_on_holdout(best_model)  # Validate
+deploy(best_model)
+```
+
+### ❌ Don't: No Domain Knowledge
+
+```python
+# ❌ Bad - Pure AutoML
+automl.fit(X, y)
+# Missing domain features!
+```
+
+```python
+# ✅ Good - Add domain features
+X_with_domain = add_domain_features(X)
+automl.fit(X_with_domain, y)
+# Better features!
+```
+
+---
+
+## Integration Points
+
+- **Feature Engineering** (`39-data-science-ml/feature-engineering/`) - Feature creation
+- **Model Training** (`05-ai-ml-core/model-training/`) - Model development
+- **Model Experiments** (`39-data-science-ml/model-experiments/`) - Experiment tracking
+
+---
+
+## Further Reading
+
+- [AutoML Best Practices](https://www.automl.org/automl/)
+- [When to Use AutoML](https://towardsdatascience.com/when-to-use-automl-7c0b0c0b0b0b)
 
 ## Resources
 

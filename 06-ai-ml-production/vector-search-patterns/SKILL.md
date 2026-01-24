@@ -9,6 +9,29 @@ description: Implementing semantic search and similarity search using vector emb
 
 Vector search (also known as semantic search or similarity search) enables finding similar items based on their meaning rather than exact keyword matches. It uses vector embeddings to represent data as points in high-dimensional space, where similarity is measured as distance between points.
 
+## Prerequisites
+
+- Understanding of vector mathematics and linear algebra
+- Knowledge of machine learning and embeddings
+- Familiarity with Python and numerical computing (numpy, scikit-learn)
+- Understanding of database concepts and indexing
+- Basic knowledge of cloud services (AWS, GCP, Azure)
+- Experience with vector databases or similarity search
+
+## Key Concepts
+
+- **Vector/Semantic Search**: Finding similar items based on meaning rather than exact keyword matches
+- **Embeddings**: Converting text/images to vectors for similarity comparison
+- **Vector Databases**: Specialized databases for efficient vector storage and retrieval
+- **Distance Metrics**: Cosine similarity, Euclidean distance, dot product for measuring vector similarity
+- **Indexing Algorithms**: HNSW (graph-based), IVF (clustering), PQ (quantization) for efficient search
+- **Hybrid Search**: Combining vector search with keyword search for better results
+- **RAG (Retrieval-Augmented Generation)**: Using retrieved context to improve LLM responses
+- **Chunking**: Splitting documents into smaller pieces for better indexing and retrieval
+- **Query Optimization**: Caching, batching, expansion techniques for better performance
+- **Scaling Strategies**: Sharding, replication, horizontal scaling for large datasets
+- **Evaluation Metrics**: Recall@K, Precision@K, MAP, MRR, NDCG for measuring search quality
+
 ## What is Vector Search / Semantic Search
 
 ### Traditional vs Vector Search

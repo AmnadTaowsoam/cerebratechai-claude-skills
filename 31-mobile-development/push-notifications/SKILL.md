@@ -1,10 +1,26 @@
+---
+name: Mobile Push Notifications
+description: Sending messages to users even when apps are not actively running using FCM, APNs, token management, and best practices for engagement and retention.
+---
+
 # Mobile Push Notifications
+
+> **Current Level:** Intermediate  
+> **Domain:** Mobile Development / Communication
+
+---
 
 ## Overview
 
-Push notifications enable apps to send messages to users even when the app is not actively running. This guide covers FCM, APNs, backend implementation, and best practices.
+Push notifications enable apps to send messages to users even when the app is not actively running. This guide covers FCM, APNs, backend implementation, and best practices for building effective push notification systems that engage users without being intrusive.
 
-## Table of Contents
+---
+
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Push Notification Concepts](#push-notification-concepts)
 2. [Firebase Cloud Messaging (FCM)](#firebase-cloud-messaging-fcm)
@@ -1295,6 +1311,163 @@ function handleForegroundMessage(
 async function cleanupInactiveTokens(): Promise<void> {
   const tokenManager = new TokenManager(prisma);
   const cleaned = await tokenManager.cleanupInactiveTokens(90);
+}
+```
+
+---
+
+## Quick Start
+
+### FCM Setup (React Native)
+
+```javascript
+import messaging from '@react-native-firebase/messaging'
+
+// Request permission
+async function requestPermission() {
+  const authStatus = await messaging().requestPermission()
+  return authStatus === messaging.AuthorizationStatus.AUTHORIZED
+}
+
+// Get FCM token
+async function getToken() {
+  const token = await messaging().getToken()
+  // Send token to backend
+  await api.saveDeviceToken(token)
+  return token
+}
+
+// Handle notifications
+messaging().onMessage(async remoteMessage => {
+  console.log('Notification received:', remoteMessage)
+  // Show local notification
+})
+```
+
+### Backend: Send Push Notification
+
+```javascript
+const admin = require('firebase-admin')
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+})
+
+async function sendPushNotification(token, title, body, data) {
+  const message = {
+    notification: { title, body },
+    data: data,
+    token: token
+  }
+  
+  try {
+    const response = await admin.messaging().send(message)
+    return { success: true, messageId: response }
+  } catch (error) {
+    if (error.code === 'messaging/invalid-registration-token') {
+      // Remove invalid token
+      await removeToken(token)
+    }
+    throw error
+  }
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Permission**: Request notification permission properly
+- [ ] **Token Management**: Store and manage device tokens
+- [ ] **Token Refresh**: Handle token refresh on app updates
+- [ ] **Invalid Tokens**: Clean up invalid/expired tokens
+- [ ] **Segmentation**: Segment users for targeted notifications
+- [ ] **Scheduling**: Support scheduled notifications
+- [ ] **Deep Linking**: Deep links from notifications
+- [ ] **Rich Notifications**: Rich media and actions
+- [ ] **Analytics**: Track notification open rates
+- [ ] **Rate Limiting**: Prevent notification spam
+- [ ] **Testing**: Test on real devices
+- [ ] **Error Handling**: Handle delivery failures
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Send Without Permission
+
+```javascript
+// ❌ Bad - Send without checking permission
+await sendNotification(token, message)  // User might not have permission!
+```
+
+```javascript
+// ✅ Good - Check permission first
+const hasPermission = await messaging().hasPermission()
+if (hasPermission) {
+  await sendNotification(token, message)
+} else {
+  await requestPermission()
+}
+```
+
+### ❌ Don't: No Token Cleanup
+
+```javascript
+// ❌ Bad - Never clean up tokens
+// Tokens accumulate forever!
+```
+
+```javascript
+// ✅ Good - Clean up invalid tokens
+async function sendNotification(token, message) {
+  try {
+    await admin.messaging().send({ token, ...message })
+  } catch (error) {
+    if (error.code === 'messaging/invalid-registration-token') {
+      await db.tokens.delete({ where: { token } })
+    }
+  }
+}
+```
+
+### ❌ Don't: Notification Spam
+
+```javascript
+// ❌ Bad - Send too many notifications
+user.actions.forEach(action => {
+  sendNotification(token, `You ${action}`)  // Spam!
+})
+```
+
+```javascript
+// ✅ Good - Batch and rate limit
+const notificationQueue = []
+user.actions.forEach(action => {
+  notificationQueue.push(action)
+})
+
+// Send one summary notification
+if (notificationQueue.length > 0) {
+  sendNotification(token, `You have ${notificationQueue.length} updates`)
+}
+```
+
+---
+
+## Integration Points
+
+- **Deep Linking** (`31-mobile-development/deep-linking/`) - Links from notifications
+- **Mobile CI/CD** (`31-mobile-development/mobile-ci-cd/`) - Notification testing
+- **Analytics** (`23-business-analytics/`) - Notification analytics
+
+---
+
+## Further Reading
+
+- [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging)
+- [Apple Push Notification Service](https://developer.apple.com/documentation/usernotifications)
+- [React Native Firebase](https://rnfirebase.io/)
 
   console.log(`Cleaned up ${cleaned} inactive tokens`);
 }

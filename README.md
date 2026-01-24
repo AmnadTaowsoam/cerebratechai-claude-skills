@@ -4,8 +4,8 @@
 
 A curated collection of **483+ specialized skills** across **73 categories** covering everything from core development to advanced features like AI/ML, blockchain, IoT, system resilience, platform engineering, governance, and more. Each skill provides detailed implementation guides, best practices, and production-ready code examples.
 
-[![Skills](https://img.shields.io/badge/Skills-483+-blue)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
-[![Categories](https://img.shields.io/badge/Categories-73-purple)](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills)
+[![Skills](https://img.shields.io/badge/Skills-483+-blue)](https://github.com/AmnadTaowsoam/cerebraSkills)
+[![Categories](https://img.shields.io/badge/Categories-73-purple)](https://github.com/AmnadTaowsoam/cerebraSkills)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
@@ -109,8 +109,8 @@ This repository contains specialized skills that help Claude understand and impl
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
-cd cerebratechai-claude-skills
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
+cd cerebraSkills
 ```
 
 2. **Link to Claude's skills directory**
@@ -870,8 +870,8 @@ Then reference: `"Following our project context, create the checkout flow"`
 
 ```bash
 # Clone repository
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
-cd cerebratechai-claude-skills
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
+cd cerebraSkills
 
 # No build step required - skills are markdown files
 ```
@@ -1006,8 +1006,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills/discussions)
+- **Issues**: [GitHub Issues](https://github.com/AmnadTaowsoam/cerebraSkills/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/AmnadTaowsoam/cerebraSkills/discussions)
 - **Email**: support@cerebratechai.com
 
 ---
@@ -1046,7 +1046,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 🌟 Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=AmnadTaowsoam/cerebratechai-claude-skills&type=Date)](https://star-history.com/#AmnadTaowsoam/cerebratechai-claude-skills&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=AmnadTaowsoam/cerebraSkills&type=Date)](https://star-history.com/#AmnadTaowsoam/cerebraSkills&Date)
 
 ---
 

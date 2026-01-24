@@ -1,8 +1,122 @@
-# Technical Decision Records (ADRs)
+### **01: Technical Decision Records (ADRs)**
 
-## Overview
+> 
+> **Current Level:** Expert (Enterprise Scale) 
+> 
+> 
+> **Domain:** Meta Skills / Architecture 
+> 
 
-Architecture Decision Records (ADRs) document significant technical decisions, their context, and consequences. They create a historical record of why decisions were made.
+---
+
+### **1. Executive Summary & Strategic Necessity**
+
+* **Context:** ในโลกปี 2025-2026 ระบบซอฟต์แวร์มีความซับซ้อนเพิ่มขึ้นอย่างมาก การตัดสินใจทางเทคนิคที่สำคัญจำเป็นต้องมีการบันทึกและติดตามอย่างเป็นระบบ Architecture Decision Records (ADRs) เป็นกระบวนการที่ช่วยให้ทีมสามารถทำความเข้าใจเหตุผลของการตัดสินใจในอดีต และหลีกเลี่ยงการทำซ้ำการอภิปรายหรือการตัดสินใจที่ผิดพลาดเดิม
+* **Business Impact:** การใช้ ADRs ช่วย:
+  - ลดเวลาในการอภิปรายและการตัดสินใจซ้ำ
+  - เพิ่มความโปร่งใสในการตัดสินใจ
+  - ลดความเสี่ยงของการสูญเสียความรู้เมื่อทีมเปลี่ยน
+  - เพิ่มประสิทธิภาพในการ Onboard ทีมใหม่
+  - ลดต้นทุนในการ Refactoring และการแก้ไขปัญหาที่เกิดจากการตัดสินใจที่ผิด
+* **Product Thinking:** ทักษะนี้ช่วยแก้ปัญหา (Pain Point) ให้กับ:
+  - ทีมพัฒนาที่ต้องการความเข้าใจในการตัดสินใจในอดีต
+  - ผู้บริหารที่ต้องการความมั่นใจในการตัดสินใจทางเทคนิค
+  - ลูกค้าที่ต้องการความสอดคล้องในการพัฒนา
+  - ทีม DevOps ที่ต้องการความเข้าใจในการ Deploy และ Monitor
+
+### **2. Technical Deep Dive (The "How-to")**
+
+* **Core Logic:** ADRs เป็นเอกสารที่บันทึกการตัดสินใจทางสถาปัตยกรรมที่สำคัญ โดยใช้กลไกต่อไปนี้:
+  - **Decision Significance Threshold:** การตัดสินใจว่าเมื่อไรควรเขียน ADR (เช่น การเปลี่ยนฐานข้อมูล, การเลือก Framework ใหม่, การเปลี่ยน Architecture)
+  - **ADR Structure:** โครงสร้างมาตรฐานของ ADR (Status, Context, Decision, Consequences, Alternatives Considered, References)
+  - **Versioning and Linking:** การใช้เลขลำดับและการเชื่อมโยงระหว่าง ADRs
+  - **Storage and Organization:** การจัดเก็บและการจัดระเบียบ ADRs
+
+* **Architecture Diagram Requirements:** แผนผังสถาปัตยกรรมที่ต้องมี:
+  - **Decision Flow Diagram:** แผนผังแสดงการไหลของการตัดสินใจ
+  - **ADR Relationship Map:** แผนผังแสดงความสัมพันธ์ระหว่าง ADRs
+  - **Timeline View:** มุมมองเวลาของการตัดสินใจ
+  - **Impact Analysis Diagram:** แผนผังแสดงผลกระทบของการตัดสินใจ
+
+* **Implementation Workflow:**
+  1. **Identify Decision:** ระบุการตัดสินใจที่ต้องบันทึก
+  2. **Create ADR:** สร้าง ADR ใหม่โดยใช้ Template
+  3. **Review:** ทีมทบทวน ADR
+  4. **Approve:** อนุมัติ ADR
+  5. **Implement:** นำการตัดสินใจไปใช้
+  6. **Track:** ติดตามผลลัพธ์
+  7. **Update:** อัปเดตหรือ Deprecate ADR ตามความเหมาะสม
+
+### **3. Tooling & Tech Stack**
+
+* **Enterprise Tools:** เครื่องมือระดับอุตสาหกรรมที่เลือกใช้:
+  - **ADR Tools:** adr-tools, MADR (Markdown ADR), log4brains
+  - **Documentation Platforms:** Confluence, Notion, GitHub Wiki, GitBook
+  - **Diagram Tools:** Mermaid.js, PlantUML, Draw.io, Lucidchart
+  - **Version Control:** Git, GitHub, GitLab, Bitbucket
+  - **Review Tools:** GitHub PRs, GitLab MRs, Code Review Tools
+
+* **Configuration Essentials:** ส่วนประกอบสำคัญในการตั้งค่า:
+  - **ADR Template:** Template มาตรฐานสำหรับการสร้าง ADR
+  - **Numbering Scheme:** รูปแบบการใช้เลขลำดับ (Sequential, Date-based, Hierarchical)
+  - **Directory Structure:** โครงสร้างไดเรกทอรี่สำหรับจัดเก็บ ADRs
+  - **Automation Scripts:** Script สำหรับสร้างและจัดการ ADRs
+  - **Integration with CI/CD:** การผนวก ADRs เข้ากับ Pipeline
+
+### **4. Standards, Compliance & Security**
+
+* **International Standards:** มาตรฐานที่เกี่ยวข้อง:
+  - **ISO/IEC 27001:** Information Security Management
+  - **ISO/IEC 9001:** Quality Management System
+  - **IEEE 1471:** Recommended Practice for Architectural Description
+
+* **Security Protocol:** กลไกการป้องกัน:
+  - **Access Control:** การควบคุมการเข้าถึง ADRs
+  - **Audit Trail:** การบันทึกการเข้าถึงและการแก้ไข
+  - **Classification:** การจัดประเภท ADRs ตามความละเอียด
+  - **Backup and Recovery:** การสำรองและการกู้คืนข้อมูล
+
+* **Explainability:** ความสามารถในการอธิบาย:
+  - **Rationale Documentation:** การบันทึกเหตุผลอย่างละเอียด
+  - **Trade-off Analysis:** การวิเคราะห์ข้อดีและข้อเสีย
+  - **Context Preservation:** การรักษาบริบทของการตัดสินใจ
+  - **Stakeholder Perspectives:** การรวมมุมมองของผู้มีส่วนได้ส่วนเสีย
+
+### **5. Unit Economics & Performance Metrics (KPIs)**
+
+* **Cost Calculation:** สูตรการคำนวณต้นทุนต่อหน่วย (COGS):
+  ```
+  Total Cost = (Time to Create ADR × Hourly Rate) + (Review Time × Hourly Rate) + (Maintenance Cost)
+  
+  ROI = (Time Saved - ADR Cost) / ADR Cost × 100%
+  
+  Time Saved = (Discussion Time Avoided) + (Re-decision Prevention) + (Onboarding Time Saved)
+  ```
+
+* **Key Performance Indicators:** ตัวชี้วัดความสำเร็จทางเทคนิค:
+  - **ADR Coverage:** % ของการตัดสินใจที่สำคัญที่มี ADR (Target: > 90%)
+  - **ADR Quality Score:** คะแนนคุณภาพของ ADR (Target: > 4/5)
+  - **Decision Reversal Rate:** % ของการตัดสินใจที่ถูกยกเลิก (Target: < 10%)
+  - **ADR Reference Rate:** % ของ ADRs ที่ถูกอ้างอิง (Target: > 50%)
+  - **Team Satisfaction:** ความพึงพอใจของทีม (Target: > 4/5)
+
+### **6. Strategic Recommendations (CTO Insights)**
+
+* **Phase Rollout:** คำแนะนำในการทยอยเริ่มใช้งาน:
+  1. **Phase 1 (Months 1-2):** สร้าง Template และ Guidelines, ฝึกอบรมทีม
+  2. **Phase 2 (Months 3-4):** เริ่มเขียน ADRs สำหรับการตัดสินใจที่สำคัญ
+  3. **Phase 3 (Months 5-6):** ผนวกเข้ากับ CI/CD, วัดผลและปรับปรุง
+  4. **Phase 4 (Year 2+):** ขยายไปยังทุกทีม, สร้าง Culture ของการบันทึกการตัดสินใจ
+
+* **Pitfalls to Avoid:** ข้อควรระวังที่มักจะผิดพลาด:
+  - **Over-documentation:** หลีกเลี่ยงการเขียน ADR สำหรับการตัดสินใจที่ไม่สำคัญ
+  - **Vague Rationale:** ต้องอธิบายเหตุผลอย่างชัดเจนและเฉพาะเจาะจง
+  - **Missing Alternatives:** ต้องระบุทางเลือกอื่นที่พิจารณา
+  - **Not Updating:** ต้องอัปเดต ADR เมื่อมีการเปลี่ยนแปลง
+  - **No Review Process:** ต้องมีกระบวนการทบทวน ADR
+  - **Poor Organization:** ต้องจัดระเบียบ ADRs อย่างเป็นระบบ
+
+---
 
 ## What are ADRs and Why They Matter
 
@@ -269,287 +383,6 @@ We will implement JWT-based authentication with refresh tokens:
 - Reviewers: Jane Smith, Security Team
 - Implementation target: Sprint 5
 - Review trigger: Security audit or scaling beyond 50K users
-```
-
-### Example 3: API Design
-
-```markdown
-# ADR-003: Use GraphQL for Public API
-
-## Status
-Superseded by ADR-015 (2024-06-01)
-
-## Context
-We need to design our public API for third-party developers. Requirements:
-- Flexible data fetching (clients need different data)
-- Minimize over-fetching and under-fetching
-- Good developer experience
-- Support for real-time updates
-- Versioning strategy
-
-## Decision
-We will use GraphQL for our public API instead of REST.
-
-## Consequences
-
-### Positive
-- Clients can request exactly the data they need
-- Single endpoint simplifies API surface
-- Strong typing with schema
-- Excellent tooling (GraphiQL, Apollo)
-- Built-in documentation via introspection
-- Subscriptions for real-time updates
-
-### Negative
-- Learning curve for team and API consumers
-- More complex caching compared to REST
-- Potential for expensive queries (N+1 problem)
-- Requires query complexity analysis and rate limiting
-- Less familiar to some developers
-
-### Risks
-- Performance issues if queries aren't optimized
-- Security concerns with unrestricted queries
-- Monitoring and debugging more complex
-
-## Alternatives Considered
-
-### Alternative 1: REST API
-- Pros: Familiar, simple, good caching, wide tooling support
-- Cons: Over-fetching/under-fetching, versioning challenges, multiple endpoints
-- Why rejected: Flexibility requirements favor GraphQL
-
-### Alternative 2: gRPC
-- Pros: High performance, strong typing, code generation
-- Cons: Not browser-friendly, less familiar, requires HTTP/2
-- Why rejected: Public API needs browser support
-
-## Implementation Notes
-- Use DataLoader to prevent N+1 queries
-- Implement query complexity analysis
-- Set query depth limits
-- Use persisted queries for production
-- Implement comprehensive monitoring
-
-## References
-- [GraphQL Best Practices](https://graphql.org/learn/best-practices/)
-- [Security considerations](link)
-
-## Notes
-- Date: 2024-02-01
-- Author: Alice Johnson
-- Reviewers: API Team
-- Superseded by: ADR-015 (Switched back to REST due to complexity)
-- Reason for superseding: GraphQL complexity outweighed benefits for our use case
-```
-
-### Example 4: Microservices Architecture
-
-```markdown
-# ADR-004: Adopt Microservices Architecture
-
-## Status
-Accepted (2024-02-15)
-
-## Context
-Our monolithic application is becoming difficult to maintain and deploy:
-- 500K+ lines of code
-- 20+ developers working on same codebase
-- Deployment takes 2+ hours
-- Frequent merge conflicts
-- Difficult to scale specific features
-- Different parts have different scaling needs
-
-Business drivers:
-- Need faster feature delivery
-- Want to experiment with new technologies
-- Plan to scale team to 50+ developers
-- Different services have different SLAs
-
-## Decision
-We will migrate to a microservices architecture over 18 months:
-- Split monolith into 8-12 services based on business domains
-- Each service owns its data (no shared databases)
-- Services communicate via REST APIs and async messaging
-- Independent deployment pipelines per service
-- Gradual migration using strangler fig pattern
-
-## Consequences
-
-### Positive
-- Teams can work independently with less coordination
-- Deploy services independently (faster releases)
-- Scale services independently based on load
-- Technology flexibility (can use different stacks where appropriate)
-- Better fault isolation
-- Easier to understand individual services
-
-### Negative
-- Increased operational complexity
-- Need for service discovery and orchestration
-- Distributed system challenges (network latency, partial failures)
-- Data consistency challenges
-- More difficult debugging and testing
-- Infrastructure costs increase
-- Need for distributed tracing and monitoring
-
-### Risks
-- Migration may take longer than planned
-- Team may lack distributed systems expertise
-- Potential for creating a "distributed monolith"
-- Increased cognitive load on developers
-- May over-decompose and create too many services
-
-## Alternatives Considered
-
-### Alternative 1: Keep Monolith, Improve Modularity
-- Pros: Simpler, no distributed system complexity, easier to debug
-- Cons: Doesn't solve deployment and scaling issues, merge conflicts continue
-- Why rejected: Doesn't address core problems of team scaling and deployment speed
-
-### Alternative 2: Modular Monolith
-- Pros: Modularity benefits without distributed system complexity
-- Cons: Still single deployment unit, can't scale parts independently
-- Why rejected: Doesn't meet independent scaling requirements
-
-### Alternative 3: Serverless Functions
-- Pros: Auto-scaling, pay-per-use, no infrastructure management
-- Cons: Vendor lock-in, cold starts, limited execution time, debugging challenges
-- Why rejected: Too radical a change, team not ready, concerns about vendor lock-in
-
-## Migration Strategy
-1. Identify service boundaries using Domain-Driven Design
-2. Extract services one at a time (strangler fig pattern)
-3. Start with read-only services (lower risk)
-4. Implement API gateway and service mesh
-5. Set up monitoring and distributed tracing first
-6. Train team on distributed systems patterns
-
-## Success Criteria
-- Deployment time reduced to < 30 minutes
-- Can deploy services independently
-- 99.9% uptime maintained during migration
-- Team velocity increases by 30%
-- No major outages caused by migration
-
-## References
-- [Microservices Patterns by Chris Richardson](https://microservices.io/)
-- [Building Microservices by Sam Newman](https://samnewman.io/books/building_microservices/)
-- [Domain-Driven Design by Eric Evans](https://www.domainlanguage.com/ddd/)
-- [Migration plan document](link)
-
-## Notes
-- Date: 2024-02-15
-- Author: Architecture Team
-- Reviewers: CTO, Engineering Managers
-- Budget approved: $500K for infrastructure and training
-- Timeline: 18 months
-- Review checkpoints: Every 3 months
-```
-
-### Example 5: Caching Strategy
-
-```markdown
-# ADR-005: Implement Multi-Layer Caching Strategy
-
-## Status
-Accepted (2024-03-01)
-
-## Context
-Our application is experiencing performance issues:
-- Database is bottleneck (80% CPU usage during peak)
-- API response times > 500ms for common queries
-- Same data queried repeatedly
-- Read-heavy workload (90% reads, 10% writes)
-- Budget for infrastructure improvements
-
-Performance requirements:
-- Target: < 100ms API response time
-- Support 10K concurrent users
-- Maintain data freshness (< 5 minutes stale acceptable)
-
-## Decision
-Implement a multi-layer caching strategy:
-1. **Browser cache** - Static assets (24 hours)
-2. **CDN cache** - API responses for public data (5 minutes)
-3. **Application cache** - Redis for frequently accessed data (5 minutes)
-4. **Database query cache** - PostgreSQL query cache
-
-## Consequences
-
-### Positive
-- Reduced database load (expect 70% reduction in queries)
-- Faster API responses (target < 100ms achieved)
-- Better user experience
-- Can handle more concurrent users
-- Reduced infrastructure costs (fewer database replicas needed)
-
-### Negative
-- Cache invalidation complexity
-- Potential for stale data
-- Increased memory usage
-- More failure modes (cache unavailable)
-- Debugging becomes harder (is it cache or DB?)
-- Need cache monitoring and alerts
-
-### Risks
-- Cache stampede during cache expiry
-- Memory exhaustion if cache grows too large
-- Inconsistent data if invalidation fails
-- Dependency on Redis (new single point of failure)
-
-## Alternatives Considered
-
-### Alternative 1: Database Read Replicas Only
-- Pros: Simpler, no cache invalidation, always fresh data
-- Cons: Doesn't reduce query load enough, still slow for complex queries
-- Why rejected: Doesn't meet performance targets
-
-### Alternative 2: Client-Side Caching Only
-- Pros: Simple, no server-side cache management
-- Cons: Doesn't help with database load, inconsistent across clients
-- Why rejected: Doesn't solve database bottleneck
-
-### Alternative 3: Materialized Views
-- Pros: Database-native, no external dependencies
-- Cons: Refresh overhead, limited flexibility
-- Why rejected: Not flexible enough for our use cases
-
-## Implementation Details
-
-### Cache Keys
-```
-user:{userId}:profile
-product:{productId}:details
-search:{query}:results
-```
-
-### Invalidation Strategy
-- **Time-based**: 5-minute TTL for most data
-- **Event-based**: Invalidate on writes
-- **Manual**: Admin can purge cache
-
-### Cache Warming
-- Pre-populate cache for popular items on deployment
-- Background job refreshes cache before expiry
-
-### Monitoring
-- Cache hit rate (target > 80%)
-- Cache memory usage
-- Cache eviction rate
-- Response time improvements
-
-## References
-- [Caching Best Practices](https://aws.amazon.com/caching/best-practices/)
-- [Redis Documentation](https://redis.io/documentation)
-- [Cache Stampede Prevention](link)
-
-## Notes
-- Date: 2024-03-01
-- Author: Performance Team
-- Reviewers: Backend Team, DevOps
-- Implementation: Sprint 8-9
-- Success metrics: Response time < 100ms, cache hit rate > 80%
 ```
 
 ## ADR Storage and Versioning

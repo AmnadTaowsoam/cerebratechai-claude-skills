@@ -1,13 +1,58 @@
+---
+name: PyTorch Deployment
+description: Comprehensive guide for deploying PyTorch models to production, covering export formats, optimization techniques, and deployment patterns.
+---
+
 # PyTorch Deployment
 
 ## Overview
-Comprehensive guide for deploying PyTorch models to production, covering export formats, optimization techniques, and deployment patterns.
 
----
+PyTorch deployment involves exporting models to production-ready formats, optimizing for inference performance, and serving models through various deployment patterns. This skill covers TorchScript, ONNX export, TorchServe, model optimization techniques, inference optimization, FastAPI deployment, model versioning, A/B testing, monitoring, error handling, and performance benchmarking.
 
-## 1. Model Export Formats
+## Prerequisites
 
-### 1.1 TorchScript
+- Understanding of PyTorch and deep learning models
+- Knowledge of model training and evaluation
+- Familiarity with web frameworks (FastAPI, Flask)
+- Understanding of Docker and containerization
+- Basic knowledge of cloud deployment concepts
+
+## Key Concepts
+
+### Model Export Formats
+
+- **TorchScript**: PyTorch's intermediate representation for production deployment
+- **Tracing**: Captures computation path from example inputs
+- **Scripting**: Captures entire Python code including control flow
+- **ONNX**: Open Neural Network Exchange for cross-framework compatibility
+- **TorchServe**: PyTorch's model serving framework
+
+### Model Optimization
+
+- **Quantization**: Reducing precision (FP32 → FP16/INT8) for efficiency
+- **Pruning**: Removing less important weights from models
+- **Knowledge Distillation**: Training smaller models from larger teacher models
+- **Model Compression**: Techniques to reduce model size
+
+### Inference Optimization
+
+- **Batching**: Processing multiple inputs together for efficiency
+- **GPU Utilization**: Multi-GPU inference for throughput
+- **Mixed Precision**: Using FP16 for faster computation
+- **Caching**: Repeated computation results
+
+### Deployment Patterns
+
+- **FastAPI Server**: REST API for model serving
+- **TorchServe**: Production-ready model serving framework
+- **ONNX Runtime**: High-performance inference engine
+- **Docker Deployment**: Containerized model deployment
+
+## Implementation Guide
+
+### Model Export Formats
+
+#### TorchScript
 
 TorchScript is an intermediate representation of a PyTorch model that can be run in a high-performance environment such as C++.
 
@@ -31,12 +76,12 @@ class MyModel(nn.Module):
 model = MyModel()
 model.eval()
 
-# Method 1: Tracing (captures the actual computation path)
+# Method 1: Tracing (captures actual computation path)
 example_input = torch.randn(1, 3, 28, 28)
 traced_model = torch.jit.trace(model, example_input)
 traced_model.save("model_traced.pt")
 
-# Method 2: Scripting (captures the entire Python code)
+# Method 2: Scripting (captures entire Python code)
 scripted_model = torch.jit.script(model)
 scripted_model.save("model_scripted.pt")
 
@@ -60,7 +105,7 @@ model = ConditionalModel()
 scripted_model = torch.jit.script(model)
 ```
 
-### 1.2 ONNX Export
+#### ONNX Export
 
 Open Neural Network Exchange (ONNX) enables interoperability between different frameworks.
 
@@ -114,7 +159,7 @@ def custom_gsymbolic(g, input, alpha):
 register_custom_op_symbolic("aten::gelu", custom_gsymbolic, 17)
 ```
 
-### 1.3 TorchServe
+#### TorchServe
 
 TorchServe is a flexible, easy-to-use tool for serving PyTorch models.
 
@@ -197,11 +242,9 @@ curl -X POST http://localhost:8080/predictions/mymodel \
   -d '{"data": [[...]]}'
 ```
 
----
+### Model Optimization
 
-## 2. Model Optimization
-
-### 2.1 Quantization
+#### Quantization
 
 Quantization reduces model size and improves inference speed by using lower precision numbers.
 
@@ -287,9 +330,9 @@ model_prepared.eval()
 quantized_model = convert(model_prepared)
 ```
 
-### 2.2 Pruning
+#### Pruning
 
-Pruning removes less important weights from the model.
+Pruning removes less important weights from model.
 
 **Structured Pruning:**
 
@@ -352,7 +395,7 @@ def iterative_pruning(model, train_loader, num_iterations=5, prune_amount=0.2):
     return model
 ```
 
-### 2.3 Model Compression
+#### Model Compression
 
 **Knowledge Distillation:**
 
@@ -401,11 +444,9 @@ for batch in train_loader:
     optimizer.step()
 ```
 
----
+### Inference Optimization
 
-## 3. Inference Optimization
-
-### 3.1 Batching
+#### Batching
 
 ```python
 import torch
@@ -472,7 +513,7 @@ class BatchInferenceServer:
                         self.results[req_id] = output
 ```
 
-### 3.2 GPU Utilization
+#### GPU Utilization
 
 ```python
 import torch
@@ -507,7 +548,7 @@ def multi_gpu_inference(model, inputs):
     return torch.cat(outputs, dim=0)
 ```
 
-### 3.3 Mixed Precision
+#### Mixed Precision
 
 ```python
 import torch
@@ -539,11 +580,9 @@ for batch in train_loader:
     scaler.update()
 ```
 
----
+### Deployment Patterns
 
-## 4. Deployment Patterns
-
-### 4.1 FastAPI Server
+#### FastAPI Server
 
 ```python
 from fastapi import FastAPI, File, UploadFile, HTTPException
@@ -626,7 +665,7 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 ```
 
-### 4.2 TorchServe Configuration
+#### TorchServe Configuration
 
 **config.properties:**
 
@@ -664,7 +703,7 @@ CMD ["torchserve", \
      "--ts-config", "/home/model-server/config.properties"]
 ```
 
-### 4.3 ONNX Runtime Server
+#### ONNX Runtime Server
 
 **Python ONNX Runtime Server:**
 
@@ -695,11 +734,9 @@ async def predict(input_data: InputData):
     return {"output": outputs[0].tolist()}
 ```
 
----
+### Model Versioning
 
-## 5. Model Versioning
-
-### 5.1 Versioning Strategy
+#### Versioning Strategy
 
 ```python
 import os
@@ -759,9 +796,7 @@ class ModelVersionManager:
         return sorted(versions, key=lambda x: x["version"])
 ```
 
----
-
-## 6. A/B Testing Models
+### A/B Testing Models
 
 ```python
 import random
@@ -822,9 +857,7 @@ router = ABTestModelRouter(
 output = router.predict(input_data, request_id="user_123")
 ```
 
----
-
-## 7. Model Monitoring
+### Model Monitoring
 
 ```python
 import time
@@ -910,9 +943,7 @@ async def predict(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 ```
 
----
-
-## 8. Error Handling
+### Error Handling
 
 ```python
 import logging
@@ -1000,64 +1031,7 @@ class SafeModelWrapper:
         }
 ```
 
----
-
-## 9. Production Checklist
-
-### Pre-Deployment Checklist
-
-- [ ] **Model Export**
-  - [ ] Model exported to production format (TorchScript/ONNX)
-  - [ ] Exported model tested and verified
-  - [ ] Model size optimized (quantization/pruning)
-
-- [ ] **Performance**
-  - [ ] Inference latency meets SLA (< 100ms for real-time)
-  - [ ] Throughput tested with expected load
-  - [ ] GPU memory usage optimized
-  - [ ] Batch processing configured
-
-- [ ] **Reliability**
-  - [ ] Error handling implemented
-  - [ ] Graceful degradation for failures
-  - [ ] Circuit breaker pattern for external dependencies
-  - [ ] Retry logic for transient failures
-
-- [ ] **Monitoring**
-  - [ ] Metrics collection (latency, throughput, errors)
-  - [ ] Logging configured
-  - [ ] Health check endpoint
-  - [ ] Alert thresholds set
-
-- [ ] **Security**
-  - [ ] Input validation implemented
-  - [ ] Rate limiting configured
-  - [ ] Authentication/authorization for API
-  - [ ] Model files stored securely
-
-- [ ] **Deployment**
-  - [ ] Docker container created
-  - [ ] Environment variables configured
-  - [ ] CI/CD pipeline set up
-  - [ ] Blue-green deployment strategy
-
-### Post-Deployment Checklist
-
-- [ ] **Validation**
-  - [ ] Smoke tests passed
-  - [ ] A/B test started
-  - [ ] Model performance monitored
-  - [ ] Error rates within acceptable range
-
-- [ ] **Documentation**
-  - [ ] API documentation updated
-  - [ ] Model version documented
-  - [ ] Known issues documented
-  - [ ] Runbook created
-
----
-
-## 10. Performance Benchmarking
+### Performance Benchmarking
 
 ```python
 import time
@@ -1207,11 +1181,91 @@ with open("benchmark_results.json", "w") as f:
     json.dump(results, f, indent=2)
 ```
 
----
+## Best Practices
 
-## Additional Resources
+### Pre-Deployment Checklist
 
-- [PyTorch Deployment Documentation](https://pytorch.org/docs/stable/deployment.html)
-- [TorchServe Documentation](https://pytorch.org/serve/)
-- [ONNX Runtime Documentation](https://onnxruntime.ai/docs/)
-- [PyTorch Quantization](https://pytorch.org/docs/stable/quantization.html)
+- **Model Export**
+  - Model exported to production format (TorchScript/ONNX)
+  - Exported model tested and verified
+  - Model size optimized (quantization/pruning)
+
+- **Performance**
+  - Inference latency meets SLA (< 100ms for real-time)
+  - Throughput tested with expected load
+  - GPU memory usage optimized
+  - Batch processing configured
+
+- **Reliability**
+  - Error handling implemented
+  - Graceful degradation for failures
+  - Circuit breaker pattern for external dependencies
+  - Retry logic for transient failures
+
+- **Monitoring**
+  - Metrics collection (latency, throughput, errors)
+  - Logging configured
+  - Health check endpoint
+  - Alert thresholds set
+
+- **Security**
+  - Input validation implemented
+  - Rate limiting configured
+  - Authentication/authorization for API
+  - Model files stored securely
+
+- **Deployment**
+  - Docker container created
+  - Environment variables configured
+  - CI/CD pipeline set up
+  - Blue-green deployment strategy
+
+### Post-Deployment Checklist
+
+- **Validation**
+  - Smoke tests passed
+  - A/B test started
+  - Model performance monitored
+  - Error rates within acceptable range
+
+- **Documentation**
+  - API documentation updated
+  - Model version documented
+  - Known issues documented
+  - Runbook created
+
+### Performance Optimization Tips
+
+1. **Use TorchScript for Production**
+   - Export models to TorchScript for faster inference
+   - Use tracing for models without control flow
+   - Use scripting for models with dynamic control flow
+
+2. **Apply Quantization**
+   - Use dynamic quantization for quick deployment
+   - Use static quantization for better performance
+   - Use QAT for minimal accuracy loss
+
+3. **Optimize Batch Size**
+   - Find optimal batch size for your hardware
+   - Use larger batches for better GPU utilization
+   - Consider latency requirements when choosing batch size
+
+4. **Use Mixed Precision**
+   - Enable FP16 for faster computation
+   - Use GradScaler for training stability
+   - Test accuracy impact before deployment
+
+5. **Monitor Model Performance**
+   - Track latency, throughput, and error rates
+   - Set up alerts for performance degradation
+   - Monitor GPU memory usage
+   - Track prediction drift
+
+## Related Skills
+
+- [`05-ai-ml-core/model-training`](05-ai-ml-core/model-training/SKILL.md)
+- [`05-ai-ml-core/model-optimization`](05-ai-ml-core/model-optimization/SKILL.md)
+- [`05-ai-ml-core/model-versioning`](05-ai-ml-core/model-versioning/SKILL.md)
+- [`06-ai-ml-production/llm-integration`](06-ai-ml-production/llm-integration/SKILL.md)
+- [`15-devops-infrastructure/ci-cd-pipelines`](15-devops-infrastructure/ci-cd-pipelines/SKILL.md)

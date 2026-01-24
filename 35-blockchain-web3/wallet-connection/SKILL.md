@@ -1,8 +1,18 @@
+---
+name: Wallet Connection
+description: Enabling users to interact with dApps using their crypto wallets including MetaMask, WalletConnect, RainbowKit, and Wagmi integration for Web3 applications.
+---
+
 # Wallet Connection
+
+> **Current Level:** Intermediate  
+> **Domain:** Blockchain / Web3 / Frontend
+
+---
 
 ## Overview
 
-Wallet connection enables users to interact with dApps using their crypto wallets. This guide covers MetaMask, WalletConnect, RainbowKit, and Wagmi integration.
+Wallet connection enables users to interact with dApps using their crypto wallets. This guide covers MetaMask, WalletConnect, RainbowKit, and Wagmi integration for building Web3 applications that connect to user wallets securely.
 
 ## Wallet Connection Patterns
 
@@ -601,7 +611,116 @@ export function NetworkIndicator() {
 9. **UX** - Clear connection status
 10. **Testing** - Test with different wallets
 
-## Resources
+---
+
+## Quick Start
+
+### RainbowKit Setup
+
+```bash
+npm install @rainbow-me/rainbowkit wagmi viem
+```
+
+```tsx
+import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit'
+import { configureChains, createConfig, WagmiConfig } from 'wagmi'
+import { mainnet, polygon } from 'wagmi/chains'
+import { publicProvider } from 'wagmi/providers/public'
+
+const { chains, publicClient } = configureChains(
+  [mainnet, polygon],
+  [publicProvider()]
+)
+
+const { connectors } = getDefaultWallets({
+  appName: 'My App',
+  projectId: 'YOUR_PROJECT_ID',
+  chains
+})
+
+const wagmiConfig = createConfig({
+  autoConnect: true,
+  connectors,
+  publicClient
+})
+
+function App() {
+  return (
+    <WagmiConfig config={wagmiConfig}>
+      <RainbowKitProvider chains={chains}>
+        <YourApp />
+      </RainbowKitProvider>
+    </WagmiConfig>
+  )
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Wallet Support**: Support multiple wallets (MetaMask, WalletConnect)
+- [ ] **Network Support**: Support multiple networks (Mainnet, Polygon, etc.)
+- [ ] **Connection Status**: Show connection status
+- [ ] **Account Display**: Display connected account
+- [ ] **Network Switching**: Allow network switching
+- [ ] **Error Handling**: Handle connection errors
+- [ ] **Security**: Never request private keys
+- [ ] **UX**: Clear connection flow
+- [ ] **Testing**: Test with different wallets
+- [ ] **Documentation**: Document wallet integration
+- [ ] **Monitoring**: Monitor connection issues
+- [ ] **Fallback**: Fallback for unsupported wallets
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Request Private Keys
+
+```javascript
+// ❌ Bad - Request private key
+const privateKey = prompt('Enter private key')  // NEVER!
+```
+
+```javascript
+// ✅ Good - Use wallet provider
+const { data: account } = useAccount()  // Wallet handles keys
+```
+
+### ❌ Don't: No Error Handling
+
+```javascript
+// ❌ Bad - No error handling
+const account = await connect()  // What if user rejects?
+```
+
+```javascript
+// ✅ Good - Handle errors
+try {
+  const account = await connect()
+} catch (error) {
+  if (error.code === 4001) {
+    // User rejected connection
+    showMessage('Connection rejected')
+  } else {
+    // Other error
+    showError('Connection failed')
+  }
+}
+```
+
+---
+
+## Integration Points
+
+- **Web3 Integration** (`35-blockchain-web3/web3-integration/`) - Web3 patterns
+- **Smart Contracts** (`35-blockchain-web3/smart-contracts/`) - Contract interaction
+- **Blockchain Authentication** (`35-blockchain-web3/blockchain-authentication/`) - Auth patterns
+
+---
+
+## Further Reading
 
 - [RainbowKit](https://www.rainbowkit.com/)
 - [Wagmi](https://wagmi.sh/)

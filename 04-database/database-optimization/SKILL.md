@@ -1,8 +1,46 @@
+---
+name: Database Optimization Techniques
+description: Query optimization, indexing strategies, and performance tuning for database systems.
+---
+
 # Database Optimization Techniques
 
-## 1. Query Optimization
+## Overview
 
-### EXPLAIN Analysis
+Database optimization involves improving query performance, reducing resource consumption, and ensuring efficient data access patterns. This skill covers query analysis, indexing strategies, caching, and maintenance practices.
+
+## Prerequisites
+
+- Understanding of SQL and database operations
+- Knowledge of database schema design principles
+- Familiarity with database management tools
+- Basic understanding of performance monitoring
+
+## Key Concepts
+
+### Performance Optimization Areas
+
+1. **Query Optimization**: Writing efficient SQL queries
+2. **Indexing Strategies**: Creating and maintaining indexes
+3. **Connection Management**: Efficient connection pooling
+4. **Caching**: Reducing database load
+5. **Schema Design**: Proper normalization and denormalization
+6. **Maintenance**: Regular database maintenance tasks
+
+### Performance Metrics
+
+- **Query Response Time**: Time to execute queries
+- **Throughput**: Queries per second
+- **Resource Usage**: CPU, memory, I/O
+- **Lock Contention**: Time spent waiting for locks
+- **Cache Hit Ratio**: Percentage of queries served from cache
+
+## Implementation Guide
+
+### Query Optimization
+
+#### EXPLAIN Analysis
+
 ```sql
 -- Basic EXPLAIN
 EXPLAIN
@@ -24,7 +62,8 @@ SELECT * FROM users WHERE email = 'user@example.com';
 db.users.find({ email: 'user@example.com' }).explain('executionStats');
 ```
 
-### Query Planning
+#### Query Planning
+
 ```sql
 -- Understanding query plans
 -- Key metrics to analyze:
@@ -51,7 +90,8 @@ LIMIT 10;
 -- 4. Inefficient join strategies
 ```
 
-### Join Optimization
+#### Join Optimization
+
 ```sql
 -- Good: Use indexed columns for joins
 CREATE INDEX idx_orders_user_id ON orders(user_id);
@@ -84,9 +124,10 @@ INNER JOIN (
 ) o ON u.id = o.user_id;
 ```
 
-## 2. Indexing Strategies
+### Indexing Strategies
 
-### B-Tree Indexes
+#### B-Tree Indexes
+
 ```sql
 -- Single column index
 CREATE INDEX idx_users_email ON users(email);
@@ -111,7 +152,8 @@ CREATE INDEX idx_users_lower_email ON users(LOWER(email));
 CREATE INDEX idx_orders_covering ON orders(user_id, status) INCLUDE (total, created_at);
 ```
 
-### Composite Indexes
+#### Composite Indexes
+
 ```sql
 -- Good: Order columns by selectivity
 -- Most selective column first
@@ -134,7 +176,8 @@ CREATE INDEX idx_users_all ON users(name, email, status, created_at, updated_at)
 -- Only the first few columns are used effectively
 ```
 
-### Partial Indexes
+#### Partial Indexes
+
 ```sql
 -- Index only active users
 CREATE INDEX idx_active_users_email ON users(email) WHERE active = true;
@@ -152,7 +195,8 @@ CREATE INDEX idx_high_value_orders ON orders(user_id) WHERE total > 1000;
 -- - Better for filtered queries
 ```
 
-### Index Maintenance
+#### Index Maintenance
+
 ```sql
 -- Rebuild index (PostgreSQL)
 REINDEX INDEX idx_users_email;
@@ -192,9 +236,10 @@ WHERE idx_scan = 0
 AND indexname NOT LIKE '%_pkey';
 ```
 
-## 3. Connection Pooling
+### Connection Pooling
 
-### Connection Pool Configuration
+#### Connection Pool Configuration
+
 ```typescript
 // Prisma connection pool
 datasource db {
@@ -219,21 +264,8 @@ const pool = new Pool({
 });
 ```
 
-```python
-# SQLAlchemy connection pool
-from sqlalchemy import create_engine
+#### Connection Pool Best Practices
 
-engine = create_engine(
-    'postgresql://user:password@localhost/mydb',
-    pool_size=10,          # Number of connections to maintain
-    max_overflow=20,        # Additional connections beyond pool_size
-    pool_timeout=30,        # Seconds to wait before giving up
-    pool_recycle=3600,      # Recycle connections after 1 hour
-    pool_pre_ping=True,     # Test connections before using
-)
-```
-
-### Connection Pool Best Practices
 ```typescript
 // Good: Use connection pool
 const pool = new Pool({
@@ -258,14 +290,15 @@ async function getUser(id: string) {
 }
 ```
 
-## 4. N+1 Query Problem
+### N+1 Query Problem
 
-### Identifying N+1 Problem
+#### Identifying N+1 Problem
+
 ```typescript
 // Bad: N+1 query problem
 async function getUsersWithOrders() {
   const users = await db.user.findMany(); // 1 query
-  
+
   const usersWithOrders = [];
   for (const user of users) {
     const orders = await db.order.findMany({ // N queries
@@ -273,25 +306,26 @@ async function getUsersWithOrders() {
     });
     usersWithOrders.push({ ...user, orders });
   }
-  
+
   return usersWithOrders;
 }
 
 // Total queries: 1 + N (where N is number of users)
 ```
 
-### Solving N+1 with Joins
+#### Solving N+1 with Joins
+
 ```typescript
 // Good: Use JOIN
 async function getUsersWithOrders() {
   const result = await db.$queryRaw`
-    SELECT 
+    SELECT
       u.id, u.name, u.email,
       o.id as order_id, o.total, o.status
     FROM users u
     LEFT JOIN orders o ON u.id = o.user_id
   `;
-  
+
   // Transform result to nested structure
   const usersMap = new Map();
   for (const row of result) {
@@ -311,14 +345,15 @@ async function getUsersWithOrders() {
       });
     }
   }
-  
+
   return Array.from(usersMap.values());
 }
 
 // Total queries: 1
 ```
 
-### Solving N+1 with Include
+#### Solving N+1 with Include
+
 ```typescript
 // Good: Prisma include
 async function getUsersWithOrders() {
@@ -335,17 +370,18 @@ async function getUsersWithOrders() {
 }
 ```
 
-### Solving N+1 with Batch Loading
+#### Solving N+1 with Batch Loading
+
 ```typescript
 // Good: Batch loading
 async function getUsersWithOrders() {
   const users = await db.user.findMany();
   const userIds = users.map(u => u.id);
-  
+
   const orders = await db.order.findMany({
     where: { userId: { in: userIds } }
   });
-  
+
   const ordersMap = new Map();
   orders.forEach(order => {
     if (!ordersMap.has(order.userId)) {
@@ -353,7 +389,7 @@ async function getUsersWithOrders() {
     }
     ordersMap.get(order.userId).push(order);
   });
-  
+
   return users.map(user => ({
     ...user,
     orders: ordersMap.get(user.id) || []
@@ -363,35 +399,37 @@ async function getUsersWithOrders() {
 // Total queries: 2
 ```
 
-## 5. Caching Strategies
+### Caching Strategies
 
-### Query Result Caching
+#### Query Result Caching
+
 ```typescript
 // Cache query results with Redis
 import { redisClient } from './redis';
 
 async function getCachedUser(userId: string) {
   const cacheKey = `user:${userId}`;
-  
+
   // Try cache first
   const cached = await redisClient.get(cacheKey);
   if (cached) {
     return JSON.parse(cached);
   }
-  
+
   // Cache miss - query database
   const user = await db.user.findUnique({ where: { id: userId } });
-  
+
   // Store in cache with 1 hour TTL
   await redisClient.set(cacheKey, JSON.stringify(user), {
     EX: 3600
   });
-  
+
   return user;
 }
 ```
 
-### Cache Invalidation
+#### Cache Invalidation
+
 ```typescript
 // Invalidate cache on update
 async function updateUser(userId: string, data: any) {
@@ -399,10 +437,10 @@ async function updateUser(userId: string, data: any) {
     where: { id: userId },
     data
   });
-  
+
   // Invalidate cache
   await redisClient.del(`user:${userId}`);
-  
+
   return user;
 }
 
@@ -414,7 +452,8 @@ async function invalidateUserCaches(userId: string) {
 }
 ```
 
-### Cache-Aside Pattern
+#### Cache-Aside Pattern
+
 ```typescript
 // Cache-aside implementation
 class CacheAside {
@@ -424,37 +463,38 @@ class CacheAside {
     if (cached) {
       return JSON.parse(cached);
     }
-    
+
     // 2. Cache miss - load from database
     const data = await this.loadFromDatabase(key);
-    
+
     // 3. Populate cache
     await redisClient.set(key, JSON.stringify(data), { EX: 3600 });
-    
+
     return data;
   }
-  
+
   async set(key: string, data: any) {
     // Update database
     await this.saveToDatabase(key, data);
-    
+
     // Update cache
     await redisClient.set(key, JSON.stringify(data), { EX: 3600 });
   }
-  
+
   async delete(key: string) {
     // Delete from database
     await this.deleteFromDatabase(key);
-    
+
     // Invalidate cache
     await redisClient.del(key);
   }
 }
 ```
 
-## 6. Denormalization When Needed
+### Denormalization When Needed
 
-### When to Denormalize
+#### When to Denormalize
+
 ```sql
 -- Good: Denormalize for read-heavy workloads
 -- Add redundant data to avoid joins
@@ -502,7 +542,8 @@ GROUP BY u.id, u.name, u.email;
 REFRESH MATERIALIZED VIEW user_order_summary;
 ```
 
-### Trade-offs
+#### Trade-offs
+
 ```sql
 -- Benefits of denormalization:
 -- - Faster read queries (no joins)
@@ -516,9 +557,10 @@ REFRESH MATERIALIZED VIEW user_order_summary;
 -- - Complex data synchronization
 ```
 
-## 7. Partitioning
+### Partitioning
 
-### Table Partitioning (PostgreSQL)
+#### Table Partitioning (PostgreSQL)
+
 ```sql
 -- Range partitioning by date
 CREATE TABLE orders (
@@ -582,7 +624,8 @@ CREATE TABLE orders_hash_3 PARTITION OF orders_hash
     FOR VALUES WITH (MODULUS 4, REMAINDER 3);
 ```
 
-### Partition Pruning
+#### Partition Pruning
+
 ```sql
 -- Query benefits from partition pruning
 -- Only relevant partitions are scanned
@@ -600,9 +643,65 @@ WHERE total > 1000;
 -- Scans all partitions
 ```
 
-## 8. Monitoring Queries
+### Database Maintenance
+
+#### Vacuum and Analyze
+
+```sql
+-- Vacuum (PostgreSQL)
+-- Reclaims storage and updates statistics
+VACUUM users;
+
+-- Vacuum with analyze
+VACUUM ANALYZE users;
+
+-- Vacuum all tables
+VACUUM ANALYZE;
+
+-- Vacuum specific table with full option
+VACUUM FULL users;  -- Reclaims more space but locks table
+
+-- Auto-vacuum configuration (PostgreSQL)
+ALTER SYSTEM SET autovacuum = on;
+ALTER SYSTEM SET autovacuum_vacuum_threshold = 50;
+ALTER SYSTEM SET autovacuum_analyze_threshold = 50;
+SELECT pg_reload_conf();
+```
+
+#### Reindexing
+
+```sql
+-- Reindex single index (PostgreSQL)
+REINDEX INDEX idx_users_email;
+
+-- Reindex all indexes on table (PostgreSQL)
+REINDEX TABLE users;
+
+-- Reindex concurrently (PostgreSQL)
+-- Doesn't lock table but takes longer
+REINDEX INDEX CONCURRENTLY idx_users_email;
+```
+
+#### Table Optimization
+
+```sql
+-- Optimize table (MySQL)
+OPTIMIZE TABLE users;
+
+-- Optimize table (SQLite)
+VACUUM;
+
+-- Analyze table (MySQL)
+ANALYZE TABLE users;
+
+-- Check table integrity (MySQL)
+CHECK TABLE users;
+```
+
+## Monitoring Queries
 
 ### Slow Query Logging
+
 ```sql
 -- Enable slow query logging (PostgreSQL)
 ALTER SYSTEM SET log_min_duration_statement = 1000; -- Log queries > 1 second
@@ -626,6 +725,7 @@ SET GLOBAL slow_query_log_file = '/var/log/mysql/slow-query.log';
 ```
 
 ### Query Performance Monitoring
+
 ```sql
 -- Find most time-consuming queries (PostgreSQL)
 SELECT
@@ -653,6 +753,7 @@ SHOW PROFILE FOR QUERY 1;
 ```
 
 ### Database Metrics
+
 ```sql
 -- Connection usage (PostgreSQL)
 SELECT
@@ -680,61 +781,10 @@ ORDER BY pg_relation_size(indexrelid) DESC
 LIMIT 20;
 ```
 
-## 9. Database Maintenance
-
-### Vacuum and Analyze
-```sql
--- Vacuum (PostgreSQL)
--- Reclaims storage and updates statistics
-VACUUM users;
-
--- Vacuum with analyze
-VACUUM ANALYZE users;
-
--- Vacuum all tables
-VACUUM ANALYZE;
-
--- Vacuum specific table with full option
-VACUUM FULL users;  -- Reclaims more space but locks table
-
--- Auto-vacuum configuration (PostgreSQL)
-ALTER SYSTEM SET autovacuum = on;
-ALTER SYSTEM SET autovacuum_vacuum_threshold = 50;
-ALTER SYSTEM SET autovacuum_analyze_threshold = 50;
-SELECT pg_reload_conf();
-```
-
-### Reindexing
-```sql
--- Reindex single index (PostgreSQL)
-REINDEX INDEX idx_users_email;
-
--- Reindex all indexes on table (PostgreSQL)
-REINDEX TABLE users;
-
--- Reindex concurrently (PostgreSQL)
--- Doesn't lock table but takes longer
-REINDEX INDEX CONCURRENTLY idx_users_email;
-```
-
-### Table Optimization
-```sql
--- Optimize table (MySQL)
-OPTIMIZE TABLE users;
-
--- Optimize table (SQLite)
-VACUUM;
-
--- Analyze table (MySQL)
-ANALYZE TABLE users;
-
--- Check table integrity (MySQL)
-CHECK TABLE users;
-```
-
-## 10. Common Anti-Patterns
+## Common Anti-Patterns
 
 ### SELECT *
+
 ```sql
 -- Bad: SELECT * retrieves all columns
 SELECT * FROM users WHERE id = 1;
@@ -749,6 +799,7 @@ SELECT id, name, email FROM users WHERE id = 1;
 ```
 
 ### Wildcard Prefix Matching
+
 ```sql
 -- Bad: Leading wildcard prevents index usage
 SELECT * FROM users WHERE name LIKE '%Smith%';
@@ -763,6 +814,7 @@ SELECT * FROM users WHERE name LIKE '%Smith%';
 ```
 
 ### OR Conditions
+
 ```sql
 -- Bad: OR conditions can prevent index usage
 SELECT * FROM users WHERE email = 'user@example.com' OR name = 'John';
@@ -777,6 +829,7 @@ SELECT * FROM users WHERE email IN ('user@example.com', 'user2@example.com');
 ```
 
 ### Subqueries
+
 ```sql
 -- Bad: Subquery can be inefficient
 SELECT * FROM users
@@ -798,6 +851,7 @@ WHERE EXISTS (
 ```
 
 ### Functions on Indexed Columns
+
 ```sql
 -- Bad: Function on indexed column prevents index usage
 SELECT * FROM users WHERE LOWER(email) = 'user@example.com';
@@ -811,6 +865,7 @@ SELECT * FROM users WHERE LOWER(email) = 'user@example.com';
 ```
 
 ### Large Transactions
+
 ```typescript
 // Bad: Large transaction holds locks too long
 async function processLargeBatch() {
@@ -835,6 +890,7 @@ async function processInBatches(users: any[]) {
 ```
 
 ### Missing Indexes
+
 ```sql
 -- Bad: No index on frequently queried column
 SELECT * FROM orders WHERE user_id = 123;
@@ -859,6 +915,7 @@ CREATE INDEX idx_orders_user_id ON orders(user_id);
 ```
 
 ### Over-Indexing
+
 ```sql
 -- Bad: Too many indexes slow down writes
 CREATE INDEX idx_users_name ON users(name);
@@ -875,40 +932,41 @@ CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_status_created ON users(status, created_at);
 ```
 
-### Not Using Prepared Statements
-```typescript
-// Bad: String concatenation vulnerable to SQL injection
-async function getUser(email: string) {
-  return await db.$queryRaw(`SELECT * FROM users WHERE email = '${email}'`);
-}
+## Best Practices
 
-// Good: Use parameterized queries
-async function getUser(email: string) {
-  return await db.user.findUnique({ where: { email } });
-}
+1. **Query Optimization**
+   - Use EXPLAIN to analyze query plans
+   - Select only needed columns
+   - Use appropriate join types
+   - Avoid functions on indexed columns
 
-// Good: Use prepared statements
-async function getUser(email: string) {
-  return await db.$queryRaw`SELECT * FROM users WHERE email = ${email}`;
-}
-```
+2. **Indexing Strategy**
+   - Create indexes on frequently queried columns
+   - Use composite indexes for multi-column queries
+   - Consider partial indexes for filtered queries
+   - Monitor and remove unused indexes
 
-### Ignoring Connection Limits
-```typescript
-// Bad: Creating too many connections
-async function processItems(items: any[]) {
-  const promises = items.map(item => 
-    db.item.create({ data: item })  // Each creates a connection
-  );
-  await Promise.all(promises);
-}
+3. **Connection Management**
+   - Use connection pooling
+   - Configure appropriate pool size
+   - Set connection timeouts
+   - Monitor connection usage
 
-// Good: Use connection pool
-const pool = new Pool({ max: 20 });
+4. **Caching**
+   - Cache frequently accessed data
+   - Implement proper cache invalidation
+   - Use appropriate TTL values
+   - Monitor cache hit rates
 
-async function processItems(items: any[]) {
-  for (const item of items) {
-    await pool.query('INSERT INTO items (...) VALUES (...)', [item]);
-  }
-}
-```
+5. **Maintenance**
+   - Regular vacuum and analyze operations
+   - Monitor slow queries
+   - Rebuild indexes periodically
+   - Keep statistics up to date
+
+## Related Skills
+
+- [`04-database/connection-pooling`](04-database/connection-pooling/SKILL.md)
+- [`04-database/cache-invalidation`](04-database/cache-invalidation/SKILL.md)
+- [`47-performance-engineering/caching-strategies`](47-performance-engineering/caching-strategies/SKILL.md)
+- [`14-monitoring-observability/prometheus-metrics`](14-monitoring-observability/prometheus-metrics/SKILL.md)

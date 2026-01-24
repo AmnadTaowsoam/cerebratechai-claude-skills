@@ -1,8 +1,18 @@
+---
+name: In-Game Purchases
+description: Enabling monetization through virtual goods and currencies with virtual economy design, store implementation, payment integration, and purchase validation for gaming applications.
+---
+
 # In-Game Purchases
+
+> **Current Level:** Intermediate  
+> **Domain:** Gaming / Payments
+
+---
 
 ## Overview
 
-In-game purchases enable monetization through virtual goods and currencies. This guide covers virtual economy, store implementation, and payment integration.
+In-game purchases enable monetization through virtual goods and currencies. This guide covers virtual economy, store implementation, and payment integration for building monetization systems that provide value to players while generating revenue.
 
 ## Virtual Economy Design
 
@@ -605,6 +615,134 @@ export class GiftingService {
 8. **Analytics** - Track purchase metrics
 9. **Testing** - Test with sandbox accounts
 10. **Compliance** - Follow platform guidelines
+
+---
+
+## Quick Start
+
+### Virtual Store
+
+```typescript
+interface StoreItem {
+  id: string
+  name: string
+  description: string
+  price: {
+    currency: 'soft' | 'hard' | 'premium'
+    amount: number
+  }
+  category: 'consumable' | 'permanent' | 'subscription'
+}
+
+async function purchaseItem(
+  playerId: string,
+  itemId: string
+): Promise<PurchaseResult> {
+  const item = await getStoreItem(itemId)
+  const player = await getPlayer(playerId)
+  
+  // Check balance
+  if (player.currency[item.price.currency] < item.price.amount) {
+    throw new Error('Insufficient funds')
+  }
+  
+  // Deduct currency
+  await deductCurrency(playerId, item.price.currency, item.price.amount)
+  
+  // Grant item
+  await grantItem(playerId, itemId)
+  
+  return { success: true, item }
+}
+```
+
+### Receipt Validation
+
+```typescript
+// iOS receipt validation
+async function validateIOSReceipt(receiptData: string): Promise<boolean> {
+  const response = await fetch('https://buy.itunes.apple.com/verifyReceipt', {
+    method: 'POST',
+    body: JSON.stringify({
+      'receipt-data': receiptData,
+      'password': process.env.IOS_SHARED_SECRET
+    })
+  })
+  
+  const result = await response.json()
+  return result.status === 0
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Virtual Economy**: Design balanced virtual economy
+- [ ] **Store Implementation**: In-game store
+- [ ] **Payment Integration**: Payment gateway integration
+- [ ] **Receipt Validation**: Validate receipts server-side
+- [ ] **Currency Management**: Manage virtual currencies
+- [ ] **Item Management**: Item granting and tracking
+- [ ] **Analytics**: Track purchase metrics
+- [ ] **Testing**: Test purchase flows
+- [ ] **Documentation**: Document purchase system
+- [ ] **Security**: Prevent cheating
+- [ ] **Compliance**: Meet app store requirements
+- [ ] **Support**: Customer support for purchases
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Trust Client
+
+```typescript
+// ❌ Bad - Client-side validation
+if (player.coins >= item.price) {
+  player.coins -= item.price
+  grantItem(item)  // Client can cheat!
+}
+```
+
+```typescript
+// ✅ Good - Server-side validation
+if (player.coins >= item.price) {
+  await deductCurrency(playerId, 'soft', item.price)
+  await grantItem(playerId, itemId)  // Server is authoritative
+}
+```
+
+### ❌ Don't: No Receipt Validation
+
+```typescript
+// ❌ Bad - No validation
+await processPurchase(purchaseData)
+// Fake purchases possible!
+```
+
+```typescript
+// ✅ Good - Validate receipts
+const isValid = await validateReceipt(purchaseData.receipt)
+if (isValid) {
+  await processPurchase(purchaseData)
+}
+```
+
+---
+
+## Integration Points
+
+- **Payment Gateways** (`30-ecommerce/payment-gateways/`) - Payment processing
+- **Game Analytics** (`38-gaming-features/game-analytics/`) - Purchase analytics
+- **Achievements** (`38-gaming-features/achievements/`) - Purchase rewards
+
+---
+
+## Further Reading
+
+- [In-Game Purchase Best Practices](https://www.apple.com/app-store/review/guidelines/#in-app-purchase)
+- [Virtual Economy Design](https://www.gamedeveloper.com/design/virtual-economy-design)
 
 ## Resources
 

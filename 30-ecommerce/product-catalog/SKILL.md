@@ -1,10 +1,24 @@
+---
+name: Product Catalog Management
+description: Managing product data, variants, categories, pricing rules, and search functionality for e-commerce platforms with proper data modeling, search optimization, and SEO.
+---
+
 # Product Catalog Management
+
+> **Current Level:** Intermediate  
+> **Domain:** E-commerce / Backend
+
+---
 
 ## Overview
 
-Product catalog management handles product data, variants, categories, pricing rules, and search functionality for e-commerce platforms.
+Product catalog management handles product data, variants, categories, pricing rules, and search functionality for e-commerce platforms. Effective catalog systems provide fast search, flexible product variants, proper categorization, and SEO optimization.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Product Data Model](#product-data-model)
 2. [Product Attributes](#product-attributes)
@@ -1906,7 +1920,129 @@ async function applyPricingRules(
 
 ---
 
-## Resources
+---
+
+## Quick Start
+
+### Product Model
+
+```typescript
+interface Product {
+  id: string
+  name: string
+  description: string
+  price: number
+  variants: ProductVariant[]
+  categories: string[]
+  tags: string[]
+  images: string[]
+}
+
+interface ProductVariant {
+  id: string
+  name: string  // e.g., "Size: Large, Color: Red"
+  price: number
+  sku: string
+  stock: number
+  attributes: Record<string, string>  // { size: "L", color: "red" }
+}
+```
+
+### Product Search
+
+```typescript
+async function searchProducts(query: string, filters: Filters) {
+  return await db.products.findMany({
+    where: {
+      AND: [
+        {
+          OR: [
+            { name: { contains: query, mode: 'insensitive' } },
+            { description: { contains: query, mode: 'insensitive' } }
+          ]
+        },
+        { categories: { hasSome: filters.categories } },
+        { price: { gte: filters.minPrice, lte: filters.maxPrice } }
+      ]
+    },
+    orderBy: { relevance: 'desc' }
+  })
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Product Data Model**: Flexible product data model
+- [ ] **Variants**: Support product variants (size, color, etc.)
+- [ ] **Categories**: Hierarchical category structure
+- [ ] **Search**: Fast full-text search
+- [ ] **Filters**: Product filtering and faceting
+- [ ] **Images**: Image management and optimization
+- [ ] **SEO**: SEO-friendly URLs and metadata
+- [ ] **Pricing**: Support pricing rules and discounts
+- [ ] **Bulk Operations**: Bulk import/export
+- [ ] **Performance**: Optimize for large catalogs
+- [ ] **Caching**: Cache product data
+- [ ] **Validation**: Validate product data
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Variants Support
+
+```typescript
+// ❌ Bad - Separate products for variants
+const product1 = { name: 'T-Shirt Red Small', price: 20 }
+const product2 = { name: 'T-Shirt Red Medium', price: 20 }
+// Duplicate data!
+```
+
+```typescript
+// ✅ Good - Variants
+const product = {
+  name: 'T-Shirt',
+  variants: [
+    { size: 'S', color: 'red', price: 20 },
+    { size: 'M', color: 'red', price: 20 }
+  ]
+}
+```
+
+### ❌ Don't: Slow Search
+
+```typescript
+// ❌ Bad - Full table scan
+const products = await db.products.findMany({
+  where: { name: { contains: query } }  // No index!
+})
+```
+
+```typescript
+// ✅ Good - Indexed search
+// Create index
+CREATE INDEX idx_products_name ON products USING gin(to_tsvector('english', name))
+
+// Search with full-text
+const products = await db.$queryRaw`
+  SELECT * FROM products
+  WHERE to_tsvector('english', name) @@ plainto_tsquery(${query})
+`
+```
+
+---
+
+## Integration Points
+
+- **Shopping Cart** (`30-ecommerce/shopping-cart/`) - Add to cart
+- **Inventory Management** (`30-ecommerce/inventory-management/`) - Stock tracking
+- **Search** (`20-ai-integration/ai-search/`) - Advanced search
+
+---
+
+## Further Reading
 
 - [Shopify Product API](https://shopify.dev/api/admin-graphql/latest/objects/Product)
 - [WooCommerce Products](https://woocommerce.github.io/woocommerce-rest-api-docs/#products)

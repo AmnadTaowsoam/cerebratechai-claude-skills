@@ -3,11 +3,11 @@ REM ========================================
 REM Sync Skills to Production (GitHub)
 REM ========================================
 REM This script pushes changes from local development
-REM (D:\Cerebra\cerebratechai-claude-skills)
+REM (D:\Cerebra\cerebraSkills)
 REM to GitHub repository
 REM ========================================
 
-set DEV_DIR=D:\Cerebra\cerebratechai-claude-skills
+set DEV_DIR=D:\Cerebra\cerebraSkills
 
 echo.
 echo ========================================

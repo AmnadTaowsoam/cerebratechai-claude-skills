@@ -1,10 +1,24 @@
+---
+name: Discount and Promotion Engine
+description: Managing coupon codes, promotional rules, discount calculations, validation, stacking rules, usage limits, and analytics for e-commerce platforms with flexible promotion system.
+---
+
 # Discount and Promotion Engine
+
+> **Current Level:** Intermediate  
+> **Domain:** E-commerce / Backend
+
+---
 
 ## Overview
 
-Discount and promotion engine manages coupon codes, promotional rules, discount calculations, validation, and analytics for e-commerce platforms.
+Discount and promotion engine manages coupon codes, promotional rules, discount calculations, validation, and analytics for e-commerce platforms. Effective promotion systems support multiple discount types, stacking rules, eligibility checks, and usage limits.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Discount Types](#discount-types)
 2. [Coupon Codes](#coupon-codes)
@@ -1837,6 +1851,147 @@ async function monitorDiscountPerformance(discountId: string): Promise<void> {
 ```
 
 ---
+
+---
+
+## Quick Start
+
+### Discount Calculation
+
+```typescript
+interface Discount {
+  id: string
+  type: 'percentage' | 'fixed' | 'free_shipping'
+  value: number
+  minPurchase?: number
+  maxDiscount?: number
+  applicableTo: 'all' | 'category' | 'product'
+}
+
+function calculateDiscount(
+  cart: Cart,
+  discount: Discount
+): number {
+  let discountAmount = 0
+  
+  if (discount.type === 'percentage') {
+    const subtotal = cart.subtotal
+    discountAmount = (subtotal * discount.value) / 100
+    
+    if (discount.maxDiscount) {
+      discountAmount = Math.min(discountAmount, discount.maxDiscount)
+    }
+  } else if (discount.type === 'fixed') {
+    discountAmount = discount.value
+  } else if (discount.type === 'free_shipping') {
+    discountAmount = cart.shippingCost
+  }
+  
+  return discountAmount
+}
+```
+
+### Coupon Validation
+
+```typescript
+async function validateCoupon(
+  code: string,
+  userId: string,
+  cart: Cart
+): Promise<{ valid: boolean; discount?: Discount; error?: string }> {
+  const coupon = await db.coupons.findUnique({
+    where: { code }
+  })
+  
+  if (!coupon || !coupon.active) {
+    return { valid: false, error: 'Invalid coupon' }
+  }
+  
+  if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
+    return { valid: false, error: 'Coupon limit reached' }
+  }
+  
+  if (coupon.userLimit) {
+    const userUsage = await getUserCouponUsage(userId, coupon.id)
+    if (userUsage >= coupon.userLimit) {
+      return { valid: false, error: 'You have used this coupon already' }
+    }
+  }
+  
+  if (coupon.minPurchase && cart.subtotal < coupon.minPurchase) {
+    return { valid: false, error: `Minimum purchase of ${coupon.minPurchase} required` }
+  }
+  
+  return { valid: true, discount: coupon }
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Discount Types**: Support multiple discount types
+- [ ] **Coupon Codes**: Coupon code generation and validation
+- [ ] **Promotion Rules**: Flexible promotion rules
+- [ ] **Stacking Rules**: Define stacking rules
+- [ ] **Eligibility**: User and product eligibility
+- [ ] **Usage Limits**: Usage limits per user/coupon
+- [ ] **Date Restrictions**: Start/end dates
+- [ ] **Calculation**: Accurate discount calculation
+- [ ] **Validation**: Validate discounts before application
+- [ ] **Analytics**: Track promotion performance
+- [ ] **Testing**: A/B test promotions
+- [ ] **Documentation**: Document promotion rules
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Validation
+
+```typescript
+// ❌ Bad - No validation
+const discount = calculateDiscount(cart, coupon)
+cart.total -= discount  // Could be negative!
+```
+
+```typescript
+// ✅ Good - Validate first
+const validation = await validateCoupon(coupon.code, userId, cart)
+if (validation.valid) {
+  const discount = calculateDiscount(cart, validation.discount)
+  cart.total = Math.max(0, cart.total - discount)
+}
+```
+
+### ❌ Don't: Unlimited Stacking
+
+```typescript
+// ❌ Bad - Stack all discounts
+const totalDiscount = discounts.reduce((sum, d) => sum + d.value, 0)
+// Could be > 100%!
+```
+
+```typescript
+// ✅ Good - Stacking rules
+const totalDiscount = applyStackingRules(discounts, cart)
+// Max 50% total discount
+```
+
+---
+
+## Integration Points
+
+- **Shopping Cart** (`30-ecommerce/shopping-cart/`) - Apply discounts
+- **Order Management** (`30-ecommerce/order-management/`) - Order processing
+- **Analytics** (`23-business-analytics/`) - Promotion analytics
+
+---
+
+## Further Reading
+
+- [E-commerce Discount Strategies](https://www.shopify.com/blog/discount-strategies)
+- [Promotion Engine Design](https://www.optimizely.com/optimization-glossary/promotion-engine/)
 
 ## Resources
 

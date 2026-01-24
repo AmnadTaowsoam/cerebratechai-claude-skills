@@ -1,13 +1,53 @@
+---
+name: Label Studio Setup
+description: Comprehensive guide for Label Studio setup and usage on local server for data labeling and annotation.
+---
+
 # Label Studio Setup
 
 ## Overview
-Comprehensive guide for Label Studio setup and usage on local server for data labeling and annotation.
 
----
+Label Studio is an open-source data labeling platform that provides tools for image, text, audio, and video annotation. This skill covers Label Studio installation, project setup, data import/export, labeling interface customization, user management, quality control, ML backend integration, API usage, backup and migration, and production deployment.
 
-## 1. Installation
+## Prerequisites
 
-### 1.1 Docker Setup
+- Understanding of Docker and containerization
+- Knowledge of Python programming
+- Familiarity with data annotation concepts
+- Basic understanding of PostgreSQL and Redis
+- Knowledge of web server configuration (Nginx)
+
+## Key Concepts
+
+### Label Studio Components
+
+- **Web Application**: Django-based UI for labeling
+- **Database**: PostgreSQL for data storage
+- **Cache**: Redis for session management
+- **ML Backend**: Optional ML model integration for pre-annotation
+- **Storage**: File storage for media assets
+
+### Annotation Types
+
+- **Image Classification**: Single label per image
+- **Object Detection**: Bounding box annotations
+- **Semantic Segmentation**: Pixel-level annotations
+- **Named Entity Recognition (NER)**: Text entity extraction
+- **Video Annotation**: Frame-by-frame labeling
+- **Audio Classification**: Labeling audio clips
+
+### Quality Control
+
+- **Review Workflow**: Multi-stage review process
+- **Consensus**: Multiple annotators per task
+- **Active Learning**: Uncertainty-based sampling
+- **Inter-annotator Agreement**: Quality metrics
+
+## Implementation Guide
+
+### Installation
+
+#### Docker Setup
 
 ```bash
 # Pull Label Studio image
@@ -23,7 +63,7 @@ docker run -it \
   heartexlabs/label-studio:latest
 ```
 
-### 1.2 Docker Compose Setup
+#### Docker Compose Setup
 
 ```yaml
 # docker-compose.yml
@@ -80,7 +120,7 @@ docker-compose down
 docker-compose logs -f app
 ```
 
-### 1.3 Local Installation
+#### Local Installation
 
 ```bash
 # Install via pip
@@ -105,7 +145,7 @@ label-studio start --data-dir ./mydata
 label-studio start --host 0.0.0.0
 ```
 
-### 1.4 Configuration
+#### Configuration
 
 ```python
 # label_studio_config.py
@@ -134,21 +174,19 @@ ALLOWED_HOSTS = ['*']
 # Email settings (for notifications)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 # ML backend settings
 ML_BACKEND_HOST = os.getenv('ML_BACKEND_HOST', 'http://localhost:9090')
-ML_BACKEND_TIMEOUT = int(os.getenv('ML_BACKEND_TIMEOUT', 100))
+ML_BACKEND_TIMEOUT = int(os.getenv('ML_BACKEND_TIMEOUT', '100'))
 ```
 
----
+### Project Setup
 
-## 2. Project Setup
-
-### 2.1 Image Classification
+#### Image Classification
 
 ```xml
 <!-- Image Classification Config -->
@@ -193,7 +231,7 @@ project = client.create_project(
 )
 ```
 
-### 2.2 Object Detection
+#### Object Detection
 
 ```xml
 <!-- Object Detection Config -->
@@ -229,7 +267,7 @@ project = client.create_project(
 )
 ```
 
-### 2.3 Segmentation
+#### Segmentation
 
 ```xml
 <!-- Segmentation Config -->
@@ -246,7 +284,7 @@ project = client.create_project(
 <Header value="Semantic Segmentation"/>
 ```
 
-### 2.4 Named Entity Recognition (NER)
+#### Named Entity Recognition (NER)
 
 ```xml
 <!-- NER Config -->
@@ -282,7 +320,7 @@ project = client.create_project(
 )
 ```
 
-### 2.5 Custom Templates
+#### Custom Templates
 
 ```xml
 <!-- Multi-Task Config (Classification + Bounding Box) -->
@@ -342,11 +380,9 @@ project = client.create_project(
 <Header value="Audio Classification"/>
 ```
 
----
+### Data Import/Export
 
-## 3. Data Import/Export
-
-### 3.1 Import Data
+#### Import Data
 
 ```python
 # Import images
@@ -402,7 +438,7 @@ tasks_with_predictions = [
 project.import_tasks(tasks_with_predictions)
 ```
 
-### 3.2 Export Data
+#### Export Data
 
 ```python
 # Export as JSON
@@ -442,11 +478,9 @@ with open('export.json', 'w') as f:
     json.dump(export, f)
 ```
 
----
+### Labeling Interface Customization
 
-## 4. Labeling Interface Customization
-
-### 4.1 Custom CSS
+#### Custom CSS
 
 ```xml
 <View style="background-color: #f0f0f0;">
@@ -459,7 +493,7 @@ with open('export.json', 'w') as f:
 </View>
 ```
 
-### 4.2 Hotkeys
+#### Hotkeys
 
 ```xml
 <View>
@@ -474,7 +508,7 @@ with open('export.json', 'w') as f:
 </View>
 ```
 
-### 4.3 Conditional Logic
+#### Conditional Logic
 
 ```xml
 <View>
@@ -493,9 +527,7 @@ with open('export.json', 'w') as f:
 </View>
 ```
 
----
-
-## 5. User Management
+### User Management
 
 ```python
 # Create user
@@ -528,11 +560,9 @@ project.add_member(user_id=1, role='Annotator')
 project.delete_member(user_id=1)
 ```
 
----
+### Quality Control
 
-## 6. Quality Control
-
-### 6.1 Review Workflow
+#### Review Workflow
 
 ```python
 # Enable review workflow
@@ -561,7 +591,7 @@ review_task.update_annotations(
 )
 ```
 
-### 6.2 Consensus
+#### Consensus
 
 ```python
 # Enable consensus
@@ -576,11 +606,9 @@ consensus_results = project.get_predictions(
 )
 ```
 
----
+### ML Backend Integration
 
-## 7. ML Backend Integration
-
-### 7.1 Pre-annotation Setup
+#### Pre-annotation Setup
 
 ```python
 # ML backend server (Flask example)
@@ -629,7 +657,7 @@ project.connect_ml_backend(
 )
 ```
 
-### 7.2 Active Learning
+#### Active Learning
 
 ```python
 # Active learning with uncertainty sampling
@@ -662,11 +690,9 @@ def predict():
     return jsonify(predictions)
 ```
 
----
+### API Usage
 
-## 8. API Usage
-
-### 8.1 Project Management
+#### Project Management
 
 ```python
 from label_studio_sdk import Client
@@ -700,7 +726,7 @@ project.update(
 client.delete_project(project_id=1)
 ```
 
-### 8.2 Task Management
+#### Task Management
 
 ```python
 # Create tasks
@@ -733,7 +759,7 @@ tasks = project.get_tasks(
 )
 ```
 
-### 8.3 Annotation Management
+#### Annotation Management
 
 ```python
 # Get annotations for task
@@ -764,11 +790,9 @@ annotation.update(
 annotation.delete()
 ```
 
----
+### Backup and Migration
 
-## 9. Backup and Migration
-
-### 9.1 Backup
+#### Backup
 
 ```bash
 # Backup database
@@ -798,7 +822,7 @@ for project in projects:
         json.dump(export, f)
 ```
 
-### 9.2 Migration
+#### Migration
 
 ```python
 # Migrate to new instance
@@ -825,11 +849,9 @@ for old_project in old_projects:
     new_project.import_tasks(task_data)
 ```
 
----
+### Production Deployment
 
-## 10. Production Deployment
-
-### 10.1 Nginx Reverse Proxy
+#### Nginx Reverse Proxy
 
 ```nginx
 # /etc/nginx/sites-available/label-studio
@@ -853,7 +875,7 @@ server {
 }
 ```
 
-### 10.2 SSL Configuration
+#### SSL Configuration
 
 ```nginx
 server {
@@ -872,16 +894,16 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
-}
 
-server {
-    listen 80;
-    server_name label-studio.example.com;
-    return 301 https://$server_name$request_uri;
+    server {
+        listen 80;
+        server_name label-studio.example.com;
+        return 301 https://$server_name$request_uri;
+    }
 }
 ```
 
-### 10.3 Systemd Service
+#### Systemd Service
 
 ```ini
 # /etc/systemd/system/label-studio.service
@@ -908,85 +930,72 @@ sudo systemctl start label-studio
 sudo systemctl status label-studio
 ```
 
----
+## Best Practices
 
-## 11. Best Practices
+1. **Project Organization**
+   - Use consistent naming conventions
+   - Create descriptive project titles
+   - Organize projects by task type
+   - Use proper labeling guidelines
 
-### 11.1 Project Organization
+2. **Quality Assurance**
+   - Enable review workflow for critical tasks
+   - Use consensus for high-stakes annotations
+   - Implement quality metrics
+   - Provide clear annotation guidelines
 
-```python
-# Use consistent naming
-project_naming = {
-    'prefix': 'team_name',
-    'date': '2024-01-14',
-    'task_type': 'classification',
-    'data_type': 'images'
-}
+3. **Performance Optimization**
+   - Use pagination for large datasets
+   - Implement async operations for imports
+   - Optimize image loading and serving
+   - Use CDN for media assets
 
-project_title = f"{project_naming['prefix']}_{project_naming['task_type']}_{project_naming['data_type']}_{project_naming['date']}"
+4. **Security**
+   - Use strong passwords and API keys
+   - Enable SSL/TLS for production
+   - Implement proper authentication
+   - Regularly update dependencies
 
-# Use descriptive labels
-label_config = '''
-<View>
-  <Header value="Instructions: Select all objects visible in the image"/>
-  <Image name="image" value="$image"/>
-  <RectangleLabels name="label" toName="image">
-    <Label value="Person" background="#FF0000"/>
-    <Label value="Vehicle" background="#00FF00"/>
-  </RectangleLabels>
-</View>
-'''
-```
+5. **Backup Strategy**
+   - Regular database backups
+   - Export project data periodically
+   - Test restore procedures
+   - Store backups securely
 
-### 11.2 Quality Assurance
+6. **User Management**
+   - Create appropriate user roles
+   - Assign users to relevant projects
+   - Monitor user activity
+   - Remove inactive users
 
-```python
-# Set up review workflow
-project.update_settings({
-    'review_mode': True,
-    'review_percentage': 0.2,  # Review 20% of tasks
-    'show_collab_predictions': True
-})
+7. **ML Integration**
+   - Use pre-annotation to speed up labeling
+   - Implement active learning for efficiency
+   - Monitor model performance
+   - Update models regularly
 
-# Use consensus for critical tasks
-project.update_settings({
-    'consensus_type': 'majority_vote',
-    'consensus_number_of_annotators': 3,
-    'min_completeness_to_view_consensus': 0.5
-})
-```
+8. **Documentation**
+   - Document labeling guidelines
+   - Create annotation examples
+   - Maintain project documentation
+   - Share knowledge with team
 
-### 11.3 Performance Optimization
+9. **Monitoring**
+   - Track annotation progress
+   - Monitor system performance
+   - Set up alerts for issues
+   - Review quality metrics
 
-```python
-# Use pagination for large datasets
-tasks = []
-page = 1
-while True:
-    page_tasks = project.get_tasks(page=page, page_size=100)
-    if not page_tasks:
-        break
-    tasks.extend(page_tasks)
-    page += 1
+10. **Scalability**
+    - Use appropriate hardware
+    - Implement load balancing
+    - Optimize database queries
+    - Plan for growth
 
-# Use async operations for large imports
-from concurrent.futures import ThreadPoolExecutor
+## Related Skills
 
-def import_batch(batch):
-    return project.import_tasks(batch)
-
-tasks = [{'data': {'image': f'image{i}.jpg'}} for i in range(10000)]
-batches = [tasks[i:i+100] for i in range(0, len(tasks), 100)]
-
-with ThreadPoolExecutor(max_workers=4) as executor:
-    executor.map(import_batch, batches)
-```
-
----
-
-## Additional Resources
-
-- [Label Studio Documentation](https://labelstud.io/guide/)
-- [Label Studio SDK](https://labelstud.io/guide/sdk.html)
-- [Label Studio Templates](https://labelstud.io/tags/)
-- [Label Studio ML Backend](https://labelstud.io/guide/ml.html)
+- [`05-ai-ml-core/data-augmentation`](05-ai-ml-core/data-augmentation/SKILL.md)
+- [`05-ai-ml-core/data-preprocessing`](05-ai-ml-core/data-preprocessing/SKILL.md)
+- [`05-ai-ml-core/model-training`](05-ai-ml-core/model-training/SKILL.md)
+- [`07-document-processing/document-parsing`](07-document-processing/document-parsing/SKILL.md)
+- [`06-ai-ml-production/llm-integration`](06-ai-ml-production/llm-integration/SKILL.md)

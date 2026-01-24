@@ -1,12 +1,28 @@
+---
+name: Leaderboards
+description: Ranking players based on scores or achievements using global, friends, and time-based leaderboards with Redis for high-performance ranking systems.
+---
+
 # Leaderboards
+
+> **Current Level:** Intermediate  
+> **Domain:** Gaming / Backend
+
+---
 
 ## Overview
 
-Leaderboards rank players based on scores or achievements. This guide covers global, friends, and time-based leaderboards with Redis for performance.
+Leaderboards rank players based on scores or achievements. This guide covers global, friends, and time-based leaderboards with Redis for performance, providing competitive ranking systems that motivate players and drive engagement.
 
-## Leaderboard Types
+---
 
-### Global Leaderboard
+---
+
+## Core Concepts
+
+### Leaderboard Types
+
+#### Global Leaderboard
 - All players worldwide
 - Highest scores overall
 - Most competitive
@@ -576,16 +592,161 @@ export class AntiCheatService {
 }
 ```
 
-## Best Practices
+---
 
-1. **Redis** - Use Redis for fast rankings
-2. **Caching** - Cache leaderboard data
-3. **Pagination** - Always paginate results
-4. **Real-time** - Use WebSocket for live updates
-5. **Validation** - Validate all scores
-6. **Anti-cheat** - Implement cheat detection
-7. **Time-based** - Support periodic resets
-8. **Friends** - Provide social leaderboards
+## Quick Start
+
+### Redis Leaderboard
+
+```javascript
+const redis = require('redis')
+const client = redis.createClient()
+
+// Add score
+await client.zAdd('leaderboard', {
+  score: 1000,
+  value: 'player-123'
+})
+
+// Get top 10
+const topPlayers = await client.zRange('leaderboard', 0, 9, {
+  REV: true,  // Descending
+  WITHSCORES: true
+})
+
+// Get player rank
+const rank = await client.zRevRank('leaderboard', 'player-123')
+```
+
+### Leaderboard API
+
+```javascript
+app.get('/leaderboard', async (req, res) => {
+  const { type = 'global', limit = 10, offset = 0 } = req.query
+  
+  const key = `leaderboard:${type}`
+  const players = await client.zRange(key, offset, offset + limit - 1, {
+    REV: true,
+    WITHSCORES: true
+  })
+  
+  res.json(players.map((player, index) => ({
+    rank: offset + index + 1,
+    playerId: player.value,
+    score: player.score
+  })))
+})
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Redis Setup**: Redis configured for leaderboards
+- [ ] **Score Validation**: Validate all submitted scores
+- [ ] **Anti-cheat**: Implement cheat detection
+- [ ] **Pagination**: Always paginate leaderboard results
+- [ ] **Caching**: Cache leaderboard data appropriately
+- [ ] **Real-time Updates**: WebSocket for live updates
+- [ ] **Time-based**: Support daily/weekly/monthly leaderboards
+- [ ] **Friends**: Friends-only leaderboards
+- [ ] **Performance**: Optimize for high read loads
+- [ ] **Monitoring**: Monitor leaderboard performance
+- [ ] **Testing**: Test with high score volumes
+- [ ] **Documentation**: Document leaderboard rules
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Score Validation
+
+```javascript
+// ❌ Bad - Trust user input
+await client.zAdd('leaderboard', {
+  score: userSubmittedScore,  // Could be hacked!
+  value: playerId
+})
+```
+
+```javascript
+// ✅ Good - Validate scores
+function validateScore(score, gameData) {
+  const maxPossibleScore = calculateMaxScore(gameData)
+  if (score > maxPossibleScore) {
+    throw new Error('Impossible score')
+  }
+  return score
+}
+
+const validScore = validateScore(userSubmittedScore, gameData)
+await client.zAdd('leaderboard', {
+  score: validScore,
+  value: playerId
+})
+```
+
+### ❌ Don't: No Pagination
+
+```javascript
+// ❌ Bad - Load all players
+const allPlayers = await client.zRange('leaderboard', 0, -1)  // All!
+```
+
+```javascript
+// ✅ Good - Paginate
+const pageSize = 10
+const offset = (page - 1) * pageSize
+const players = await client.zRange(
+  'leaderboard',
+  offset,
+  offset + pageSize - 1,
+  { REV: true }
+)
+```
+
+### ❌ Don't: No Caching
+
+```javascript
+// ❌ Bad - Query Redis every time
+app.get('/leaderboard', async (req, res) => {
+  const players = await client.zRange('leaderboard', 0, 9)  // Every request!
+  res.json(players)
+})
+```
+
+```javascript
+// ✅ Good - Cache top players
+const cache = new Map()
+
+app.get('/leaderboard', async (req, res) => {
+  if (cache.has('top-10')) {
+    return res.json(cache.get('top-10'))
+  }
+  
+  const players = await client.zRange('leaderboard', 0, 9, { REV: true })
+  cache.set('top-10', players)
+  setTimeout(() => cache.delete('top-10'), 60000)  // 1 min cache
+  
+  res.json(players)
+})
+```
+
+---
+
+## Integration Points
+
+- **Redis Caching** (`04-database/redis-caching/`) - Redis patterns
+- **Real-time Features** (`34-real-time-features/`) - Live updates
+- **Game Analytics** (`38-gaming-features/game-analytics/`) - Score analytics
+
+---
+
+## Further Reading
+
+- [Redis Sorted Sets](https://redis.io/docs/data-types/sorted-sets/)
+- [Leaderboard Patterns](https://redis.io/docs/stack/search/leaderboard/)
+- [Gaming Leaderboards](https://www.gamedeveloper.com/design/leaderboard-design-patterns)
 9. **Analytics** - Track leaderboard engagement
 10. **Performance** - Optimize for scale
 

@@ -1,13 +1,51 @@
+---
+name: Data Augmentation
+description: Comprehensive guide for data augmentation techniques across images, text, audio, and tabular data.
+---
+
 # Data Augmentation
 
 ## Overview
-Comprehensive guide for data augmentation techniques across images, text, audio, and tabular data.
 
----
+Data augmentation is a technique used to artificially increase the size and diversity of training datasets by creating modified versions of existing data. This skill covers augmentation techniques for images, text, audio, and tabular data, including popular libraries like Albumentations, NLPAug, and custom augmentation strategies.
 
-## 1. Image Augmentation
+## Prerequisites
 
-### 1.1 Albumentations
+- Understanding of machine learning concepts
+- Knowledge of Python programming
+- Familiarity with data preprocessing
+- Understanding of overfitting and generalization
+- Basic knowledge of image, text, audio processing
+
+## Key Concepts
+
+### Augmentation Types
+
+- **Image Augmentation**: Geometric transformations, color adjustments, noise injection
+- **Text Augmentation**: Back-translation, synonym replacement, word insertion/deletion
+- **Audio Augmentation**: Time stretching, pitch shifting, noise addition, masking
+- **Tabular Augmentation**: SMOTE, ADASYN, Gaussian noise, feature mixup
+
+### Augmentation Strategies
+
+- **Online Augmentation**: Apply augmentation during training
+- **Offline Augmentation**: Pre-compute augmented samples
+- **Test-Time Augmentation (TTA)**: Apply multiple augmentations at inference time
+- **AutoAugment**: Automatically search for optimal augmentation policies
+
+### Common Libraries
+
+- **Albumentations**: Fast and flexible image augmentation library
+- **Torchvision**: PyTorch's built-in transforms
+- **ImgAug**: Powerful image augmentation library
+- **NLPAug**: Text augmentation library
+- **Imbalanced-learn**: Tabular data augmentation (SMOTE, ADASYN)
+
+## Implementation Guide
+
+### Image Augmentation
+
+#### Albumentations
 
 ```python
 import albumentations as A
@@ -99,7 +137,7 @@ val_augmentor = AlbumentationsAugmentor(mode='val', image_size=(224, 224))
 augmented_image = train_augmentor(original_image)
 ```
 
-### 1.2 Torchvision Transforms
+#### Torchvision Transforms
 
 ```python
 import torchvision.transforms as transforms
@@ -165,7 +203,7 @@ train_transform = TorchvisionAugmentor(mode='train', image_size=224)
 augmented_image = train_transform(pil_image)
 ```
 
-### 1.3 ImgAug
+#### ImgAug
 
 ```python
 import imgaug as ia
@@ -218,11 +256,9 @@ train_augmentor = ImgAugAugmentor(mode='train')
 augmented_image = train_augmentor(numpy_image)
 ```
 
----
+### Text Augmentation
 
-## 2. Text Augmentation
-
-### 2.1 Back-Translation
+#### Back-Translation
 
 ```python
 from deep_translator import GoogleTranslator
@@ -267,7 +303,7 @@ augmentor = BackTranslationAugmentor(languages=['fr', 'de', 'es'])
 augmented_texts = augmentor.augment("This is a sample text for augmentation.")
 ```
 
-### 2.2 Synonym Replacement
+#### Synonym Replacement
 
 ```python
 import nltk
@@ -312,10 +348,10 @@ class SynonymReplacementAugmentor:
 
 # Usage
 augmentor = SynonymReplacementAugmentor(replacement_prob=0.3)
-augmented_text = augmentor.augment("The quick brown fox jumps over the lazy dog")
+augmented_text = augmentor.augment("The quick brown fox jumps over lazy dog")
 ```
 
-### 2.3 NLPAug
+#### NLPAug
 
 ```python
 import nlpaug.augmenter.word as naw
@@ -412,9 +448,7 @@ augmented_texts = augmentor.augment_char_level(
 )
 ```
 
----
-
-## 3. Audio Augmentation
+### Audio Augmentation
 
 ```python
 import numpy as np
@@ -511,9 +545,7 @@ augmentor = AudioAugmentor(sample_rate=16000)
 augmented_audio = augmentor.augment(original_audio)
 ```
 
----
-
-## 4. Tabular Data Augmentation
+### Tabular Data Augmentation
 
 ```python
 import numpy as np
@@ -601,11 +633,9 @@ X_noisy = augmentor.gaussian_noise_augmentation(X_train, noise_level=0.01)
 X_mixup, y_mixup = augmentor.feature_mixup(X_train, y_train, n_samples=100)
 ```
 
----
+### Augmentation Strategies
 
-## 5. Augmentation Strategies
-
-### 5.1 Online vs Offline Augmentation
+#### Online vs Offline Augmentation
 
 ```python
 class OnlineAugmentation:
@@ -681,7 +711,7 @@ offline_augmentor = OfflineAugmentation(augmentor, augmentations_per_sample=2)
 X_augmented, y_augmented = offline_augmentor.augment_dataset(X_train, y_train)
 ```
 
-### 5.2 Probability Settings
+#### Probability Settings
 
 ```python
 class ProbabilisticAugmentor:
@@ -713,9 +743,7 @@ prob_augmentor.add_augmentation(color_jitter, probability=0.4)
 augmented_data = prob_augmentor.augment(original_data)
 ```
 
----
-
-## 6. Custom Augmentations
+### Custom Augmentations
 
 ```python
 import numpy as np
@@ -822,9 +850,7 @@ cutmix_image = CustomAugmentor.cutmix(image1, image2, alpha=1.0)
 mosaic_image = CustomAugmentor.mosaic([img1, img2, img3, img4])
 ```
 
----
-
-## 7. Validation Set Handling
+### Validation Set Handling
 
 ```python
 class ValidationAugmentation:
@@ -864,11 +890,9 @@ predictions = [model.predict(sample) for sample in augmented_samples]
 final_prediction = val_augmentor.average_predictions(predictions)
 ```
 
----
+### Production Considerations
 
-## 8. Production Considerations
-
-### 8.1 Efficient Augmentation
+#### Efficient Augmentation
 
 ```python
 import multiprocessing as mp
@@ -903,7 +927,7 @@ efficient_augmentor = EfficientAugmentor(augmentor, n_workers=4)
 augmented_data = efficient_augmentor.augment_dataset(X_train, batch_size=32)
 ```
 
-### 8.2 Augmentation Caching
+#### Augmentation Caching
 
 ```python
 import hashlib
@@ -953,11 +977,9 @@ cached_augmentor = CachedAugmentor(augmentor)
 augmented_data = cached_augmentor.augment(original_data)
 ```
 
----
+### Common Patterns
 
-## 9. Common Patterns
-
-### 9.1 AutoAugment
+#### AutoAugment
 
 ```python
 import random
@@ -1007,7 +1029,7 @@ autoaugment = AutoAugment()
 augmented_image = autoaugment.apply_policy(original_image)
 ```
 
-### 9.2 RandAugment
+#### RandAugment
 
 ```python
 class RandAugment:
@@ -1056,103 +1078,60 @@ randaugment = RandAugment(n=2, m=10)
 augmented_image = randaugment(original_image)
 ```
 
----
+## Best Practices
 
-## 10. Best Practices
+1. **Start Simple**
+   - Begin with basic augmentations (flip, rotate)
+   - Gradually increase complexity
+   - Monitor impact on model performance
 
-### 10.1 Augmentation Guidelines
+2. **Use Appropriate Augmentations**
+   - Classification: More aggressive augmentations
+   - Detection: Careful with spatial augmentations (need to adjust bounding boxes)
+   - Segmentation: Apply same augmentations to both image and mask
 
-```python
-# 1. Start with simple augmentations
-simple_augmentor = A.Compose([
-    A.HorizontalFlip(p=0.5),
-    A.Rotate(limit=15, p=0.5),
-    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
+3. **Don't Augment Validation/Test Sets**
+   - Only apply normalization, not augmentation
+   - Use test-time augmentation (TTA) for inference
 
-# 2. Gradually increase complexity
-complex_augmentor = A.Compose([
-    A.HorizontalFlip(p=0.5),
-    A.VerticalFlip(p=0.2),
-    A.Rotate(limit=30, p=0.5),
-    A.ShiftScaleRotate(p=0.5),
-    A.OneOf([
-        A.GaussNoise(p=1.0),
-        A.MotionBlur(p=1.0),
-    ], p=0.2),
-    A.ColorJitter(p=0.3),
-    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
+4. **Monitor Performance**
+   - Track training/validation loss with and without augmentation
+   - Use visualization to verify augmentations
+   - Check label preservation after augmentation
 
-# 3. Use appropriate augmentations for task
-# Classification: More aggressive augmentations
-# Detection: Careful with spatial augmentations (need to adjust bounding boxes)
-# Segmentation: Apply same augmentations to both image and mask
+5. **Use Probability-Based Application**
+   - Apply augmentations with appropriate probabilities
+   - Avoid over-augmentation that distorts data
+   - Balance between diversity and data quality
 
-# 4. Monitor impact on model performance
-# Track training/validation loss with and without augmentation
+6. **Handle Class Imbalance**
+   - Use SMOTE or ADASYN for tabular data
+   - Apply more augmentation to minority classes
+   - Consider weighted sampling
 
-# 5. Don't augment validation/test sets
-# Only apply normalization, not augmentation
-val_transform = A.Compose([
-    A.Resize(224, 224),
-    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
-```
+7. **Optimize Performance**
+   - Use multiprocessing for batch augmentation
+   - Cache augmented samples when possible
+   - Use efficient libraries like Albumentations
 
-### 10.2 Debugging Augmentations
+8. **Debug Augmentations**
+   - Visualize augmented samples
+   - Check label preservation
+   - Verify augmentation pipeline correctness
 
-```python
-import matplotlib.pyplot as plt
+9. **Consider Task-Specific Needs**
+   - Medical imaging: Limited augmentations
+   - Satellite imagery: Rotation-invariant augmentations
+   - Text: Preserve semantic meaning
 
-class AugmentationDebugger:
-    """Debug augmentation pipeline."""
+10. **Reproducibility**
+    - Set random seeds for consistent results
+    - Cache augmentations for debugging
+    - Document augmentation pipeline
 
-    def __init__(self, augmentor):
-        self.augmentor = augmentor
+## Related Skills
 
-    def visualize_augmentations(self, image, n_samples=10):
-        """Visualize multiple augmentations."""
-        fig, axes = plt.subplots(2, 5, figsize=(15, 6))
-        axes = axes.flatten()
-
-        # Original image
-        axes[0].imshow(image)
-        axes[0].set_title('Original')
-        axes[0].axis('off')
-
-        # Augmented versions
-        for i in range(1, n_samples):
-            augmented = self.augmentor(image)
-            axes[i].imshow(augmented)
-            axes[i].set_title(f'Augmented {i}')
-            axes[i].axis('off')
-
-        plt.tight_layout()
-        plt.show()
-
-    def check_label_preservation(self, image, label, augmentor, n_samples=100):
-        """Check if augmentation preserves labels."""
-        labels = []
-        for _ in range(n_samples):
-            augmented = augmentor(image)
-            # Get label from augmented image (depends on task)
-            pred_label = get_label(augmented)
-            labels.append(pred_label)
-
-        consistency = sum(1 for l in labels if l == label) / len(labels)
-        print(f"Label consistency: {consistency:.2%}")
-
-# Usage
-debugger = AugmentationDebugger(augmentor)
-debugger.visualize_augmentations(original_image, n_samples=10)
-```
-
----
-
-## Additional Resources
-
-- [Albumentations Documentation](https://albumentations.ai/docs/)
-- [NLPAug Documentation](https://nlpaug.readthedocs.io/)
-- [Librosa Documentation](https://librosa.org/doc/main/index.html)
-- [Torchvision Transforms](https://pytorch.org/vision/stable/transforms.html)
+- [`05-ai-ml-core/data-preprocessing`](05-ai-ml-core/data-preprocessing/SKILL.md)
+- [`05-ai-ml-core/model-training`](05-ai-ml-core/model-training/SKILL.md)
+- [`05-ai-ml-core/model-optimization`](05-ai-ml-core/model-optimization/SKILL.md)
+- [`06-ai-ml-production/llm-integration`](06-ai-ml-production/llm-integration/SKILL.md)

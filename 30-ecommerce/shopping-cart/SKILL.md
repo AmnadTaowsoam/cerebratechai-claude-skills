@@ -1,10 +1,26 @@
+---
+name: Shopping Cart Implementation
+description: Building shopping cart systems that allow users to collect items for purchase, with proper state management, validation, price calculations, and cart persistence.
+---
+
 # Shopping Cart Implementation
+
+> **Current Level:** Intermediate  
+> **Domain:** E-commerce / Frontend
+
+---
 
 ## Overview
 
-A shopping cart is a critical component of any e-commerce system, allowing users to collect items for purchase. This guide covers various cart architectures and implementations.
+A shopping cart is a critical component of any e-commerce system, allowing users to collect items for purchase. This guide covers various cart architectures and implementations, including guest carts, logged-in user carts, cart persistence, and cart abandonment tracking.
 
-## Table of Contents
+---
+
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Cart Architecture](#cart-architecture)
 2. [Cart Operations](#cart-operations)
@@ -1719,7 +1735,157 @@ function validateCartLimits(cart: Cart): {
 
 ---
 
-## Resources
+---
+
+## Quick Start
+
+### Basic Shopping Cart
+
+```typescript
+interface CartItem {
+  productId: string
+  quantity: number
+  price: number
+}
+
+class ShoppingCart {
+  private items: CartItem[] = []
+  
+  addItem(productId: string, quantity: number, price: number) {
+    const existing = this.items.find(item => item.productId === productId)
+    if (existing) {
+      existing.quantity += quantity
+    } else {
+      this.items.push({ productId, quantity, price })
+    }
+  }
+  
+  removeItem(productId: string) {
+    this.items = this.items.filter(item => item.productId !== productId)
+  }
+  
+  getTotal(): number {
+    return this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  }
+  
+  getItemCount(): number {
+    return this.items.reduce((sum, item) => sum + item.quantity, 0)
+  }
+}
+```
+
+### Cart Persistence
+
+```typescript
+// Save cart to localStorage (guest) or database (logged-in)
+function saveCart(cart: ShoppingCart) {
+  if (user.isLoggedIn()) {
+    await api.saveCart(cart.items)
+  } else {
+    localStorage.setItem('cart', JSON.stringify(cart.items))
+  }
+}
+
+// Load cart
+function loadCart(): ShoppingCart {
+  const cart = new ShoppingCart()
+  if (user.isLoggedIn()) {
+    const items = await api.getCart()
+    cart.items = items
+  } else {
+    const items = JSON.parse(localStorage.getItem('cart') || '[]')
+    cart.items = items
+  }
+  return cart
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Cart State**: Manage cart state (localStorage or database)
+- [ ] **Guest Cart**: Support guest cart with localStorage
+- [ ] **Cart Merge**: Merge guest cart with user cart on login
+- [ ] **Validation**: Validate cart items (stock, price, availability)
+- [ ] **Price Calculation**: Accurate price calculations (tax, shipping, discounts)
+- [ ] **Cart Persistence**: Persist cart across sessions
+- [ ] **Cart Abandonment**: Track cart abandonment
+- [ ] **Cart Recovery**: Email reminders for abandoned carts
+- [ ] **Performance**: Optimize cart operations
+- [ ] **Error Handling**: Handle cart errors gracefully
+- [ ] **Testing**: Test cart operations thoroughly
+- [ ] **Security**: Validate cart data server-side
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Client-Side Only Validation
+
+```typescript
+// ❌ Bad - Only client validation
+function addToCart(productId: string, quantity: number) {
+  if (quantity > 0) {  // Client-side only!
+    cart.addItem(productId, quantity)
+  }
+}
+```
+
+```typescript
+// ✅ Good - Server-side validation
+async function addToCart(productId: string, quantity: number) {
+  // Validate on server
+  const validation = await api.validateCartItem(productId, quantity)
+  if (validation.valid) {
+    cart.addItem(productId, quantity)
+  } else {
+    showError(validation.error)
+  }
+}
+```
+
+### ❌ Don't: No Cart Persistence
+
+```typescript
+// ❌ Bad - Cart lost on refresh
+const cart = new ShoppingCart()  // Lost on page reload!
+```
+
+```typescript
+// ✅ Good - Persist cart
+const cart = loadCart()  // Load from storage
+
+// Save on changes
+cart.on('change', () => {
+  saveCart(cart)
+})
+```
+
+### ❌ Don't: Trust Client Prices
+
+```typescript
+// ❌ Bad - Use client price
+cart.addItem(productId, quantity, clientPrice)  // Can be manipulated!
+```
+
+```typescript
+// ✅ Good - Get price from server
+const product = await api.getProduct(productId)
+cart.addItem(productId, quantity, product.price)  // Server price
+```
+
+---
+
+## Integration Points
+
+- **Payment Gateways** (`30-ecommerce/payment-gateways/`) - Checkout integration
+- **Order Management** (`30-ecommerce/order-management/`) - Order creation
+- **Inventory Management** (`30-ecommerce/inventory-management/`) - Stock validation
+
+---
+
+## Further Reading
 
 - [Stripe Checkout](https://stripe.com/docs/payments/checkout)
 - [PayPal Checkout](https://developer.paypal.com/docs/checkout/)

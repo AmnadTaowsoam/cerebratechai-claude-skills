@@ -1382,9 +1382,210 @@ Key takeaways for retry, timeout, and backoff strategies:
 9. **Don't retry 4xx errors** - Client errors won't succeed on retry
 10. **Use appropriate timeout values** - Based on p99 latency + buffer
 
-## Related Skills
+---
 
-- `40-system-resilience/failure-modes` - Understanding what failures to retry
-- `40-system-resilience/chaos-engineering` - Testing retry behavior
-- `40-system-resilience/bulkhead-patterns` - Isolating failures
+## Quick Start
+
+### Basic Retry with Exponential Backoff
+
+```python
+import time
+import random
+from typing import Callable, Any
+
+def retry_with_backoff(
+    func: Callable,
+    max_retries: int = 3,
+    initial_delay: float = 1.0,
+    max_delay: float = 60.0,
+    exponential_base: float = 2.0
+) -> Any:
+    """Retry function with exponential backoff"""
+    delay = initial_delay
+    
+    for attempt in range(max_retries):
+        try:
+            return func()
+        except Exception as e:
+            if attempt == max_retries - 1:
+                raise
+            
+            # Calculate delay with jitter
+            jitter = random.uniform(0, delay * 0.1)
+            sleep_time = min(delay + jitter, max_delay)
+            
+            time.sleep(sleep_time)
+            delay *= exponential_base
+    
+    raise Exception("Max retries exceeded")
+```
+
+### Usage
+
+```python
+# Retry API call
+result = retry_with_backoff(
+    lambda: api_client.get_data(),
+    max_retries=3,
+    initial_delay=1.0
+)
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Retry Strategy**: Choose appropriate retry strategy (exponential, linear, fixed)
+- [ ] **Max Retries**: Set reasonable max retry limits (typically 3-5)
+- [ ] **Backoff**: Implement exponential backoff with jitter
+- [ ] **Timeout**: Set connection and read timeouts
+- [ ] **Idempotency**: Ensure operations are idempotent
+- [ ] **Error Classification**: Only retry retryable errors (5xx, network errors)
+- [ ] **Circuit Breaker**: Implement circuit breaker to prevent retry storms
+- [ ] **Monitoring**: Track retry rates, success rates, latency
+- [ ] **Logging**: Log retry attempts with context
+- [ ] **Deadline**: Set overall deadline for entire operation
+- [ ] **Resource Limits**: Prevent resource exhaustion from too many retries
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Retry Everything
+
+```python
+# ❌ Bad - Retries non-retryable errors
+def retry_all(func):
+    for i in range(5):
+        try:
+            return func()
+        except Exception:  # Catches everything!
+            time.sleep(1)
+    raise
+```
+
+```python
+# ✅ Good - Only retry retryable errors
+RETRYABLE_ERRORS = (ConnectionError, TimeoutError, HTTPException)
+
+def retry_smart(func):
+    for i in range(5):
+        try:
+            return func()
+        except RETRYABLE_ERRORS:
+            if i < 4:
+                time.sleep(2 ** i)
+                continue
+            raise
+        except Exception as e:
+            # Don't retry client errors (4xx)
+            raise
+```
+
+### ❌ Don't: No Backoff (Thundering Herd)
+
+```python
+# ❌ Bad - All retries happen immediately
+def retry_no_backoff(func):
+    for i in range(5):
+        try:
+            return func()
+        except Exception:
+            pass  # No delay!
+    raise
+```
+
+```python
+# ✅ Good - Exponential backoff with jitter
+import random
+
+def retry_with_backoff(func):
+    for i in range(5):
+        try:
+            return func()
+        except Exception:
+            if i < 4:
+                delay = (2 ** i) + random.uniform(0, 1)  # Jitter
+                time.sleep(delay)
+                continue
+            raise
+```
+
+### ❌ Don't: Infinite Retries
+
+```python
+# ❌ Bad - Never gives up
+def retry_forever(func):
+    while True:
+        try:
+            return func()
+        except Exception:
+            time.sleep(1)  # Retries forever!
+```
+
+```python
+# ✅ Good - Bounded retries
+def retry_bounded(func, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            return func()
+        except Exception:
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
+                continue
+            raise
+```
+
+### ❌ Don't: No Timeout
+
+```python
+# ❌ Bad - Waits forever
+response = requests.get(url)  # No timeout!
+```
+
+```python
+# ✅ Good - Set timeouts
+response = requests.get(
+    url,
+    timeout=(5, 30)  # (connect timeout, read timeout)
+)
+```
+
+### ❌ Don't: Retry Non-Idempotent Operations
+
+```python
+# ❌ Bad - Retries can cause duplicates
+def create_order(data):
+    return retry_with_backoff(
+        lambda: api.post('/orders', data)  # Creates order multiple times!
+    )
+```
+
+```python
+# ✅ Good - Make idempotent or don't retry
+def create_order(data, idempotency_key):
+    return retry_with_backoff(
+        lambda: api.post('/orders', data, headers={
+            'Idempotency-Key': idempotency_key  # Prevents duplicates
+        })
+    )
+```
+
+---
+
+## Integration Points
+
+- **Failure Modes** (`40-system-resilience/failure-modes/`) - Understanding what failures to retry
+- **Chaos Engineering** (`40-system-resilience/chaos-engineering/`) - Testing retry behavior
+- **Bulkhead Patterns** (`40-system-resilience/bulkhead-patterns/`) - Isolating failures
+- **Circuit Breaker** (`40-system-resilience/graceful-degradation/`) - Preventing retry storms
+- **Error Handling** (`03-backend-api/error-handling/`) - Error classification
+
+---
+
+## Further Reading
+
+- [Exponential Backoff and Jitter](https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/)
+- [Retry Pattern (Microsoft)](https://docs.microsoft.com/en-us/azure/architecture/patterns/retry)
+- [Circuit Breaker Pattern](https://martinfowler.com/bliki/CircuitBreaker.html)
 - `40-system-resilience/graceful-degradation` - Fallback strategies

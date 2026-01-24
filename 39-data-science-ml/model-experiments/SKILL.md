@@ -1,8 +1,18 @@
+---
+name: ML Experiment Tracking
+description: Managing ML experiments, metrics, parameters, and artifacts using MLflow, Weights & Biases, and best practices for reproducible ML experiments and model versioning.
+---
+
 # ML Experiment Tracking
+
+> **Current Level:** Advanced  
+> **Domain:** Data Science / ML / Experimentation
+
+---
 
 ## Overview
 
-Experiment tracking manages ML experiments, metrics, parameters, and artifacts. This guide covers MLflow, Weights & Biases, and best practices.
+Experiment tracking manages ML experiments, metrics, parameters, and artifacts. This guide covers MLflow, Weights & Biases, and best practices for tracking experiments, comparing models, and ensuring reproducibility in ML development.
 
 ## Experiment Tracking Importance
 
@@ -489,9 +499,104 @@ with mlflow.start_run():
 9. **Automation** - Automate logging
 10. **Storage** - Manage artifact storage
 
-## Resources
+---
+
+## Quick Start
+
+### MLflow Tracking
+
+```python
+import mlflow
+
+mlflow.set_experiment("my-experiment")
+
+with mlflow.start_run():
+    # Log parameters
+    mlflow.log_param("learning_rate", 0.01)
+    mlflow.log_param("epochs", 100)
+    
+    # Train model
+    model = train_model(X_train, y_train)
+    
+    # Log metrics
+    accuracy = evaluate_model(model, X_test, y_test)
+    mlflow.log_metric("accuracy", accuracy)
+    
+    # Log model
+    mlflow.sklearn.log_model(model, "model")
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Experiment Tracking**: Set up experiment tracking
+- [ ] **Parameter Logging**: Log all hyperparameters
+- [ ] **Metric Logging**: Log all metrics
+- [ ] **Artifact Storage**: Store model artifacts
+- [ ] **Reproducibility**: Ensure reproducibility
+- [ ] **Comparison**: Compare experiments
+- [ ] **Cleanup**: Archive old experiments
+- [ ] **Documentation**: Document experiment goals
+- [ ] **Collaboration**: Share experiments
+- [ ] **Automation**: Automate logging
+- [ ] **Storage**: Manage artifact storage
+- [ ] **Versioning**: Model versioning
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Tracking
+
+```python
+# ❌ Bad - No tracking
+model = train_model(X, y)
+# No record of what was done!
+```
+
+```python
+# ✅ Good - Track everything
+with mlflow.start_run():
+    mlflow.log_params(params)
+    model = train_model(X, y)
+    mlflow.log_metrics(metrics)
+    mlflow.log_model(model)
+```
+
+### ❌ Don't: Inconsistent Logging
+
+```python
+# ❌ Bad - Inconsistent
+run1: log_metric("acc", 0.95)
+run2: log_metric("accuracy", 0.96)
+# Different metric names!
+```
+
+```python
+# ✅ Good - Consistent
+run1: log_metric("accuracy", 0.95)
+run2: log_metric("accuracy", 0.96)
+# Same metric names
+```
+
+---
+
+## Integration Points
+
+- **Model Training** (`05-ai-ml-core/model-training/`) - Training process
+- **Feature Engineering** (`39-data-science-ml/feature-engineering/`) - Features
+- **ML Serving** (`39-data-science-ml/ml-serving/`) - Model deployment
+
+---
+
+## Further Reading
 
 - [MLflow](https://mlflow.org/)
+- [Weights & Biases](https://wandb.ai/)
+- [Experiment Tracking Best Practices](https://mlflow.org/docs/latest/tracking.html)
+
+## Resources
 - [Weights & Biases](https://wandb.ai/)
 - [TensorBoard](https://www.tensorflow.org/tensorboard)
 - [Neptune.ai](https://neptune.ai/)

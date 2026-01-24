@@ -1,10 +1,24 @@
+---
+name: Ticketing System
+description: Managing customer support requests, tracking their lifecycle, assigning them to agents, and ensuring timely resolution with SLA tracking, priority management, and automated routing.
+---
+
 # Ticketing System
+
+> **Current Level:** Intermediate  
+> **Domain:** Customer Support / Backend
+
+---
 
 ## Overview
 
-A ticketing system manages customer support requests, tracks their lifecycle, assigns them to agents, and ensures timely resolution.
+A ticketing system manages customer support requests, tracks their lifecycle, assigns them to agents, and ensures timely resolution. Effective ticketing systems include automated routing, SLA tracking, priority management, and integration with email and chat systems.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Ticketing System Architecture](#ticketing-system-architecture)
 2. [Database Schema](#database-schema)
@@ -2050,9 +2064,134 @@ async function logAuditEvent(
 
 ---
 
-## Resources
+---
+
+## Quick Start
+
+### Ticket Creation
+
+```typescript
+interface Ticket {
+  id: string
+  subject: string
+  description: string
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+  status: 'open' | 'in-progress' | 'resolved' | 'closed'
+  customerId: string
+  assignedTo?: string
+  createdAt: Date
+  slaDeadline?: Date
+}
+
+async function createTicket(ticket: Ticket) {
+  const created = await db.tickets.create({
+    data: {
+      ...ticket,
+      slaDeadline: calculateSLADeadline(ticket.priority)
+    }
+  })
+  
+  // Auto-assign if rules match
+  await autoAssignTicket(created.id)
+  
+  return created
+}
+```
+
+### SLA Tracking
+
+```typescript
+function calculateSLADeadline(priority: string): Date {
+  const slaHours = {
+    urgent: 1,
+    high: 4,
+    medium: 24,
+    low: 72
+  }
+  
+  const deadline = new Date()
+  deadline.setHours(deadline.getHours() + slaHours[priority])
+  return deadline
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Ticket Creation**: Multiple channels (email, chat, web)
+- [ ] **Auto-Routing**: Automatic ticket routing
+- [ ] **Assignment Logic**: Smart assignment to agents
+- [ ] **Priority Management**: Priority levels and escalation
+- [ ] **SLA Tracking**: Track SLA compliance
+- [ ] **Email Integration**: Email to ticket conversion
+- [ ] **Automated Responses**: Automated acknowledgment
+- [ ] **Search**: Full-text search for tickets
+- [ ] **Reporting**: Ticket metrics and reports
+- [ ] **Integration**: Integrate with CRM and other tools
+- [ ] **Documentation**: Document ticket processes
+- [ ] **Training**: Train agents on system
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No SLA Tracking
+
+```typescript
+// ❌ Bad - No SLA
+const ticket = await createTicket(data)
+// No deadline tracking!
+```
+
+```typescript
+// ✅ Good - SLA tracking
+const ticket = await createTicket({
+  ...data,
+  slaDeadline: calculateSLADeadline(data.priority)
+})
+
+// Monitor SLA
+setInterval(() => {
+  checkSLABreaches()
+}, 60000)  // Every minute
+```
+
+### ❌ Don't: Manual Assignment Only
+
+```typescript
+// ❌ Bad - Manual assignment
+// Tickets sit unassigned!
+```
+
+```typescript
+// ✅ Good - Auto-assignment
+async function autoAssignTicket(ticketId: string) {
+  const ticket = await getTicket(ticketId)
+  const agent = await findBestAgent(ticket)
+  
+  if (agent) {
+    await assignTicket(ticketId, agent.id)
+  }
+}
+```
+
+---
+
+## Integration Points
+
+- **Live Chat** (`29-customer-support/live-chat/`) - Chat to ticket
+- **Knowledge Base** (`29-customer-support/knowledge-base/`) - Self-service
+- **CRM Integration** (`32-crm-integration/`) - Customer data
+
+---
+
+## Further Reading
 
 - [Zendesk API Documentation](https://developer.zendesk.com/api-reference/)
+- [Ticketing System Best Practices](https://www.zendesk.com/blog/ticketing-system-best-practices/)
+
+## Resources
 - [Freshdesk API Documentation](https://developers.freshdesk.com/api/)
 - [Help Scout API Documentation](https://developer.helpscout.com/)
 - [Prisma Documentation](https://www.prisma.io/docs/)

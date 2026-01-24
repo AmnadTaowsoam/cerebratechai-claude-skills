@@ -1,55 +1,170 @@
 # Fastify REST API Patterns
 
-## Overview
+---
 
-Fastify is a high-performance Node.js web framework focused on speed and low overhead. This skill covers production-ready patterns for building REST APIs with Fastify, including routing, validation, error handling, plugins, and performance optimization.
+## 1. Executive Summary & Strategic Necessity
 
-**When to use Fastify**: When you need maximum performance for your Node.js API, have high throughput requirements, or want built-in schema validation and serialization.
+### 1.1 Context (ภาษาไทย)
+
+Fastify เป็น high-performance Node.js web framework ที่ focused บน speed และ low overhead โดยมี built-in schema validation และ serialization ซึ่งช่วยให้ developers สร้าง APIs ที่ production-ready อย่างรวดเร็ว
+
+Fastify ประกอบด้วย:
+- **High Performance** - 2x faster กว่า Express
+- **JSON Schema Validation** - Built-in validation ด้วย JSON Schema
+- **Fast Serialization** - Optimized JSON serialization
+- **TypeScript Support** - First-class TypeScript support
+- **Plugin System** - Extensible plugin architecture
+- **Low Overhead** - Minimal request overhead
+
+### 1.2 Business Impact (ภาษาไทย)
+
+**ผลกระทบทางธุรกิจ:**
+
+1. **เพิ่ม Performance** - Fastify ช่วยเพิ่ม API performance ได้ถึง 2-3x
+2. **ลด Infrastructure Cost** - Higher throughput ช่วยลด infrastructure cost
+3. **เพิ่ม Developer Experience** - Built-in validation และ serialization ช่วยเพิ่ม DX
+4. **ลด Bugs** - Type-safe validation ช่วยลด bugs
+5. **ปรับปรุง Scalability** - High-performance framework ช่วยเพิ่ม scalability
+
+### 1.3 Product Thinking (ภาษาไทย)
+
+**มุมมองด้านผลิตภัณฑ์:**
+
+1. **Performance-First** - Fastify ต้องเป็น performance-first framework
+2. **Type-Safe** - APIs ต้อง type-safe ด้วย TypeScript
+3. **Validated** - APIs ต้อง validated ด้วย JSON Schema
+4. **Fast** - APIs ต้อง fast และ low-latency
+5. **Production-Ready** - APIs ต้อง production-ready ด้วย monitoring
 
 ---
 
-## Table of Contents
+## 2. Technical Deep Dive (The "How-to")
 
-1. [Project Setup](#project-setup)
-2. [Basic Server Configuration](#basic-server-configuration)
-3. [Routing Patterns](#routing-patterns)
-4. [Request Validation](#request-validation)
-5. [Response Serialization](#response-serialization)
-6. [Error Handling](#error-handling)
-7. [Plugins](#plugins)
-8. [Middleware (Hooks)](#middleware-hooks)
-9. [Authentication & Authorization](#authentication--authorization)
-10. [Database Integration](#database-integration)
-11. [Testing](#testing)
-12. [Performance Optimization](#performance-optimization)
-13. [Production Deployment](#production-deployment)
-14. [Best Practices](#best-practices)
+### 2.1 Core Logic
 
----
+Fastify ประกอบด้วย:
 
-## Project Setup
+1. **Application** - Fastify application instance
+2. **Router** - Routing system สำหรับ mapping URLs ไปยัง handlers
+3. **JSON Schema** - JSON Schema validation
+4. **Serialization** - Fast JSON serialization
+5. **Hooks** - Request/response lifecycle hooks
+6. **Plugins** - Extensible plugin system
+7. **Error Handling** - Built-in error handling
 
-### Installation
+### 2.2 Architecture Diagram Requirements
 
-```bash
-# Create new project
-mkdir my-fastify-api
-cd my-fastify-api
-npm init -y
-
-# Install Fastify and TypeScript
-npm install fastify
-npm install -D typescript @types/node tsx
-
-# Install common dependencies
-npm install @fastify/cors @fastify/helmet @fastify/rate-limit
-npm install @fastify/swagger @fastify/swagger-ui
-npm install @fastify/jwt @fastify/cookie
-npm install dotenv
+```
+┌─────────────────────────────────────────────────────────┐
+│              Fastify Architecture                   │
+├─────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Client Layer                         │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Browser    │  │  Mobile     │  │  API Client │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Plugin Layer                        │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  CORS       │  │  Helmet     │  │  Swagger    │  │   │
+│  │  │  Plugin     │  │  Plugin     │  │  Plugin     │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Hook Layer                           │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  onRequest   │  │  preHandler │  │  onResponse │  │   │
+│  │  │  Hook        │  │  Hook       │  │  Hook       │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Routing Layer                        │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Routes     │  │  Handlers    │  │  Services   │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Data Layer                           │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  JSON Schema │  │  Models     │  │  Repositories│  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### TypeScript Configuration
+### 2.3 Implementation Workflow
 
+**Step 1: Initialize Fastify App**
+
+```typescript
+// src/app.ts
+import Fastify from 'fastify'
+
+export async function buildApp(): Promise<FastifyInstance> {
+  const app = Fastify({
+    logger: {
+      level: 'info',
+    },
+  })
+
+  return app
+}
+```
+
+**Step 2: Add Routes**
+
+```typescript
+// src/routes/users/index.ts
+import { FastifyPluginAsync } from 'fastify'
+
+const userRoutes: FastifyPluginAsync = async (fastify) => {
+  fastify.get('/users', async (request, reply) => {
+    return { users: [] }
+  })
+}
+
+export default userRoutes
+```
+
+**Step 3: Include Routes**
+
+```typescript
+// src/app.ts
+import { buildApp } from './app'
+
+const app = await buildApp()
+
+await app.register(userRoutes, { prefix: '/api/v1' })
+```
+
+---
+
+## 3. Tooling & Tech Stack
+
+### 3.1 Enterprise Tools
+
+| Tool | Purpose | Version | License |
+|------|---------|---------|---------|
+| Fastify | Web Framework | ^4.25.0 | MIT |
+| TypeScript | Type Safety | ^5.3.0 | Apache-2.0 |
+| @fastify/cors | CORS Plugin | ^8.4.0 | MIT |
+| @fastify/helmet | Security Plugin | ^11.1.0 | MIT |
+| @fastify/swagger | API Documentation | ^8.12.0 | MIT |
+| @fastify/jwt | JWT Authentication | ^7.2.0 | MIT |
+| @fastify/rate-limit | Rate Limiting | ^9.1.0 | MIT |
+| @fastify/swagger-ui | Swagger UI | ^2.1.0 | MIT |
+| pino | Logging Library | ^8.16.0 | MIT |
+
+### 3.2 Configuration Essentials
+
+**TypeScript Configuration:**
 ```json
 // tsconfig.json
 {
@@ -78,8 +193,214 @@ npm install dotenv
 }
 ```
 
-### Project Structure
+**Fastify Configuration:**
+```typescript
+// src/config/fastify.ts
+import { FastifyInstance } from 'fastify'
 
+export async function buildApp(): Promise<FastifyInstance> {
+  const app = Fastify({
+    logger: {
+      level: 'info',
+      transport: {
+        target: 'pino-pretty',
+        options: {
+          translateTime: 'HH:MM:ss Z',
+          ignore: 'pid,hostname',
+        },
+      },
+    },
+    // Request ID tracking
+    requestIdHeader: 'x-request-id',
+    requestIdLogLabel: 'reqId',
+    // Trust proxy (for production behind reverse proxy)
+    trustProxy: process.env.NODE_ENV === 'production',
+    // Body size limits
+    bodyLimit: 1048576, // 1MB
+    // Timeout
+    connectionTimeout: 10000,
+    keepAliveTimeout: 5000,
+  })
+
+  return app
+}
+```
+
+---
+
+## 4. Standards, Compliance & Security
+
+### 4.1 International Standards
+
+- **OpenAPI 3.0** - OpenAPI Specification
+- **REST API Standards** - RESTful API Design Standards
+- **OWASP** - Security Best Practices
+- **GDPR** - Data Protection สำหรับ API Data
+- **HIPAA** - Healthcare Data Protection
+
+### 4.2 Security Protocol
+
+Fastify ต้องปฏิบัติตามหลักความปลอดภัย:
+
+1. **Input Validation** - Validate ข้อมูลทั้ง client และ server
+2. **Authentication** - ใช้ JWT หรือ OAuth2
+3. **Authorization** - Implement role-based access control
+4. **CORS** - Configure CORS อย่างเหมาะสม
+5. **HTTPS** - ใช้ HTTPS สำหรับ production
+6. **Rate Limiting** - จำกัดจำนวน requests
+7. **Security Headers** - ใช้ Helmet สำหรับ security headers
+
+### 4.3 Explainability
+
+Fastify ต้องสามารถอธิบายได้ว่า:
+
+1. **Request Flow** - ทำไม request ถูก process อย่างไร
+2. **Validation** - ทำไม data ถูก validate อย่างไร
+3. **Error Handling** - ทำไม errors ถูก handle อย่างไร
+4. **Response Format** - ทำไม responses ถูก serialize อย่างไร
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+### 5.1 Cost Calculation
+
+| Metric | Calculation | Target |
+|--------|-------------|--------|
+| Response Time | Average response time | < 20ms |
+| Throughput | Requests per second | > 3000 req/s |
+| Error Rate | Errors / Total Requests | < 1% |
+| Memory Usage | Memory per request | < 2 MB |
+| CPU Usage | CPU utilization | < 50% |
+
+### 5.2 Key Performance Indicators
+
+**Technical Metrics:**
+
+1. **Response Time** - Average response time
+2. **Throughput** - Requests per second
+3. **Error Rate** - Error rate
+4. **Memory Usage** - Memory usage
+
+**Business Metrics:**
+
+1. **API Availability** - API uptime
+2. **User Satisfaction** - CSAT score
+3. **Support Tickets** - Support tickets จาก API issues
+4. **Time to Resolution** - Average time to resolve issues
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+### 6.1 Phase Rollout
+
+**Phase 1: Foundation (Week 1-2)**
+- Initialize Fastify app
+- Setup project structure
+- Add basic routes
+- Implement JSON Schema validation
+
+**Phase 2: Advanced Features (Week 3-4)**
+- Add hooks
+- Implement authentication
+- Add plugins
+- Setup database integration
+
+**Phase 3: Integration (Week 5-6)**
+- Add Swagger documentation
+- Implement rate limiting
+- Add caching
+- Setup monitoring
+
+**Phase 4: Production (Week 7-8)**
+- Optimize performance
+- Setup load testing
+- Documentation and training
+- Best practices documentation
+
+### 6.2 Pitfalls to Avoid
+
+1. **Poor JSON Schema Design** - ไม่ design JSON schemas อย่างถูกต้อง
+2. **Missing Error Handling** - ไม่ handle errors อย่างเหมาะสม
+3. **No Request ID** - ไม่ track request IDs
+4. **Poor Performance** - ไม่ optimize performance
+5. **No Monitoring** - ไม่ monitor performance
+6. **Poor TypeScript** - ไม่ใช้ TypeScript อย่างถูกต้อง
+
+### 6.3 Best Practices Checklist
+
+- [ ] ใช้ TypeScript สำหรับ type safety
+- [ ] Implement JSON Schema validation
+- [ ] Use Fastify hooks สำหรับ cross-cutting concerns
+- [ ] Implement proper error handling
+- [ ] Add authentication แล authorization
+- [ ] Use plugins สำหรับ reusable functionality
+- [ ] Implement request ID tracking
+- [ ] Use async/await สำหรับ async operations
+- [ ] Test endpoints ด้วย Jest
+- [ ] Use Swagger documentation
+- [ ] Add CORS configuration
+- [ ] Implement rate limiting
+- [ ] Use caching สำหรับ performance
+- [ ] Monitor performance แล errors
+- [ ] Optimize serialization
+- [ ] Use connection pooling
+
+---
+
+## 7. Implementation Examples
+
+### 7.1 Project Setup
+
+**Installation:**
+```bash
+# Create new project
+mkdir my-fastify-api
+cd my-fastify-api
+npm init -y
+
+# Install Fastify and TypeScript
+npm install fastify
+npm install -D typescript @types/node tsx
+
+# Install common dependencies
+npm install @fastify/cors @fastify/helmet @fastify/rate-limit
+npm install @fastify/swagger @fastify/swagger-ui
+npm install @fastify/jwt @fastify/cookie
+npm install dotenv
+```
+
+**TypeScript Configuration:**
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "lib": ["ES2022"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+}
+```
+
+**Project Structure:**
 ```
 src/
 ├── config/
@@ -117,12 +438,9 @@ src/
 └── server.ts               # Server entry point
 ```
 
----
+### 7.2 Basic Server Configuration
 
-## Basic Server Configuration
-
-### Environment Variables
-
+**Environment Variables:**
 ```typescript
 // src/config/env.ts
 import { config } from 'dotenv';
@@ -168,8 +486,7 @@ function validateEnv(): EnvConfig {
 export const env = validateEnv();
 ```
 
-### App Configuration
-
+**App Configuration:**
 ```typescript
 // src/app.ts
 import Fastify, { FastifyInstance } from 'fastify';
@@ -211,7 +528,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   // Global error handler
   app.setErrorHandler((error, request, reply) => {
     request.log.error(error);
-    
+
     const statusCode = error.statusCode || 500;
     const message = error.message || 'Internal Server Error';
 
@@ -229,8 +546,7 @@ export async function buildApp(): Promise<FastifyInstance> {
 }
 ```
 
-### Server Entry Point
-
+**Server Entry Point:**
 ```typescript
 // src/server.ts
 import { buildApp } from './app';
@@ -263,12 +579,9 @@ async function start() {
 start();
 ```
 
----
+### 7.3 Routing Patterns
 
-## Routing Patterns
-
-### Basic Routes
-
+**Basic Routes:**
 ```typescript
 // src/routes/users/index.ts
 import { FastifyPluginAsync } from 'fastify';
@@ -337,8 +650,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
 export default userRoutes;
 ```
 
-### Route Handlers
-
+**Route Handlers:**
 ```typescript
 // src/routes/users/handlers.ts
 import { FastifyRequest, FastifyReply } from 'fastify';
@@ -367,7 +679,7 @@ export async function createUser(
 ) {
   try {
     const user = await userService.create(request.body);
-    
+
     return reply.status(201).send({
       success: true,
       data: user,
@@ -384,7 +696,7 @@ export async function getUsers(
 ) {
   try {
     const users = await userService.findAll();
-    
+
     return reply.send({
       success: true,
       data: users,
@@ -401,11 +713,11 @@ export async function getUser(
 ) {
   try {
     const user = await userService.findById(request.params.id);
-    
+
     if (!user) {
       return reply.notFound('User not found');
     }
-    
+
     return reply.send({
       success: true,
       data: user,
@@ -417,7 +729,7 @@ export async function getUser(
 }
 
 export async function updateUser(
-  request: FastifyRequest<{ 
+  request: FastifyRequest<{
     Params: GetUserParams;
     Body: UpdateUserBody;
   }>,
@@ -428,11 +740,11 @@ export async function updateUser(
       request.params.id,
       request.body
     );
-    
+
     if (!user) {
       return reply.notFound('User not found');
     }
-    
+
     return reply.send({
       success: true,
       data: user,
@@ -449,7 +761,7 @@ export async function deleteUser(
 ) {
   try {
     await userService.delete(request.params.id);
-    
+
     return reply.status(204).send();
   } catch (error) {
     request.log.error(error);
@@ -458,8 +770,7 @@ export async function deleteUser(
 }
 ```
 
-### Route Registration
-
+**Route Registration:**
 ```typescript
 // src/routes/index.ts
 import { FastifyPluginAsync } from 'fastify';
@@ -481,12 +792,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
 export default routes;
 ```
 
----
+### 7.4 Request Validation
 
-## Request Validation
-
-### JSON Schema Validation
-
+**JSON Schema Validation:**
 ```typescript
 // src/routes/users/schemas.ts
 import { FastifySchema } from 'fastify';
@@ -509,8 +817,8 @@ export const createUserSchema: FastifySchema = {
     required: ['email', 'password', 'name'],
     properties: {
       email: { type: 'string', format: 'email' },
-      password: { 
-        type: 'string', 
+      password: {
+        type: 'string',
         minLength: 8,
         pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]',
       },
@@ -658,14 +966,13 @@ export const listUsersSchema: FastifySchema = {
 };
 ```
 
-### Custom Validation
-
+**Custom Validation:**
 ```typescript
 // Custom validator function
 fastify.addHook('preValidation', async (request, reply) => {
   if (request.body && typeof request.body === 'object') {
     const body = request.body as Record<string, unknown>;
-    
+
     // Custom validation logic
     if (body.email && !isValidEmail(body.email as string)) {
       return reply.badRequest('Invalid email format');
@@ -680,12 +987,9 @@ function isValidEmail(email: string): boolean {
 }
 ```
 
----
+### 7.5 Response Serialization
 
-## Response Serialization
-
-### Fast JSON Serialization
-
+**Fast JSON Serialization:**
 ```typescript
 // Fastify uses JSON schemas for serialization optimization
 const getUserResponse = {
@@ -725,8 +1029,7 @@ fastify.get('/users/:id', async (request, reply) => {
 });
 ```
 
-### Custom Serializers
-
+**Custom Serializers:**
 ```typescript
 // src/utils/serializers.ts
 import { FastifyReply } from 'fastify';
@@ -744,7 +1047,7 @@ export function serializeUser(user: any) {
 // Use in route handler
 export async function getUser(request: FastifyRequest, reply: FastifyReply) {
   const user = await userService.findById(request.params.id);
-  
+
   return reply.send({
     success: true,
     data: serializeUser(user),
@@ -752,12 +1055,9 @@ export async function getUser(request: FastifyRequest, reply: FastifyReply) {
 }
 ```
 
----
+### 7.6 Error Handling
 
-## Error Handling
-
-### Custom Error Classes
-
+**Custom Error Classes:**
 ```typescript
 // src/utils/errors.ts
 export class AppError extends Error {
@@ -773,7 +1073,7 @@ export class AppError extends Error {
 }
 
 export class ValidationError extends AppError {
-  constructor(message: string, public details?: any) {
+  constructor(message: string = 'Validation failed', public details?: any) {
     super(message, 400, 'VALIDATION_ERROR');
   }
 }
@@ -803,8 +1103,7 @@ export class ConflictError extends AppError {
 }
 ```
 
-### Global Error Handler
-
+**Global Error Handler:**
 ```typescript
 // src/app.ts
 import { FastifyError } from 'fastify';
@@ -859,8 +1158,7 @@ app.setErrorHandler((error: FastifyError, request, reply) => {
 });
 ```
 
-### Async Error Handling
-
+**Async Error Handling:**
 ```typescript
 // Fastify automatically catches async errors
 // No need for try-catch in every handler!
@@ -868,11 +1166,11 @@ app.setErrorHandler((error: FastifyError, request, reply) => {
 // ✅ Good: Let Fastify handle errors
 export async function getUser(request: FastifyRequest, reply: FastifyReply) {
   const user = await userService.findById(request.params.id);
-  
+
   if (!user) {
     throw new NotFoundError('User not found');
   }
-  
+
   return reply.send({ success: true, data: user });
 }
 
@@ -880,11 +1178,11 @@ export async function getUser(request: FastifyRequest, reply: FastifyReply) {
 export async function getUser(request: FastifyRequest, reply: FastifyReply) {
   try {
     const user = await userService.findById(request.params.id);
-    
+
     if (!user) {
       throw new NotFoundError('User not found');
     }
-    
+
     return reply.send({ success: true, data: user });
   } catch (error) {
     // This is unnecessary! Fastify catches it automatically
@@ -893,12 +1191,9 @@ export async function getUser(request: FastifyRequest, reply: FastifyReply) {
 }
 ```
 
----
+### 7.7 Plugins
 
-## Plugins
-
-### Creating Custom Plugin
-
+**Creating Custom Plugin:**
 ```typescript
 // src/plugins/database.ts
 import fp from 'fastify-plugin';
@@ -935,8 +1230,7 @@ export default fp(databasePlugin, {
 });
 ```
 
-### Using Plugins
-
+**Using Plugins:**
 ```typescript
 // src/app.ts
 import database from './plugins/database';
@@ -953,8 +1247,7 @@ app.get('/users', async (request, reply) => {
 });
 ```
 
-### Common Plugins
-
+**Common Plugins:**
 ```typescript
 // src/plugins/cors.ts
 import fp from 'fastify-plugin';
@@ -1037,16 +1330,13 @@ export default fp(async (fastify) => {
 });
 ```
 
----
+### 7.8 Middleware (Hooks)
 
-## Middleware (Hooks)
-
-### Hook Types
-
+**Hook Types:**
+```
 Fastify uses hooks instead of traditional middleware:
 
-```typescript
-// Request lifecycle hooks (in order)
+Request lifecycle hooks (in order):
 - onRequest
 - preParsing
 - preValidation
@@ -1055,15 +1345,14 @@ Fastify uses hooks instead of traditional middleware:
 - onSend
 - onResponse
 
-// Application hooks
+Application hooks:
 - onReady
 - onClose
 - onRoute
 - onRegister
 ```
 
-### Authentication Hook
-
+**Authentication Hook:**
 ```typescript
 // src/hooks/auth.hook.ts
 import { FastifyRequest, FastifyReply } from 'fastify';
@@ -1114,8 +1403,7 @@ fastify.get('/protected', {
 });
 ```
 
-### Logging Hook
-
+**Logging Hook:**
 ```typescript
 // src/hooks/logging.hook.ts
 import { FastifyRequest, FastifyReply } from 'fastify';
@@ -1149,8 +1437,7 @@ app.addHook('onRequest', logRequestHook);
 app.addHook('onResponse', logResponseHook);
 ```
 
-### Global Hooks
-
+**Global Hooks:**
 ```typescript
 // src/app.ts
 export async function buildApp() {
@@ -1178,12 +1465,9 @@ export async function buildApp() {
 }
 ```
 
----
+### 7.9 Authentication & Authorization
 
-## Authentication & Authorization
-
-### JWT Authentication
-
+**JWT Authentication:**
 ```typescript
 // src/plugins/jwt.ts
 import fp from 'fastify-plugin';
@@ -1263,7 +1547,7 @@ export async function refreshToken(
 ) {
   try {
     const decoded = request.server.jwt.verify(request.body.refreshToken);
-    
+
     const newAccessToken = request.server.jwt.sign({
       id: decoded.id,
     });
@@ -1278,8 +1562,7 @@ export async function refreshToken(
 }
 ```
 
-### Role-Based Authorization
-
+**Role-Based Authorization:**
 ```typescript
 // src/hooks/authorize.hook.ts
 import { FastifyRequest, FastifyReply } from 'fastify';
@@ -1307,15 +1590,13 @@ fastify.post('/posts', {
 }, createPost);
 ```
 
----
+### 7.10 Database Integration
 
-## Database Integration
-
-### Prisma Integration
-
+**Prisma Integration:**
 ```typescript
 // src/plugins/database.ts
 import fp from 'fastify-plugin';
+import { FastifyInstance } from 'fastify';
 import { PrismaClient } from '@prisma/client';
 
 declare module 'fastify' {
@@ -1326,8 +1607,8 @@ declare module 'fastify' {
 
 async function databasePlugin(fastify: FastifyInstance) {
   const prisma = new PrismaClient({
-    log: env.NODE_ENV === 'development' 
-      ? ['query', 'error', 'warn'] 
+    log: env.NODE_ENV === 'development'
+      ? ['query', 'error', 'warn']
       : ['error'],
   });
 
@@ -1345,8 +1626,7 @@ export default fp(databasePlugin, {
 });
 ```
 
-### Repository Pattern
-
+**Repository Pattern:**
 ```typescript
 // src/repositories/user.repository.ts
 import { PrismaClient, User } from '@prisma/client';
@@ -1433,7 +1713,7 @@ export class UserService {
     order?: 'asc' | 'desc';
   }) {
     const { page, limit, sort = 'createdAt', order = 'desc' } = options;
-    
+
     const skip = (page - 1) * limit;
 
     const [users, total] = await Promise.all([
@@ -1466,12 +1746,9 @@ export class UserService {
 }
 ```
 
----
+### 7.11 Testing
 
-## Testing
-
-### Test Setup
-
+**Test Setup:**
 ```typescript
 // test/helper.ts
 import { FastifyInstance } from 'fastify';
@@ -1488,8 +1765,7 @@ export async function cleanupTestApp(app: FastifyInstance) {
 }
 ```
 
-### Unit Tests
-
+**Unit Tests:**
 ```typescript
 // test/routes/users.test.ts
 import { describe, it, beforeAll, afterAll, expect } from '@jest/globals';
@@ -1594,8 +1870,7 @@ describe('User Routes', () => {
 });
 ```
 
-### Integration Tests
-
+**Integration Tests:**
 ```typescript
 // test/integration/auth.test.ts
 describe('Authentication Flow', () => {
@@ -1653,12 +1928,9 @@ describe('Authentication Flow', () => {
 });
 ```
 
----
+### 7.12 Performance Optimization
 
-## Performance Optimization
-
-### Caching
-
+**Caching:**
 ```typescript
 // src/plugins/cache.ts
 import fp from 'fastify-plugin';
@@ -1684,8 +1956,7 @@ fastify.get('/users/:id', {
 });
 ```
 
-### Connection Pooling
-
+**Connection Pooling:**
 ```typescript
 // src/plugins/database.ts
 const prisma = new PrismaClient({
@@ -1694,8 +1965,11 @@ const prisma = new PrismaClient({
       url: env.DATABASE_URL,
     },
   },
-  // Connection pool settings
   log: ['error', 'warn'],
+});
+
+// Connection pool settings
+log: ['error', 'warn'],
 });
 
 // In prisma/schema.prisma
@@ -1713,8 +1987,7 @@ datasource db {
 }
 ```
 
-### Load Testing
-
+**Load Testing:**
 ```bash
 # Install autocannon
 npm install -g autocannon
@@ -1729,12 +2002,9 @@ autocannon -c 100 -d 30 -m POST \
   http://localhost:3000/api/v1/users
 ```
 
----
+### 7.13 Production Deployment
 
-## Production Deployment
-
-### Production Configuration
-
+**Production Configuration:**
 ```typescript
 // src/config/production.ts
 export const productionConfig = {
@@ -1771,8 +2041,7 @@ export const productionConfig = {
 };
 ```
 
-### Dockerfile
-
+**Dockerfile:**
 ```dockerfile
 # Dockerfile
 FROM node:18-alpine AS builder
@@ -1801,8 +2070,7 @@ EXPOSE 3000
 CMD ["node", "dist/server.js"]
 ```
 
-### Docker Compose
-
+**Docker Compose:**
 ```yaml
 # docker-compose.yml
 version: '3.8'
@@ -1841,8 +2109,7 @@ volumes:
   postgres_data:
 ```
 
-### PM2 Configuration
-
+**PM2 Configuration:**
 ```javascript
 // ecosystem.config.js
 module.exports = {
@@ -1863,12 +2130,9 @@ module.exports = {
 };
 ```
 
----
+### 7.14 Best Practices
 
-## Best Practices
-
-### ✅ DO
-
+**✅ DO:**
 - **Use JSON Schema for validation and serialization**
   ```typescript
   // Fast and type-safe
@@ -1911,13 +2175,12 @@ module.exports = {
   }
   ```
 
-### ❌ DON'T
-
+**❌ DON'T:**
 - **Don't use Express middleware directly**
   ```typescript
   // ❌ Bad: Express middleware
   app.use(expressMiddleware);
-  
+
   // ✅ Good: Use Fastify hooks
   app.addHook('onRequest', fastifyHook);
   ```
@@ -1926,7 +2189,7 @@ module.exports = {
   ```typescript
   // ❌ Bad: Slow
   delete user.password;
-  
+
   // ✅ Good: Use schema serialization
   schema: { response: { 200: userSchema } }
   ```
@@ -1935,7 +2198,7 @@ module.exports = {
   ```typescript
   // ❌ Bad
   const file = fs.readFileSync('file.txt');
-  
+
   // ✅ Good
   const file = await fs.promises.readFile('file.txt');
   ```
@@ -1945,13 +2208,13 @@ module.exports = {
   // ❌ Bad: Routes registered before plugins
   await app.register(routes);
   await app.register(database);
-  
+
   // ✅ Good: Plugins first
   await app.register(database);
   await app.register(routes);
   ```
 
-### Checklist
+### 7.15 Checklist
 
 - [ ] JSON schemas for all routes
 - [ ] Error handling middleware configured
@@ -1968,165 +2231,16 @@ module.exports = {
 - [ ] Environment variables validated
 - [ ] Production build tested
 - [ ] Performance tested (load testing)
+- [ ] Request ID tracking enabled
+- [ ] Async/await used consistently
+- [ ] Fastify hooks used for cross-cutting concerns
 
 ---
 
-## Common Pitfalls
+## 8. Related Skills
 
-### ❌ Pitfall 1: Not Awaiting Plugin Registration
-
-```typescript
-// ❌ Bad: Not awaiting
-app.register(database); // Missing await!
-app.register(routes);
-
-// ✅ Good: Always await
-await app.register(database);
-await app.register(routes);
-```
-
-### ❌ Pitfall 2: Blocking the Event Loop
-
-```typescript
-// ❌ Bad: Synchronous operation
-app.get('/heavy', async (request, reply) => {
-  const result = doHeavyComputationSync(); // Blocks event loop!
-  return { data: result };
-});
-
-// ✅ Good: Use worker threads for CPU-intensive tasks
-import { Worker } from 'worker_threads';
-
-app.get('/heavy', async (request, reply) => {
-  const result = await runInWorker('./heavy-task.js');
-  return { data: result };
-});
-```
-
-### ❌ Pitfall 3: Not Using Schema Serialization
-
-```typescript
-// ❌ Bad: Manually filtering (slow)
-app.get('/users/:id', async (request, reply) => {
-  const user = await getUser(request.params.id);
-  const { password, ...safeUser } = user; // Slow!
-  return safeUser;
-});
-
-// ✅ Good: Schema serialization (fast)
-app.get('/users/:id', {
-  schema: {
-    response: {
-      200: {
-        type: 'object',
-        properties: {
-          id: { type: 'string' },
-          email: { type: 'string' },
-          name: { type: 'string' },
-          // password not included = automatically excluded
-        },
-      },
-    },
-  },
-}, async (request, reply) => {
-  const user = await getUser(request.params.id);
-  return user; // Fastify removes password automatically
-});
-```
-
----
-
-## Migration from Express
-
-### Express vs Fastify
-
-| Feature | Express | Fastify |
-|---------|---------|---------|
-| **Middleware** | `app.use(middleware)` | `app.addHook('onRequest', hook)` |
-| **Routing** | `app.get('/users', handler)` | `app.get('/users', handler)` ✅ Same |
-| **Validation** | Manual (express-validator) | Built-in (JSON Schema) |
-| **Serialization** | Manual | Automatic (JSON Schema) |
-| **Async Errors** | Need try-catch or middleware | Automatic handling |
-| **Performance** | Slower | 2x faster |
-| **TypeScript** | Requires setup | First-class support |
-
-### Migration Example
-
-```typescript
-// Express
-app.use(cors());
-app.use(helmet());
-app.use(express.json());
-
-app.get('/users/:id', async (req, res, next) => {
-  try {
-    const user = await getUser(req.params.id);
-    if (!user) {
-      return res.status(404).json({ error: 'Not found' });
-    }
-    delete user.password;
-    res.json({ data: user });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Fastify
-await app.register(cors);
-await app.register(helmet);
-
-app.get('/users/:id', {
-  schema: {
-    params: {
-      type: 'object',
-      properties: {
-        id: { type: 'string', format: 'uuid' },
-      },
-    },
-    response: {
-      200: {
-        type: 'object',
-        properties: {
-          data: {
-            type: 'object',
-            properties: {
-              id: { type: 'string' },
-              email: { type: 'string' },
-              name: { type: 'string' },
-            },
-          },
-        },
-      },
-    },
-  },
-}, async (request, reply) => {
-  const user = await getUser(request.params.id);
-  
-  if (!user) {
-    return reply.notFound('User not found');
-  }
-  
-  return { data: user }; // Password auto-removed by schema
-});
-```
-
----
-
-## Additional Resources
-
-### Official Documentation
-- [Fastify Documentation](https://www.fastify.io/docs/latest/)
-- [Fastify Plugins](https://www.fastify.io/ecosystem/)
-- [Fastify GitHub](https://github.com/fastify/fastify)
-
-### Community
-- [Fastify Discord](https://discord.gg/fastify)
-- [Stack Overflow](https://stackoverflow.com/questions/tagged/fastify)
-
-### Performance
-- [Fastify Benchmarks](https://www.fastify.io/benchmarks/)
-- [Why Fastify is Fast](https://www.fastify.io/docs/latest/Guides/Getting-Started/#why-is-fastify-fast)
-
----
-
-**When to use this skill**: Building high-performance REST APIs with Node.js where speed and low overhead are priorities. Ideal for microservices, real-time applications, and high-throughput APIs.
+- `03-backend-api/error-handling`
+- `03-backend-api/validation`
+- `03-backend-api/middleware`
+- `01-foundations/api-design`
+- `14-monitoring-observability`

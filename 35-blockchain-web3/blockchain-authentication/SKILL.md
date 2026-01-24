@@ -1,8 +1,18 @@
+---
+name: Blockchain Authentication
+description: Using cryptographic signatures to verify user identity without passwords through Sign-In with Ethereum (SIWE), message signing, signature verification, and session management.
+---
+
 # Blockchain Authentication
+
+> **Current Level:** Advanced  
+> **Domain:** Blockchain / Authentication
+
+---
 
 ## Overview
 
-Web3 authentication uses cryptographic signatures to verify user identity without passwords. This guide covers Sign-In with Ethereum (SIWE), message signing, and session management.
+Web3 authentication uses cryptographic signatures to verify user identity without passwords. This guide covers Sign-In with Ethereum (SIWE), message signing, and session management for building passwordless authentication systems using blockchain wallets.
 
 ## Web3 Authentication Concepts
 
@@ -567,6 +577,108 @@ const csrfProtection = csrf({ cookie: true });
 8. **Secure Storage** - Store tokens securely
 9. **Token Refresh** - Implement token refresh mechanism
 10. **Audit Logging** - Log all authentication events
+
+---
+
+## Quick Start
+
+### Sign-In with Ethereum (SIWE)
+
+```typescript
+import { SiweMessage } from 'siwe'
+
+// Generate message
+const message = new SiweMessage({
+  domain: 'example.com',
+  address: userAddress,
+  statement: 'Sign in with Ethereum',
+  uri: 'https://example.com',
+  version: '1',
+  chainId: 1,
+  nonce: generateNonce(),
+  expirationTime: new Date(Date.now() + 5 * 60 * 1000).toISOString()
+})
+
+const messageToSign = message.prepareMessage()
+
+// User signs message with wallet
+const signature = await wallet.signMessage(messageToSign)
+
+// Verify on server
+const siweMessage = new SiweMessage(messageToSign)
+const result = await siweMessage.verify({ signature })
+```
+
+---
+
+## Production Checklist
+
+- [ ] **SIWE Implementation**: Sign-In with Ethereum
+- [ ] **Nonce Usage**: Use nonces to prevent replay attacks
+- [ ] **Message Expiry**: Set expiration times
+- [ ] **Signature Verification**: Verify signatures server-side
+- [ ] **Session Management**: Secure session tokens
+- [ ] **HTTPS Only**: Always use HTTPS
+- [ ] **Wallet Support**: Support multiple wallets
+- [ ] **Error Handling**: Handle wallet errors
+- [ ] **Testing**: Test with different wallets
+- [ ] **Documentation**: Document auth flow
+- [ ] **Security**: Security best practices
+- [ ] **Compliance**: Meet compliance requirements
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Nonce
+
+```typescript
+// ❌ Bad - No nonce
+const message = 'Sign in'
+const signature = await wallet.signMessage(message)
+// Replay attack possible!
+```
+
+```typescript
+// ✅ Good - With nonce
+const nonce = generateNonce()
+const message = `Sign in with nonce: ${nonce}`
+const signature = await wallet.signMessage(message)
+// Nonce prevents replay
+```
+
+### ❌ Don't: Trust Client Verification
+
+```typescript
+// ❌ Bad - Client verification
+const isValid = await verifySignatureOnClient(signature)
+if (isValid) {
+  login()  // Client can fake!
+}
+```
+
+```typescript
+// ✅ Good - Server verification
+const isValid = await verifySignatureOnServer(signature, message)
+if (isValid) {
+  createSession(userAddress)
+}
+```
+
+---
+
+## Integration Points
+
+- **Wallet Connection** (`35-blockchain-web3/wallet-connection/`) - Wallet integration
+- **Web3 Integration** (`35-blockchain-web3/web3-integration/`) - Web3 patterns
+- **OAuth2** (`10-authentication-authorization/oauth2/`) - Auth patterns
+
+---
+
+## Further Reading
+
+- [Sign-In with Ethereum](https://login.xyz/)
+- [EIP-4361](https://eips.ethereum.org/EIPS/eip-4361)
 
 ## Resources
 

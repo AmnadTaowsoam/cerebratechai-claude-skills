@@ -1,12 +1,187 @@
+---
+name: Operational Runbooks
+description: Step-by-step procedures for operating and troubleshooting systems, including incident response, maintenance tasks, and operational workflows.
+---
+
 # Operational Runbooks
 
-## Overview
-
-Runbooks provide step-by-step procedures for operating and troubleshooting systems.
+> **Current Level:** Expert (Enterprise Scale)
+> **Domain:** Documentation / Operations
 
 ---
 
-## 1. Runbook Purpose
+## Overview
+
+Runbooks provide step-by-step procedures for operating and troubleshooting systems. Effective runbooks enable teams to handle incidents, perform maintenance, and operate systems consistently with clear, actionable instructions.
+
+---
+
+## 1. Executive Summary & Strategic Necessity
+
+* **Context:** ในปี 2025-2026 Operational Runbooks ด้วย Best Practices ช่วย Operations ที่มีอัตโนมาติการทำงานอัตโนมาติ (Operational Excellence) ใน Enterprise Scale
+
+* **Business Impact:** Operational Runbooks ช่วยลด Downtime ของระบบ Operations ผ่านการตอบคำถามอัตโนมาติการเขียนเอกสาร (Reduce MTTR), ลดต้นทุนการจัดการทีม (Increase operational efficiency), เพิ่มอัตรากำไร Gross Margin ผ่านการทำงานอัตโนมาติ (Faster incident resolution), และปรับประสบทการทำงาน (Consistent operations)
+
+* **Product Thinking:** Operational Runbooks ช่วยแก้ปัญหา (Pain Point) ความต้องการมีการเขียนเอกสารที่ชัดเจน (Teams need clear operational procedures) ผ่านการทำงานอัตโนมาติ (Standardized procedures)
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+* **Core Logic:** Operational Runbooks ใช้ Best Practices ช่วย Operations ทำงานอัตโนมาติ:
+  1. **Runbook Structure**: กำหนด Runbook Structure (Service Overview, Architecture, Deployment, Monitoring, Alerts, Troubleshooting, Emergency Procedures, Maintenance, Tools and Access, Contacts)
+  2. **Runbook Templates**: สร้าง Runbook Templates สำหรับการเขียน runbooks (Basic template, Advanced template)
+  3. **Runbook Testing**: จัดการ Runbook Testing (Accuracy testing, Completeness testing, Usability testing, Emergency testing)
+  4. **Runbook Maintenance**: สร้าง Runbook Maintenance สำหรับการดูแล runbooks (Regular updates, Quarterly reviews, Testing procedures)
+  5. **Agent-Friendly Runbooks**: สร้าง Agent-Friendly Runbooks สำหรับ AI Agents (Clear steps, Verification criteria, Troubleshooting procedures)
+
+* **Architecture Diagram Requirements:** แผนผังระบบ Operational Runbooks ต้องมีองค์ประกอบ:
+  1. **Runbook Repository**: Runbook Repository สำหรับการจัดเก็บ runbooks (Git repository, Documentation platform)
+  2. **Runbook Templates**: Runbook Templates สำหรับการเขียน runbooks (Basic template, Advanced template)
+  3. **Runbook Testing Framework**: Runbook Testing Framework สำหรับการทดสอบ runbooks (Accuracy testing, Completeness testing, Usability testing)
+  4. **Runbook Maintenance System**: Runbook Maintenance System สำหรับการดูแล runbooks (Version control, Review process, Update notifications)
+  5. **Runbook Search**: Runbook Search สำหรับการค้นหา runbooks (Full-text search, Tag-based search, Category-based search)
+  6. **Runbook Analytics**: Runbook Analytics สำหรับการวิเคราะห์ runbook usage (Usage metrics, Search analytics, Feedback collection)
+  7. **Observability**: Logging, Monitoring, Tracing สำหรับการ debug และปรับสิทท
+
+* **Implementation Workflow:** ขั้นตอนการนำ Operational Runbooks ไปใช้งานจริง:
+  1. **Planning Phase**: กำหนด Requirement และเลือก Runbook Platform ที่เหมาะสม
+  2. **Runbook Repository Setup**: ตั้งค่า Runbook Repository สำหรับการจัดเก็บ runbooks
+  3. **Runbook Templates Creation**: สร้าง Runbook Templates สำหรับการเขียน runbooks
+  4. **Runbook Testing Framework Setup**: ตั้งค่า Runbook Testing Framework สำหรับการทดสอบ runbooks
+  5. **Runbook Maintenance System Setup**: ตั้งค่า Runbook Maintenance System สำหรับการดูแล runbooks
+  6. **Testing Phase**: Unit test, Integration test, E2E test ด้วยจริง Scenario
+  7. **Deployment**: Deploy ด้วย CI/CD pipeline, Set up Monitoring
+  8. **Optimization**: Optimize runbook search, Add runbook templates, Improve UX
+  9. **Maintenance**: Monitor runbook usage, Update runbook content, Handle edge cases
+
+---
+
+## 3. Tooling & Tech Stack
+
+* **Enterprise Tools:** เครื่องมือระดับอุตสาหกรรมที่เลือกใช้สำหรับ Operational Runbooks ใน Enterprise Scale:
+  1. **Git**: Version control system สำหรับ runbook versioning
+  2. **GitHub/GitLab**: Git hosting platforms สำหรับ runbook collaboration
+  3. **Confluence**: Documentation platform สำหรับ runbook storage
+  4. **Notion**: Documentation platform สำหรับ runbook storage
+  5. **GitBook**: Documentation platform สำหรับ runbook storage
+  6. **Algolia**: Search platform สำหรับ runbook search
+  7. **Elasticsearch**: Search platform สำหรับ runbook search
+  8. **Grafana**: Monitoring platform สำหรับ runbook analytics
+  9. **Prometheus**: Metrics platform สำหรับ runbook analytics
+  10. **PagerDuty**: Incident management platform สำหรับ runbook integration
+
+* **Configuration Essentials:** การตั้งค่าสำคัญสำหรับให้ระบบเสถียร Operational Runbooks:
+  1. **Runbook Templates**: ตั้งค่า Runbook Templates (Basic template, Advanced template)
+  2. **Runbook Testing**: ตั้งค่า Runbook Testing (Accuracy testing, Completeness testing, Usability testing)
+  3. **Runbook Maintenance**: ตั้งค่า Runbook Maintenance (Version control, Review process, Update notifications)
+  4. **Runbook Search**: ตั้งค่า Runbook Search (Full-text search, Tag-based search, Category-based search)
+  5. **Monitoring**: ตั้งค่า Monitoring สำหรับ tracking runbook usage (Usage metrics, Search analytics, Feedback collection)
+  6. **Secret Management**: Use Environment variables หรือ Secret Manager (AWS Secrets Manager, HashiCorp Vault)
+  7. **Rate Limiting**: Per-user และ Per-IP rate limits สำหรับป้องกัน Abuse (100-1000 requests/hour)
+  8. **Logging Level**: INFO สำหรับ Production, DEBUG สำหรับ Development
+  9. **Observability**: Track success rate, runbook usage, search accuracy ต่อเป้าหลาย
+  10. **Documentation**: Maintain Runbook Platform documentation สำหรับ team reference
+
+---
+
+## 4. Standards, Compliance & Security
+
+* **International Standards:** มาตรฐานที่เกี่ยวข้อง:
+  1. **ISO/IEC 27001**: Information Security Management - สำหรับการจัดการ Secrets และ Access Control
+  2. **ISO/IEC 27017**: Code of Practice for Information Security Controls - สำหรับ Secure Operations
+  3. **ISO/IEC 22301**: Business Continuity Management - สำหรับ Disaster Recovery
+  4. **GDPR**: General Data Protection Regulation - สำหรับการจัดการ Personal Data และ User Consent
+  5. **SOC 2 Type II**: Security Controls - สำหรับการ Audit และ Compliance
+
+* **Security Protocol:** กลไกการป้องกัน Operational Runbooks:
+  1. **Input Validation**: Validate และ Sanitize ทุก Input ก่อน processing (Prevent XSS, SQL injection)
+  2. **Output Sanitization**: Filter sensitive information จาก runbooks (API keys, Secrets, Passwords)
+  3. **Access Control**: RBAC (Role-Based Access Control) สำหรับ runbook access - บาง runbooks internal only
+  4. **Audit Trail**: Log ทุก runbook access ด้วย Timestamp, User ID, และ Runbook accessed (สำหรับ Forensics และ Compliance)
+  5. **Rate Limiting**: Per-user และ Per-IP rate limits สำหรับป้องกัน Abuse (100-1000 requests/hour)
+  6. **Secure Communication**: TLS 1.3 สำหรับ HTTPS access
+  7. **Secret Management**: Use Environment variables หรือ Secret Manager (AWS Secrets Manager, HashiCorp Vault)
+  8. **Content Security**: CSP headers สำหรับ preventing XSS attacks
+  9. **Authentication**: Implement authentication สำหรับ internal runbooks (SSO, OAuth)
+  10. **Data Encryption**: Encrypt sensitive data ที่ rest ใน Database (AES-256 หรือ Customer-managed keys)
+
+* **Explainability:** (สำหรับ Runbooks) ความสามารถในการอธิบายผลลัพธ์ผ่านเทคนิค:
+  1. **Clear Structure**: เก็บ runbook structure สำหรับ easy understanding
+  2. **Detailed Steps**: Provide detailed steps สำหรับ complex procedures
+  3. **Verification Criteria**: Include verification criteria สำหรับ each step
+  4. **Troubleshooting Procedures**: Provide troubleshooting procedures สำหรับ common issues
+  5. **Reference Links**: Link to external documentation สำหรับ complex topics
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+* **Cost Calculation:** สูตรการคำนวณต้นทุกต่อหน่วย Operational Runbooks:
+  1. **Platform Cost** = Platform subscription × Cost per user/month
+     - Confluence: $5-15/user/month
+     - Notion: $8-15/user/month
+     - GitBook: $8-20/user/month
+  2. **Storage Cost** = Runbook storage × Cost per GB/month
+     - GitHub Pages: Free
+     - GitLab Pages: Free
+     - S3: $0.023/GB/month
+  3. **Search Cost** = Search API calls × Cost per 1000 calls
+     - Algolia: $1-5/1000 calls
+     - Elasticsearch: $0-100/month (self-hosted)
+  4. **Monitoring Cost** = Monitoring platform subscription × Cost per month
+     - Grafana Cloud: $50-500/month
+     - Datadog: $15-23/host/month
+  5. **Total Monthly Cost** = Platform Cost + Storage Cost + Search Cost + Monitoring Cost
+  6. **Infrastructure Costs** = Compute ($0/month for static sites) + Storage ($0/month for static sites) + Monitoring ($50-500/month)
+
+* **Key Performance Indicators:** ตัวชี้วัดความสำเร็จทางเทคนิค:
+  1. **Runbook Coverage**: เปอร์เซ็นต์ของ services ที่มี runbooks (Target: >80%)
+  2. **Runbook Quality Score**: คะแนน runbook quality จาก automated checks (Target: >4.0)
+  3. **Runbook Accuracy**: เปอร์เซ็นต์ของ runbooks ที่มี accurate procedures (Target: >95%)
+  4. **Runbook Completeness**: เปอร์เซ็นต์ของ runbooks ที่มี complete procedures (Target: >90%)
+  5. **Operator Satisfaction Score**: 1-5 rating จาก Operator feedback (Target: >4.0)
+  6. **Error Rate**: อัตราการ Error (Target: <1%)
+  7. **MTTR**: Mean Time To Resolution (Target: <30 minutes)
+  8. **Runbook Usage**: เปอร์เซ็นต์ของ operators ที่ใช้ runbooks (Target: >80%)
+  9. **Search Accuracy**: เปอร์เซ็นต์ของ search results ที่ relevant (Target: >90%)
+  10. **Knowledge Transfer**: เปอร์เซ็นต์ของ knowledge transfer (Target: >80%)
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+* **Phase Rollout:** คำแนะนำในการทยอยเริ่มใช้งาน Operational Runbooks เพื่อลดความเสี่ยง:
+  1. **Phase 1: MVP (1-2 เดือน)**: Deploy Simple Operational Runbooks ด้วย Basic Templates และ Manual review สำหรับ Internal team ก่อนเปิดให้ Public
+     - **Goal**: Validate Operational Runbooks architecture และ gather feedback
+     - **Success Criteria**: >80% runbook coverage, <30s search time
+     - **Risk Mitigation**: Internal-only access, Manual review ก่อน Public
+  2. **Phase 2: Beta (2-3 เดือน)**: Expand ด้วย Advanced Templates และ Runbook Testing Framework สำหรับ Selected customers
+     - **Goal**: Test scalability และ Runbook reliability
+     - **Success Criteria**: >90% runbook coverage, <15s search time
+     - **Risk Mitigation**: Canary deployment, Feature flags, Gradual rollout
+  3. **Phase 3: GA (3-6 เดือน)**: Full rollout ด้วย Advanced features (Runbook Search, Runbook Analytics, Agent-Friendly Runbooks)
+     - **Goal**: Enterprise-grade runbook quality และ Performance
+     - **Success Criteria**: >95% runbook coverage, <10s search time, 99.9% uptime
+     - **Risk Mitigation**: Load testing, Disaster recovery, Blue-green deployment
+
+* **Pitfalls to Avoid:** ข้อควรระวังที่มักจะผิดพลาดในระดับ Enterprise Scale:
+  1. **Over-engineering**: สร้าง Operational Runbooks ที่ซ้อนเกินไป (Too many sections, Complex templates) → เริ่มจาก Simple และ iterate
+  2. **No Runbook Templates**: ไม่มี Runbook Templates ทำให้ consistency ลด → Implement Runbook Templates สำหรับ common patterns
+  3. **Outdated Runbooks**: Runbooks ไม่ sync กับ systems → Implement automated runbook quality checks
+  4. **Missing Runbook Testing**: ไม่มี Runbook Testing ทำให้ runbooks ไม่ reliable → Implement Runbook Testing Framework
+  5. **No Runbook Maintenance**: ไม่มี Runbook Maintenance ทำให้ runbooks outdated → Implement Runbook Maintenance System
+  6. **No Agent-Friendly Runbooks**: ไม่มี Agent-Friendly Runbooks ทำให้ AI Agents สับสนใจ → Implement Agent-Friendly runbook guidelines
+  7. **Poor Search**: Search ไม่ดีทำให้ operators หา runbooks ไม่ได้ → Implement advanced search (Algolia, Elasticsearch)
+  8. **No Runbook Analytics**: ไม่มี Runbook Analytics ทำให้ไม่รู้ runbook usage → Implement runbook analytics
+  9. **No Runbook Documentation**: ไม่มี Runbook Documentation ทำให้ team reference → Maintain Runbook Platform documentation
+  10. **Single Point of Failure**: ไม่มี Redundancy หรือ Fallback → Deploy multiple instances ด้วย CDN
+
+---
+
+## Core Concepts
+
+### 1. Runbook Purpose
 
 ### Why Runbooks Matter
 
@@ -1593,7 +1768,6 @@ echo "Restore completed"
 | 1.0 | [Date] | [Name] | Initial version |
 | 1.1 | [Date] | [Name] | [Changes] |
 ```
-```
 
 ---
 
@@ -1635,6 +1809,150 @@ echo "Restore completed"
 - Share lessons learned
 
 ## 6. Be Collaborative
+- Involve team
+- Get feedback
+- Update regularly
+- Share knowledge
+```
+
+---
+
+## Quick Start
+
+### Basic Runbook Template
+
+```markdown
+# Runbook: [Task Name]
+
+## Overview
+[Brief description of what this runbook covers]
+
+## Prerequisites
+- [ ] Requirement 1
+- [ ] Requirement 2
+
+## Steps
+
+### Step 1: [Action]
+1. Do this
+2. Then this
+3. Verify result
+
+### Step 2: [Action]
+[Detailed steps]
+
+## Troubleshooting
+
+### Problem: [Issue]
+**Symptoms:** [What you see]
+**Solution:** [How to fix]
+
+## Rollback
+
+If something goes wrong:
+1. Step 1
+2. Step 2
+
+## Related Runbooks
+- [Related runbook 1]
+- [Related runbook 2]
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Clear Purpose**: Each runbook has clear purpose and scope
+- [ ] **Step-by-Step**: Instructions are numbered and sequential
+- [ ] **Prerequisites**: All prerequisites listed and verified
+- [ ] **Verification**: Each step includes verification criteria
+- [ ] **Troubleshooting**: Common issues and solutions documented
+- [ ] **Rollback**: Rollback procedures included for risky operations
+- [ ] **Testing**: Runbooks tested by someone other than author
+- [ ] **Updates**: Runbooks reviewed and updated regularly
+- [ ] **Accessibility**: Runbooks easily accessible to team
+- [ ] **Version Control**: Runbooks versioned and tracked
+- [ ] **Feedback**: Mechanism for team to provide feedback
+- [ ] **Links**: Related runbooks and documentation linked
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Vague Instructions
+
+```markdown
+# ❌ Bad - Unclear
+## Step 1: Restart the service
+[No details on how]
+```
+
+```markdown
+# ✅ Good - Specific
+## Step 1: Restart the service
+1. SSH into server: `ssh user@server`
+2. Check service status: `systemctl status myservice`
+3. Restart service: `sudo systemctl restart myservice`
+4. Verify: `systemctl status myservice` (should show "active")
+```
+
+### ❌ Don't: Missing Prerequisites
+
+```markdown
+# ❌ Bad - No prerequisites
+## Steps
+1. Run deployment script
+```
+
+```markdown
+# ✅ Good - Prerequisites listed
+## Prerequisites
+- [ ] Access to production environment
+- [ ] Database backup completed
+- [ ] Team notified of maintenance window
+
+## Steps
+1. Run deployment script
+```
+
+### ❌ Don't: No Troubleshooting
+
+```markdown
+# ❌ Bad - No help when things go wrong
+## Steps
+1. Deploy application
+[What if it fails?]
+```
+
+```markdown
+# ✅ Good - Troubleshooting included
+## Steps
+1. Deploy application
+
+## Troubleshooting
+
+### Problem: Deployment fails
+**Symptoms:** Error message "Connection timeout"
+**Solution:** 
+1. Check network connectivity
+2. Verify credentials
+3. Retry with increased timeout
+```
+
+---
+
+## Integration Points
+
+- **Technical Writing** (`21-documentation/technical-writing/`) - Clear documentation
+- **System Architecture** (`21-documentation/system-architecture-docs/`) - System context
+- **Incident Management** (`41-incident-management/`) - Incident response runbooks
+
+---
+
+## Further Reading
+
+- [Google SRE Runbook](https://sre.google/workbook/runbooks/)
+- [Runbook Best Practices](https://www.atlassian.com/incident-management/handbook/runbooks)
 - Get peer reviews
 - Share knowledge
 - Use version control
@@ -1651,4 +1969,3 @@ echo "Restore completed"
 - Answer questions
 - Solve problems
 - Enable decisions
-```

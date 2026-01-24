@@ -1,4 +1,18 @@
+---
+name: Secure Coding
+description: Writing secure code following security principles like least privilege, defense in depth, input validation, and secure design patterns to prevent vulnerabilities.
+---
+
 # Secure Coding
+
+> **Current Level:** Intermediate  
+> **Domain:** Security / Code Quality
+
+---
+
+## Overview
+
+Secure coding practices prevent vulnerabilities and security breaches by following security principles from the start. Effective secure coding includes input validation, output encoding, proper error handling, and following security best practices throughout the development lifecycle.
 
 ## Secure Coding Principles
 
@@ -783,26 +797,121 @@ app.get('/ping/:host', (req, res) => {
 });
 ```
 
-## Summary Checklist
+---
 
-### Before Coding
+## Quick Start
 
-- [ ] Understand security requirements
-- [ ] Review threat model
-- [ ] Choose secure libraries
-- [ ] Set up security tools
+### Input Validation
 
-### During Coding
+```python
+from pydantic import BaseModel, validator, EmailStr
 
-- [ ] Validate all input
-- [ ] Encode all output
-- [ ] Use parameterized queries
-- [ ] Implement proper auth/authz
-- [ ] Handle errors securely
+class UserInput(BaseModel):
+    email: EmailStr
+    age: int
+    
+    @validator('age')
+    def validate_age(cls, v):
+        if v < 0 or v > 150:
+            raise ValueError('Age must be between 0 and 150')
+        return v
 
-### Before Deployment
+# Usage
+try:
+    user = UserInput(email="user@example.com", age=25)
+except ValidationError as e:
+    # Handle validation error
+    pass
+```
 
-- [ ] Run SAST scan
+### Parameterized Queries
+
+```python
+# ❌ Bad - SQL injection risk
+cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")
+
+# ✅ Good - Parameterized query
+cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Input Validation**: Validate and sanitize all user input
+- [ ] **Output Encoding**: Encode output to prevent XSS
+- [ ] **Parameterized Queries**: Use parameterized queries (no SQL injection)
+- [ ] **Authentication**: Implement proper authentication
+- [ ] **Authorization**: Implement proper authorization (RBAC)
+- [ ] **Error Handling**: Don't expose sensitive info in errors
+- [ ] **Secrets Management**: Never commit secrets to code
+- [ ] **Dependencies**: Keep dependencies updated (vulnerability scanning)
+- [ ] **SAST**: Run static analysis security testing
+- [ ] **DAST**: Run dynamic analysis security testing
+- [ ] **Code Review**: Security-focused code reviews
+- [ ] **Security Training**: Team trained on secure coding
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Trust User Input
+
+```python
+# ❌ Bad - No validation
+def process_user_input(data):
+    return f"Hello {data['name']}"  # XSS risk!
+```
+
+```python
+# ✅ Good - Validate and encode
+from html import escape
+
+def process_user_input(data):
+    name = validate_name(data['name'])  # Validate
+    return f"Hello {escape(name)}"  # Encode
+```
+
+### ❌ Don't: SQL Injection
+
+```python
+# ❌ Bad - SQL injection
+query = f"SELECT * FROM users WHERE name = '{name}'"
+```
+
+```python
+# ✅ Good - Parameterized query
+query = "SELECT * FROM users WHERE name = %s"
+cursor.execute(query, (name,))
+```
+
+### ❌ Don't: Expose Secrets
+
+```python
+# ❌ Bad - Secret in code
+api_key = "sk-1234567890"  # Committed to repo!
+```
+
+```python
+# ✅ Good - Environment variable
+api_key = os.getenv('API_KEY')  # From secrets manager
+```
+
+---
+
+## Integration Points
+
+- **Secrets Management** (`24-security-practices/secrets-management/`) - Secure secrets
+- **OWASP Top 10** (`24-security-practices/owasp-top-10/`) - Common vulnerabilities
+- **Security Audit** (`24-security-practices/security-audit/`) - Security reviews
+
+---
+
+## Further Reading
+
+- [OWASP Secure Coding](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)
+- [CWE Top 25](https://cwe.mitre.org/top25/)
+- [Secure Coding Guidelines](https://cheatsheetseries.owasp.org/)
 - [ ] Run dependency scan
 - [ ] Review security headers
 - [ ] Test for vulnerabilities

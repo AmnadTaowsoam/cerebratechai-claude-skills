@@ -1,18 +1,134 @@
----
-id: api-design
-title: RESTful API Design Principles
-description: RESTful API design principles, best practices, and patterns for building consistent, scalable, and developer-friendly APIs
-category: 01-foundations
-tags:
-  - api
-  - rest
-  - http
-  - design
-  - backend
-lastUpdated: 2024-01-19
+### **01: RESTful API Design Principles**
+
+> 
+> **Current Level:** Expert (Enterprise Scale) 
+> 
+> 
+> **Domain:** Foundations / Backend Development 
+> 
+
 ---
 
-# RESTful API Design Principles
+### **1. Executive Summary & Strategic Necessity**
+
+* **Context:** ในโลกปี 2025-2026 การออกแบบ RESTful API เป็นทักษะสำคัญที่มีผลกระทบต่อความสามารถในการขยายระบบและประสิทธิภาพของทีมพัฒนา API ที่ดีจะช่วยลด Technical Debt ที่เกิดจากการออกแบบ API ที่ไม่ดี และช่วยให้ผู้ใช้งาน (Developers, Partners, Customers) ได้สร้าง Integration ได้อย่างรวดเร็วและเสถียร
+* **Business Impact:** การออกแบบ RESTful API ที่มีประสิทธิภาพช่วย:
+  - ลดเวลาในการพัฒนา Integration ใหม่
+  - เพิ่มความพึงพอใจของผู้ใช้งาน (Developers)
+  - ลดความเสี่ยงที่อาจเกิดจากการเรียก API ที่ไม่ถูกต้อง
+  - เพิ่มความเสถียรและ Performance ของระบบ
+  - ลดต้นทุนในการบำรุงและการแก้ไข
+  - เพิ่มประสิทธิภาพในการวางแผน Roadmap และการจัดการ Version
+* **Product Thinking:** ทักษะนี้ช่วยแก้ปัญหา (Pain Point) ให้กับ:
+  - ทีมพัฒนาที่ต้องการ API ที่เอกสารอย่างชัดเจนและใช้งานได้ง่าย
+  - ผู้ใช้งาน (Partners) ที่ต้องการ API ที่เสถียรและมีการรองรับที่ดี
+  - ลูกค้าที่ต้องการ API ที่ตอบสนองรวดเร็ว
+  - ทีม Support ที่ต้องการ API ที่มี Error Messages ที่ชัดเจน
+  - ผู้บริหารที่ต้องการ API ที่สามารถวัดและวิเคราะห์การใช้งานได้
+
+### **2. Technical Deep Dive (The "How-to")**
+
+* **Core Logic:** RESTful API Design เป็นกระบวนการที่ช่วยให้:
+  - **Resource-First Thinking:** การออกแบบ API รอบ Resources (Nouns) ไม่ใช่ Actions (Verbs)
+  - **Consistency:** การใช้ Naming Conventions, Response Formats, Error Handling ที่สอดคล้องกัน
+  - **HTTP Semantics:** การใช้ HTTP Methods และ Status Codes ตามความหมายของแต่ละ Method
+  - **Statelessness:** แต่ละ Request ต้องมีข้อมูลครบถ้วน ไม่ต้องพึ่พึง Session บน Server
+  - **Versioning:** การวางแผนการเปลี่ยนแปลง API ตั้งแต่เริ่ม
+  - **Security:** การใช้ Authentication, Authorization, Rate Limiting, Input Validation
+
+* **Architecture Diagram Requirements:** แผนผังสถาปัตยกรรมที่ต้องมี:
+  - **API Resource Hierarchy:** แผนผังแสดงความสัมพันธ์ระหว่าง Resources
+  - **Request/Response Flow:** แผนผังแสดงการไหลของ Request และ Response
+  - **Authentication Flow:** แผนผังแสดงการ Authentication และ Authorization
+  - **Error Handling Flow:** แผนผังแสดงการจัดการ Error
+  - **Versioning Strategy:** แผนผังแสดงการจัดการ Version ของ API
+
+* **Implementation Workflow:**
+  1. **Define Resources:** ระบุ Resources ทั้งหมดที่ API จะให้บริการ
+  2. **Design Endpoints:** ออกแบบ Endpoints ตาม RESTful Principles
+  3. **Define Request/Response Formats:** กำหนด Format ของ Request และ Response
+  4. **Define Error Handling:** กำหนด Error Response Format และ Error Codes
+  5. **Implement Authentication/Authorization:** สร้างระบบ Authentication และ Authorization
+  6. **Implement Rate Limiting:** สร้างระบบ Rate Limiting เพื่อป้องกันการใช้งานเกิน
+  7. **Write Documentation:** สร้าง API Documentation (OpenAPI/Swagger)
+  8. **Test API:** ทดสอบ API ด้วย Integration Tests และ Load Tests
+  9. **Deploy and Monitor:** Deploy API และติดตาม Performance และ Errors
+
+### **3. Tooling & Tech Stack**
+
+* **Enterprise Tools:** เครื่องมือระดับอุตสาหกรรมที่เลือกใช้:
+  - **API Documentation:** OpenAPI/Swagger, Postman, Insomnia, Redoc
+  - **API Testing:** Postman, Insomnia, REST Client, JMeter
+  - **API Gateway:** Kong, AWS API Gateway, Azure API Management
+  - **Monitoring:** Datadog, New Relic, Prometheus, Grafana
+  - **Documentation Platforms:** Confluence, Notion, GitHub Wiki
+
+* **Configuration Essentials:** ส่วนประกอบสำคัญในการตั้งค่า:
+  - **API Gateway Configuration:** การตั้งค่า API Gateway (Rate Limiting, Caching, Authentication)
+  - **CORS Configuration:** การตั้งค่า CORS สำหรับ Cross-Origin Requests
+  - **Security Headers:** การตั้งค่า Security Headers (CSP, X-Frame-Options, etc.)
+  - **Rate Limiting Rules:** การตั้งค่า Rate Limiting ตาม User Plan หรือ Endpoint
+  - **Monitoring Alerts:** การตั้งค่า Alerts สำหรับ Performance และ Errors
+
+### **4. Standards, Compliance & Security**
+
+* **International Standards:** มาตรฐานที่เกี่ยวข้อง:
+  - **RFC 7231-7235:** HTTP/1.1
+  - **RFC 8288:** The OAuth 2.0 Authorization Framework
+  - **OpenAPI Specification:** OpenAPI 3.0 Specification
+  - **OWASP API Security:** OWASP API Security Top 10
+
+* **Security Protocol:** กลไกการป้องกัน:
+  - **Authentication:** การใช้ JWT, OAuth 2.0, API Keys
+  - **Authorization:** การใช้ Role-Based Access Control (RBAC)
+  - **Input Validation:** การตรวจสอบและ Validate ข้อมูลที่รับมา
+  - **Output Encoding:** การ Encode Output เพื่อป้องกัน XSS
+  - **Rate Limiting:** การจำกัด Request ต่อวินาที
+  - **HTTPS Only:** การบังคับให้ใช้ HTTPS เท่านั้น
+
+* **Explainability:** ความสามารถในการอธิบาย:
+  - **API Documentation:** การบันทึก API Documentation อย่างละเอียด
+  - **Error Messages:** การใช้ Error Messages ที่ชัดเจนและ Actionable
+  - **Request/Response Examples:** การให้ตัวอย่างของ Request และ Response
+  - **Use Cases:** การอธิบาย Use Cases และ Workflows
+  - **Changelog:** การบันทึกการเปลี่ยนแปลง API
+
+### **5. Unit Economics & Performance Metrics (KPIs)**
+
+* **Cost Calculation:** สูตรการคำนวณต้นทุนต่อหน่วย (COGS):
+  ```
+  Total Cost = (Development Cost) + (Infrastructure Cost) + (Monitoring Cost)
+  
+  ROI = (Developer Productivity Gain - Total Cost) / Total Cost × 100%
+  
+  Developer Productivity Gain = (Time Saved × Hourly Rate × Number of Developers)
+  ```
+
+* **Key Performance Indicators:** ตัวชี้วัดความสำเร็จทางเทคนิค:
+  - **API Response Time:** เวลาเฉลี่ยในการตอบสนอง (Target: < 100ms P95)
+  - **API Availability:** % ของเวลาที่ API พร้อมใช้งาน (Target: > 99.9%)
+  - **Error Rate:** % ของ Request ที่ล้มเหลว (Target: < 0.1%)
+  - **Developer Satisfaction:** ความพึงพอใจของผู้ใช้งาน (Target: > 4/5)
+  - **Integration Success Rate:** % ของ Integration ที่สำเร็จในครั้งแรก (Target: > 95%)
+
+### **6. Strategic Recommendations (CTO Insights)**
+
+* **Phase Rollout:** คำแนะนำในการทยอยเริ่มใช้งาน:
+  1. **Phase 1 (Months 1-2):** สร้าง API Design Guidelines และ Template, ฝึกอบรมทีม
+  2. **Phase 2 (Months 3-4):** ออกแบบ API ใหม่ตาม RESTful Principles
+  3. **Phase 3 (Months 5-6):** สร้าง API Gateway และ Monitoring
+  4. **Phase 4 (Year 2+):** ขยายไปยังทุกทีม, สร้าง Culture ของการออกแบบ API ที่ดี
+
+* **Pitfalls to Avoid:** ข้อควรระวังที่มักจะผิดพลาด:
+  - **Over-engineering:** หลีกเลี่ยงการออกแบบ API ที่ซับซ้อนเกินไป
+  - **Inconsistent Naming:** ต้องใช้ Naming Conventions ที่สอดคล้องกัน
+  - **Poor Error Handling:** ต้องใช้ Error Response Format ที่สอดคล้องกัน
+  - **No Versioning:** ต้องวางแผนการเปลี่ยนแปลง API ตั้งแต่เริ่ม
+  - **Missing Documentation:** ต้องมี API Documentation ที่ครบถ้วน
+  - **No Rate Limiting:** ต้องมี Rate Limiting เพื่อป้องกันการใช้งานเกิน
+  - **Ignoring Security:** ต้องพิจารณา Security ตั้งแต่เริ่ม
+
+---
 
 ## Overview
 
@@ -49,7 +165,6 @@ Use HTTP methods and status codes according to their intended semantic meaning:
 - **PUT**: Replace entire resource (idempotent, unsafe)
 - **PATCH**: Partial update (non-idempotent, unsafe)
 - **DELETE**: Remove resource (idempotent, unsafe)
-
 
 ## Table of Contents
 
@@ -98,8 +213,6 @@ REST (Representational State Transfer) is an architectural style based on six ke
 
 ### 6. Code on Demand (Optional)
 - Server can extend client functionality by transferring executable code
-
----
 
 ## HTTP Methods
 
@@ -224,8 +337,6 @@ HTTP/1.1 200 OK
 - Return 404 if resource doesn't exist
 - Consider soft delete for audit trails
 
----
-
 ## URL Structure and Naming
 
 ### Resource Naming Conventions
@@ -240,6 +351,7 @@ GET /api/v1/product-categories
 GET /api/v1/getUser
 GET /api/v1/user
 GET /api/v1/orderItems
+GET /api/v1/productCategories
 ```
 
 ### Resource Hierarchy
@@ -271,29 +383,8 @@ GET /api/v1/orders/456/items?include=details
 GET /api/v1/users?page=2&limit=20
 GET /api/v1/users?offset=40&limit=20
 GET /api/v1/users?cursor=eyJpZCI6MTAwfQ==
-
-# Filtering
-GET /api/v1/users?status=active
-GET /api/v1/users?role=admin&status=active
-GET /api/v1/users?created_after=2024-01-01
-GET /api/v1/products?price_min=100&price_max=500
-
-# Sorting
-GET /api/v1/users?sort=created_at
-GET /api/v1/users?sort=-created_at              # Descending
-GET /api/v1/users?sort=name,-created_at         # Multiple fields
-
-# Field Selection (Sparse Fieldsets)
-GET /api/v1/users?fields=id,name,email
-GET /api/v1/users/123?fields=id,name
-
-# Search
 GET /api/v1/users?search=john
 GET /api/v1/products?q=laptop
-
-# Including Related Resources
-GET /api/v1/orders?include=user,items
-GET /api/v1/users/123?include=orders,profile
 ```
 
 ### URL Structure Examples
@@ -313,8 +404,6 @@ POST /api/v1/orders/456/cancel
 POST /api/v1/payments/789/refund
 ```
 
----
-
 ## Status Codes
 
 ### 2xx Success
@@ -325,24 +414,6 @@ POST /api/v1/payments/789/refund
 | 201 | Created | Successful POST creating a resource |
 | 202 | Accepted | Request accepted for async processing |
 | 204 | No Content | Successful request with no response body |
-
-```typescript
-// 200 OK - Successful retrieval
-res.status(200).json({ data: user });
-
-// 201 Created - Resource created
-res.status(201).json({ data: newUser });
-
-// 202 Accepted - Async processing started
-res.status(202).json({
-  message: "Export job started",
-  jobId: "abc-123",
-  statusUrl: "/api/v1/jobs/abc-123"
-});
-
-// 204 No Content - Successful deletion
-res.status(204).send();
-```
 
 ### 4xx Client Errors
 
@@ -359,69 +430,6 @@ res.status(204).send();
 | 422 | Unprocessable Entity | Validation errors |
 | 429 | Too Many Requests | Rate limit exceeded |
 
-```typescript
-// 400 Bad Request
-res.status(400).json({
-  error: {
-    code: "INVALID_REQUEST",
-    message: "Invalid JSON in request body"
-  }
-});
-
-// 401 Unauthorized
-res.status(401).json({
-  error: {
-    code: "AUTHENTICATION_REQUIRED",
-    message: "Missing or invalid authorization token"
-  }
-});
-
-// 403 Forbidden
-res.status(403).json({
-  error: {
-    code: "PERMISSION_DENIED",
-    message: "You don't have permission to access this resource"
-  }
-});
-
-// 404 Not Found
-res.status(404).json({
-  error: {
-    code: "RESOURCE_NOT_FOUND",
-    message: "User with ID 123 not found"
-  }
-});
-
-// 409 Conflict
-res.status(409).json({
-  error: {
-    code: "RESOURCE_CONFLICT",
-    message: "Email already exists"
-  }
-});
-
-// 422 Unprocessable Entity (Validation)
-res.status(422).json({
-  error: {
-    code: "VALIDATION_ERROR",
-    message: "Validation failed",
-    details: [
-      { field: "email", message: "Invalid email format" },
-      { field: "password", message: "Must be at least 8 characters" }
-    ]
-  }
-});
-
-// 429 Too Many Requests
-res.status(429).json({
-  error: {
-    code: "RATE_LIMIT_EXCEEDED",
-    message: "Too many requests. Please try again later.",
-    retryAfter: 60
-  }
-});
-```
-
 ### 5xx Server Errors
 
 | Code | Name | Usage |
@@ -430,28 +438,6 @@ res.status(429).json({
 | 502 | Bad Gateway | Invalid response from upstream server |
 | 503 | Service Unavailable | Server temporarily unavailable |
 | 504 | Gateway Timeout | Upstream server timeout |
-
-```typescript
-// 500 Internal Server Error
-res.status(500).json({
-  error: {
-    code: "INTERNAL_ERROR",
-    message: "An unexpected error occurred",
-    requestId: "req-abc-123"  // For debugging
-  }
-});
-
-// 503 Service Unavailable
-res.status(503).json({
-  error: {
-    code: "SERVICE_UNAVAILABLE",
-    message: "Service is under maintenance",
-    retryAfter: 3600
-  }
-});
-```
-
----
 
 ## Request/Response Format
 
@@ -640,8 +626,6 @@ Always use ISO 8601 format:
 }
 ```
 
----
-
 ## Versioning Strategies
 
 ### URL Path Versioning (Recommended)
@@ -704,8 +688,6 @@ app.use('/api/v1', (req, res, next) => {
 3. Announce deprecation with sunset headers
 4. Provide migration guides
 5. Use semantic versioning for breaking changes
-
----
 
 ## Authentication Patterns
 
@@ -822,15 +804,13 @@ redirect_uri=https://app.example.com/callback
 
 // Token response
 {
-  "access_token": "eyJhbGciOiJSUzI1NiIs...",
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
   "token_type": "Bearer",
   "expires_in": 3600,
-  "refresh_token": "dGhpcyBpcyBhIHJlZnJl...",
+  "refresh_token": "dGhpcyBpcyBhIHJlZnJlc2gu",
   "scope": "read write"
 }
 ```
-
----
 
 ## Rate Limiting
 
@@ -900,8 +880,6 @@ export const rateLimitByPlan = (req: Request) => {
   return limits[plan];
 };
 ```
-
----
 
 ## CORS Configuration
 
@@ -973,8 +951,6 @@ app.options('/api/*', (req, res) => {
 });
 ```
 
----
-
 ## API Documentation
 
 ### OpenAPI/Swagger Specification
@@ -1025,24 +1001,6 @@ paths:
                 $ref: '#/components/schemas/UserListResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
-
-    post:
-      summary: Create a user
-      tags:
-        - Users
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateUserRequest'
-      responses:
-        '201':
-          description: User created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserResponse'
         '422':
           $ref: '#/components/responses/ValidationError'
 
@@ -1065,38 +1023,13 @@ components:
           type: string
           format: date-time
 
-    CreateUserRequest:
-      type: object
-      required:
-        - email
-        - name
-      properties:
-        email:
-          type: string
-          format: email
-        name:
-          type: string
-          minLength: 1
-          maxLength: 100
-
-    Error:
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            code:
-              type: string
-            message:
-              type: string
-
-  responses:
-    Unauthorized:
-      description: Authentication required
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+    responses:
+      Unauthorized:
+        description: Authentication required
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
 
   securitySchemes:
     bearerAuth:
@@ -1121,8 +1054,6 @@ security:
 - [ ] Webhook documentation (if applicable)
 - [ ] Testing/sandbox environment details
 
----
-
 ## Common API Patterns Checklist
 
 ### Design Phase
@@ -1132,7 +1063,7 @@ security:
 - [ ] Use kebab-case for multi-word resources
 - [ ] Limit URL nesting to 2-3 levels maximum
 - [ ] Design consistent response envelopes
-- [ ] Plan versioning strategy from the start
+- [ ] Plan versioning strategy from start
 - [ ] Define standard error response format
 
 ### Implementation Phase
@@ -1186,8 +1117,6 @@ security:
 - [ ] Track rate limit violations
 - [ ] Monitor authentication failures
 
----
-
 ## Quick Reference
 
 ### HTTP Methods Cheat Sheet
@@ -1228,8 +1157,6 @@ X-RateLimit-Remaining: 999
 X-RateLimit-Reset: 1705312800
 Cache-Control: no-cache, private
 ```
-
----
 
 ## Common Pitfalls
 
@@ -1465,8 +1392,6 @@ res.json({ data: users });
 res.set('Cache-Control', 'public, max-age=300');
 res.json({ data: users });
 ```
-
----
 
 ## Additional Resources
 

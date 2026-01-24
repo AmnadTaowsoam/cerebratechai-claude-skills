@@ -1,8 +1,20 @@
+---
+name: Canary Deployment
+description: Gradually rolling out new versions to a subset of users, monitoring for issues, and expanding the rollout if everything looks healthy to minimize risk and enable fast rollback.
+---
+
 # Canary Deployment
 
-## What is Canary Deployment
+> **Current Level:** Intermediate  
+> **Domain:** DevOps / Deployment
 
-Canary deployment is a deployment strategy where you gradually roll out a new version to a subset of users, monitor for issues, and expand the rollout if everything looks healthy.
+---
+
+## Overview
+
+Canary deployment is a deployment strategy where you gradually roll out a new version to a subset of users, monitor for issues, and expand the rollout if everything looks healthy. This minimizes risk by catching issues early and enabling fast rollback.
+
+## What is Canary Deployment
 
 ### Core Concept
 
@@ -1315,6 +1327,189 @@ def canary_without_rollback():
 - [ ] Rollback procedure documented
 - [ ] Rollback tested
 - [ ] Rollback automated
+```
+
+---
+
+## Quick Start
+
+### Kubernetes Canary Deployment
+
+```yaml
+# canary-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-canary
+spec:
+  replicas: 1  # 5% of traffic
+  selector:
+    matchLabels:
+      app: myapp
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: myapp
+        version: canary
+    spec:
+      containers:
+      - name: app
+        image: myapp:v2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+spec:
+  selector:
+    app: myapp
+  ports:
+  - port: 80
+```
+
+### Traffic Splitting
+
+```yaml
+# Istio VirtualService for canary
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: app
+spec:
+  hosts:
+  - app.example.com
+  http:
+  - match:
+    - headers:
+        canary:
+          exact: "true"
+    route:
+    - destination:
+        host: app
+        subset: canary
+      weight: 100
+  - route:
+    - destination:
+        host: app
+        subset: stable
+      weight: 95
+    - destination:
+        host: app
+        subset: canary
+      weight: 5
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Traffic Splitting**: Configure traffic splitting (5% initial)
+- [ ] **Monitoring**: Set up comprehensive monitoring
+- [ ] **Metrics**: Define success/failure metrics
+- [ ] **Alerts**: Configure alerts for canary issues
+- [ ] **Rollback Plan**: Automated rollback triggers
+- [ ] **Testing**: Test canary deployment process
+- [ ] **Documentation**: Document canary procedure
+- [ ] **Approval**: Approval process for promotion
+- [ ] **Timeline**: Define canary duration (e.g., 1 hour)
+- [ ] **Gradual Rollout**: Plan for gradual traffic increase
+- [ ] **Communication**: Notify team of canary deployment
+- [ ] **Validation**: Validate canary health before promotion
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Monitoring
+
+```yaml
+# ❌ Bad - Deploy without monitoring
+apiVersion: apps/v1
+kind: Deployment
+# No health checks or metrics!
+```
+
+```yaml
+# ✅ Good - With monitoring
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+```
+
+### ❌ Don't: Too Fast Rollout
+
+```yaml
+# ❌ Bad - Jump to 100% immediately
+weight: 5  # 5%
+# ... 1 minute later
+weight: 100  # 100% - Too fast!
+```
+
+```yaml
+# ✅ Good - Gradual increase
+# Stage 1: 5% for 1 hour
+weight: 5
+# Stage 2: 25% for 1 hour
+weight: 25
+# Stage 3: 50% for 1 hour
+weight: 50
+# Stage 4: 100%
+weight: 100
+```
+
+### ❌ Don't: No Rollback Triggers
+
+```yaml
+# ❌ Bad - Manual rollback only
+# No automatic triggers
+```
+
+```yaml
+# ✅ Good - Automatic rollback
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+spec:
+  strategy:
+    canary:
+      steps:
+      - setWeight: 5
+      - pause: { duration: 1h }
+      - analysis:
+          templates:
+          - templateName: error-rate
+          args:
+          - name: error-rate
+            value: "0.01"  # Rollback if > 1%
+```
+
+---
+
+## Integration Points
+
+- **Blue-Green Deployment** (`26-deployment-strategies/blue-green-deployment/`) - Alternative strategy
+- **Rollback Strategies** (`26-deployment-strategies/rollback-strategies/`) - Rollback procedures
+- **Monitoring** (`14-monitoring-observability/`) - Deployment monitoring
+
+---
+
+## Further Reading
+
+- [Kubernetes Canary Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#canary-deployment)
+- [Istio Traffic Management](https://istio.io/latest/docs/tasks/traffic-management/)
+- [Argo Rollouts](https://argoproj.github.io/argo-rollouts/)
 - [ ] Rollback monitored
 
 ### Post-Deployment

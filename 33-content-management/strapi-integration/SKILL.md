@@ -1,8 +1,18 @@
+---
+name: Strapi Integration
+description: Integrating with Strapi open-source headless CMS built with Node.js, including setup, content types, customization, API integration, and deployment patterns.
+---
+
 # Strapi Integration
+
+> **Current Level:** Intermediate  
+> **Domain:** Content Management / Backend
+
+---
 
 ## Overview
 
-Strapi is an open-source headless CMS built with Node.js. This guide covers setup, content types, customization, and integration patterns.
+Strapi is an open-source headless CMS built with Node.js. This guide covers setup, content types, customization, and integration patterns for building content-driven applications with a developer-friendly CMS.
 
 ## Strapi Setup
 
@@ -595,6 +605,100 @@ module.exports = ({ env }) => ({
 8. **Plugins** - Develop custom plugins for specific needs
 9. **Performance** - Optimize queries with populate
 10. **Deployment** - Use Docker for consistent deployments
+
+---
+
+## Quick Start
+
+### Strapi API Client
+
+```javascript
+const Strapi = require('strapi-sdk-javascript').default
+
+const strapi = new Strapi('http://localhost:1337')
+
+// Fetch entries
+const articles = await strapi.getEntries('articles', {
+  _sort: 'created_at:desc',
+  _limit: 10
+})
+
+// Create entry
+const article = await strapi.createEntry('articles', {
+  title: 'My Article',
+  content: 'Article content',
+  published: true
+})
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Strapi Setup**: Strapi instance configured
+- [ ] **Content Types**: Content types defined
+- [ ] **API Access**: API access configured
+- [ ] **Authentication**: API authentication set up
+- [ ] **Permissions**: Content permissions configured
+- [ ] **Media Library**: Media library configured
+- [ ] **Custom Fields**: Custom fields added if needed
+- [ ] **Webhooks**: Webhooks for content updates
+- [ ] **Caching**: Cache API responses
+- [ ] **Performance**: Optimize API performance
+- [ ] **Documentation**: Document content structure
+- [ ] **Backup**: Backup Strapi data
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Expose Admin API
+
+```javascript
+// ❌ Bad - Expose admin API
+const strapi = new Strapi('http://localhost:1337/admin')
+// Admin API exposed!
+```
+
+```javascript
+// ✅ Good - Use public API
+const strapi = new Strapi('http://localhost:1337')
+// Public API with proper permissions
+```
+
+### ❌ Don't: No Caching
+
+```javascript
+// ❌ Bad - No caching
+const articles = await strapi.getEntries('articles')
+// Every request hits Strapi!
+```
+
+```javascript
+// ✅ Good - Cache responses
+const cacheKey = 'articles'
+let articles = await cache.get(cacheKey)
+if (!articles) {
+  articles = await strapi.getEntries('articles')
+  await cache.set(cacheKey, articles, 3600)  // 1 hour
+}
+```
+
+---
+
+## Integration Points
+
+- **Headless CMS** (`33-content-management/headless-cms/`) - CMS patterns
+- **Contentful Integration** (`33-content-management/contentful-integration/`) - Alternative CMS
+- **Next.js Patterns** (`02-frontend/nextjs-patterns/`) - SSG/ISR
+
+---
+
+## Further Reading
+
+- [Strapi Documentation](https://docs.strapi.io/)
+- [Strapi SDK](https://github.com/strapi/strapi-sdk-javascript)
+- [Strapi Deployment](https://docs.strapi.io/developer-docs/latest/setup-deployment-guides/deployment.html)
 
 ## Resources
 

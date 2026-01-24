@@ -1,8 +1,18 @@
+---
+name: Custom CRM Development
+description: Building custom CRM systems with careful architecture planning, database design, core features including contact management, deal pipeline, activity tracking, and implementation patterns.
+---
+
 # Custom CRM Development
+
+> **Current Level:** Advanced  
+> **Domain:** CRM / Backend / Architecture
+
+---
 
 ## Overview
 
-Building a custom CRM system requires careful architecture planning. This guide covers database design, core features, and implementation patterns.
+Building a custom CRM system requires careful architecture planning. This guide covers database design, core features, and implementation patterns for building scalable CRM systems that meet specific business needs.
 
 ## CRM Architecture
 
@@ -474,8 +484,112 @@ export default router;
 9. **Audit Trail** - Track all changes
 10. **Mobile** - Design mobile-friendly APIs
 
-## Resources
+---
+
+## Quick Start
+
+### CRM Data Model
+
+```typescript
+interface Contact {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  company?: Company
+  deals: Deal[]
+  activities: Activity[]
+}
+
+interface Deal {
+  id: string
+  name: string
+  value: number
+  stage: string
+  probability: number
+  contact: Contact
+  expectedCloseDate?: Date
+}
+
+interface Activity {
+  id: string
+  type: 'call' | 'email' | 'meeting' | 'note'
+  subject: string
+  description: string
+  contact: Contact
+  createdAt: Date
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Architecture**: CRM architecture designed
+- [ ] **Data Model**: Flexible data model
+- [ ] **Contact Management**: Contact management
+- [ ] **Deal Pipeline**: Deal pipeline
+- [ ] **Activity Tracking**: Activity tracking
+- [ ] **Custom Fields**: Support custom fields
+- [ ] **Search**: Full-text search
+- [ ] **Reporting**: CRM reports
+- [ ] **Integration**: External integrations
+- [ ] **Security**: Access control
+- [ ] **Documentation**: Document CRM structure
+- [ ] **Testing**: Test CRM functionality
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Rigid Schema
+
+```typescript
+// ❌ Bad - Fixed schema
+interface Contact {
+  field1: string
+  field2: string
+  // Can't add custom fields!
+}
+```
+
+```typescript
+// ✅ Good - Flexible schema
+interface Contact {
+  id: string
+  customFields: Record<string, any>  // Flexible
+}
+```
+
+### ❌ Don't: No Data Validation
+
+```typescript
+// ❌ Bad - No validation
+await db.contacts.create({ data: contact })
+// Invalid data possible!
+```
+
+```typescript
+// ✅ Good - Validate
+const validated = validateContact(contact)
+await db.contacts.create({ data: validated })
+```
+
+---
+
+## Integration Points
+
+- **Contact Management** (`32-crm-integration/contact-management/`) - Contact patterns
+- **Sales Pipeline** (`32-crm-integration/sales-pipeline/`) - Pipeline patterns
+- **Lead Management** (`32-crm-integration/lead-management/`) - Lead patterns
+
+---
+
+## Further Reading
 
 - [CRM Best Practices](https://www.salesforce.com/resources/articles/crm-best-practices/)
+- [CRM Architecture](https://www.hubspot.com/crm)
+
+## Resources
 - [Database Design](https://www.postgresql.org/docs/current/ddl.html)
 - [REST API Design](https://restfulapi.net/)

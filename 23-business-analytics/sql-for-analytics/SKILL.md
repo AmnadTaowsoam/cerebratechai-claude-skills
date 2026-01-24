@@ -1,4 +1,18 @@
+---
+name: SQL for Analytics
+description: Writing SQL queries for analytics including aggregations, window functions, CTEs, and complex joins to extract insights from large datasets efficiently.
+---
+
 # SQL for Analytics
+
+> **Current Level:** Intermediate  
+> **Domain:** Business Analytics / Data Engineering
+
+---
+
+## Overview
+
+Analytics SQL focuses on aggregations, analysis, and insights rather than transactional operations. Effective analytics SQL uses window functions, CTEs, complex joins, and optimization techniques to query large datasets efficiently.
 
 ## Analytics SQL vs Transactional SQL
 
@@ -1154,15 +1168,131 @@ SELECT
 FROM orders;
 ```
 
-## Summary Checklist
+---
 
-### Query Writing
+## Quick Start
 
-- [ ] Understand data schema
-- [ ] Write clear, readable SQL
-- [ ] Use appropriate aggregations
-- [ ] Handle NULL values
-- [ ] Test with sample data
+### Common Analytics Queries
+
+```sql
+-- Daily active users
+SELECT 
+  DATE(created_at) as date,
+  COUNT(DISTINCT user_id) as dau
+FROM events
+WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY DATE(created_at)
+ORDER BY date DESC;
+
+-- Revenue by product
+SELECT 
+  p.name,
+  SUM(oi.quantity * oi.price) as revenue,
+  COUNT(DISTINCT o.order_id) as orders
+FROM orders o
+JOIN order_items oi ON o.order_id = oi.order_id
+JOIN products p ON oi.product_id = p.product_id
+WHERE o.created_at >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY p.name
+ORDER BY revenue DESC;
+
+-- Cohort retention
+WITH first_purchase AS (
+  SELECT 
+    user_id,
+    MIN(created_at) as first_purchase_date
+  FROM orders
+  GROUP BY user_id
+)
+SELECT 
+  DATE_TRUNC('month', fp.first_purchase_date) as cohort_month,
+  COUNT(DISTINCT fp.user_id) as cohort_size,
+  COUNT(DISTINCT o.user_id) as active_users
+FROM first_purchase fp
+LEFT JOIN orders o ON fp.user_id = o.user_id
+  AND DATE_TRUNC('month', o.created_at) = DATE_TRUNC('month', fp.first_purchase_date) + INTERVAL '1 month'
+GROUP BY DATE_TRUNC('month', fp.first_purchase_date);
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Query Optimization**: Optimize queries for performance
+- [ ] **Indexes**: Appropriate indexes for analytics queries
+- [ ] **Window Functions**: Use window functions for rankings
+- [ ] **CTEs**: Use CTEs for complex queries
+- [ ] **NULL Handling**: Handle NULL values properly
+- [ ] **Data Quality**: Validate data quality
+- [ ] **Documentation**: Document query purpose and logic
+- [ ] **Testing**: Test queries with sample data
+- [ ] **Performance**: Monitor query performance
+- [ ] **Caching**: Cache expensive queries
+- [ ] **Version Control**: Version control SQL queries
+- [ ] **Review**: Code review for SQL queries
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: SELECT *
+
+```sql
+-- ❌ Bad - Select all columns
+SELECT * FROM users WHERE status = 'active'
+```
+
+```sql
+-- ✅ Good - Select only needed columns
+SELECT user_id, email, created_at 
+FROM users 
+WHERE status = 'active'
+```
+
+### ❌ Don't: No Indexes
+
+```sql
+-- ❌ Bad - Full table scan
+SELECT * FROM orders WHERE created_at > '2024-01-01'
+-- No index on created_at!
+```
+
+```sql
+-- ✅ Good - With index
+CREATE INDEX idx_orders_created_at ON orders(created_at);
+SELECT * FROM orders WHERE created_at > '2024-01-01'
+```
+
+### ❌ Don't: Ignore NULLs
+
+```sql
+-- ❌ Bad - NULL handling
+SELECT AVG(price) FROM products
+-- NULLs included in count but not in sum!
+```
+
+```sql
+-- ✅ Good - Handle NULLs
+SELECT AVG(COALESCE(price, 0)) FROM products
+-- Or
+SELECT AVG(price) FROM products WHERE price IS NOT NULL
+```
+
+---
+
+## Integration Points
+
+- **Dashboard Design** (`23-business-analytics/dashboard-design/`) - Query results visualization
+- **KPI Metrics** (`23-business-analytics/kpi-metrics/`) - Metric queries
+- **Database Optimization** (`04-database/database-optimization/`) - Query optimization
+
+---
+
+## Further Reading
+
+- [SQL Window Functions](https://www.postgresql.org/docs/current/tutorial-window.html)
+- [SQL Performance Tuning](https://use-the-index-luke.com/)
+- [Analytics SQL Patterns](https://www.mode.com/sql-tutorial/)
 
 ### Performance
 

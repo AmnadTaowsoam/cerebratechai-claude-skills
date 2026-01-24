@@ -1,8 +1,18 @@
+---
+name: Email Marketing Integration
+description: Connecting your application with email service providers for transactional emails, marketing campaigns, and customer communications using SendGrid, Mailchimp, AWS SES, and best practices.
+---
+
 # Email Marketing Integration
+
+> **Current Level:** Intermediate  
+> **Domain:** Marketing / Communication
+
+---
 
 ## Overview
 
-Email marketing integration covers connecting your application with email service providers for transactional emails, marketing campaigns, and customer communications.
+Email marketing integration covers connecting your application with email service providers for transactional emails, marketing campaigns, and customer communications. Effective email integration handles deliverability, templates, tracking, compliance, and automation.
 
 ## Table of Contents
 
@@ -2237,6 +2247,173 @@ def send_templated_email(to_email, from_email, template_name, template_data):
 
 ### Production
 - [ ] Configure production credentials
+- [ ] Set up SPF, DKIM, DMARC records
+- [ ] Monitor deliverability rates
+- [ ] Set up bounce handling
+- [ ] Configure unsubscribe handling
+```
+
+---
+
+## Quick Start
+
+### SendGrid Integration
+
+```javascript
+const sgMail = require('@sendgrid/mail')
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+
+const msg = {
+  to: 'user@example.com',
+  from: 'noreply@example.com',
+  subject: 'Welcome!',
+  text: 'Welcome to our service',
+  html: '<strong>Welcome to our service</strong>'
+}
+
+await sgMail.send(msg)
+```
+
+### AWS SES Integration
+
+```javascript
+const AWS = require('aws-sdk')
+const ses = new AWS.SES({ region: 'us-east-1' })
+
+const params = {
+  Source: 'noreply@example.com',
+  Destination: {
+    ToAddresses: ['user@example.com']
+  },
+  Message: {
+    Subject: { Data: 'Welcome!' },
+    Body: {
+      Html: { Data: '<h1>Welcome!</h1>' },
+      Text: { Data: 'Welcome!' }
+    }
+  }
+}
+
+await ses.sendEmail(params).promise()
+```
+
+### Email Template
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1>Welcome {{name}}!</h1>
+    <p>Thank you for joining us.</p>
+    <a href="{{actionUrl}}" style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none;">
+      Get Started
+    </a>
+  </div>
+</body>
+</html>
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Email Service**: Choose and configure email service provider
+- [ ] **SPF/DKIM/DMARC**: Set up email authentication records
+- [ ] **Templates**: Create responsive email templates
+- [ ] **Unsubscribe**: Implement unsubscribe handling (CAN-SPAM, GDPR)
+- [ ] **Bounce Handling**: Handle bounces and invalid emails
+- [ ] **Rate Limiting**: Respect rate limits to avoid throttling
+- [ ] **Tracking**: Set up open/click tracking (if needed)
+- [ ] **Testing**: Test emails across email clients
+- [ ] **Deliverability**: Monitor spam scores and deliverability
+- [ ] **Compliance**: Ensure GDPR/CAN-SPAM compliance
+- [ ] **Error Handling**: Handle API errors gracefully
+- [ ] **Monitoring**: Monitor email sending success rates
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Unsubscribe Link
+
+```html
+<!-- ❌ Bad - No unsubscribe (violates CAN-SPAM) -->
+<div>Marketing email content</div>
+```
+
+```html
+<!-- ✅ Good - Unsubscribe link included -->
+<div>Marketing email content</div>
+<p><a href="{{unsubscribeUrl}}">Unsubscribe</a></p>
+```
+
+### ❌ Don't: Ignore Bounces
+
+```javascript
+// ❌ Bad - No bounce handling
+await sendEmail(user.email, content)
+```
+
+```javascript
+// ✅ Good - Handle bounces
+try {
+  await sendEmail(user.email, content)
+} catch (error) {
+  if (error.isBounce) {
+    markEmailAsInvalid(user.email)
+  }
+}
+```
+
+### ❌ Don't: No Rate Limiting
+
+```javascript
+// ❌ Bad - Send all at once
+users.forEach(user => sendEmail(user.email))
+```
+
+```javascript
+// ✅ Good - Rate limit
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+for (const user of users) {
+  await sendEmail(user.email)
+  await delay(100)  // 10 emails per second
+}
+```
+
+### ❌ Don't: Hardcoded Email Addresses
+
+```javascript
+// ❌ Bad - Hardcoded
+const fromEmail = 'noreply@example.com'
+```
+
+```javascript
+// ✅ Good - Environment variable
+const fromEmail = process.env.FROM_EMAIL || 'noreply@example.com'
+```
+
+---
+
+## Integration Points
+
+- **Error Handling** (`03-backend-api/error-handling/`) - Email sending errors
+- **Queue Systems** (`08-messaging-queue/`) - Async email sending
+- **Compliance** (`12-compliance-governance/`) - GDPR/CAN-SPAM compliance
+
+---
+
+## Further Reading
+
+- [SendGrid Documentation](https://docs.sendgrid.com/)
+- [AWS SES Guide](https://docs.aws.amazon.com/ses/)
+- [Email Best Practices](https://www.campaignmonitor.com/resources/)
 - [ ] Set up monitoring
 - [ ] Configure error handling
 - [ ] Set up logging

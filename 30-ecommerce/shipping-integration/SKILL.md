@@ -1,10 +1,24 @@
+---
+name: Shipping Carrier Integration
+description: Integrating with shipping carriers for real-time rate calculation, label generation, tracking, and pickup scheduling with various shipping providers like FedEx, UPS, DHL, and USPS.
+---
+
 # Shipping Carrier Integration
+
+> **Current Level:** Intermediate  
+> **Domain:** E-commerce / Logistics
+
+---
 
 ## Overview
 
-Shipping carrier integration enables real-time shipping rate calculation, label generation, tracking, and pickup scheduling with various shipping providers.
+Shipping carrier integration enables real-time shipping rate calculation, label generation, tracking, and pickup scheduling with various shipping providers. Effective integration includes address validation, rate comparison, label generation, and tracking updates.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Shipping Concepts](#shipping-concepts)
 2. [Carrier APIs](#carrier-apis)
@@ -1409,6 +1423,143 @@ async function getShippingRateWithFallback(params: RateRequest): Promise<RateRes
 ```
 
 ---
+
+---
+
+## Quick Start
+
+### Shipping Rate Calculation
+
+```typescript
+interface ShippingRate {
+  carrier: string
+  service: string
+  rate: number
+  estimatedDays: number
+}
+
+async function calculateShippingRates(
+  origin: Address,
+  destination: Address,
+  weight: number,
+  dimensions: Dimensions
+): Promise<ShippingRate[]> {
+  const carriers = ['fedex', 'ups', 'usps']
+  const rates: ShippingRate[] = []
+  
+  for (const carrier of carriers) {
+    const rate = await getCarrierRate(carrier, {
+      origin,
+      destination,
+      weight,
+      dimensions
+    })
+    rates.push(rate)
+  }
+  
+  return rates.sort((a, b) => a.rate - b.rate)
+}
+```
+
+### Label Generation
+
+```typescript
+async function generateShippingLabel(
+  orderId: string,
+  carrier: string,
+  service: string
+): Promise<string> {
+  const order = await getOrder(orderId)
+  
+  const label = await carrierAPI.createLabel({
+    carrier,
+    service,
+    from: order.originAddress,
+    to: order.shippingAddress,
+    weight: order.totalWeight,
+    dimensions: order.dimensions
+  })
+  
+  await saveTrackingNumber(orderId, label.trackingNumber)
+  return label.labelUrl
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Carrier APIs**: Integrate with shipping carriers
+- [ ] **Rate Calculation**: Real-time rate calculation
+- [ ] **Address Validation**: Validate shipping addresses
+- [ ] **Label Generation**: Generate shipping labels
+- [ ] **Tracking**: Track shipments
+- [ ] **Multi-Carrier**: Support multiple carriers
+- [ ] **Rate Comparison**: Compare rates across carriers
+- [ ] **Webhooks**: Handle carrier webhooks
+- [ ] **Error Handling**: Handle carrier errors
+- [ ] **Testing**: Test with real carriers
+- [ ] **Documentation**: Document integration
+- [ ] **Monitoring**: Monitor carrier API health
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Address Validation
+
+```typescript
+// ❌ Bad - No validation
+const rate = await calculateRate({
+  address: userInput  // Could be invalid!
+})
+```
+
+```typescript
+// ✅ Good - Validate first
+const validated = await validateAddress(userInput)
+if (!validated.valid) {
+  throw new Error('Invalid address')
+}
+const rate = await calculateRate({ address: validated.address })
+```
+
+### ❌ Don't: No Fallback
+
+```typescript
+// ❌ Bad - Single carrier
+const rate = await fedex.calculateRate(params)
+// What if FedEx fails?
+```
+
+```typescript
+// ✅ Good - Multiple carriers
+const carriers = ['fedex', 'ups', 'usps']
+for (const carrier of carriers) {
+  try {
+    const rate = await getCarrierRate(carrier, params)
+    return rate
+  } catch (error) {
+    continue  // Try next carrier
+  }
+}
+```
+
+---
+
+## Integration Points
+
+- **Order Fulfillment** (`30-ecommerce/order-fulfillment/`) - Fulfillment workflow
+- **Order Management** (`30-ecommerce/order-management/`) - Order tracking
+- **Payment Gateways** (`30-ecommerce/payment-gateways/`) - Payment processing
+
+---
+
+## Further Reading
+
+- [FedEx API](https://developer.fedex.com/)
+- [UPS API](https://developer.ups.com/)
+- [USPS API](https://www.usps.com/business/web-tools-apis/)
 
 ## Resources
 

@@ -1,8 +1,331 @@
 # Next.js 14+ App Router Patterns
 
-## 1. App Router Structure and Conventions
+---
 
-### Directory Structure
+## 1. Executive Summary & Strategic Necessity
+
+### 1.1 Context (ภาษาไทย)
+
+Next.js 14+ App Router คือ framework สำหรับ React ที่มี features ที่ทรงพลัง เช่น Server Components, Streaming, Server Actions, และ Improved Data Fetching App Router ใช้ file-based routing และ nested layouts ที่ช่วยให้การสร้าง complex applications ง่ายขึ้น
+
+Next.js 14+ มี features ที่สำคัญ เช่น:
+- **Server Components** - Components ที่ทำงานบน server และลด JavaScript bundle
+- **Streaming** - ส่ง HTML และ data แบบ progressive ไปยัง client
+- **Server Actions** - Functions ที่ทำงานบน server และเรียกจาก client components
+- **Route Handlers** - API routes ที่ทำงานบน server
+- **Middleware** - Intercept requests และ responses
+
+### 1.2 Business Impact (ภาษาไทย)
+
+**ผลกระทบทางธุรกิจ:**
+
+1. **ลด Time-to-Market** - Next.js ช่วยลดเวลาในการพัฒนาได้ถึง 30-40%
+2. **เพิ่ม Performance** - Server Components และ Streaming ช่วยเพิ่ม performance
+3. **ลด Infrastructure Cost** - Edge runtime และ caching ช่วยลด cost
+4. **เพิ่ม SEO** - Server-side rendering ช่วยเพิ่ม SEO
+5. **ปรับปรุง Developer Experience** - Features ที่ทรงพลังช่วยเพิ่ม productivity
+
+### 1.3 Product Thinking (ภาษาไทย)
+
+**มุมมองด้านผลิตภัณฑ์:**
+
+1. **Performance-First** - Next.js ต้องไม่ส่งผลกระทบต่อ performance ของแอปพลิเคชัน
+2. **SEO-Ready** - Server-side rendering ช่วยเพิ่ม SEO
+3. **Scalable** - Features ที่ทรงพลังช่วยให้แอปพลิเคชัน scalable
+4. **Developer-Friendly** - Features ที่ใช้งานง่ายช่วยเพิ่ม productivity
+5. **Future-Proof** - Next.js มี updates และ features ใหม่อย่างต่อเนื่อง
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+### 2.1 Core Logic
+
+Next.js 14+ App Router ประกอบด้วย:
+
+1. **File-Based Routing** - Routes จาก directory structure
+2. **Server Components** - Components ที่ทำงานบน server
+3. **Client Components** - Components ที่ทำงานบน client
+4. **Streaming** - Progressive rendering ด้วย Suspense
+5. **Server Actions** - Functions ที่ทำงานบน server
+6. **Route Handlers** - API routes ที่ทำงานบน server
+7. **Middleware** - Intercept requests และ responses
+
+### 2.2 Architecture Diagram Requirements
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              Next.js 14+ App Router Architecture       │
+├─────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Client Layer                           │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Browser    │  │  Client     │  │  React    │  │   │
+│  │  │  APIs      │  │  Components│  │  Hooks    │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Server Layer                           │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Server     │  │  Route      │  │  Server   │  │   │
+│  │  │  Components│  │  Handlers   │  │  Actions  │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Streaming  │  │  Caching    │  │  Middleware│  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Data Layer                            │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Database   │  │  External   │  │  File     │  │   │
+│  │  │  Access    │  │  APIs       │  │  System   │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Runtime Layer                         │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Edge       │  │  Node.js    │  │  Serverless│  │   │
+│  │  │  Runtime   │  │  Runtime    │  │  Functions│  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 2.3 Implementation Workflow
+
+**Step 1: Setup App Router Structure**
+
+```typescript
+// app/layout.tsx - Root Layout
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: 'My App',
+  description: 'A Next.js application',
+}
+
+export default function RootLayout({
+  children
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
+    </html>
+  )
+}
+```
+
+---
+
+## 3. Tooling & Tech Stack
+
+### 3.1 Enterprise Tools
+
+| Tool | Purpose | Version | License |
+|------|---------|---------|---------|
+| Next.js | React Framework | ^14.0.0 | MIT |
+| React | UI Library | ^18.0.0 | MIT |
+| TypeScript | Type Safety | ^5.0.0 | Apache 2.0 |
+| Tailwind CSS | Styling | ^3.0.0 | MIT |
+| Zod | Schema Validation | ^3.0.0 | MIT |
+
+### 3.2 Configuration Essentials
+
+**TypeScript Configuration:**
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2020",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}
+```
+
+**Next.js Configuration:**
+```typescript
+// next.config.ts
+import type { NextConfig } from 'next'
+
+const nextConfig: NextConfig = {
+  images: {
+    domains: ['example.com'],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
+  },
+}
+
+export default nextConfig
+```
+
+---
+
+## 4. Standards, Compliance & Security
+
+### 4.1 International Standards
+
+- **WCAG 2.1 Level AA** - Accessibility สำหรับทุก users
+- **ISO 9241-11** - Usability Standards
+- **GDPR** - Data Protection สำหรับ User Data
+- **PCI DSS** - Security Standards สำหรับ Payment
+
+### 4.2 Security Protocol
+
+Next.js ต้องปฏิบัติตามหลักความปลอดภัย:
+
+1. **Input Validation** - Validate ข้อมูลทั้ง client และ server
+2. **CSRF Protection** - ใช้ built-in CSRF protection
+3. **Secure Headers** - ใช้ security headers ที่เหมาะสม
+4. **Rate Limiting** - จำกัดจำนวน requests ต่อผู้ใช้
+
+```typescript
+// middleware.ts - Security Headers
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+export function middleware(request: NextRequest) {
+  const response = NextResponse.next()
+  
+  // Security headers
+  response.headers.set('X-Frame-Options', 'DENY')
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  
+  return response
+}
+```
+
+### 4.3 Explainability
+
+Next.js ต้องสามารถอธิบายได้ว่า:
+
+1. **Routing Logic** - ทำไม route ถูก match อย่างไร
+2. **Data Fetching** - ทำไม data ถูก fetch เมื่อไร
+3. **Caching Strategy** - ทำไม cache ถูกใช้งานอย่างไร
+4. **Error Handling** - ทำไม error ถูก handle อย่างไร
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+### 5.1 Cost Calculation
+
+| Metric | Calculation | Target |
+|--------|-------------|--------|
+| Time to First Byte (TTFB) | Server response time | < 200ms |
+| First Contentful Paint (FCP) | First paint time | < 1.8s |
+| Largest Contentful Paint (LCP) | Largest element paint | < 2.5s |
+| Cumulative Layout Shift (CLS) | Layout stability | < 0.1 |
+| Time to Interactive (TTI) | Interactive time | < 3.8s |
+
+### 5.2 Key Performance Indicators
+
+**Technical Metrics:**
+
+1. **Core Web Vitals** - LCP, FID, CLS
+2. **Bundle Size** - JavaScript bundle ที่ใช้งาน
+3. **Server Response Time** - Server response time
+4. **Cache Hit Rate** - Cache hit rate
+
+**Business Metrics:**
+
+1. **Conversion Rate** - อัตราการแปลงผู้ใช้
+2. **Bounce Rate** - อัตราการออกจากหน้า
+3. **User Engagement** - Engagement time
+4. **SEO Rankings** - Search engine rankings
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+### 6.1 Phase Rollout
+
+**Phase 1: Foundation (Week 1-2)**
+- Setup Next.js project
+- Configure TypeScript and ESLint
+- Setup routing structure
+- Implement basic layouts
+
+**Phase 2: Data Fetching (Week 3-4)**
+- Implement Server Components
+- Add data fetching patterns
+- Setup caching strategies
+- Implement streaming
+
+**Phase 3: Advanced Features (Week 5-6)**
+- Add Server Actions
+- Implement Route Handlers
+- Setup Middleware
+- Add error handling
+
+**Phase 4: Production (Week 7-8)**
+- Performance optimization
+- Security hardening
+- Analytics integration
+- Documentation and training
+
+### 6.2 Pitfalls to Avoid
+
+1. **Overusing Client Components** - ไม่ใช้ Client Components มากเกินไป
+2. **Poor Caching** - ไม่ใช้ caching อย่างเหมาะสม
+3. **Ignoring SEO** - ไม่คำนึงถึง SEO
+4. **Security Issues** - ไม่ implement security measures
+5. **Performance Issues** - ไม่ optimize performance
+6. **Accessibility Issues** - ไม่คำนึงถึง accessibility
+
+### 6.3 Best Practices Checklist
+
+- [ ] ใช้ Server Components โดย default
+- [ ] Implement caching strategies อย่างเหมาะสม
+- [ ] ใช้ Suspense สำหรับ streaming
+- [ ] Implement error boundaries
+- [ ] ใช้ loading states
+- [ ] Optimize images ด้วย next/image
+- [ ] ใช้ TypeScript สำหรับ type safety
+- [ ] Implement security headers
+- [ ] ใช้ middleware สำหรับ auth
+- [ ] Optimize bundle size
+- [ ] Test บนทุก browsers และ devices
+- [ ] Monitor Core Web Vitals
+- [ ] Implement analytics tracking
+- [ ] คำนึงถึง accessibility
+- [ ] Document API routes
+
+---
+
+## 7. Implementation Examples
+
+### 7.1 App Router Structure and Conventions
+
+**Directory Structure:**
 ```
 app/
 ├── (auth)/              # Route group - doesn't affect URL
@@ -31,7 +354,7 @@ app/
 └── favicon.ico
 ```
 
-### File Conventions
+**File Conventions:**
 - `page.tsx` - Route page component
 - `layout.tsx` - Layout component (wraps child routes)
 - `loading.tsx` - Loading UI for Suspense boundaries
@@ -40,9 +363,9 @@ app/
 - `route.ts` - API route handler
 - `template.tsx` - Like layout but remounts on navigation
 
-## 2. Server Components vs Client Components
+### 7.2 Server Components vs Client Components
 
-### Server Components (Default)
+**Server Components (Default):**
 ```typescript
 // Default - Server Component
 import { db } from '@/lib/db'
@@ -66,7 +389,7 @@ export default async function UserList() {
 - Keeping sensitive data on server
 - Reducing client-side JavaScript bundle
 
-### Client Components
+**Client Components:**
 ```typescript
 'use client'
 
@@ -89,7 +412,7 @@ export default function Counter() {
 - Event handlers (onClick, onChange, etc.)
 - State management libraries (Zustand, Redux)
 
-### Component Composition Pattern
+**Component Composition Pattern:**
 ```typescript
 // Server Component
 import { db } from '@/lib/db'
@@ -134,9 +457,9 @@ export function UserList({ users }: UserListProps) {
 }
 ```
 
-## 3. Data Fetching Patterns
+### 7.3 Data Fetching Patterns
 
-### Server Components Data Fetching
+**Server Components Data Fetching:**
 ```typescript
 // app/users/page.tsx
 import { db } from '@/lib/db'
@@ -158,7 +481,7 @@ export default async function UsersPage() {
 }
 ```
 
-### Client Components Data Fetching
+**Client Components Data Fetching:**
 ```typescript
 'use client'
 
@@ -202,7 +525,7 @@ export function UsersFetcher() {
 }
 ```
 
-### Streaming and Suspense
+**Streaming and Suspense:**
 ```typescript
 // app/dashboard/page.tsx
 import { Suspense } from 'react'
@@ -246,28 +569,9 @@ function ActivitySkeleton() {
 }
 ```
 
-### Streaming with fetch
-```typescript
-// app/dashboard/UserStats.tsx
-export async function UserStats() {
-  // This will stream the response
-  const stats = await fetch('https://api.example.com/stats', {
-    cache: 'no-store'
-  }).then(res => res.json())
-  
-  return (
-    <div className="grid grid-cols-3 gap-4">
-      <StatCard label="Users" value={stats.users} />
-      <StatCard label="Revenue" value={stats.revenue} />
-      <StatCard label="Orders" value={stats.orders} />
-    </div>
-  )
-}
-```
+### 7.4 Caching Strategies
 
-## 4. Caching Strategies
-
-### force-cache (Default)
+**force-cache (Default):**
 ```typescript
 // Cached until manually revalidated
 export default async function ProductsPage() {
@@ -279,7 +583,7 @@ export default async function ProductsPage() {
 }
 ```
 
-### no-store
+**no-store:**
 ```typescript
 // Always fetch fresh data
 export default async function LivePricePage() {
@@ -291,7 +595,7 @@ export default async function LivePricePage() {
 }
 ```
 
-### revalidate (Time-based)
+**revalidate (Time-based):**
 ```typescript
 // Revalidate every 60 seconds
 export const revalidate = 60
@@ -311,7 +615,7 @@ export default async function ProductsPage() {
 }
 ```
 
-### on-demand Revalidation
+**on-demand Revalidation:**
 ```typescript
 // app/api/revalidate/route.ts
 import { revalidatePath, revalidateTag } from 'next/cache'
@@ -341,30 +645,9 @@ export default async function ProductsPage() {
 }
 ```
 
-### Route Handlers Caching
-```typescript
-// app/api/products/route.ts
-import { NextResponse } from 'next/server'
+### 7.5 API Routes (Route Handlers)
 
-export const dynamic = 'force-dynamic' // Disable caching
-
-export async function GET() {
-  const products = await db.product.findMany()
-  return NextResponse.json(products)
-}
-
-// Or with revalidation
-export const revalidate = 300 // 5 minutes
-
-export async function GET() {
-  const products = await db.product.findMany()
-  return NextResponse.json(products)
-}
-```
-
-## 5. API Routes (Route Handlers)
-
-### Basic Route Handler
+**Basic Route Handler:**
 ```typescript
 // app/api/users/route.ts
 import { NextRequest, NextResponse } from 'next/server'
@@ -397,7 +680,7 @@ export async function POST(request: NextRequest) {
 }
 ```
 
-### Dynamic Route Handler
+**Dynamic Route Handler:**
 ```typescript
 // app/api/users/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
@@ -451,354 +734,9 @@ export async function DELETE(
 }
 ```
 
-### Route Handler with CORS
-```typescript
-// app/api/webhook/route.ts
-import { NextRequest, NextResponse } from 'next/server'
+### 7.6 Server Actions
 
-export async function OPTIONS(request: NextRequest) {
-  return new NextResponse(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-    }
-  })
-}
-
-export async function POST(request: NextRequest) {
-  const body = await request.json()
-  
-  // Process webhook...
-  
-  return NextResponse.json({ received: true })
-}
-```
-
-## 6. Metadata API
-
-### Static Metadata
-```typescript
-// app/about/page.tsx
-import type { Metadata } from 'next'
-
-export const metadata: Metadata = {
-  title: 'About Us',
-  description: 'Learn more about our company',
-  openGraph: {
-    title: 'About Us',
-    description: 'Learn more about our company',
-    images: ['/og-image.jpg']
-  }
-}
-
-export default function AboutPage() {
-  return <div>About page content</div>
-}
-```
-
-### Dynamic Metadata
-```typescript
-// app/blog/[slug]/page.tsx
-import type { Metadata } from 'next'
-import { db } from '@/lib/db'
-
-type Props = {
-  params: { slug: string }
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await db.post.findUnique({
-    where: { slug: params.slug }
-  })
-  
-  return {
-    title: post?.title || 'Blog Post',
-    description: post?.excerpt || '',
-    openGraph: {
-      title: post?.title,
-      description: post?.excerpt,
-      images: post?.coverImage ? [post.coverImage] : []
-    }
-  }
-}
-
-export default async function BlogPostPage({ params }: Props) {
-  const post = await db.post.findUnique({
-    where: { slug: params.slug }
-  })
-  
-  return <article>{post?.content}</article>
-}
-```
-
-### Root Layout Metadata
-```typescript
-// app/layout.tsx
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-
-const inter = Inter({ subsets: ['latin'] })
-
-export const metadata: Metadata = {
-  title: {
-    default: 'My App',
-    template: '%s | My App'
-  },
-  description: 'A Next.js application',
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-icon.png'
-  },
-  manifest: '/manifest.json',
-  themeColor: '#000000'
-}
-
-export default function RootLayout({
-  children
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
-  )
-}
-```
-
-## 7. Loading and Error States
-
-### Loading UI
-```typescript
-// app/dashboard/loading.tsx
-export default function DashboardLoading() {
-  return (
-    <div className="space-y-6">
-      <div className="h-8 w-64 bg-gray-200 animate-pulse rounded" />
-      <div className="grid grid-cols-3 gap-4">
-        {[1, 2, 3].map(i => (
-          <div key={i} className="h-32 bg-gray-200 animate-pulse rounded" />
-        ))}
-      </div>
-    </div>
-  )
-}
-```
-
-### Error UI
-```typescript
-// app/dashboard/error.tsx
-'use client'
-
-import { useEffect } from 'react'
-
-type ErrorProps = {
-  error: Error & { digest?: string }
-  reset: () => void
-}
-
-export default function DashboardError({ error, reset }: ErrorProps) {
-  useEffect(() => {
-    console.error('Dashboard error:', error)
-  }, [error])
-  
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <h2 className="text-2xl font-bold mb-4">Something went wrong!</h2>
-      <p className="text-gray-600 mb-4">{error.message}</p>
-      <button
-        onClick={reset}
-        className="px-4 py-2 bg-blue-500 text-white rounded"
-      >
-        Try again
-      </button>
-    </div>
-  )
-}
-```
-
-### Global Error UI
-```typescript
-// app/global-error.tsx
-'use client'
-
-export default function GlobalError({
-  error,
-  reset
-}: {
-  error: Error & { digest?: string }
-  reset: () => void
-}) {
-  return (
-    <html>
-      <body>
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <h2 className="text-3xl font-bold mb-4">Application Error</h2>
-          <button onClick={reset}>Reset application</button>
-        </div>
-      </body>
-    </html>
-  )
-}
-```
-
-### Not Found UI
-```typescript
-// app/not-found.tsx
-import Link from 'next/link'
-
-export default function NotFound() {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <h2 className="text-4xl font-bold mb-4">404 - Page Not Found</h2>
-      <p className="text-gray-600 mb-4">
-        The page you're looking for doesn't exist.
-      </p>
-      <Link
-        href="/"
-        className="px-4 py-2 bg-blue-500 text-white rounded"
-      >
-        Go Home
-      </Link>
-    </div>
-  )
-}
-```
-
-## 8. Route Groups and Layouts
-
-### Route Groups
-```typescript
-// app/(marketing)/about/page.tsx - /about
-// app/(marketing)/contact/page.tsx - /contact
-// app/(auth)/login/page.tsx - /login
-// app/(auth)/register/page.tsx - /register
-
-// Group layouts
-// app/(marketing)/layout.tsx - Applies to about and contact
-export default function MarketingLayout({
-  children
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <div>
-      <MarketingHeader />
-      <main>{children}</main>
-      <MarketingFooter />
-    </div>
-  )
-}
-```
-
-### Nested Layouts
-```typescript
-// app/layout.tsx - Root layout
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html>
-      <body>
-        <Navbar />
-        {children}
-        <Footer />
-      </body>
-    </html>
-  )
-}
-
-// app/dashboard/layout.tsx - Dashboard layout
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex">
-      <Sidebar />
-      <main className="flex-1">{children}</main>
-    </div>
-  )
-}
-
-// app/dashboard/settings/layout.tsx - Settings sub-layout
-export default function SettingsLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div>
-      <SettingsNav />
-      {children}
-    </div>
-  )
-}
-```
-
-### Template vs Layout
-```typescript
-// layout.tsx - Preserves state across navigation
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <div>{children}</div>
-}
-
-// template.tsx - Remounts on navigation (useful for animations)
-export default function Template({ children }: { children: React.ReactNode }) {
-  return <div className="animate-in">{children}</div>
-}
-```
-
-## 9. Parallel and Intercepting Routes
-
-### Parallel Routes
-```typescript
-// app/dashboard/@analytics/page.tsx - /dashboard
-// app/dashboard/@settings/page.tsx - /dashboard
-
-// app/dashboard/layout.tsx
-export default function DashboardLayout({
-  children,
-  analytics,
-  settings
-}: {
-  children: React.ReactNode
-  analytics: React.ReactNode
-  settings: React.ReactNode
-}) {
-  return (
-    <div className="grid grid-cols-12 gap-4">
-      <div className="col-span-8">{children}</div>
-      <div className="col-span-4 space-y-4">
-        {analytics}
-        {settings}
-      </div>
-    </div>
-  )
-}
-```
-
-### Intercepting Routes
-```typescript
-// app/photo/[id]/page.tsx - Regular photo page
-// app/(.)photo/[id]/page.tsx - Intercepted modal (same URL)
-// app/(..)photo/[id]/page.tsx - Intercepted modal (one level up)
-// app/(...)photo/[id]/page.tsx - Intercepted modal (root level)
-
-// app/(.)photo/[id]/page.tsx
-import { useRouter } from 'next/navigation'
-
-export default function PhotoModal({ params }: { params: { id: string } }) {
-  const router = useRouter()
-  
-  return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center">
-      <div className="bg-white p-4 rounded-lg">
-        <img src={`/photos/${params.id}.jpg`} alt="Photo" />
-        <button onClick={() => router.back()}>Close</button>
-      </div>
-    </div>
-  )
-}
-```
-
-## 10. Server Actions
-
-### Basic Server Action
+**Basic Server Action:**
 ```typescript
 // app/actions.ts
 'use server'
@@ -824,7 +762,7 @@ export async function deleteUser(id: string) {
 }
 ```
 
-### Server Action with Validation
+**Server Action with Validation:**
 ```typescript
 // app/actions.ts
 'use server'
@@ -861,69 +799,9 @@ export async function createUser(prevState: any, formData: FormData) {
 }
 ```
 
-### Using Server Actions in Forms
-```typescript
-'use client'
+### 7.7 Middleware
 
-import { useFormState, useFormStatus } from 'react-dom'
-import { createUser } from '@/app/actions'
-
-function SubmitButton() {
-  const { pending } = useFormStatus()
-  
-  return (
-    <button disabled={pending} type="submit">
-      {pending ? 'Creating...' : 'Create User'}
-    </button>
-  )
-}
-
-export function CreateUserForm() {
-  const [state, formAction] = useFormState(createUser, null)
-  
-  return (
-    <form action={formAction}>
-      <input name="name" type="text" placeholder="Name" />
-      {state?.errors?.name && (
-        <p className="text-red-500">{state.errors.name[0]}</p>
-      )}
-      
-      <input name="email" type="email" placeholder="Email" />
-      {state?.errors?.email && (
-        <p className="text-red-500">{state.errors.email[0]}</p>
-      )}
-      
-      <SubmitButton />
-      
-      {state?.message && (
-        <p className="text-green-500">{state.message}</p>
-      )}
-    </form>
-  )
-}
-```
-
-### Server Actions with Direct Invocation
-```typescript
-'use client'
-
-import { createUser } from '@/app/actions'
-
-export function CreateUserButton() {
-  const handleClick = async () => {
-    await createUser({
-      name: 'John Doe',
-      email: 'john@example.com'
-    })
-  }
-  
-  return <button onClick={handleClick}>Create User</button>
-}
-```
-
-## 11. Middleware
-
-### Basic Middleware
+**Basic Middleware:**
 ```typescript
 // middleware.ts
 import { NextResponse } from 'next/server'
@@ -945,7 +823,7 @@ export const config = {
 }
 ```
 
-### Middleware with Response Headers
+**Middleware with Response Headers:**
 ```typescript
 // middleware.ts
 import { NextResponse } from 'next/server'
@@ -966,41 +844,9 @@ export function middleware(request: NextRequest) {
 }
 ```
 
-### Middleware with Locale
-```typescript
-// middleware.ts
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+### 7.8 Performance Optimization
 
-const locales = ['en', 'th', 'ja']
-const defaultLocale = 'en'
-
-export function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname
-  
-  // Check if there is any supported locale in the pathname
-  const pathnameIsMissingLocale = locales.every(
-    locale => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
-  )
-  
-  // Redirect if there is no locale
-  if (pathnameIsMissingLocale) {
-    return NextResponse.redirect(
-      new URL(`/${defaultLocale}${pathname}`, request.url)
-    )
-  }
-  
-  return NextResponse.next()
-}
-
-export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)']
-}
-```
-
-## 12. Performance Optimization
-
-### Dynamic Imports
+**Dynamic Imports:**
 ```typescript
 'use client'
 
@@ -1027,7 +873,7 @@ export default function DashboardPage() {
 }
 ```
 
-### Image Optimization
+**Image Optimization:**
 ```typescript
 import Image from 'next/image'
 
@@ -1046,7 +892,7 @@ export default function ProductImage() {
 }
 ```
 
-### Font Optimization
+**Font Optimization:**
 ```typescript
 import { Inter, Roboto } from 'next/font/google'
 
@@ -1072,83 +918,44 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-### Script Optimization
-```typescript
-import Script from 'next/script'
+### 7.9 Best Practices
 
-export default function Analytics() {
-  return (
-    <>
-      <Script
-        src="https://www.googletagmanager.com/gtag/js"
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'GA_MEASUREMENT_ID');
-        `}
-      </Script>
-    </>
-  )
-}
-```
+**Routing:**
+- Use Server Components by default
+- Implement proper error boundaries
+- Use loading states for better UX
+- Optimize route structure
 
-### Preloading Data
-```typescript
-// app/dashboard/page.tsx
-import { Suspense } from 'react'
+**Data Fetching:**
+- Use caching strategies appropriately
+- Implement streaming with Suspense
+- Fetch data as close to where it's used
+- Use Server Actions for mutations
 
-async function getData() {
-  const res = await fetch('https://api.example.com/data', {
-    next: { revalidate: 60 }
-  })
-  return res.json()
-}
+**Performance:**
+- Use dynamic imports for heavy components
+- Optimize images with next/image
+- Use font optimization
+- Monitor Core Web Vitals
 
-export default async function DashboardPage() {
-  // Start fetching data early
-  const dataPromise = getData()
-  
-  return (
-    <div>
-      <h1>Dashboard</h1>
-      <Suspense fallback={<Loading />}>
-        <DashboardContent dataPromise={dataPromise} />
-      </Suspense>
-    </div>
-  )
-}
+**Security:**
+- Implement proper authentication
+- Use security headers
+- Validate all inputs
+- Sanitize user data
 
-async function DashboardContent({ dataPromise }: { dataPromise: Promise<any> }) {
-  const data = await dataPromise
-  return <div>{/* Render data */}</div>
-}
-```
+**Accessibility:**
+- Use semantic HTML
+- Implement keyboard navigation
+- Add ARIA labels where needed
+- Test with screen readers
 
-### Route Segment Config
-```typescript
-// app/products/page.tsx
+---
 
-// Disable caching
-export const dynamic = 'force-dynamic'
+## 8. Related Skills
 
-// Set runtime
-export const runtime = 'edge' // or 'nodejs'
-
-// Set revalidation time
-export const revalidate = 3600
-
-// Set fetch cache
-export const fetchCache = 'force-no-store'
-
-export default async function ProductsPage() {
-  const products = await fetch('https://api.example.com/products', {
-    cache: 'no-store'
-  }).then(res => res.json())
-  
-  return <ProductList products={products} />
-}
-```
+- `02-frontend/react-best-practices`
+- `02-frontend/state-management`
+- `03-backend-api/express-rest`
+- `03-backend-api/fastapi-patterns`
+- `26-deployment-strategies`

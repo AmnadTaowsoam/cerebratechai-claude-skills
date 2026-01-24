@@ -1,12 +1,180 @@
+---
+name: AI Agents
+description: Autonomous systems that use language models to perform tasks, make decisions, and interact with users or other systems using ReAct patterns, tool calling, and memory systems.
+---
+
 # AI Agents
 
-## Overview
-
-AI agents are autonomous systems that use language models to perform tasks, make decisions, and interact with users or other systems.
+> **Current Level:** Expert (Enterprise Scale)
+> **Domain:** AI / Agent Systems
 
 ---
 
-## 1. AI Agent Concepts
+## Overview
+
+AI agents are autonomous systems that use language models to perform tasks, make decisions, and interact with users or other systems. They combine reasoning (thinking) with action (doing) in iterative loops, enabling them to solve complex problems by breaking them down into smaller steps, using tools, and learning from feedback.
+
+---
+
+## 1. Executive Summary & Strategic Necessity
+
+* **Context:** ในปี 2025-2026 AI Agents ได้กลายเป็นเทคโนโลยีที่จำเป็นสำหรับองค์องค์อัตโนมาติ การและการตัดสินใจ (Autonomous AI Agents) ด้วย ReAct Pattern และ Tool Calling ซึ่งเป็นมาตรฐานสำหรับ Enterprise Scale
+
+* **Business Impact:** AI Agents ช่วยลด Downtime ของระบบ Customer Support ผ่านการตอบคำถามอัตโนมา (24/7), ลดต้นทุนการจัดการทีม (Reduce manual effort), เพิ่มอัตรากำไร Gross Margin ผ่านการทำงานอัตโนมาติ (Automated workflows), และปรับประสบทการทำงาน (Consistent quality)
+
+* **Product Thinking:** AI Agents ช่วยแก้ปัญหา (Pain Point) ความต้องการมีระบบที่ซับซ้อนและต้องการทำงานซ้ำๆ (Repetitive tasks) ผ่านการทำงานอัตโนมาติ และการตัดสินใจ (Autonomous decision-making)
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+* **Core Logic:** AI Agents ใช้ ReAct Pattern (Reason + Act) ซึ่งทำงานอัตโนมาติ โดยการวนลูปแบบ:
+  1. **Thought**: Agent คิดคิดว่าจะทำอะไร (Think about what to do)
+  2. **Action**: Agent ทำการกระทำตามที่คิด (Execute action based on thought)
+  3. **Observation**: Agent สังเกตผลลัพธ์จากการกระทำ (Observe result of action)
+  4. **Loop**: วนซ้ำจนกว่าจนถึงเป้าหรือไม่ (Repeat until goal achieved)
+
+* **Architecture Diagram Requirements:** แผนผังระบบ AI Agent ต้องมีองค์ประกอบ:
+  1. **LLM Integration**: Language Model สำหรับการคิดคิด (OpenAI GPT-4, Anthropic Claude, etc.)
+  2. **Tool Registry**: เก็บเครื่องมือ (Tools) ที่ Agent สามารถใช้ (API calls, Database queries, File operations)
+  3. **Memory System**: ระบบความจำ (Short-term: ConversationBuffer, Long-term: Vector Store)
+  4. **Agent Executor**: ส่วนส่งคำสั่งและจัดการลำดับ (Max iterations, Timeout handling)
+  5. **State Management**: จัดการสถานะของ Agent และ Conversation context
+  6. **Observability**: Logging, Monitoring, Tracing สำหรับการ debug และปรับสิทท
+
+* **Implementation Workflow:** ขั้นตอนการนำ AI Agent ไปใช้งานจริง:
+  1. **Planning Phase**: กำหนด Requirement และเลือก Model ที่เหมาะสม
+  2. **Tool Development**: สร้าง Tools ที่จำเป็นต้องสำหรับ Domain (Database, API, File system)
+  3. **Memory Design**: ออกแบบ Memory architecture (Token-based, Vector-based, Hybrid)
+  4. **Agent Implementation**: สร้าง Agent ด้วย LangChain หรือ Custom framework
+  5. **Testing Phase**: Unit test Tools, Integration test Agent, E2E test ด้วยจริง Scenario
+  6. **Deployment**: Deploy ด้วย API Gateway, Set up Rate limiting, Configure Monitoring
+  7. **Optimization**: Tune prompts, Optimize token usage, Cache embeddings
+  8. **Maintenance**: Monitor performance, Update Tools, Handle edge cases
+
+---
+
+## 3. Tooling & Tech Stack
+
+* **Enterprise Tools:** เครื่องมือระดับอุตสาหกรรมที่เลือกใช้สำหรับ AI Agents:
+  1. **LangChain**: Framework สำหรับสร้าง Agents ด้วย LLMs (Python, JavaScript)
+  2. **AutoGPT**: Framework สำหรับ Autonomous Agents ด้วย Memory และ Tools
+  3. **CrewAI**: Multi-agent orchestration สำหรับการจัดการหลาย Agents
+  4. **OpenAI Assistants API**: Official API สำหรับสร้าง AI Assistants ด้วย Tools และ Code Interpreter
+  5. **LangGraph**: Framework สำหรับ Stateful AI Agents ด้วย Graph-based workflows
+  6. **Pinecone/Weaviate**: Vector Database สำหรับ Long-term Memory (Semantic search)
+  7. **Redis**: Cache สำหรับ Short-term Memory และ Rate limiting
+  8. **PostgreSQL**: Database สำหรับการจัดเก็บ Conversation History และ User data
+  9. **Prometheus**: Monitoring สำหรับ Metrics (Token usage, Latency, Error rate)
+  10. **Grafana**: Visualization dashboard สำหรับ Observability
+
+* **Configuration Essentials:** การตั้งค่าสำคัญสำหรับให้ระบบเสถียร:
+  1. **Model Configuration**: เลือก Model ตาม Use case (GPT-4 สำหรับ Complex reasoning, GPT-3.5-turbo สำหรับ Speed)
+  2. **Token Budget**: ตั้ง max_tokens ตาม Budget และ Context window (4,000-8,000 tokens)
+  3. **Temperature Settings**: 0.0-0.3 สำหรับ Creativity, 0.7 สำหรับ Deterministic
+  4. **Rate Limiting**: 10-100 requests/minute ตาม User tier และ API limits
+  5. **Timeout Configuration**: 30-60 seconds สำหรับ Agent execution, 5-10 seconds สำหรับ Tool calls
+  6. **Memory Configuration**: 10-20 messages สำหรับ Short-term, 100-500 documents สำหรับ Vector search
+  7. **Retry Policy**: Exponential backoff (base: 2, max: 5) ด้วย Jitter
+  8. **Logging Level**: INFO สำหรับ Production, DEBUG สำหรับ Development
+  9. **Monitoring**: Track success rate, token usage, latency, error rate ต่อเป้าหลาย
+  10. **Secret Management**: Use Environment variables หรือ Secret Manager (AWS Secrets Manager, HashiCorp Vault)
+
+---
+
+## 4. Standards, Compliance & Security
+
+* **International Standards:** มาตรฐานที่เกี่ยวข้อง:
+  1. **ISO/IEC 27001**: Information Security Management - สำหรับการจัดการ Secrets และ Access Control
+  2. **ISO/IEC 27017**: Code of Practice for Information Security Controls - สำหรับ Secure Development
+  3. **GDPR**: General Data Protection Regulation - สำหรับการจัดการ Personal Data และ User Consent
+  4. **SOC 2 Type II**: Security Controls - สำหรับการ Audit และ Compliance
+  5. **OWASP Top 10**: Web Application Security - สำหรับการป้องกัน Prompt Injection และ Data Exposure
+
+* **Security Protocol:** กลไกการป้องกัน AI Agents:
+  1. **Input Validation**: Validate และ Sanitize ทุก Input ก่อนส่งให้ LLM หรือ Tools (Prevent prompt injection, SQL injection)
+  2. **Output Sanitization**: Filter sensitive information จาก LLM output (PII, Secrets, Internal URLs)
+  3. **Tool Permission Model**: RBAC (Role-Based Access Control) สำหรับ Tools - บาง Tools ต้องการ Admin permission, บาง Tools เปิดให้ทุก User
+  4. **Audit Trail**: Log ทุก Agent action, Tool call, และ Decision ด้วย Timestamp, User ID, และ Result (สำหรับ Forensics และ Compliance)
+  5. **Rate Limiting**: Per-user และ Per-API rate limits สำหรับป้องกัน Abuse (100-1000 requests/hour)
+  6. **Secure Communication**: mTLS สำหรับ internal services, TLS 1.3 สำหรับ external APIs
+  7. **Secret Rotation**: Rotate API keys ทุก 30-90 วัน (Automated key rotation)
+  8. **Sandboxing**: Run Tools ใน isolated environment (Docker containers, Lambda functions)
+  9. **Content Filtering**: Block malicious content, Adult content, และ Violations (Content moderation APIs)
+  10. **Data Encryption**: Encrypt sensitive data ที่ rest ใน Database (AES-256 หรือ Customer-managed keys)
+
+* **Explainability:** (สำหรับ AI) ความสามารถในการอธิบายผลลัพธ์ผ่านเทคนิค:
+  1. **Chain of Thought Logging**: เก็บ Thought process ของ Agent สำหรับ Debugging และ Transparency
+  2. **Tool Call Tracing**: Log ทุก Tool call ด้วย Input, Output, และ Execution time
+  3. **Decision Reasoning**: บันทึกเหตุผลการตัดสินใจของ Agent (Why chose this action?)
+  4. **Confidence Scoring**: ให้คะแนน (0-1) กับทุก Decision สำหรับการประเมิน
+  5. **SHAP/LIME Integration**: ใช้ Explainability techniques สำหรับ complex decisions (Local explanations)
+  6. **Human-in-the-Loop**: จัดการ Approval สำหรับ critical actions ด้วย Audit trail
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+* **Cost Calculation:** สูตรการคำนวณต้นทุนต่อหน่วย AI Agents:
+  1. **LLM Cost per Request** = (Input Tokens + Output Tokens) × Price per 1K tokens
+     - GPT-4: $0.03/1K input + $0.06/1K output
+     - GPT-3.5-turbo: $0.001/1K input + $0.002/1K output
+     - Claude 3 Opus: $0.015/1K input + $0.075/1K output
+  2. **Tool Execution Cost** = API calls × Cost per call
+     - Database Query: $0.001 per query (PostgreSQL RDS)
+     - External API: $0.01-0.10 per call (varies by service)
+  3. **Vector Search Cost** = $0.001 per query (Pinecone)
+  4. **Total Cost per Agent Run** = LLM Cost + Tool Costs + Vector Search Cost
+  5. **Monthly Cost** = (Cost per Run × Runs per Month) + Infrastructure Costs
+  6. **Infrastructure Costs** = Compute ($20-100/month) + Storage ($0.023/GB/month) + Monitoring ($10/month)
+
+* **Key Performance Indicators:** ตัวชี้วัดความสำเร็จทางเทคนิค:
+  1. **Success Rate**: อัตราการสำเร็จของ Agent (Target: >95%)
+  2. **Average Latency**: เวลาการตอบกลับ (Target: <5 seconds สำหรับ single-turn, <30 seconds สำหรับ multi-turn)
+  3. **Token Usage per Request**: เฉลี่ย Token เฉลี่ย Request (Target: <2,000 tokens)
+  4. **Tool Call Success Rate**: อัตราการสำเร็จของ Tool calls (Target: >98%)
+  5. **Average Tool Execution Time**: เวลาการทำงาน Tool (Target: <2 seconds)
+  6. **User Satisfaction Score**: 1-5 rating จาก User feedback (Target: >4.0)
+  7. **Error Rate**: อัตราการ Error (Target: <1%)
+  8. **Concurrent Users**: จำนวยผู้ใช้งานพร้อมกัน (Peak: 100-1,000 concurrent sessions)
+  9. **Cache Hit Rate**: อัตราการ Cache hit (Target: >80% สำหรับ repeated queries)
+  10. **Agent Iterations per Request**: จำนวย iteration เฉลี่ย Request (Target: <5 iterations)
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+* **Phase Rollout:** คำแนะนำในการทยอยเริ่มใช้งาน AI Agents เพื่อลดความเสี่ยง:
+  1. **Phase 1: MVP (1-2 เดือน)**: Deploy Simple Agent ด้วย 1-2 Tools (Database lookup, Web search) สำหรับ Internal team ก่อนเปิดให้ Public
+     - **Goal**: Validate Agent architecture และ gather feedback
+     - **Success Criteria**: >80% success rate, <10s latency
+     - **Risk Mitigation**: Rate limiting, Manual review ก่อน Auto-approve
+  2. **Phase 2: Beta (2-3 เดือน)**: Expand ด้วย 5-10 Tools และ Memory system สำหรับ Selected customers
+     - **Goal**: Test scalability และ Tool reliability
+     - **Success Criteria**: >90% success rate, <5s latency
+     - **Risk Mitigation**: Canary deployment, Feature flags, Gradual rollout
+  3. **Phase 3: GA (3-6 เดือน)**: Full rollout ด้วย 10-20 Tools, Advanced Memory, และ Multi-agent orchestration
+     - **Goal**: Enterprise-grade reliability และ Performance
+     - **Success Criteria**: >95% success rate, <3s latency, 99.9% uptime
+     - **Risk Mitigation**: Load testing, Disaster recovery, Blue-green deployment
+
+* **Pitfalls to Avoid:** ข้อควรระวังที่มักจะผิดพลาดในระดับ Enterprise Scale:
+  1. **Over-engineering**: สร้าง Agent ที่ซับซ้อนเกินไป (Too many tools, Complex memory) → เริ่มจาก Simple และ iterate
+  2. **No Rate Limiting**: ไม่มี Rate limits ทำให้ Cost blowout และ API abuse → Implement per-user และ per-endpoint limits ด้วย Redis
+  3. **Infinite Loops**: Agent วนลูปไม่มีทางออก (Max iterations = ∞) → Set max_iterations=10 และ timeout=60s
+  4. **Ignoring Tool Errors**: Tool failures crash Agent → Wrap Tools ด้วย try-catch และ return fallback response
+  5. **No Context Management**: ส่งทุก message เป็น Independent → Implement sliding window และ summary
+  6. **Hardcoding API Keys**: Keys ใน code ที่เปิดให้ Public → Use Environment variables หรือ Secret Manager
+  7. **No Observability**: ไม่มี Logging/Tracing → Add structured logging ด้วย correlation IDs
+  8. **Skipping Validation**: ไม่ Validate Tool inputs/outputs → Implement schema validation และ sanitization
+  9. **Poor Prompt Design**: Vague prompts ทำให้ Agent hallucinate → Use specific, testable prompts ด้วย examples
+  10. **Single Point of Failure**: ไม่มี Redundancy หรือ Fallback → Deploy multiple instances ด้วย Load balancer
+
+---
+
+## Core Concepts
+
+### 1. AI Agent Concepts
 
 ### What is an AI Agent?
 
@@ -108,7 +276,7 @@ print(result)
 # Plan-and-Execute Architecture
 
 ## Concept
-Agent creates a plan first, then executes each step.
+Agent creates a plan first, then executes each step in the plan.
 
 ## Process
 1. **Planning**: Agent creates a plan to achieve goal
@@ -179,7 +347,6 @@ Learning: Always check code for errors before generating
 Next Action:
 - Check code for syntax errors ✓
 - Generate code ✓
-- Verify code compiles ✓
 ```
 
 ## Implementation
@@ -187,7 +354,7 @@ Next Action:
 from langchain.agents import Agent, Tool
 from langchain.memory import ConversationBufferMemory
 
-# Define tools
+# Define tool
 code_tool = Tool(
     name="CodeExecutor",
     func=execute_code,
@@ -340,6 +507,7 @@ Store recent interactions for context.
 - **ConversationBuffer**: Store last N messages
 - **ConversationBufferWindow**: Store last N tokens
 - **ConversationSummaryMemory**: Summarize old conversations
+- **ConversationBufferWindowMemory**: Store last N tokens
 
 ## Implementation
 ```python
@@ -382,9 +550,12 @@ vectorstore = Chroma.from_texts(
     embedding=OpenAIEmbeddings()
 )
 
+# Create retriever
+retriever = vectorstore.as_retriever()
+
 # Create memory with retrieval
 memory = VectorStoreRetrieverMemory(
-    retriever=vectorstore.as_retriever(),
+    retriever=retriever,
     memory_key="chat_history"
 )
 
@@ -417,7 +588,7 @@ vectorstore = Chroma.from_documents(
 # Create retriever
 retriever = vectorstore.as_retriever()
 
-# Create memory
+# Create memory with retrieval
 memory = VectorStoreRetrieverMemory(
     retriever=retriever,
     memory_key="chat_history"
@@ -445,36 +616,27 @@ print(result)
 ```python
 from langchain.agents import Agent, Tool
 from langchain.llms import OpenAI
+from langchain.tools import DuckDuckGoSearchRun
 
 # Define tools
-search_tool = Tool(
-    name="Search",
-    func=search_function,
-    description="Search for information"
-)
-
-calculator_tool = Tool(
-    name="Calculator",
-    func=calculator_function,
-    description="Perform calculations"
-)
+search_tool = DuckDuckGoSearchRun()
 
 # Create agent
 agent = Agent(
-    tools=[search_tool, calculator_tool],
+    tools=[search_tool],
     llm=OpenAI(temperature=0),
     verbose=True
 )
 
 # Run agent
-result = agent.run("What is 25 * 42?")
+result = agent.run("What is Python?")
 print(result)
 ```
 
 ### Custom Agent
 
 ```python
-from langchain.agents import AgentExecutor, Agent
+from langchain.agents import AgentExecutor, Agent, Tool
 from langchain.tools import Tool
 
 # Define custom tools
@@ -501,7 +663,7 @@ executor = AgentExecutor.from_agent_and_tools(
 )
 
 # Run executor
-result = executor.run("Perform custom action on data")
+result = executor.run("Perform custom action")
 print(result)
 ```
 
@@ -606,7 +768,7 @@ functions = [
                 "properties": {
                     "location": {
                         "type": "string",
-                        "description": "City and state"
+                        "description": "The city and state"
                     }
                 },
                 "required": ["location"]
@@ -618,15 +780,9 @@ functions = [
 # Create assistant with functions
 assistant = client.beta.assistants.create(
     name="Weather Assistant",
-    instructions="You are a helpful weather assistant.",
+    instructions="You are a weather assistant.",
     tools=functions,
     model="gpt-4"
-)
-
-# Run assistant
-run = client.beta.threads.runs.create(
-    thread_id=thread.id,
-    assistant_id=assistant.id
 )
 ```
 
@@ -821,8 +977,7 @@ print(result)
 ### Interactive Agent
 
 ```python
-from langchain.agents import AgentExecutor, Agent
-from langchain.tools import Tool
+from langchain.agents import AgentExecutor, Agent, Tool
 
 # Define interactive agent
 class InteractiveAgent(Agent):
@@ -911,168 +1066,216 @@ def test_e2e():
 
 ---
 
-## 11. Production Considerations
+## Quick Start
 
-### Deployment
-
-```python
-# Deploy agent as API
-from fastapi import FastAPI
-from pydantic import BaseModel
-
-app = FastAPI()
-
-class Request(BaseModel):
-    input: str
-
-@app.post("/agent")
-async def run_agent(request: Request):
-    # Run agent
-    result = agent.run(request.input)
-    
-    return result
-
-# Run with uvicorn
-# uvicorn main:app --host 0.0.0.0 --port 8000
-```
-
-### Monitoring
+### Minimal Setup
 
 ```python
-# Monitor agent performance
-import time
+from langchain.agents import Agent, Tool
+from langchain.llms import OpenAI
 
-def monitored_agent_run(agent, input: str):
-    start_time = time.time()
-    
-    # Run agent
-    result = agent.run(input)
-    
-    end_time = time.time()
-    duration = end_time - start_time
-    
-    # Log metrics
-    log_metrics({
-        "input": input,
-        "duration": duration,
-        "success": result['success'],
-        "tokens_used": result.get('tokens_used', 0)
-    })
-    
-    return result
+# 1. Define a simple tool
+def search_tool(query: str) -> str:
+    """Search for information"""
+    return f"Results for: {query}"
 
-# Use monitored agent
-result = monitored_agent_run(agent, "test input")
-print(result)
-```
+# 2. Create tool wrapper
+search = Tool(
+    name="Search",
+    func=search_tool,
+    description="Search for information"
+)
 
-### Cost Optimization
+# 3. Initialize LLM
+llm = OpenAI(temperature=0)
 
-```python
-# Optimize token usage
-from langchain.callbacks import get_openai_callback
-
-# Track token usage
-token_tracker = get_openai_callback()
-
-# Create agent with token tracking
+# 4. Create agent
 agent = Agent(
-    tools=[tool1, tool2],
+    tools=[search],
     llm=llm,
-    callbacks=[token_tracker],
     verbose=True
 )
 
-# Run agent
-result = agent.run("test input")
+# 5. Run agent
+result = agent.run("What is Python?")
+print(result)
+```
 
-# Get token usage
-total_tokens = token_tracker.total_tokens
-total_cost = total_tokens * 0.00002  # $0.02 per 1k tokens
-print(f"Total tokens: {total_tokens}")
-print(f"Total cost: ${total_cost}")
+### Installation
+
+```bash
+pip install langchain openai
+export OPENAI_API_KEY="your-api-key"
+```
+
+### Next Steps
+
+1. Add more tools (APIs, databases, file systems)
+2. Implement memory for context retention
+3. Add error handling and fallbacks
+4. Set up monitoring and logging
 ```
 
 ---
 
-## 12. Example Use Cases
+## Production Checklist
 
-### Customer Service Agent
+- [ ] **Error Handling**: Implement try-catch blocks for all tool calls
+- [ ] **Rate Limiting**: Add rate limits to prevent API abuse
+- [ ] **Token Budget**: Set maximum token limits per agent run
+- [ ] **Timeout**: Configure timeouts to prevent infinite loops
+- [ ] **Logging**: Set up structured logging for all agent actions
+- [ ] **Monitoring**: Add metrics for success rate, latency, token usage
+- [ ] **Security**: Validate and sanitize all inputs
+- [ ] **Cost Tracking**: Monitor API costs per agent execution
+- [ ] **Max Iterations**: Set max_iterations to prevent infinite loops
+- [ ] **Memory Management**: Implement context window for conversation history
+- [ ] **Tool Permissions**: Implement RBAC for tool access control
+- [ ] **Audit Trail**: Log all agent decisions and tool calls
+- [ ] **Fallback Strategy**: Implement fallback mechanisms for failures
+- [ ] **Input Validation**: Validate all inputs before processing
+- [ ] **Output Sanitization**: Filter sensitive data from outputs
+- [ ] **Retry Logic**: Implement exponential backoff for retries
+- [ ] **Observability**: Add tracing and correlation IDs
+- [ ] **Load Testing**: Test with expected traffic patterns
+- [ ] **Disaster Recovery**: Implement backup and recovery procedures
 
-```python
-from langchain.agents import Agent, Tool
-from langchain.tools import Tool
+---
 
-# Define tools
-search_knowledge_base = Tool(
-    name="SearchKnowledgeBase",
-    func=search_kb,
-    description="Search customer knowledge base"
-)
+## Anti-patterns
 
-create_ticket = Tool(
-    name="CreateTicket",
-    func=create_support_ticket,
-    description="Create support ticket"
-)
-
-# Create customer service agent
-customer_service_agent = Agent(
-    tools=[search_knowledge_base, create_ticket],
-    llm=llm,
-    instructions="You are a helpful customer service agent.",
-    verbose=True
-)
-
-# Run agent
-result = customer_service_agent.run("I need help with my order")
-print(result)
-```
-
-### Research Agent
+### ❌ Don't: Infinite Loops Without Limits
 
 ```python
-from langchain.agents import Agent, Tool
-from langchain.tools import DuckDuckGoSearchRun
-
-# Define tools
-search = DuckDuckGoSearchRun()
-
-# Create research agent
-research_agent = Agent(
-    tools=[search],
+# ❌ Bad - No max iterations
+agent = Agent(
+    tools=[tool1, tool2],
     llm=llm,
-    instructions="You are a research assistant. Search for information and provide detailed answers.",
-    verbose=True
+    # Missing max_iterations parameter
 )
-
-# Run agent
-result = research_agent.run("Research the latest developments in AI")
-print(result)
 ```
-
-### Code Assistant Agent
 
 ```python
-from langchain.agents import Agent, Tool
-from langchain.tools import Tool
-
-# Define tools
-code_executor = Tool(
-    name="CodeExecutor",
-    func=execute_code,
-    description="Execute code and return output"
-)
-
-# Create code assistant
-code_assistant = Agent(
-    tools=[code_executor],
+# ✅ Good - Set iteration limits
+agent = Agent(
+    tools=[tool1, tool2],
     llm=llm,
-    instructions="You are a coding assistant. Write code and execute it.",
-    verbose=True
+    max_iterations=10,  # Prevent infinite loops
+    max_execution_time=60  # Timeout after 60 seconds
 )
-
-# Run agent
-result = code_assistant.run("Write a function to calculate factorial")
-print(result)
 ```
+
+### ❌ Don't: Ignore Tool Errors
+
+```python
+# ❌ Bad - No error handling
+def tool_function(input: str) -> str:
+    result = external_api.call(input)  # Can fail
+    return result
+```
+
+```python
+# ✅ Good - Handle errors gracefully
+def tool_function(input: str) -> str:
+    try:
+        result = external_api.call(input)
+        return result
+    except APIError as e:
+        logger.error(f"Tool error: {e}")
+        return f"Error: {str(e)}"
+```
+
+### ❌ Don't: Expose Sensitive Data in Tool Descriptions
+
+```python
+# ❌ Bad - Exposes API keys
+tool = Tool(
+    name="Database",
+    func=db_query,
+    description=f"Query database at {DB_HOST} with key {API_KEY}"  # Security risk!
+)
+```
+
+```python
+# ✅ Good - Generic descriptions
+tool = Tool(
+    name="Database",
+    func=db_query,
+    description="Query the internal database for user information"
+)
+```
+
+### ❌ Don't: No Memory Management
+
+```python
+# ❌ Bad - Each message is independent
+response = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[{"role": "user", "content": input}]  # No history!
+)
+```
+
+```python
+# ✅ Good - Maintain conversation context
+response = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        ...conversationHistory,  # Previous messages
+        {"role": "user", "content": input}
+    ]
+)
+```
+
+### ❌ Don't: No Fallback Strategy
+
+```python
+# ❌ Bad - Fails if vector search fails
+def search(query: str):
+    return vector_search(query)  # No fallback
+```
+
+```python
+# ✅ Good - Fallback to keyword search
+def search(query: str):
+    try:
+        return vector_search(query)
+    except Exception as e:
+        logger.error(f"Vector search failed: {e}")
+        return keyword_search(query)  # Fallback
+```
+
+### ❌ Don't: Trust Agent Output Without Validation
+
+```python
+# ❌ Bad - Direct execution
+result = agent.run(user_input)
+execute_code(result)  # Dangerous!
+```
+
+```python
+# ✅ Good - Validate before execution
+result = agent.run(user_input)
+if validate_output(result):
+    execute_code(result)
+else:
+    raise ValidationError("Agent output failed validation")
+```
+
+---
+
+## Integration Points
+
+- **LLM Integration** (`06-ai-ml-production/llm-integration/`) - Setting up LLM providers
+- **Function Calling** (`06-ai-ml-production/llm-function-calling/`) - Tool and function definitions
+- **RAG Implementation** (`06-ai-ml-production/rag-implementation/`) - Adding knowledge retrieval
+- **Vector Search** (`06-ai-ml-production/vector-search/`) - Semantic memory systems
+- **Error Handling** (`03-backend-api/error-handling/`) - Production error patterns
+
+---
+
+## Further Reading
+
+- [LangChain Agents Documentation](https://python.langchain.com/docs/modules/agents/)
+- [OpenAI Assistants API](https://platform.openai.com/docs/assistants/overview)
+- [ReAct Paper](https://arxiv.org/abs/2210.03629)
+- [Agent Patterns](https://github.com/langchain-ai/langchain/tree/master/templates)

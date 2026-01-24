@@ -1,13 +1,57 @@
+---
+name: YOLO Integration
+description: Comprehensive guide for integrating YOLO (You Only Look Once) object detection models (YOLOv8, YOLOv9) using Ultralytics library.
+---
+
 # YOLO Integration
 
 ## Overview
-Comprehensive guide for integrating YOLO (You Only Look Once) object detection models (YOLOv8, YOLOv9) using Ultralytics library.
 
----
+YOLO (You Only Look Once) is a state-of-the-art object detection model known for its speed and accuracy. This skill covers YOLO integration using the Ultralytics library, including YOLOv8 and YOLOv9 models, model loading and inference, custom training, object detection, instance segmentation, pose estimation, real-time inference, batch processing, API integration, performance optimization, and production deployment.
 
-## 1. YOLO Setup (Ultralytics)
+## Prerequisites
 
-### 1.1 Installation
+- Understanding of computer vision and object detection concepts
+- Knowledge of PyTorch and deep learning
+- Familiarity with OpenCV and image processing
+- Understanding of dataset formats (COCO, YOLO)
+- Basic knowledge of FastAPI and REST APIs
+
+## Key Concepts
+
+### YOLO Models
+
+- **YOLOv8**: State-of-the-art object detection with anchor-free detection
+- **YOLOv9**: Latest YOLO version with improved accuracy
+- **Model Sizes**: n (nano), s (small), m (medium), l (large), x (extra-large)
+- **Task Variants**: Detection, segmentation, pose estimation, classification
+
+### Ultralytics Library
+
+- **YOLO Class**: Main interface for model loading and inference
+- **Training Pipeline**: Built-in training with data augmentation
+- **Export Formats**: ONNX, TensorRT, CoreML, TFLite
+- **Result Objects**: Structured detection results with boxes, masks, keypoints
+
+### Dataset Formats
+
+- **YOLO Format**: Normalized bounding boxes with class IDs
+- **COCO Format**: Industry-standard annotation format
+- **Data.yaml**: Dataset configuration for training
+- **Directory Structure**: Organized images and labels folders
+
+### Deployment Patterns
+
+- **FastAPI Server**: REST API for YOLO inference
+- **Docker Deployment**: Containerized YOLO service
+- **Kubernetes**: Scalable deployment with GPU support
+- **Real-Time Inference**: Webcam and video stream processing
+
+## Implementation Guide
+
+### YOLO Setup (Ultralytics)
+
+#### Installation
 
 ```bash
 # Basic installation
@@ -25,7 +69,7 @@ cd ultralytics
 pip install -e .
 ```
 
-### 1.2 Verify Installation
+#### Verify Installation
 
 ```python
 from ultralytics import YOLO
@@ -44,7 +88,7 @@ model = YOLO("yolov8n.pt")  # Load pretrained model
 print(f"Model loaded successfully: {model.names}")
 ```
 
-### 1.3 Available Models
+#### Available Models
 
 ```python
 from ultralytics import YOLO
@@ -79,11 +123,9 @@ pose_models = {
 }
 ```
 
----
+### Model Loading and Inference
 
-## 2. Model Loading and Inference
-
-### 2.1 Basic Inference
+#### Basic Inference
 
 ```python
 from ultralytics import YOLO
@@ -111,7 +153,7 @@ for result in results:
         print(f"{class_name}: {confidence:.2f} at {bbox}")
 ```
 
-### 2.2 Inference with Parameters
+#### Inference with Parameters
 
 ```python
 # Inference with custom parameters
@@ -132,7 +174,7 @@ results = model(
 results = model(["image1.jpg", "image2.jpg", "image3.jpg"])
 ```
 
-### 2.3 Video Inference
+#### Video Inference
 
 ```python
 # Inference on video file
@@ -151,11 +193,9 @@ for result in model("video.mp4", stream=True):
     # Your processing logic here
 ```
 
----
+### Custom Training
 
-## 3. Custom Training
-
-### 3.1 Dataset Preparation
+#### Dataset Preparation
 
 **Dataset Structure:**
 
@@ -253,7 +293,7 @@ coco_to_yolo(
 )
 ```
 
-### 3.2 Training Configuration
+#### Training Configuration
 
 ```python
 from ultralytics import YOLO
@@ -311,7 +351,7 @@ results = model.train(
 )
 ```
 
-### 3.3 Fine-Tuning
+#### Fine-Tuning
 
 ```python
 from ultralytics import YOLO
@@ -354,7 +394,7 @@ results = model.train(
 )
 ```
 
-### 3.4 Resume Training
+#### Resume Training
 
 ```python
 # Resume from last checkpoint
@@ -367,11 +407,9 @@ results = model.train(
 )
 ```
 
----
+### Object Detection
 
-## 4. Object Detection
-
-### 4.1 Basic Detection
+#### Basic Detection
 
 ```python
 from ultralytics import YOLO
@@ -399,7 +437,7 @@ for result in results:
     print(detections)
 ```
 
-### 4.2 Custom Detection Pipeline
+#### Custom Detection Pipeline
 
 ```python
 from ultralytics import YOLO
@@ -477,7 +515,7 @@ annotated = detector.draw_detections(image, detections)
 cv2.imwrite("detections.jpg", annotated)
 ```
 
-### 4.3 Batch Processing
+#### Batch Processing
 
 ```python
 from ultralytics import YOLO
@@ -517,11 +555,9 @@ batch_detect(
 )
 ```
 
----
+### Instance Segmentation
 
-## 5. Instance Segmentation
-
-### 5.1 Segmentation Inference
+#### Segmentation Inference
 
 ```python
 from ultralytics import YOLO
@@ -557,7 +593,7 @@ for result in results:
         cv2.imwrite("segmentation.jpg", annotated)
 ```
 
-### 5.2 Mask Processing
+#### Mask Processing
 
 ```python
 import numpy as np
@@ -589,11 +625,9 @@ for result in results:
             cv2.imwrite(f"object_{i}.png", extracted)
 ```
 
----
+### Pose Estimation
 
-## 6. Pose Estimation
-
-### 6.1 Pose Detection
+#### Pose Detection
 
 ```python
 from ultralytics import YOLO
@@ -622,7 +656,7 @@ for result in results:
         cv2.imwrite("pose.jpg", annotated)
 ```
 
-### 6.2 Pose Analysis
+#### Pose Analysis
 
 ```python
 import numpy as np
@@ -710,11 +744,9 @@ for result in results:
             print(f"Person {i} angles: {angles}")
 ```
 
----
+### Real-Time Inference
 
-## 7. Real-Time Inference
-
-### 7.1 Webcam Inference
+#### Webcam Inference
 
 ```python
 from ultralytics import YOLO
@@ -748,7 +780,7 @@ cap.release()
 cv2.destroyAllWindows()
 ```
 
-### 7.2 Real-Time with FPS Counter
+#### Real-Time with FPS Counter
 
 ```python
 from ultralytics import YOLO
@@ -790,7 +822,7 @@ cap.release()
 cv2.destroyAllWindows()
 ```
 
-### 7.3 Multi-Threaded Inference
+#### Multi-Threaded Inference
 
 ```python
 from ultralytics import YOLO
@@ -856,11 +888,9 @@ cap.release()
 cv2.destroyAllWindows()
 ```
 
----
+### Batch Processing
 
-## 8. Batch Processing
-
-### 8.1 Efficient Batch Inference
+#### Efficient Batch Inference
 
 ```python
 from ultralytics import YOLO
@@ -887,7 +917,7 @@ image_paths = list(Path("images/").glob("*.jpg"))
 results = batch_inference(image_paths, batch_size=16)
 ```
 
-### 8.2 Parallel Batch Processing
+#### Parallel Batch Processing
 
 ```python
 from ultralytics import YOLO
@@ -933,11 +963,9 @@ image_paths = list(Path("images/").glob("*.jpg"))
 results = parallel_batch_inference(image_paths, num_workers=4)
 ```
 
----
+### API Integration
 
-## 9. API Integration
-
-### 9.1 FastAPI YOLO Server
+#### FastAPI YOLO Server
 
 ```python
 from fastapi import FastAPI, File, UploadFile, HTTPException
@@ -998,7 +1026,6 @@ async def detect(file: UploadFile = File(...)):
             image_width=image.shape[1],
             image_height=image.shape[0]
         )
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1017,7 +1044,7 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 ```
 
-### 9.2 Client Usage
+#### Client Usage
 
 ```python
 import requests
@@ -1036,11 +1063,9 @@ for detection in result["detections"]:
     print(f"{detection['class_name']}: {detection['confidence']:.2f}")
 ```
 
----
+### Performance Optimization
 
-## 10. Performance Optimization
-
-### 10.1 Model Optimization
+#### Model Optimization
 
 ```python
 from ultralytics import YOLO
@@ -1066,7 +1091,7 @@ model.half()  # Convert to FP16
 results = model("image.jpg", half=True)
 ```
 
-### 10.2 Inference Optimization
+#### Inference Optimization
 
 ```python
 from ultralytics import YOLO
@@ -1088,7 +1113,7 @@ results = model(
 )
 ```
 
-### 10.3 TensorRT Optimization
+#### TensorRT Optimization
 
 ```python
 from ultralytics import YOLO
@@ -1102,11 +1127,9 @@ model = YOLO("yolov8n.engine")
 results = model("image.jpg")
 ```
 
----
+### Post-Processing Results
 
-## 11. Post-Processing Results
-
-### 11.1 Result Filtering
+#### Result Filtering
 
 ```python
 from ultralytics import YOLO
@@ -1136,7 +1159,7 @@ for box in result.boxes:
         large_boxes.append(box)
 ```
 
-### 11.2 Non-Maximum Suppression (Custom)
+#### Non-Maximum Suppression (Custom)
 
 ```python
 import numpy as np
@@ -1180,7 +1203,7 @@ def calculate_iou(box1, box2):
     return intersection / union if union > 0 else 0
 ```
 
-### 11.3 Result Visualization
+#### Result Visualization
 
 ```python
 from ultralytics import YOLO
@@ -1225,11 +1248,9 @@ def get_color(class_id):
     return tuple(np.random.randint(0, 255, 3).tolist())
 ```
 
----
+### Production Deployment
 
-## 12. Production Deployment
-
-### 12.1 Docker Deployment
+#### Docker Deployment
 
 **Dockerfile:**
 
@@ -1266,7 +1287,7 @@ uvicorn>=0.23.0
 python-multipart>=0.0.6
 ```
 
-### 12.2 Kubernetes Deployment
+#### Kubernetes Deployment
 
 **deployment.yaml:**
 
@@ -1310,7 +1331,7 @@ spec:
   type: LoadBalancer
 ```
 
-### 12.3 Production Best Practices
+#### Production Best Practices
 
 ```python
 from ultralytics import YOLO
@@ -1347,11 +1368,85 @@ model = YOLOModel("yolov8n.pt")
 results = model.predict("image.jpg")
 ```
 
----
+## Best Practices
 
-## Additional Resources
+### Model Selection
 
-- [Ultralytics Documentation](https://docs.ultralytics.com/)
-- [YOLOv8 GitHub](https://github.com/ultralytics/ultralytics)
-- [YOLOv9 GitHub](https://github.com/WongKinYiu/yolov9)
-- [COCO Dataset](https://cocodataset.org/)
+1. **Choose Model Size Based on Requirements**
+   - Use `yolov8n` for real-time applications
+   - Use `yolov8s/m` for balanced performance
+   - Use `yolov8l/x` for maximum accuracy
+
+2. **Use Task-Specific Models**
+   - Use `yolov8n-seg.pt` for instance segmentation
+   - Use `yolov8n-pose.pt` for pose estimation
+   - Use detection models for object detection only
+
+### Training Best Practices
+
+1. **Dataset Preparation**
+   - Use high-quality annotations
+   - Ensure consistent image sizes
+   - Balance class distribution
+   - Use data augmentation
+
+2. **Training Configuration**
+   - Start with pretrained weights
+   - Use appropriate learning rate
+   - Monitor validation metrics
+   - Save checkpoints regularly
+
+3. **Fine-Tuning**
+   - Freeze backbone layers initially
+   - Use lower learning rates
+   - Gradually unfreeze layers
+   - Monitor for overfitting
+
+### Inference Optimization
+
+1. **Use Half Precision**
+   ```python
+   model = YOLO("yolov8n.pt")
+   results = model("image.jpg", half=True)
+   ```
+
+2. **Optimize Inference Parameters**
+   - Set appropriate confidence threshold
+   - Limit maximum detections
+   - Disable verbose output
+   - Use GPU acceleration
+
+3. **Export Optimized Models**
+   - Export to ONNX for cross-platform deployment
+   - Export to TensorRT for NVIDIA GPUs
+   - Export to CoreML for Apple devices
+
+### Production Deployment
+
+1. **Use Singleton Pattern**
+   - Load model once at startup
+   - Reuse model across requests
+   - Avoid loading model per request
+
+2. **Implement Error Handling**
+   - Handle invalid inputs gracefully
+   - Log errors appropriately
+   - Provide meaningful error messages
+
+3. **Monitor Performance**
+   - Track inference latency
+   - Monitor GPU memory usage
+   - Set up alerts for performance degradation
+
+4. **Use Appropriate Hardware**
+   - Use GPU for real-time applications
+   - Consider edge devices for mobile deployment
+   - Optimize for target platform
+
+## Related Skills
+
+- [`05-ai-ml-core/model-training`](05-ai-ml-core/model-training/SKILL.md)
+- [`05-ai-ml-core/model-optimization`](05-ai-ml-core/model-optimization/SKILL.md)
+- [`05-ai-ml-core/pytorch-deployment`](05-ai-ml-core/pytorch-deployment/SKILL.md)
+- [`07-document-processing/image-preprocessing`](07-document-processing/image-preprocessing/SKILL.md)
+- [`06-ai-ml-production/llm-integration`](06-ai-ml-production/llm-integration/SKILL.md)

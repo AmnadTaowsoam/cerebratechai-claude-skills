@@ -1,8 +1,41 @@
+---
+name: Document Parsing
+description: Comprehensive guide to structured document parsing and information extraction from various document types
+---
+
+---
+name: Document Parsing
+description: Comprehensive guide to structured document parsing and information extraction from various document types
+---
+
 # Document Parsing
 
 ## Overview
 
 Comprehensive guide to structured document parsing and information extraction from various document types.
+
+## Prerequisites
+
+- Understanding of document formats (PDF, images, scanned documents)
+- Knowledge of OCR (Optical Character Recognition) techniques
+- Familiarity with regular expressions for pattern matching
+- Experience with data structures and validation schemas
+- Understanding of NLP (Natural Language Processing) and named entity recognition
+- Familiarity with computer vision and image processing
+- Knowledge of document layout analysis
+- Experience with PDF parsing libraries
+
+## Key Concepts
+
+- **Document Types**: Invoices, receipts, forms, contracts, reports, tables
+- **Extraction Techniques**: Template-based, rule-based, ML-based extraction
+- **Libraries**: pdfplumber, PyPDF2, Camelot, Tabula, pdfplumber, Spacy, Transformers
+- **Layout Analysis**: Detecting document structure, regions, columns
+- **Table Extraction**: Extracting tables from PDFs using various libraries
+- **Information Extraction**: Key-value pairs, entities, dates, amounts
+- **Post-processing**: Data normalization, validation, error handling
+- **Caching**: Storing extracted data to improve performance
+- **Production Patterns**: Pipeline architecture, monitoring, error handling
 
 ## Table of Contents
 

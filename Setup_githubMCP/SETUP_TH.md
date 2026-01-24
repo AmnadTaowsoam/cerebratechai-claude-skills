@@ -33,7 +33,7 @@
    - **Token name**: `Claude MCP - Skills`
    - **Expiration**: `90 days` (หรือตามต้องการ)
    - **Repository access**: เลือก **Only select repositories**
-   - เลือก repository: `cerebratechai-claude-skills`
+   - เลือก repository: `cerebraSkills`
 
 4. **ตั้งค่าสิทธิ์**
    - **Repository permissions**:
@@ -81,7 +81,7 @@
          "env": {
            "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
            "GITHUB_OWNER": "AmnadTaowsoam",
-           "GITHUB_REPO": "cerebratechai-claude-skills",
+           "GITHUB_REPO": "cerebraSkills",
            "GITHUB_BRANCH": "main"
          }
        }
@@ -242,7 +242,7 @@ Claude จะสร้างโค้ดตาม best practices ที่กำ
 
 ## 🆘 ต้องการความช่วยเหลือ?
 
-- เปิด Issue: https://github.com/AmnadTaowsoam/cerebratechai-claude-skills/issues
+- เปิด Issue: https://github.com/AmnadTaowsoam/cerebraSkills/issues
 - ดูเอกสาร MCP: https://modelcontextprotocol.io
 - ดูเอกสาร GitHub MCP Server: https://github.com/modelcontextprotocol/servers/tree/main/src/github
 

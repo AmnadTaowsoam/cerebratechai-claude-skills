@@ -1,12 +1,189 @@
+---
+name: User Guides
+description: Creating comprehensive guides that help end users understand how to use your product effectively, with clear instructions, screenshots, and troubleshooting.
+---
+
 # User Guides
 
-## Overview
-
-User guides help end users understand how to use your product effectively.
+> **Current Level:** Expert (Enterprise Scale)
+> **Domain:** Documentation / User Experience
 
 ---
 
-## 1. User Guide Structure
+## Overview
+
+User guides help end users understand how to use your product effectively. Effective user guides use clear language, step-by-step instructions, visual aids, and troubleshooting sections to help users accomplish their goals.
+
+---
+
+## 1. Executive Summary & Strategic Necessity
+
+* **Context:** ในปี 2025-2026 User Guides ด้วย Best Practices ช่วย Documentation ที่มีอัตโนมาติการทำงานอัตโนมาติ (Documentation Excellence) ใน Enterprise Scale
+
+* **Business Impact:** User Guides ช่วยลด Downtime ของระบบ Documentation ผ่านการตอบคำถามอัตโนมาติการเขียนเอกสาร (Reduce support tickets), ลดต้นทุนการจัดการทีม (Increase user satisfaction), เพิ่มอัตรากำไร Gross Margin ผ่านการทำงานอัตโนมาติ (Faster user onboarding), และปรับประสบทการทำงาน (Consistent user experience)
+
+* **Product Thinking:** User Guides ช่วยแก้ปัญหา (Pain Point) ความต้องการมีการเขียนเอกสารที่ชัดเจน (Users need clear guides) ผ่านการทำงานอัตโนมาติ (Standardized guides)
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+* **Core Logic:** User Guides ใช้ Best Practices ช่วย Documentation ทำงานอัตโนมาติ:
+  1. **User Guide Structure**: กำหนด User Guide Structure (Title Page, Table of Contents, Introduction, Getting Started, Features, Tutorials, Troubleshooting, FAQ, Glossary)
+  2. **Getting Started Guides**: สร้าง Getting Started Guides สำหรับการเริ่มต้น (Installation, Configuration, First Run)
+  3. **Feature Documentation**: จัดการ Feature Documentation สำหรับการอธิบาย features (Overview, When to Use, How It Works, Using Feature, Examples)
+  4. **Tutorials vs How-Tos**: จัดการ Tutorials vs How-Tos สำหรับการเขียน guides (Tutorial structure, How-To structure)
+  5. **FAQ Sections**: สร้าง FAQ Sections สำหรับการตอบคำถาม (General questions, Installation, Features, Troubleshooting)
+  6. **Troubleshooting Guides**: จัดการ Troubleshooting Guides สำหรับการแก้ปัญหา (Common issues, Error messages, Getting help)
+  7. **Screenshots and Videos**: สร้าง Screenshots and Videos สำหรับ visual aids (Screenshot guidelines, Video guidelines)
+
+* **Architecture Diagram Requirements:** แผนผังระบบ User Guides ต้องมีองค์ประกอบ:
+  1. **User Guide Repository**: User Guide Repository สำหรับการจัดเก็บ guides (Git repository, Documentation platform)
+  2. **User Guide Generator**: User Guide Generator สำหรับการสร้าง guides (Markdown, HTML, PDF)
+  3. **User Guide Templates**: User Guide Templates สำหรับการเขียน guides (Getting Started template, Feature template, FAQ template)
+  4. **User Guide Search**: User Guide Search สำหรับการค้นหา guides (Full-text search, Tag-based search, Category-based search)
+  5. **User Guide Analytics**: User Guide Analytics สำหรับการวิเคราะห์ guide usage (Usage metrics, Search analytics, Feedback collection)
+  6. **Feedback Mechanisms**: Feedback Mechanisms สำหรับการรับ feedback (Page-level feedback, Feedback form, Issue reporting)
+  7. **Observability**: Logging, Monitoring, Tracing สำหรับการ debug และปรับสิทท
+
+* **Implementation Workflow:** ขั้นตอนการนำ User Guides ไปใช้งานจริง:
+  1. **Planning Phase**: กำหนด Requirement และเลือก User Guide Platform ที่เหมาะสม
+  2. **User Guide Repository Setup**: ตั้งค่า User Guide Repository สำหรับการจัดเก็บ guides
+  3. **User Guide Generator Setup**: ตั้งค่า User Guide Generator สำหรับการสร้าง guides
+  4. **User Guide Templates Creation**: สร้าง User Guide Templates สำหรับการเขียน guides
+  5. **Feedback Mechanisms Setup**: ตั้งค่า Feedback Mechanisms สำหรับการรับ feedback
+  6. **Testing Phase**: Unit test, Integration test, E2E test ด้วยจริง Scenario
+  7. **Deployment**: Deploy ด้วย CI/CD pipeline, Set up Monitoring
+  8. **Optimization**: Optimize user guide search, Add user guide templates, Improve UX
+  9. **Maintenance**: Monitor user guide usage, Update user guide content, Handle edge cases
+
+---
+
+## 3. Tooling & Tech Stack
+
+* **Enterprise Tools:** เครื่องมือระดับอุตสาหกรรมที่เลือกใช้สำหรับ User Guides ใน Enterprise Scale:
+  1. **GitBook**: Documentation platform สำหรับ user guides
+  2. **Notion**: Documentation platform สำหรับ user guides
+  3. **Confluence**: Documentation platform สำหรับ user guides
+  4. **Docusaurus**: Static site generator สำหรับ user guides
+  5. **ReadMe**: API documentation platform สำหรับ user guides
+  6. **WordPress**: CMS platform สำหรับ user guides
+  7. **Loom**: Video recording tool สำหรับ video guides
+  8. **OBS Studio**: Video recording tool สำหรับ video guides
+  9. **Loom**: Screenshot tool สำหรับ screenshots
+  10. **Git**: Version control system สำหรับ guide versioning
+
+* **Configuration Essentials:** การตั้งค่าสำคัญสำหรับให้ระบบเสถียร User Guides:
+  1. **User Guide Templates**: ตั้งค่า User Guide Templates (Getting Started template, Feature template, FAQ template)
+  2. **Search Optimization**: ตั้งค่า Search Optimization (Title optimization, Content optimization, Meta tags)
+  3. **Feedback Mechanisms**: ตั้งค่า Feedback Mechanisms (Page-level feedback, Feedback form, Issue reporting)
+  4. **Localization**: ตั้งค่า Localization (Content preparation, Translation process, Cultural considerations)
+  5. **Maintenance**: ตั้งค่า Maintenance (Regular updates, Version management, Content review)
+  6. **Monitoring**: ตั้งค่า Monitoring สำหรับ tracking user guide usage (Usage metrics, Search analytics, Feedback collection)
+  7. **Secret Management**: Use Environment variables หรือ Secret Manager (AWS Secrets Manager, HashiCorp Vault)
+  8. **Rate Limiting**: Per-user และ Per-IP rate limits สำหรับป้องกัน Abuse (100-1000 requests/hour)
+  9. **Logging Level**: INFO สำหรับ Production, DEBUG สำหรับ Development
+  10. **Observability**: Track success rate, user guide usage, search accuracy ต่อเป้าหลาย
+
+---
+
+## 4. Standards, Compliance & Security
+
+* **International Standards:** มาตรฐานที่เกี่ยวข้อง:
+  1. **ISO/IEC 27001**: Information Security Management - สำหรับการจัดการ Secrets และ Access Control
+  2. **ISO/IEC 27017**: Code of Practice for Information Security Controls - สำหรับ Secure Documentation
+  3. **WCAG 2.1**: Web Content Accessibility Guidelines - สำหรับ Accessibility
+  4. **GDPR**: General Data Protection Regulation - สำหรับการจัดการ Personal Data และ User Consent
+  5. **SOC 2 Type II**: Security Controls - สำหรับการ Audit และ Compliance
+
+* **Security Protocol:** กลไกการป้องกัน User Guides:
+  1. **Input Validation**: Validate และ Sanitize ทุก Input ก่อน processing (Prevent XSS, SQL injection)
+  2. **Output Sanitization**: Filter sensitive information จาก user guides (API keys, Secrets, Passwords)
+  3. **Access Control**: RBAC (Role-Based Access Control) สำหรับ user guide access - บาง guides internal only
+  4. **Audit Trail**: Log ทุก user guide access ด้วย Timestamp, User ID, และ Guide accessed (สำหรับ Forensics และ Compliance)
+  5. **Rate Limiting**: Per-user และ Per-IP rate limits สำหรับป้องกัน Abuse (100-1000 requests/hour)
+  6. **Secure Communication**: TLS 1.3 สำหรับ HTTPS access
+  7. **Secret Management**: Use Environment variables หรือ Secret Manager (AWS Secrets Manager, HashiCorp Vault)
+  8. **Content Security**: CSP headers สำหรับ preventing XSS attacks
+  9. **Authentication**: Implement authentication สำหรับ internal user guides (SSO, OAuth)
+  10. **Data Encryption**: Encrypt sensitive data ที่ rest ใน Database (AES-256 หรือ Customer-managed keys)
+
+* **Explainability:** (สำหรับ User Guides) ความสามารถในการอธิบายผลลัพธ์ผ่านเทคนิค:
+  1. **Clear Structure**: เก็บ user guide structure สำหรับ easy understanding
+  2. **Detailed Steps**: Provide detailed steps สำหรับ complex tasks
+  3. **Visual Aids**: Include visual aids สำหรับ understanding (Screenshots, Videos, Diagrams)
+  4. **Context Information**: Include context information สำหรับ understanding features
+  5. **Reference Links**: Link to external documentation สำหรับ complex topics
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+* **Cost Calculation:** สูตรการคำนวณต้นทุกต่อหน่วย User Guides:
+  1. **Platform Cost** = Platform subscription × Cost per user/month
+     - Confluence: $5-15/user/month
+     - Notion: $8-15/user/month
+     - GitBook: $8-20/user/month
+  2. **Storage Cost** = User guide storage × Cost per GB/month
+     - GitHub Pages: Free
+     - GitLab Pages: Free
+     - S3: $0.023/GB/month
+  3. **Video Hosting Cost** = Video storage × Cost per GB/month
+     - Loom: Free tier + $12.50/month
+     - Vimeo: $20-75/month
+  4. **Monitoring Cost** = Monitoring platform subscription × Cost per month
+     - Grafana Cloud: $50-500/month
+     - Datadog: $15-23/host/month
+  5. **Total Monthly Cost** = Platform Cost + Storage Cost + Video Hosting Cost + Monitoring Cost
+  6. **Infrastructure Costs** = Compute ($0/month for static sites) + Storage ($0/month for static sites) + Monitoring ($50-500/month)
+
+* **Key Performance Indicators:** ตัวชี้วัดความสำเร็จทางเทคนิค:
+  1. **User Guide Coverage**: เปอร์เซ็นต์ของ features ที่มี user guides (Target: >80%)
+  2. **User Guide Quality Score**: คะแนน user guide quality จาก automated checks (Target: >4.0)
+  3. **User Guide Accuracy**: เปอร์เซ็นต์ของ user guides ที่มี accurate information (Target: >95%)
+  4. **User Guide Completeness**: เปอร์เซ็นต์ของ user guides ที่มี complete information (Target: >90%)
+  5. **User Satisfaction Score**: 1-5 rating จาก User feedback (Target: >4.0)
+  6. **Error Rate**: อัตราการ Error (Target: <1%)
+  7. **Onboarding Time**: เวลาการ onboarding users (Target: <30 minutes)
+  8. **Support Ticket Reduction**: เปอร์เซ็นต์ของ support tickets ที่ลดลง (Target: >50%)
+  9. **Search Accuracy**: เปอร์เซ็นต์ของ search results ที่ relevant (Target: >90%)
+  10. **Knowledge Transfer**: เปอร์เซ็นต์ของ knowledge transfer (Target: >80%)
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+* **Phase Rollout:** คำแนะนำในการทยอยเริ่มใช้งาน User Guides เพื่อลดความเสี่ยง:
+  1. **Phase 1: MVP (1-2 เดือน)**: Deploy Simple User Guides ด้วย Basic Templates และ Manual review สำหรับ Internal team ก่อนเปิดให้ Public
+     - **Goal**: Validate User Guides architecture และ gather feedback
+     - **Success Criteria**: >80% user guide coverage, <30s search time
+     - **Risk Mitigation**: Internal-only access, Manual review ก่อน Public
+  2. **Phase 2: Beta (2-3 เดือน)**: Expand ด้วย Search Optimization และ Feedback Mechanisms สำหรับ Selected customers
+     - **Goal**: Test scalability และ User Guide reliability
+     - **Success Criteria**: >90% user guide coverage, <15s search time
+     - **Risk Mitigation**: Canary deployment, Feature flags, Gradual rollout
+  3. **Phase 3: GA (3-6 เดือน)**: Full rollout ด้วย Advanced features (Localization, Video Guides, User Guide Analytics)
+     - **Goal**: Enterprise-grade user guide quality และ Performance
+     - **Success Criteria**: >95% user guide coverage, <10s search time, 99.9% uptime
+     - **Risk Mitigation**: Load testing, Disaster recovery, Blue-green deployment
+
+* **Pitfalls to Avoid:** ข้อควรระวังที่มักจะผิดพลาดในระดับ Enterprise Scale:
+  1. **Over-engineering**: สร้าง User Guides ที่ซ้อนเกินไป (Too many sections, Complex templates) → เริ่มจาก Simple และ iterate
+  2. **No User Guide Templates**: ไม่มี User Guide Templates ทำให้ consistency ลด → Implement User Guide Templates สำหรับ common patterns
+  3. **Outdated Guides**: Guides ไม่ sync กับ product → Implement automated guide quality checks
+  4. **Missing Screenshots**: ไม่มี Screenshots ทำให้ users สับสนใจ → Implement screenshot guidelines
+  5. **No Troubleshooting**: ไม่มี Troubleshooting ทำให้ users แก้ปัญหาไม่ได้ → Implement troubleshooting guides
+  6. **No Feedback Mechanisms**: ไม่มี Feedback Mechanisms ทำให้ feedback ไม่ได้ → Implement feedback mechanisms
+  7. **No Search Optimization**: ไม่มี Search Optimization ทำให้ users หา guides ไม่ได้ → Implement search optimization
+  8. **Poor Search**: Search ไม่ดีทำให้ users หา guides ไม่ได้ → Implement advanced search (Algolia, Elasticsearch)
+  9. **No User Guide Analytics**: ไม่มี User Guide Analytics ทำให้ไม่รู้ guide usage → Implement user guide analytics
+  10. **No Localization**: ไม่มี Localization ทำให้ users ในตลาดประเทศไม่ได้ใช้ → Implement localization
+
+---
+
+## Core Concepts
+
+### 1. User Guide Structure
 
 ### Standard Structure
 
@@ -77,7 +254,7 @@ User guides help end users understand how to use your product effectively.
 # [Section Title]
 
 ## Overview
-[Brief introduction to the section]
+[Brief introduction to section]
 
 ## [Subsection 1]
 [Content with examples]
@@ -103,11 +280,11 @@ User guides help end users understand how to use your product effectively.
 
 ## Welcome to [Product Name]
 
-[Product Name] helps you [main benefit]. This guide will walk you through the basics of getting started.
+[Product Name] helps you [main benefit]. This guide will walk you through basics of getting started.
 
 ## What You'll Learn
 
-By the end of this guide, you'll know how to:
+By end of this guide, you'll know how to:
 - [ ] [Learning objective 1]
 - [ ] [Learning objective 2]
 - [ ] [Learning objective 3]
@@ -131,16 +308,16 @@ npm install [product-name]
 ### Option B: Download from Website
 
 1. Visit [website URL]
-2. Click the download button
-3. Run the installer
-4. Follow the prompts
+2. Click download button
+3. Run installer
+4. Follow prompts
 
 ## Step 2: Configuration
 
 1. Open [config file]
 2. Add your API key
 3. Set your preferences
-4. Save the file
+4. Save file
 
 ```yaml
 # config.yaml
@@ -164,8 +341,8 @@ Your application is running at http://localhost:3000
 ## Step 4: Create Your First [Resource]
 
 1. Navigate to [URL]
-2. Click the "Create" button
-3. Fill in the form
+2. Click "Create" button
+3. Fill in form
 4. Click "Save"
 
 Congratulations! You've created your first [resource].
@@ -206,7 +383,7 @@ Use [feature name] when you need to:
 
 ## How It Works
 
-[Explanation of how the feature works, with diagrams if helpful]
+[Explanation of how feature works, with diagrams if helpful]
 
 ## Using [Feature Name]
 
@@ -294,7 +471,7 @@ Use [feature name] when you need to:
 
 ## What You'll Build
 
-[Description of what the reader will build by the end of the tutorial]
+[Description of what reader will build by end of tutorial]
 
 ## What You'll Learn
 
@@ -362,7 +539,7 @@ Use [feature name] when you need to:
 
 ## Overview
 
-[Brief description of the task]
+[Brief description of task]
 
 ## Prerequisites
 
@@ -414,7 +591,7 @@ Use [feature name] when you need to:
 
 [Answer]
 
-### What are the system requirements?
+### What are system requirements?
 
 [Answer]
 
@@ -486,10 +663,10 @@ Use [feature name] when you need to:
 
 ## Still Have Questions?
 
-If you don't find the answer you're looking for:
+If you don't find answer you're looking for:
 - [Contact Support](#)
 - [Join our Community](#)
-- [Read the Documentation](#)
+- [Read Documentation](#)
 ```
 
 ---
@@ -533,9 +710,9 @@ If you don't find the answer you're looking for:
 # Command if applicable
 ```
 
-**If the Issue Persists**
+**If Issue Persists**
 
-[What to do if none of the solutions work]
+[What to do if none of solutions work]
 
 ---
 
@@ -559,9 +736,9 @@ If you don't find the answer you're looking for:
 
 [Step-by-step instructions]
 
-**If the Issue Persists**
+**If Issue Persists**
 
-[What to do if none of the solutions work]
+[What to do if none of solutions work]
 
 ---
 
@@ -570,13 +747,15 @@ If you don't find the answer you're looking for:
 ### Error: [Error Message]
 
 **What This Means**
-[Explanation of the error]
+
+[Explanation of error]
 
 **Common Causes**
 - [Cause 1]
 - [Cause 2]
 
 **How to Fix**
+
 1. [Step 1]
 2. [Step 2]
 3. [Step 3]
@@ -586,9 +765,9 @@ If you don't find the answer you're looking for:
 ## Getting Help
 
 If you're still experiencing issues:
-1. Check the [documentation](#)
-2. Search the [knowledge base](#)
-3. Ask in the [community forum](#)
+1. Check [documentation](#)
+2. Search [knowledge base](#)
+3. Ask in [community forum](#)
 4. [Contact support](#)
 
 ### When Contacting Support
@@ -621,7 +800,7 @@ Please include:
 ### 1. Relevance
 - Only include relevant parts
 - Crop unnecessary elements
-- Focus on the feature being documented
+- Focus on feature being documented
 
 ### 2. Clarity
 - Use high resolution
@@ -654,7 +833,7 @@ Please include:
 
 ![Screenshot of [feature]](path/to/screenshot.png)
 
-**Figure 1**: [Brief description of what the screenshot shows]
+**Figure 1**: [Brief description of what screenshot shows]
 
 ### Key Elements
 1. [Element 1]: Description
@@ -706,8 +885,8 @@ Please include:
 ## [Feature Name] Video
 
 <video controls width="800">
-  <source src="path/to/video.mp4" type="video/mp4">
-  Your browser does not support the video tag.
+   <source src="path/to/video.mp4" type="video/mp4">
+   Your browser does not support video tag.
 </video>
 
 ### Video Contents
@@ -722,7 +901,7 @@ Please include:
 
 ### Transcript
 
-[Full transcript of the video]
+[Full transcript of video]
 ```
 ```
 
@@ -808,12 +987,12 @@ For more information, see:
     {
       "@type": "HowToStep",
       "name": "Navigate to Users",
-      "text": "Go to the Users section"
+      "text": "Go to Users section"
     },
     {
       "@type": "HowToStep",
       "name": "Click Create",
-      "text": "Click the Create button"
+      "text": "Click Create button"
     }
   ]
 }
@@ -835,18 +1014,18 @@ For more information, see:
 ### Rating System
 ```html
 <div class="feedback-section">
-  <p>Was this page helpful?</p>
-  <button class="feedback-button" data-rating="yes">Yes</button>
-  <button class="feedback-button" data-rating="no">No</button>
+   <p>Was this page helpful?</p>
+   <button class="feedback-button" data-rating="yes">Yes</button>
+   <button class="feedback-button" data-rating="no">No</button>
 </div>
 ```
 
 ### Comment Section
 ```html
 <div class="comments-section">
-  <h3>Comments</h3>
-  <textarea placeholder="Leave a comment..."></textarea>
-  <button>Submit</button>
+   <h3>Comments</h3>
+   <textarea placeholder="Leave a comment..."></textarea>
+   <button>Submit</button>
 </div>
 ```
 
@@ -854,23 +1033,23 @@ For more information, see:
 
 ```html
 <form class="feedback-form">
-  <h3>Submit Feedback</h3>
-  
-  <label for="feedback-type">Feedback Type</label>
-  <select id="feedback-type">
-    <option>Correction</option>
-    <option>Suggestion</option>
-    <option>Question</option>
-    <option>Other</option>
-  </select>
-  
-  <label for="feedback-message">Message</label>
-  <textarea id="feedback-message" required></textarea>
-  
-  <label for="feedback-email">Email (optional)</label>
-  <input type="email" id="feedback-email">
-  
-  <button type="submit">Submit Feedback</button>
+   <h3>Submit Feedback</h3>
+   
+   <label for="feedback-type">Feedback Type</label>
+   <select id="feedback-type">
+     <option>Correction</option>
+     <option>Suggestion</option>
+     <option>Question</option>
+     <option>Other</option>
+   </select>
+   
+   <label for="feedback-message">Message</label>
+   <textarea id="feedback-message" required></textarea>
+   
+   <label for="feedback-email">Email (optional)</label>
+   <input type="email" id="feedback-email">
+   
+   <button type="submit">Submit Feedback</button>
 </form>
 ```
 
@@ -880,11 +1059,11 @@ For more information, see:
 ```markdown
 ## Report an Issue
 
-Found an issue in the documentation? Please [open an issue on GitHub](https://github.com/example/repo/issues).
+Found an issue in documentation? Please [open an issue on GitHub](https://github.com/example/repo/issues).
 
 When reporting an issue, include:
 - Page URL
-- Description of the issue
+- Description of issue
 - Suggested fix (if applicable)
 - Screenshots (if applicable)
 ```
@@ -895,7 +1074,7 @@ When reporting an issue, include:
 ```markdown
 ## Community Support
 
-Join the conversation:
+Join conversation:
 - [Discord Server](#)
 - [Reddit Community](#)
 - [Stack Overflow](#)
@@ -1331,3 +1510,118 @@ Join the conversation:
 - **Mistake**: Not updating documentation
 - **Fix**: Schedule regular updates
 ```
+
+---
+
+## Quick Start
+
+### Basic User Guide Template
+
+```markdown
+# [Product Name] User Guide
+
+## Getting Started
+1. Sign up for an account
+2. Complete your profile
+3. Explore dashboard
+
+## Key Features
+
+### Feature 1: [Name]
+**What it does:** [Description]
+**How to use:**
+1. Step 1
+2. Step 2
+3. Step 3
+
+**Screenshot:**
+![Feature screenshot](image.png)
+
+## Troubleshooting
+
+### Problem: [Issue]
+**Solution:** [Fix]
+
+## FAQ
+
+**Q:** [Question]
+A: [Answer]
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Clear Structure**: Logical organization with table of contents
+- [ ] **Getting Started**: Quick start guide for new users
+- [ ] **Step-by-Step**: Clear, numbered instructions
+- [ ] **Screenshots**: Visual aids for complex steps
+- [ ] **Search**: Searchable documentation
+- [ ] **Troubleshooting**: Common issues and solutions
+- [ ] **FAQ**: Frequently asked questions
+- [ ] **Updates**: Keep guides current with product changes
+- [ ] **Feedback**: Mechanism for users to provide feedback
+- [ ] **Accessibility**: Accessible format and language
+- [ ] **Multiple Formats**: PDF, web, video options
+- [ ] **Localization**: Translated for target markets
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Technical Jargon
+
+```markdown
+# ❌ Bad - Too technical
+## Configuration
+Set `API_ENDPOINT` environment variable to configure REST API endpoint.
+```
+
+```markdown
+# ✅ Good - User-friendly
+## Settings
+Enter your API address in Settings page.
+```
+
+### ❌ Don't: Missing Screenshots
+
+```markdown
+# ❌ Bad - No visuals
+## Step 1: Click button
+[No screenshot]
+```
+
+```markdown
+# ✅ Good - With screenshot
+## Step 1: Click button
+![Click button](screenshot.png)
+```
+
+### ❌ Don't: Outdated Information
+
+```markdown
+# ❌ Bad - Old interface
+## Dashboard
+[Describes old interface that no longer exists]
+```
+
+```markdown
+# ✅ Good - Current
+## Dashboard (Updated: 2024-01-15)
+[Current interface description]
+```
+
+---
+
+## Integration Points
+
+- **Technical Writing** (`21-documentation/technical-writing/`) - Clear writing
+- **User Research** (`22-ux-ui-design/user-research/`) - Understand user needs
+- **Accessibility** (`22-ux-ui-design/accessibility/`) - Accessible documentation
+
+---
+
+## Further Reading
+
+- [Write the Docs](https://www.writethedocs.org/)
+- [User Guide Best Practices](https://www.helpscout.com/blog/user-manual/)

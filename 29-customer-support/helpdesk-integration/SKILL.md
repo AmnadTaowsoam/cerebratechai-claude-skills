@@ -1,10 +1,24 @@
+---
+name: Helpdesk System Integration
+description: Connecting applications with customer support platforms like Zendesk, Intercom, and Freshdesk to manage tickets, user accounts, support workflows, SSO integration, and widget embedding.
+---
+
 # Helpdesk System Integration
+
+> **Current Level:** Intermediate  
+> **Domain:** Customer Support / Integration
+
+---
 
 ## Overview
 
-Helpdesk system integration connects your application with customer support platforms like Zendesk, Intercom, and Freshdesk to manage tickets, user accounts, and support workflows.
+Helpdesk system integration connects your application with customer support platforms like Zendesk, Intercom, and Freshdesk to manage tickets, user accounts, and support workflows. Effective integration includes SSO, widget embedding, automated ticket creation, and SLA management.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Helpdesk Platforms Comparison](#helpdesk-platforms-comparison)
 2. [Zendesk API Integration](#zendesk-api-integration)
@@ -1727,9 +1741,100 @@ function logApiCall(platform: string, method: string, endpoint: string, data?: a
 
 ---
 
-## Resources
+---
+
+## Quick Start
+
+### Zendesk Integration
+
+```typescript
+const zendesk = require('node-zendesk')
+
+const client = zendesk.createClient({
+  username: process.env.ZENDESK_EMAIL,
+  token: process.env.ZENDESK_API_TOKEN,
+  remoteUri: `https://${process.env.ZENDESK_SUBDOMAIN}.zendesk.com/api/v2`
+})
+
+// Create ticket
+async function createTicket(ticket: Ticket) {
+  return await client.tickets.create({
+    ticket: {
+      subject: ticket.subject,
+      comment: { body: ticket.description },
+      priority: ticket.priority,
+      requester: { email: ticket.userEmail }
+    }
+  })
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Platform Selection**: Choose helpdesk platform
+- [ ] **API Integration**: Integrate with helpdesk API
+- [ ] **SSO Integration**: Single sign-on setup
+- [ ] **Widget Embedding**: Embed helpdesk widget
+- [ ] **Automated Tickets**: Auto-create tickets
+- [ ] **SLA Management**: SLA tracking
+- [ ] **Analytics**: Analytics integration
+- [ ] **Error Handling**: Handle API errors
+- [ ] **Testing**: Test integration
+- [ ] **Documentation**: Document integration
+- [ ] **Monitoring**: Monitor integration health
+- [ ] **Support**: Support team training
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No SSO
+
+```markdown
+# ❌ Bad - Separate login
+Users login to app
+Users login separately to helpdesk
+# Poor UX!
+```
+
+```markdown
+# ✅ Good - SSO
+Users login to app
+Helpdesk uses SSO
+# Seamless experience
+```
+
+### ❌ Don't: No Automation
+
+```markdown
+# ❌ Bad - Manual ticket creation
+User reports issue → Support creates ticket manually
+# Slow!
+```
+
+```markdown
+# ✅ Good - Automated
+User reports issue → Ticket auto-created
+# Fast and consistent
+```
+
+---
+
+## Integration Points
+
+- **Ticketing System** (`29-customer-support/ticketing-system/`) - Ticket management
+- **Live Chat** (`29-customer-support/live-chat/`) - Chat to ticket
+- **SSO Integration** (`24-security-practices/sso-integration/`) - Single sign-on
+
+---
+
+## Further Reading
 
 - [Zendesk API Documentation](https://developer.zendesk.com/api-reference/)
 - [Intercom API Documentation](https://developers.intercom.com/)
 - [Freshdesk API Documentation](https://developers.freshdesk.com/api/)
 - [Passport SAML Strategy](https://www.passportjs.org/packages/passport-saml/)
+
+## Resources

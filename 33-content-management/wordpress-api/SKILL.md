@@ -1,8 +1,18 @@
+---
+name: WordPress API
+description: Using WordPress REST API for headless WordPress implementations including authentication, endpoints, custom post types, media management, and Next.js integration.
+---
+
 # WordPress API
+
+> **Current Level:** Intermediate  
+> **Domain:** Content Management / Backend
+
+---
 
 ## Overview
 
-WordPress REST API enables headless WordPress implementations. This guide covers authentication, endpoints, custom post types, and Next.js integration.
+WordPress REST API enables headless WordPress implementations. This guide covers authentication, endpoints, custom post types, and Next.js integration for building content-driven applications with WordPress as a headless CMS.
 
 ## WordPress REST API Overview
 
@@ -541,6 +551,125 @@ export default function BlogPost({ post }: { post: ParsedPost }) {
 8. **Performance** - Optimize API requests
 9. **Error Handling** - Handle API errors gracefully
 10. **ISR** - Use Incremental Static Regeneration with Next.js
+
+---
+
+## Quick Start
+
+### WordPress REST API Client
+
+```typescript
+const WORDPRESS_API = 'https://yoursite.com/wp-json/wp/v2'
+
+// Fetch posts
+async function getPosts() {
+  const response = await fetch(`${WORDPRESS_API}/posts`)
+  return await response.json()
+}
+
+// Create post
+async function createPost(post: CreatePostDto) {
+  const response = await fetch(`${WORDPRESS_API}/posts`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.WP_API_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(post)
+  })
+  return await response.json()
+}
+```
+
+### Next.js Integration
+
+```typescript
+// pages/blog/[slug].js
+export async function getStaticProps({ params }) {
+  const post = await fetch(
+    `${WORDPRESS_API}/posts?slug=${params.slug}`
+  ).then(res => res.json())
+  
+  return {
+    props: { post: post[0] },
+    revalidate: 60
+  }
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Authentication**: Application passwords or JWT configured
+- [ ] **API Access**: REST API enabled
+- [ ] **Caching**: Cache API responses
+- [ ] **Pagination**: Handle pagination
+- [ ] **Embedded Data**: Use _embed parameter
+- [ ] **Custom Post Types**: Custom post types if needed
+- [ ] **Media**: Media library integration
+- [ ] **Webhooks**: Webhooks for content updates
+- [ ] **Error Handling**: Handle API errors
+- [ ] **Testing**: Test API integration
+- [ ] **Documentation**: Document API usage
+- [ ] **Security**: Secure API access
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Caching
+
+```typescript
+// ❌ Bad - No caching
+const posts = await fetch(`${WORDPRESS_API}/posts`)
+// Every request hits WordPress!
+```
+
+```typescript
+// ✅ Good - Cache responses
+const cacheKey = 'wordpress_posts'
+let posts = await cache.get(cacheKey)
+if (!posts) {
+  posts = await fetch(`${WORDPRESS_API}/posts`)
+  await cache.set(cacheKey, posts, 3600)  // 1 hour
+}
+```
+
+### ❌ Don't: Expose Admin Credentials
+
+```typescript
+// ❌ Bad - Admin credentials
+const response = await fetch(`${WORDPRESS_API}/posts`, {
+  headers: {
+    'Authorization': `Basic ${btoa('admin:password')}`  // Exposed!
+  }
+})
+```
+
+```typescript
+// ✅ Good - Application password
+const response = await fetch(`${WORDPRESS_API}/posts`, {
+  headers: {
+    'Authorization': `Bearer ${process.env.WP_APP_PASSWORD}`  // Secure
+  }
+})
+```
+
+---
+
+## Integration Points
+
+- **Headless CMS** (`33-content-management/headless-cms/`) - CMS patterns
+- **Contentful Integration** (`33-content-management/contentful-integration/`) - Alternative CMS
+- **Next.js Patterns** (`02-frontend/nextjs-patterns/`) - SSG/ISR
+
+---
+
+## Further Reading
+
+- [WordPress REST API](https://developer.wordpress.org/rest-api/)
+- [WordPress Application Passwords](https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/)
 
 ## Resources
 

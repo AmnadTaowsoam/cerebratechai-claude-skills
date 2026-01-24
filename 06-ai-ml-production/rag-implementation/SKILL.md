@@ -1,7 +1,38 @@
+---
+name: RAG Implementation
+description: Comprehensive guide for Retrieval-Augmented Generation (RAG) implementation using LangChain
+---
+
 # RAG Implementation
 
 ## Overview
 Comprehensive guide for Retrieval-Augmented Generation (RAG) implementation using LangChain.
+
+## Prerequisites
+
+- Understanding of vector databases and embeddings
+- Familiarity with LangChain framework
+- Knowledge of document processing and chunking
+- Experience with LLM integration
+- Understanding of semantic search concepts
+- Basic knowledge of retrieval strategies
+
+## Key Concepts
+
+- **RAG Architecture**: Retrieval-Augmented Generation combines retrieval from a knowledge base with LLM generation
+- **Document Chunking**: Splitting documents into smaller pieces for efficient processing and retrieval
+- **Embeddings**: Converting text to vector representations for semantic similarity search
+- **Vector Stores**: Databases optimized for storing and retrieving vector embeddings (FAISS, Chroma, Pinecone, Weaviate)
+- **Semantic Search**: Finding documents based on meaning rather than keyword matching
+- **Hybrid Search**: Combining semantic search with keyword search (BM25) for better results
+- **Re-ranking**: Improving retrieval results by re-scoring with more accurate models
+- **Context Window Management**: Managing the amount of context passed to the LLM within token limits
+- **Multi-Query Retrieval**: Generating multiple queries from a single input to improve retrieval coverage
+- **Self-Querying**: Extracting metadata filters from queries to refine search results
+- **Parent Document Retrieval**: Retrieving full parent documents instead of chunks for better context
+- **RAG Evaluation**: Measuring precision, recall, and F1 score for retrieval and generation quality
+- **Caching**: Storing frequently asked queries and responses to improve performance
+- **Batch Processing**: Processing multiple queries concurrently for efficiency
 
 ---
 
@@ -1416,6 +1447,16 @@ print(f"Retrieval issues: {retrieval_issues}")
 ```
 
 ---
+
+## Related Skills
+
+- [`06-ai-ml-production/embedding-models`](06-ai-ml-production/embedding-models/SKILL.md)
+- [`06-ai-ml-production/vector-search`](06-ai-ml-production/vector-search/SKILL.md)
+- [`06-ai-ml-production/vector-search-patterns`](06-ai-ml-production/vector-search-patterns/SKILL.md)
+- [`06-ai-ml-production/prompt-engineering`](06-ai-ml-production/prompt-engineering/SKILL.md)
+- [`06-ai-ml-production/llm-integration`](06-ai-ml-production/llm-integration/SKILL.md)
+- [`07-document-processing/rag-architecture-patterns`](07-document-processing/rag-architecture-patterns/SKILL.md)
+- [`07-document-processing/rag-chunking-metadata-strategy`](07-document-processing/rag-chunking-metadata-strategy/SKILL.md)
 
 ## Additional Resources
 

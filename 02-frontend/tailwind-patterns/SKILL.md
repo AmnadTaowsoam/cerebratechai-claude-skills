@@ -1,8 +1,113 @@
 # Tailwind CSS Patterns and Best Practices
 
-## 1. Configuration (tailwind.config.js)
+---
 
-### Basic Configuration
+## 1. Executive Summary & Strategic Necessity
+
+### 1.1 Context (ภาษาไทย)
+
+Tailwind CSS คือ utility-first CSS framework ที่ช่วยให้ developers สร้าง UI ได้รวดเร็วและ maintainable โดยใช้ utility classes แทน custom CSS ซึ่งช่วยลด context switching ระหว่าง HTML และ CSS files
+
+Tailwind CSS ใช้ utility-first approach ซึ่งช่วยให้ developers:
+- **Rapid Development** - สร้าง UI ได้รวดเร็วด้วย utility classes
+- **Consistent Design** - รักษา consistency ด้วย design tokens
+- **Responsive Design** - สร้าง responsive layouts ได้ง่าย
+- **Dark Mode** - Built-in dark mode support
+- **Customizable** - Fully customizable ด้วย configuration files
+- **Production-Ready** - Optimized สำหรับ production ด้วย JIT mode
+
+### 1.2 Business Impact (ภาษาไทย)
+
+**ผลกระทบทางธุรกิจ:**
+
+1. **เพิ่ม Development Velocity** - ลดเวลาในการพัฒนา UI ได้ถึง 30-50%
+2. **ลด CSS Bundle Size** - Purge unused styles ช่วยลด bundle size ได้ถึง 80%
+3. **เพิ่ม Maintainability** - Consistent design tokens ช่วยเพิ่ม maintainability
+4. **ลด Context Switching** - Utility classes ช่วยลดการสลับระหว่าง HTML และ CSS
+5. **ปรับปรุง Consistency** - Design system ที่ consistent ช่วยเพิ่ม UX
+
+### 1.3 Product Thinking (ภาษาไทย)
+
+**มุมมองด้านผลิตภัณฑ์:**
+
+1. **Utility-First** - Tailwind ต้องเป็น CSS framework หลัก
+2. **Responsive** - UI ต้อง responsive ทุก devices
+3. **Dark Mode** - Dark mode support ต้อง built-in
+4. **Customizable** - Design system ต้อง customizable
+5. **Performance** - CSS bundle ต้อง optimized สำหรับ production
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+### 2.1 Core Logic
+
+Tailwind CSS ประกอบด้วย:
+
+1. **Utility Classes** - Small, single-purpose CSS classes
+2. **Design Tokens** - Consistent values สำหรับ colors, spacing, typography
+3. **Responsive Modifiers** - Breakpoint prefixes สำหรับ responsive design
+4. **State Modifiers** - Hover, focus, active states
+5. **Dark Mode** - Dark mode support ด้วย class หรือ media query
+6. **JIT Mode** - Just-In-Time compiler สำหรับ production optimization
+7. **Plugins** - Extensible plugin system
+
+### 2.2 Architecture Diagram Requirements
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              Tailwind CSS Architecture                 │
+├─────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Configuration Layer                   │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  tailwind   │  │  Theme      │  │  Plugins    │  │   │
+│  │  │  config    │  │  Extension  │  │             │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Utility Layer                          │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Layout     │  │  Typography │  │  Colors     │  │   │
+│  │  │  Utilities  │  │  Utilities  │  │  Utilities  │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Modifier Layer                        │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Responsive │  │  State      │  │  Dark       │  │   │
+│  │  │  Modifiers  │  │  Modifiers  │  │  Mode       │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Build Layer                            │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  JIT Mode   │  │  Purge      │  │  Minify     │  │   │
+│  │  │  Compiler   │  │  Unused     │  │  Output     │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 2.3 Implementation Workflow
+
+**Step 1: Install Tailwind CSS**
+
+```bash
+# Install Tailwind CSS
+npm install -D tailwindcss postcss autoprefixer
+
+# Initialize Tailwind
+npx tailwindcss init -p
+```
+
+**Step 2: Configure Tailwind**
+
 ```javascript
 // tailwind.config.js
 /** @type {import('tailwindcss').Config} */
@@ -20,7 +125,224 @@ module.exports = {
 }
 ```
 
-### Theme Customization
+**Step 3: Add Tailwind Directives**
+
+```css
+/* styles.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+---
+
+## 3. Tooling & Tech Stack
+
+### 3.1 Enterprise Tools
+
+| Tool | Purpose | Version | License |
+|------|---------|---------|---------|
+| Tailwind CSS | Utility-First CSS Framework | ^3.4.0 | MIT |
+| PostCSS | CSS Post-Processor | ^8.4.0 | MIT |
+| Autoprefixer | CSS Vendor Prefixing | ^10.4.0 | MIT |
+| @tailwindcss/forms | Form Plugin | ^0.5.0 | MIT |
+| @tailwindcss/typography | Typography Plugin | ^0.5.0 | MIT |
+| @tailwindcss/aspect-ratio | Aspect Ratio Plugin | ^0.4.0 | MIT |
+| Tailwind CSS IntelliSense | VS Code Extension | Latest | MIT |
+
+### 3.2 Configuration Essentials
+
+**PostCSS Configuration:**
+```javascript
+// postcss.config.js
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+```
+
+**Tailwind Configuration:**
+```javascript
+// tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: 'class', // or 'media'
+  content: [
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+        },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['Fira Code', 'monospace'],
+      },
+    },
+  },
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+  ],
+}
+```
+
+---
+
+## 4. Standards, Compliance & Security
+
+### 4.1 International Standards
+
+- **WCAG 2.1** - Web Content Accessibility Guidelines
+- **W3C CSS Standards** - CSS Specification Standards
+- **ISO 9241-11** - Usability Standards
+- **GDPR** - Data Protection สำหรับ User Data
+
+### 4.2 Security Protocol
+
+Tailwind CSS ต้องปฏิบัติตามหลักความปลอดภัย:
+
+1. **Content Security Policy** - ใช้ CSP headers สำหรับ inline styles
+2. **Input Sanitization** - Validate ข้อมูลทั้ง client และ server
+3. **XSS Prevention** - ไม่ใช้ inline styles จาก user input
+4. **Secure Dependencies** - ตรวจสอบ dependencies สำหรับ vulnerabilities
+
+### 4.3 Explainability
+
+Tailwind CSS ต้องสามารถอธิบายได้ว่า:
+
+1. **Utility Classes** - ทำไมใช้ utility classes อย่างไร
+2. **Design Tokens** - ทำไมใช้ design tokens อย่างไร
+3. **Responsive Design** - ทำไมใช้ responsive modifiers อย่างไร
+4. **Dark Mode** - ทำไมใช้ dark mode อย่างไร
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+### 5.1 Cost Calculation
+
+| Metric | Calculation | Target |
+|--------|-------------|--------|
+| CSS Bundle Size | CSS bundle size | < 20 KB |
+| Purge Efficiency | Unused styles removed | > 80% |
+| Build Time | Tailwind build time | < 5s |
+| Runtime Performance | CSS parsing time | < 50ms |
+| Development Velocity | UI development time | -30% |
+
+### 5.2 Key Performance Indicators
+
+**Technical Metrics:**
+
+1. **CSS Bundle Size** - CSS bundle ที่ใช้งาน
+2. **Purge Efficiency** - Unused styles ที่ถูกลบ
+3. **Build Time** - เวลาในการ build
+4. **Runtime Performance** - CSS parsing time
+
+**Business Metrics:**
+
+1. **Development Velocity** - เวลาในการพัฒนา UI
+2. **Maintainability** - Maintainability score
+3. **Consistency** - Design consistency score
+4. **User Experience** - UX metrics
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+### 6.1 Phase Rollout
+
+**Phase 1: Foundation (Week 1-2)**
+- Install Tailwind CSS
+- Setup configuration files
+- Create basic utility patterns
+- Implement basic components
+
+**Phase 2: Advanced Features (Week 3-4)**
+- Implement responsive design
+- Add dark mode support
+- Create custom utilities
+- Setup plugins
+
+**Phase 3: Optimization (Week 5-6)**
+- Optimize bundle size
+- Implement purge strategy
+- Setup build pipeline
+- Performance testing
+
+**Phase 4: Production (Week 7-8)**
+- Documentation and training
+- Design system creation
+- Component library
+- Best practices documentation
+
+### 6.2 Pitfalls to Avoid
+
+1. **Over-Engineering** - ไม่ใช้ Tailwind สำหรับ simple projects
+2. **Poor Configuration** - ไม่ configure Tailwind อย่างเหมาะสม
+3. **Missing Purge** - ไม่ purge unused styles
+4. **Inconsistent Design** - ไม่ใช้ design tokens อย่าง consistent
+5. **Poor Performance** - ไม่ optimize bundle size
+6. **Accessibility Issues** - ไม่ consider accessibility
+
+### 6.3 Best Practices Checklist
+
+- [ ] ใช้ utility classes สำหรับ rapid development
+- [ ] Implement responsive design ด้วย breakpoints
+- [ ] Add dark mode support
+- [ ] Use design tokens สำหรับ consistency
+- [ ] Purge unused styles สำหรับ production
+- [ ] Optimize bundle size
+- [ ] Use semantic HTML
+- [ ] Consider accessibility
+- [ ] Create reusable components
+- [ ] Use plugins สำหรับ advanced features
+- [ ] Test บนทุก browsers และ devices
+- [ ] Document design system
+- [ ] Use Tailwind IntelliSense
+- [ ] Organize classes logically
+- [ ] Use container queries สำหรับ component-level responsiveness
+
+---
+
+## 7. Implementation Examples
+
+### 7.1 Configuration
+
+**Basic Configuration:**
+```javascript
+// tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+**Theme Customization:**
 ```javascript
 // tailwind.config.js
 module.exports = {
@@ -65,7 +387,7 @@ module.exports = {
 }
 ```
 
-### Custom Colors
+**Custom Colors:**
 ```javascript
 // tailwind.config.js
 module.exports = {
@@ -96,7 +418,7 @@ module.exports = {
 }
 ```
 
-### Extending Utilities
+**Extending Utilities:**
 ```javascript
 // tailwind.config.js
 module.exports = {
@@ -126,7 +448,7 @@ module.exports = {
 }
 ```
 
-### Plugin Configuration
+**Plugin Configuration:**
 ```javascript
 // tailwind.config.js
 const plugin = require('tailwindcss/plugin')
@@ -146,7 +468,7 @@ module.exports = {
           textShadow: '4px 4px 8px rgba(0,0,0,0.2)',
         },
       })
-      
+
       addComponents({
         '.btn': {
           padding: theme('spacing.2'),
@@ -163,9 +485,9 @@ module.exports = {
 }
 ```
 
-## 2. Common Utility Patterns
+### 7.2 Common Utility Patterns
 
-### Layout (Flex)
+**Layout (Flex):**
 ```html
 <!-- Flex container -->
 <div class="flex">
@@ -206,7 +528,7 @@ module.exports = {
 </div>
 ```
 
-### Layout (Grid)
+**Layout (Grid):**
 ```html
 <!-- Basic grid -->
 <div class="grid grid-cols-3 gap-4">
@@ -246,7 +568,7 @@ module.exports = {
 </div>
 ```
 
-### Spacing
+**Spacing:**
 ```html
 <!-- Padding -->
 <div class="p-4">All sides</div>
@@ -277,7 +599,7 @@ module.exports = {
 </div>
 ```
 
-### Typography
+**Typography:**
 ```html
 <!-- Font size -->
 <h1 class="text-4xl font-bold">Heading 1</h1>
@@ -316,7 +638,7 @@ module.exports = {
 <p class="line-clamp-2">This text will show only 2 lines and truncate the rest...</p>
 ```
 
-### Colors and Backgrounds
+**Colors and Backgrounds:**
 ```html
 <!-- Background colors -->
 <div class="bg-white">White background</div>
@@ -349,9 +671,9 @@ module.exports = {
 <input class="ring-offset-2 ring-offset-blue-100 ring-2 ring-blue-500" />
 ```
 
-## 3. Responsive Design
+### 7.3 Responsive Design
 
-### Breakpoints
+**Breakpoints:**
 ```html
 <!-- Default breakpoint classes (mobile-first) -->
 <div class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4">
@@ -395,7 +717,7 @@ module.exports = {
 </h1>
 ```
 
-### Mobile-First Approach
+**Mobile-First Approach:**
 ```html
 <!-- Mobile-first: Start with mobile styles, add breakpoints for larger screens -->
 <div class="
@@ -428,9 +750,9 @@ module.exports = {
 </div>
 ```
 
-## 4. Component Patterns
+### 7.4 Component Patterns
 
-### Buttons
+**Buttons:**
 ```html
 <!-- Primary button -->
 <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
@@ -480,7 +802,7 @@ module.exports = {
 </button>
 ```
 
-### Cards
+**Cards:**
 ```html
 <!-- Basic card -->
 <div class="bg-white rounded-lg shadow-md p-6">
@@ -530,7 +852,7 @@ module.exports = {
 </div>
 ```
 
-### Forms
+**Forms:**
 ```html
 <!-- Form container -->
 <form class="max-w-md mx-auto space-y-4">
@@ -645,7 +967,7 @@ module.exports = {
 </form>
 ```
 
-### Navigation
+**Navigation:**
 ```html
 <!-- Simple nav -->
 <nav class="flex items-center justify-between p-4 bg-white shadow">
@@ -660,14 +982,14 @@ module.exports = {
 <!-- Responsive nav with mobile menu -->
 <nav class="flex items-center justify-between p-4 bg-white shadow">
   <div class="text-xl font-bold">Logo</div>
-  
+
   <!-- Desktop menu -->
   <div class="hidden md:flex gap-4">
     <a href="#" class="text-gray-700 hover:text-blue-500">Home</a>
     <a href="#" class="text-gray-700 hover:text-blue-500">About</a>
     <a href="#" class="text-gray-700 hover:text-blue-500">Contact</a>
   </div>
-  
+
   <!-- Mobile menu button -->
   <button class="md:hidden">
     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -719,9 +1041,9 @@ module.exports = {
 </div>
 ```
 
-## 5. Dark Mode Implementation
+### 7.5 Dark Mode Implementation
 
-### Using Class Strategy
+**Using Class Strategy:**
 ```javascript
 // tailwind.config.js
 module.exports = {
@@ -750,7 +1072,7 @@ module.exports = {
 </script>
 ```
 
-### Dark Mode Styles
+**Dark Mode Styles:**
 ```html
 <!-- Text colors -->
 <p class="text-gray-900 dark:text-gray-100">Adaptive text color</p>
@@ -783,9 +1105,9 @@ module.exports = {
 </nav>
 ```
 
-## 6. Custom Utilities with @apply
+### 7.6 Custom Utilities with @apply
 
-### Creating Component Classes
+**Creating Component Classes:**
 ```css
 /* styles.css */
 @tailwind base;
@@ -796,23 +1118,23 @@ module.exports = {
   .btn {
     @apply px-4 py-2 rounded font-medium transition-colors;
   }
-  
+
   .btn-primary {
     @apply bg-blue-500 text-white hover:bg-blue-600;
   }
-  
+
   .btn-secondary {
     @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
   }
-  
+
   .btn-danger {
     @apply bg-red-500 text-white hover:bg-red-600;
   }
-  
+
   .card {
     @apply bg-white rounded-lg shadow-md p-6;
   }
-  
+
   .input {
     @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500;
   }
@@ -822,12 +1144,12 @@ module.exports = {
   .text-shadow {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
   }
-  
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -847,9 +1169,9 @@ module.exports = {
 <input type="text" class="input" placeholder="Enter text" />
 ```
 
-## 7. Performance Optimization
+### 7.7 Performance Optimization
 
-### Purge Unused Styles
+**Purge Unused Styles:**
 ```javascript
 // tailwind.config.js
 module.exports = {
@@ -863,7 +1185,7 @@ module.exports = {
 }
 ```
 
-### JIT Mode (Default in v3+)
+**JIT Mode (Default in v3+):**
 ```javascript
 // tailwind.config.js
 module.exports = {
@@ -873,7 +1195,7 @@ module.exports = {
 }
 ```
 
-### Minimize Arbitrary Values
+**Minimize Arbitrary Values:**
 ```html
 <!-- Avoid excessive arbitrary values -->
 <div class="w-[123px] h-[456px] mt-[78px]">Not recommended</div>
@@ -882,7 +1204,7 @@ module.exports = {
 <div class="w-32 h-40 mt-20">Recommended</div>
 ```
 
-### Group Related Utilities
+**Group Related Utilities:**
 ```html
 <!-- Group related utilities together -->
 <div class="
@@ -894,44 +1216,16 @@ module.exports = {
 </div>
 ```
 
-## 8. With CSS-in-JS (styled-components, emotion)
+### 7.8 Common Layouts
 
-### Using Tailwind with styled-components
-```javascript
-// Button.js
-import styled from 'styled-components'
-
-const StyledButton = styled.button`
-  @apply px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors;
-`
-
-export default StyledButton
-```
-
-### Using Tailwind with emotion
-```javascript
-/** @jsxImportSource @emotion/react */
-import { css } from '@emotion/react'
-
-const buttonStyles = css`
-  @apply px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors;
-`
-
-function Button({ children, ...props }) {
-  return <button css={buttonStyles} {...props}>{children}</button>
-}
-```
-
-## 9. Common Layouts
-
-### Center Layout
+**Center Layout:**
 ```html
 <div class="min-h-screen flex items-center justify-center">
   <div>Centered content</div>
 </div>
 ```
 
-### Sidebar Layout
+**Sidebar Layout:**
 ```html
 <div class="flex min-h-screen">
   <aside class="w-64 bg-gray-900 text-white">
@@ -943,7 +1237,7 @@ function Button({ children, ...props }) {
 </div>
 ```
 
-### Header-Footer Layout
+**Header-Footer Layout:**
 ```html
 <div class="min-h-screen flex flex-col">
   <header class="bg-white shadow">
@@ -958,7 +1252,7 @@ function Button({ children, ...props }) {
 </div>
 ```
 
-### Masonry Grid
+**Masonry Grid:**
 ```html
 <div class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4">
   <div class="break-inside-avoid mb-4">
@@ -973,9 +1267,9 @@ function Button({ children, ...props }) {
 </div>
 ```
 
-## 10. Best Practices
+### 7.9 Best Practices
 
-### Use Semantic HTML
+**Use Semantic HTML:**
 ```html
 <!-- Good: Semantic HTML -->
 <nav class="flex justify-between p-4">
@@ -996,7 +1290,7 @@ function Button({ children, ...props }) {
 </div>
 ```
 
-### Extract Reusable Components
+**Extract Reusable Components:**
 ```html
 <!-- Instead of repeating button styles everywhere -->
 <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Button</button>
@@ -1005,7 +1299,7 @@ function Button({ children, ...props }) {
 <button class="btn btn-primary">Button</button>
 ```
 
-### Use Responsive Prefixes Sparingly
+**Use Responsive Prefixes Sparingly:**
 ```html
 <!-- Good: Only override what changes -->
 <div class="w-full md:w-1/2">
@@ -1018,7 +1312,7 @@ function Button({ children, ...props }) {
 </div>
 ```
 
-### Use Arbitrary Values Judiciously
+**Use Arbitrary Values Judiciously:**
 ```html
 <!-- Good: For one-off values -->
 <div class="w-[374px]">Specific width needed</div>
@@ -1027,11 +1321,11 @@ function Button({ children, ...props }) {
 <div class="w-sidebar">Sidebar width</div>
 ```
 
-### Use the Tailwind IntelliSense Extension
+**Use the Tailwind IntelliSense Extension:**
 - Install the Tailwind CSS IntelliSense extension for VS Code
 - Provides autocomplete, hover previews, and linting
 
-### Organize Classes Logically
+**Organize Classes Logically:**
 ```html
 <div class="
   flex items-center justify-between
@@ -1045,7 +1339,7 @@ function Button({ children, ...props }) {
 </div>
 ```
 
-### Use Container Queries (when supported)
+**Use Container Queries (when supported):**
 ```html
 <div class="@container">
   <div class="@lg:text-xl @md:text-base text-sm">
@@ -1053,3 +1347,13 @@ function Button({ children, ...props }) {
   </div>
 </div>
 ```
+
+---
+
+## 8. Related Skills
+
+- `02-frontend/react-best-practices`
+- `02-frontend/nextjs-patterns`
+- `02-frontend/shadcn-ui`
+- `22-ux-ui-design/design-systems`
+- `22-ux-ui-design/responsive-design`

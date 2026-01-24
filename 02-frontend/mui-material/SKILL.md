@@ -1,12 +1,110 @@
 # Material-UI (MUI) Best Practices
 
-## 1. Theme Setup and Customization
+---
 
-### Basic Theme Setup
+## 1. Executive Summary & Strategic Necessity
+
+### 1.1 Context (ภาษาไทย)
+
+Material-UI (MUI) คือ component library ที่ใช้ Google's Material Design สำหรับ React ซึ่งมี components ที่พร้อมใช้งานและมี customization ที่ยืดหยุ่น MUI ใช้ Emotion สำหรับ CSS-in-JS และมี theme system ที่ทรงพลังสำหรับการจัดการ design tokens และ styling
+
+MUI ให้ components ที่มี accessibility และ responsive design ที่ดี พร้อมกับ TypeScript support และ internationalization (i18n) ซึ่งเหมาะสำหรับ enterprise applications ที่ต้องการ consistency และ scalability
+
+### 1.2 Business Impact (ภาษาไทย)
+
+**ผลกระทบทางธุรกิจ:**
+
+1. **ลด Development Time** - MUI มี components ที่พร้อมใช้งาน ช่วยลดเวลาในการพัฒนา UI ได้ถึง 40-60%
+2. **เพิ่ม User Experience** - Material Design principles ช่วยเพิ่ม UX และ consistency
+3. **ลด Maintenance Cost** - Component reuse และ theme system ช่วยลด maintenance cost
+4. **เพิ่ม Accessibility** - Built-in accessibility ช่วยให้ผู้ใช้ทุกคนเข้าถึงได้
+5. **ปรับปรุง Time-to-Market** - Rapid prototyping และ development ช่วยลด time-to-market
+
+### 1.3 Product Thinking (ภาษาไทย)
+
+**มุมมองด้านผลิตภัณฑ์:**
+
+1. **Design System** - MUI เป็น design system ที่สมบูรณ์พร้อมใช้งาน
+2. **Customization** - Theme system ช่วยให้ customization ง่ายและยืดหยุ่น
+3. **Accessibility First** - Components มี accessibility ที่ดีตั้งแต่เริ่ม
+4. **Responsive Design** - Built-in responsive design สำหรับทุก devices
+5. **Internationalization** - Support สำหรับ multiple languages และ RTL
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+### 2.1 Core Logic
+
+MUI ประกอบด้วย:
+
+1. **Core Components** - 50+ components ที่พร้อมใช้งาน
+2. **Theme System** - จัดการ design tokens และ styling
+3. **Styled Components** - `sx` prop และ `styled()` API
+4. **Layout System** - Grid, Container, Stack สำหรับ responsive layouts
+5. **Form Components** - TextField, Select, Checkbox และอื่นๆ
+6. **Data Display** - Table, Card, List สำหรับแสดงข้อมูล
+
+### 2.2 Architecture Diagram Requirements
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              MUI Architecture                           │
+├─────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Application Layer                       │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │   Pages      │  │  Features   │  │  Layouts  │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Theme Provider Layer                   │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Theme      │  │  Color      │  │  Design   │  │   │
+│  │  │  Context    │  │  Mode       │  │  Tokens   │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Component Library Layer                 │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Layout     │  │  Navigation │  │  Feedback  │  │   │
+│  │  │  Components │  │  Components │  │  Components│  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Form       │  │  Data       │  │  Surface   │  │   │
+│  │  │  Components │  │  Display    │  │  Components│  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Styling System Layer                   │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  sx Prop    │  │  styled()   │  │  System   │  │   │
+│  │  │  API        │  │  API        │  │  Props    │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              CSS-in-JS Engine Layer                  │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │   Emotion   │  │  Cache      │  │  Server    │  │   │
+│  │  │   Runtime   │  │  Provider   │  │  Rendering │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 2.3 Implementation Workflow
+
+**Step 1: Setup Theme Provider**
+
 ```typescript
 // theme.ts
 import { createTheme, responsiveFontSizes } from '@mui/material/styles'
-import { Roboto } from '@mui/material/styles'
 
 let theme = createTheme({
   palette: {
@@ -18,7 +116,7 @@ let theme = createTheme({
     },
   },
   typography: {
-    fontFamily: Roboto.style.fontFamily,
+    fontFamily: '"Inter", "Roboto", sans-serif',
   },
 })
 
@@ -27,7 +125,6 @@ theme = responsiveFontSizes(theme)
 export default theme
 ```
 
-### Custom Theme Provider
 ```typescript
 // ThemeRegistry.tsx
 'use client'
@@ -35,21 +132,244 @@ export default theme
 import * as React from 'react'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
-import NextAppDirEmotionCacheProvider from './EmotionCache'
+import theme from './theme'
 
 export default function ThemeRegistry({ children }: { children: React.ReactNode }) {
   return (
-    <NextAppDirEmotionCacheProvider options={{ key: 'mui' }}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
-      </ThemeProvider>
-    </NextAppDirEmotionCacheProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      {children}
+    </ThemeProvider>
   )
 }
 ```
 
-### Advanced Theme Configuration
+---
+
+## 3. Tooling & Tech Stack
+
+### 3.1 Enterprise Tools
+
+| Tool | Purpose | Version | License |
+|------|---------|---------|---------|
+| @mui/material | Core Component Library | ^5.0.0 | MIT |
+| @mui/icons-material | Icons | ^5.0.0 | MIT |
+| @emotion/react | CSS-in-JS Engine | ^11.0.0 | MIT |
+| @emotion/styled | Styled Components | ^11.0.0 | MIT |
+| TypeScript | Type Safety | ^5.0.0 | Apache 2.0 |
+
+### 3.2 Configuration Essentials
+
+**TypeScript Configuration:**
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2020"
+  }
+}
+```
+
+---
+
+## 4. Standards, Compliance & Security
+
+### 4.1 International Standards
+
+- **WCAG 2.1 Level AA** - Components มี accessibility ที่ดี
+- **Material Design Guidelines** - ปฏิบัติตาม Google's Material Design
+- **ISO 9241-11** - Usability Standards สำหรับ UI Components
+- **GDPR** - Data Protection สำหรับ User Data
+
+### 4.2 Security Protocol
+
+MUI ต้องปฏิบัติตามหลักความปลอดภัย:
+
+1. **XSS Prevention** - Sanitize user input ใน form components
+2. **CSRF Protection** - ใช้ CSRF tokens สำหรับ forms
+3. **Secure Storage** - ไม่เก็บ sensitive data ใน localStorage
+4. **Content Security** - ใช้ Content Security Policy
+
+```typescript
+// Secure form handling
+import { TextField } from '@mui/material'
+
+function SecureForm() {
+  const [value, setValue] = React.useState('')
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Sanitize input if needed
+    const sanitized = e.target.value.replace(/[<>]/g, '')
+    setValue(sanitized)
+  }
+
+  return (
+    <TextField
+      value={value}
+      onChange={handleChange}
+      label="Secure Input"
+    />
+  )
+}
+```
+
+### 4.3 Explainability
+
+MUI ต้องสามารถอธิบายได้ว่า:
+
+1. **Component Behavior** - ทำไม component ทำงานอย่างไร
+2. **Theme System** - ทำไม theme ใช้งานอย่างไร
+3. **Styling Approach** - ทำไมใช้ `sx` prop หรือ `styled()`
+4. **Accessibility** - ทำไม components มี accessibility ที่ดี
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+### 5.1 Cost Calculation
+
+| Metric | Calculation | Target |
+|--------|-------------|--------|
+| Bundle Size | JavaScript bundle size | < 300 KB |
+| Initial Load Time | Time to first render | < 2s |
+| Component Render Time | Time per component render | < 50ms |
+| Theme Update Time | Time to update theme | < 100ms |
+| Accessibility Score | WCAG compliance score | > 95% |
+
+### 5.2 Key Performance Indicators
+
+**Technical Metrics:**
+
+1. **Bundle Size** - JavaScript bundle ที่ใช้งาน
+2. **Render Performance** - Component render time
+3. **Theme Performance** - Theme update time
+4. **Accessibility Score** - WCAG compliance score
+
+**Business Metrics:**
+
+1. **Development Velocity** - เวลาในการพัฒนา features
+2. **UI Consistency** - Consistency ของ UI ทั่วแอป
+3. **User Satisfaction** - ความพึงพอใจของผู้ใช้
+4. **Accessibility Compliance** - Accessibility compliance rate
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+### 6.1 Phase Rollout
+
+**Phase 1: Foundation (Week 1-2)**
+- Setup theme provider
+- Create base layout components
+- Implement color system
+- Setup typography
+
+**Phase 2: Core Components (Week 3-4)**
+- Implement navigation components
+- Add form components
+- Create data display components
+- Setup feedback components
+
+**Phase 3: Advanced Features (Week 5-6)**
+- Implement dark mode
+- Add custom theme tokens
+- Create reusable components
+- Setup responsive design
+
+**Phase 4: Production (Week 7-8)**
+- Performance optimization
+- Accessibility audit
+- Documentation and training
+- Component library
+
+### 6.2 Pitfalls to Avoid
+
+1. **Over-customization** - ไม่ customize components มากเกินไป
+2. **Theme Bloat** - ไม่เพิ่ม theme tokens ที่ไม่จำเป็น
+3. **Accessibility Issues** - ไม่คำนึงถึง accessibility
+4. **Performance Issues** - ไม่ optimize bundle size
+5. **Inconsistent Usage** - ไม่ใช้ components อย่างสม่ำเสมอ
+6. **Legacy Patterns** - ใช้ `makeStyles` แทน `sx` prop
+
+### 6.3 Best Practices Checklist
+
+- [ ] ใช้ `sx` prop สำหรับ styling แบบ inline
+- [ ] ใช้ `styled()` API สำหรับ reusable components
+- [ ] Implement theme provider สำหรับ consistent styling
+- [ ] ใช้ responsive design สำหรับทุก devices
+- [ ] คำนึงถึง accessibility ในทุก components
+- [ ] Optimize bundle size ด้วย tree-shaking
+- [ ] ใช้ TypeScript สำหรับ type safety
+- [ ] Implement dark mode สำหรับ user preference
+- [ ] ใช้ system props สำหรับ responsive layouts
+- [ ] Create custom theme tokens สำหรับ brand consistency
+- [ ] ใช้ memoization สำหรับ performance
+- [ ] Implement lazy loading สำหรับ heavy components
+- [ ] Test บนทุก browsers และ devices
+- [ ] คำนึงถึง internationalization (i18n)
+
+---
+
+## 7. Implementation Examples
+
+### 7.1 Theme Setup and Customization
+
+**Basic Theme Setup:**
+```typescript
+// theme.ts
+import { createTheme, responsiveFontSizes } from '@mui/material/styles'
+
+let theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#dc004e',
+    },
+  },
+  typography: {
+    fontFamily: '"Inter", "Roboto", sans-serif',
+  },
+})
+
+theme = responsiveFontSizes(theme)
+
+export default theme
+```
+
+**Custom Theme Provider:**
+```typescript
+// ThemeRegistry.tsx
+'use client'
+
+import * as React from 'react'
+import { ThemeProvider } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import theme from './theme'
+
+export default function ThemeRegistry({ children }: { children: React.ReactNode }) {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      {children}
+    </ThemeProvider>
+  )
+}
+```
+
+**Advanced Theme Configuration:**
 ```typescript
 import { createTheme } from '@mui/material/styles'
 
@@ -118,7 +438,7 @@ const theme = createTheme({
 export default theme
 ```
 
-### Dark Mode Theme
+**Dark Mode Theme:**
 ```typescript
 import { createTheme } from '@mui/material/styles'
 
@@ -148,9 +468,9 @@ export default function createAppTheme(mode: 'light' | 'dark') {
 }
 ```
 
-## 2. Component Styling Approaches
+### 7.2 Component Styling Approaches
 
-### sx Prop (Recommended)
+**sx Prop (Recommended):**
 ```typescript
 import { Box, Button } from '@mui/material'
 
@@ -199,7 +519,7 @@ function StyledComponent() {
 }
 ```
 
-### styled() API
+**styled() API:**
 ```typescript
 import { styled } from '@mui/material/styles'
 import { Button, Card, CardContent, Typography } from '@mui/material'
@@ -238,34 +558,7 @@ function StyledComponents() {
 }
 ```
 
-### makeStyles (Legacy - Not Recommended)
-```typescript
-import { makeStyles } from '@mui/styles'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
-
-const theme = createTheme()
-
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    padding: theme.spacing(2),
-    backgroundColor: theme.palette.background.paper,
-  },
-  button: {
-    margin: theme.spacing(1),
-  },
-}))
-
-function LegacyComponent() {
-  const classes = useStyles()
-  return (
-    <div className={classes.root}>
-      <button className={classes.button}>Legacy Button</button>
-    </div>
-  )
-}
-```
-
-### Using System Props
+**Using System Props:**
 ```typescript
 import { Box, Typography } from '@mui/material'
 
@@ -290,9 +583,9 @@ function SystemPropsExample() {
 }
 ```
 
-## 3. Common Components
+### 7.3 Common Components
 
-### Layout Components
+**Layout Components:**
 ```typescript
 import { Container, Grid, Stack, Box, Paper } from '@mui/material'
 
@@ -338,7 +631,7 @@ function LayoutExample() {
 }
 ```
 
-### Navigation Components
+**Navigation Components:**
 ```typescript
 import {
   AppBar,
@@ -437,7 +730,7 @@ function NavigationExample() {
 }
 ```
 
-### Form Components
+**Form Components:**
 ```typescript
 import {
   TextField,
@@ -550,7 +843,7 @@ function FormExample() {
 }
 ```
 
-### Feedback Components
+**Feedback Components:**
 ```typescript
 import {
   Snackbar,
@@ -622,7 +915,7 @@ function FeedbackExample() {
 }
 ```
 
-### Data Display Components
+**Data Display Components:**
 ```typescript
 import {
   Table,
@@ -733,9 +1026,9 @@ function DataDisplayExample() {
 }
 ```
 
-## 4. Responsive Design with MUI
+### 7.4 Responsive Design with MUI
 
-### Using Grid for Responsive Layouts
+**Using Grid for Responsive Layouts:**
 ```typescript
 import { Grid, Paper, Typography } from '@mui/material'
 
@@ -763,37 +1056,7 @@ function ResponsiveGrid() {
 }
 ```
 
-### Hidden/Visible Components
-```typescript
-import { Box, Hidden } from '@mui/material'
-
-function ResponsiveVisibility() {
-  return (
-    <>
-      {/* Using sx prop */}
-      <Box
-        sx={{
-          display: { xs: 'none', md: 'block' },
-          bgcolor: 'primary.main',
-          p: 2,
-          color: 'white',
-        }}
-      >
-        Hidden on mobile, visible on desktop
-      </Box>
-
-      {/* Using Hidden component (deprecated, use sx instead) */}
-      <Hidden smDown>
-        <Box sx={{ bgcolor: 'secondary.main', p: 2, color: 'white' }}>
-          Hidden on small screens and below
-        </Box>
-      </Hidden>
-    </>
-  )
-}
-```
-
-### Responsive Typography
+**Responsive Typography:**
 ```typescript
 import { Typography } from '@mui/material'
 
@@ -821,9 +1084,9 @@ function ResponsiveTypography() {
 }
 ```
 
-## 5. Dark Mode Implementation
+### 7.5 Dark Mode Implementation
 
-### Theme Context for Dark Mode
+**Theme Context for Dark Mode:**
 ```typescript
 // ColorModeContext.tsx
 import React, { createContext, useContext, useState } from 'react'
@@ -867,7 +1130,7 @@ export const useColorMode = () => {
 }
 ```
 
-### Dark Mode Toggle
+**Dark Mode Toggle:**
 ```typescript
 import { IconButton, useTheme } from '@mui/material'
 import { Brightness4, Brightness7 } from '@mui/icons-material'
@@ -885,9 +1148,9 @@ function DarkModeToggle() {
 }
 ```
 
-## 6. Custom Theme Tokens
+### 7.6 Custom Theme Tokens
 
-### Extending Theme with Custom Tokens
+**Extending Theme with Custom Tokens:**
 ```typescript
 import { createTheme } from '@mui/material/styles'
 
@@ -934,7 +1197,7 @@ declare module '@mui/material/styles' {
 export default theme
 ```
 
-### Using Custom Tokens
+**Using Custom Tokens:**
 ```typescript
 import { Box, useTheme } from '@mui/material'
 
@@ -955,9 +1218,9 @@ function CustomTokenExample() {
 }
 ```
 
-## 7. Performance Optimization
+### 7.7 Performance Optimization
 
-### Lazy Loading Components
+**Lazy Loading Components:**
 ```typescript
 import { lazy, Suspense } from 'react'
 import { CircularProgress, Box } from '@mui/material'
@@ -979,7 +1242,7 @@ function LazyLoadExample() {
 }
 ```
 
-### Memoizing Styled Components
+**Memoizing Styled Components:**
 ```typescript
 import { memo } from 'react'
 import { styled } from '@mui/material/styles'
@@ -1002,7 +1265,7 @@ const MemoizedCard = memo(function MemoizedCard({ title, content }: { title: str
 })
 ```
 
-### Virtualization with react-window
+**Virtualization with react-window:**
 ```typescript
 import { FixedSizeList } from 'react-window'
 import { List, ListItem, ListItemText, Paper } from '@mui/material'
@@ -1033,9 +1296,9 @@ function VirtualizedList({ items }: { items: any[] }) {
 }
 ```
 
-## 8. TypeScript Integration
+### 7.8 TypeScript Integration
 
-### Typing Custom Props
+**Typing Custom Props:**
 ```typescript
 import { Button, ButtonProps } from '@mui/material'
 
@@ -1051,7 +1314,7 @@ function CustomButton({ customProp, ...props }: CustomButtonProps) {
 <CustomButton customProp="Hello" variant="contained" />
 ```
 
-### Typing Form Values
+**Typing Form Values:**
 ```typescript
 import { useForm, Controller } from 'react-hook-form'
 import { TextField, Button } from '@mui/material'
@@ -1097,9 +1360,9 @@ function TypedForm() {
 }
 ```
 
-## 9. Common Patterns and Recipes
+### 7.9 Common Patterns and Recipes
 
-### Data Table with Selection
+**Data Table with Selection:**
 ```typescript
 import {
   Table,
@@ -1224,7 +1487,7 @@ function DataTable({ rows, columns }: DataTableProps) {
 }
 ```
 
-### Modal Form
+**Modal Form:**
 ```typescript
 import {
   Dialog,
@@ -1292,7 +1555,7 @@ function ModalForm({ open, onClose, onSubmit }: ModalFormProps) {
 }
 ```
 
-### Searchable List
+**Searchable List:**
 ```typescript
 import {
   List,
@@ -1339,7 +1602,7 @@ function SearchableList({ items }: { items: string[] }) {
 }
 ```
 
-### Stepper Form
+**Stepper Form:**
 ```typescript
 import {
   Stepper,
@@ -1422,3 +1685,45 @@ function StepperForm() {
   )
 }
 ```
+
+### 7.10 Best Practices
+
+**Styling:**
+- Use `sx` prop for inline styling
+- Use `styled()` API for reusable components
+- Leverage theme tokens for consistency
+- Use system props for responsive layouts
+
+**Performance:**
+- Lazy load heavy components
+- Memoize expensive components
+- Use virtualization for large lists
+- Optimize bundle size with tree-shaking
+
+**Accessibility:**
+- Use semantic HTML elements
+- Provide ARIA labels where needed
+- Ensure keyboard navigation works
+- Test with screen readers
+
+**TypeScript:**
+- Type custom props properly
+- Use generics for reusable components
+- Leverage MUI's built-in types
+- Use `Controller` with React Hook Form
+
+**Theme:**
+- Keep theme tokens organized
+- Use responsive font sizes
+- Implement dark mode properly
+- Extend theme with custom tokens
+
+---
+
+## 8. Related Skills
+
+- `02-frontend/react-best-practices`
+- `02-frontend/state-management`
+- `02-frontend/responsive-design`
+- `02-frontend/accessibility`
+- `22-ux-ui-design/design-systems`

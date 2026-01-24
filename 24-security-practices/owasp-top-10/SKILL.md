@@ -1,8 +1,20 @@
+---
+name: OWASP Top 10
+description: Understanding and mitigating the top 10 most critical security risks to web applications as defined by OWASP, including broken access control, cryptographic failures, injection, and insecure design.
+---
+
 # OWASP Top 10
 
-## What is OWASP Top 10
+> **Current Level:** Intermediate  
+> **Domain:** Security / Application Security
 
-The OWASP (Open Web Application Security Project) Top 10 is a standard awareness document representing a broad consensus about the most critical security risks to web applications. Updated every 3-4 years (2021 is the latest version).
+---
+
+## Overview
+
+The OWASP (Open Web Application Security Project) Top 10 is a standard awareness document representing a broad consensus about the most critical security risks to web applications. Updated every 3-4 years (2021 is the latest version), it provides a prioritized list of security risks and mitigation strategies.
+
+## What is OWASP Top 10
 
 ### Why OWASP Top 10 Matters
 
@@ -837,6 +849,106 @@ app.get('/api/user/:id', async (req, res) => {
 - [ ] Check dependencies
 - [ ] Review configuration
 - [ ] Test security
+```
+
+---
+
+## Quick Start
+
+### OWASP Top 10 (2021) Overview
+
+1. **A01: Broken Access Control** - Validate authorization
+2. **A02: Cryptographic Failures** - Use strong encryption
+3. **A03: Injection** - Use parameterized queries
+4. **A04: Insecure Design** - Security by design
+5. **A05: Security Misconfiguration** - Secure defaults
+6. **A06: Vulnerable Components** - Update dependencies
+7. **A07: Authentication Failures** - Strong authentication
+8. **A08: Software and Data Integrity** - Verify integrity
+9. **A09: Security Logging Failures** - Comprehensive logging
+10. **A10: SSRF** - Validate server requests
+
+### Prevent Injection
+
+```javascript
+// ❌ Bad - SQL injection
+const query = `SELECT * FROM users WHERE id = ${userId}`
+
+// ✅ Good - Parameterized query
+const query = 'SELECT * FROM users WHERE id = ?'
+db.query(query, [userId])
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Access Control**: Validate all authorization checks
+- [ ] **Encryption**: Use strong encryption for sensitive data
+- [ ] **Parameterized Queries**: Prevent injection attacks
+- [ ] **Security Design**: Security by design principles
+- [ ] **Configuration**: Secure default configurations
+- [ ] **Dependencies**: Keep dependencies updated
+- [ ] **Authentication**: Strong authentication mechanisms
+- [ ] **Integrity**: Verify software and data integrity
+- [ ] **Logging**: Comprehensive security logging
+- [ ] **SSRF Protection**: Validate server-side requests
+- [ ] **Security Testing**: Regular security scans
+- [ ] **Training**: Team security training
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Broken Access Control
+
+```javascript
+// ❌ Bad - No authorization check
+app.get('/api/users/:id', (req, res) => {
+  const user = db.getUser(req.params.id)  // Anyone can access!
+  res.json(user)
+})
+```
+
+```javascript
+// ✅ Good - Authorization check
+app.get('/api/users/:id', authenticate, (req, res) => {
+  if (req.user.id !== req.params.id && !req.user.isAdmin) {
+    return res.status(403).json({ error: 'Forbidden' })
+  }
+  const user = db.getUser(req.params.id)
+  res.json(user)
+})
+```
+
+### ❌ Don't: SQL Injection
+
+```javascript
+// ❌ Bad - String concatenation
+const query = `SELECT * FROM users WHERE email = '${email}'`
+```
+
+```javascript
+// ✅ Good - Parameterized query
+const query = 'SELECT * FROM users WHERE email = ?'
+db.query(query, [email])
+```
+
+---
+
+## Integration Points
+
+- **Secure Coding** (`24-security-practices/secure-coding/`) - Secure coding practices
+- **Security Audit** (`24-security-practices/security-audit/`) - Security reviews
+- **Vulnerability Management** (`24-security-practices/vulnerability-management/`) - Vulnerability handling
+
+---
+
+## Further Reading
+
+- [OWASP Top 10 2021](https://owasp.org/Top10/)
+- [OWASP Cheat Sheets](https://cheatsheetseries.owasp.org/)
+- [OWASP Testing Guide](https://owasp.org/www-project-web-security-testing-guide/)
 
 ### After Deployment
 

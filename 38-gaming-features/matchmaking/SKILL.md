@@ -1,8 +1,20 @@
+---
+name: Matchmaking
+description: Pairing players for multiplayer games based on skill, latency, and party composition using ELO rating systems, queue management, and balance algorithms for fair and engaging matches.
+---
+
 # Matchmaking
+
+> **Current Level:** Intermediate  
+> **Domain:** Gaming / Backend
+
+---
 
 ## Overview
 
-Matchmaking pairs players for multiplayer games based on skill, latency, and party composition. This guide covers ELO, queue systems, and balance algorithms.
+Matchmaking pairs players for multiplayer games based on skill, latency, and party composition. This guide covers ELO, queue systems, and balance algorithms for creating fair, balanced matches that provide good gameplay experiences.
+
+---
 
 ## Matchmaking Concepts
 
@@ -484,12 +496,144 @@ interface Player {
 }
 ```
 
-## Best Practices
+---
 
-1. **Skill Matching** - Use ELO or Glicko-2
-2. **Queue Times** - Balance fairness vs wait time
-3. **Parties** - Support group matchmaking
-4. **Latency** - Consider network quality
+## Quick Start
+
+### Basic Matchmaking Queue
+
+```typescript
+interface Player {
+  id: string
+  rating: number
+  region: string
+  partyId?: string
+}
+
+class MatchmakingQueue {
+  private queue: Player[] = []
+  
+  addPlayer(player: Player) {
+    this.queue.push(player)
+    this.tryMatch()
+  }
+  
+  tryMatch() {
+    // Sort by rating
+    this.queue.sort((a, b) => a.rating - b.rating)
+    
+    // Find players within rating range
+    for (let i = 0; i < this.queue.length - 1; i++) {
+      const player1 = this.queue[i]
+      const player2 = this.queue[i + 1]
+      
+      const ratingDiff = Math.abs(player1.rating - player2.rating)
+      if (ratingDiff <= 100 && player1.region === player2.region) {
+        this.createMatch([player1, player2])
+        this.queue.splice(i, 2)
+        break
+      }
+    }
+  }
+  
+  createMatch(players: Player[]) {
+    // Create match and notify players
+    console.log('Match created:', players.map(p => p.id))
+  }
+}
+```
+
+### ELO Rating Update
+
+```typescript
+function updateELO(playerRating: number, opponentRating: number, won: boolean): number {
+  const expectedScore = 1 / (1 + Math.pow(10, (opponentRating - playerRating) / 400))
+  const actualScore = won ? 1 : 0
+  const kFactor = 32
+  
+  return Math.round(playerRating + kFactor * (actualScore - expectedScore))
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Skill Matching**: Use ELO or Glicko-2 rating system
+- [ ] **Queue Management**: Efficient queue management
+- [ ] **Rating Range**: Configurable rating range for matching
+- [ ] **Latency Consideration**: Match players in same region
+- [ ] **Party Support**: Support group/party matchmaking
+- [ ] **Wait Time**: Balance fairness vs wait time
+- [ ] **Queue Time Limits**: Maximum queue time
+- [ ] **Match Quality**: Monitor match quality metrics
+- [ ] **Testing**: Test with various player pools
+- [ ] **Analytics**: Track matchmaking metrics
+- [ ] **Documentation**: Document matchmaking rules
+- [ ] **Anti-cheat**: Prevent rating manipulation
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Skill Matching
+
+```typescript
+// ❌ Bad - Random matching
+function matchPlayers(players: Player[]) {
+  return [players[0], players[1]]  // Random!
+}
+```
+
+```typescript
+// ✅ Good - Skill-based matching
+function matchPlayers(players: Player[]) {
+  // Find players with similar rating
+  const ratingRange = 100
+  for (const player1 of players) {
+    const match = players.find(p => 
+      p.id !== player1.id &&
+      Math.abs(p.rating - player1.rating) <= ratingRange
+    )
+    if (match) return [player1, match]
+  }
+}
+```
+
+### ❌ Don't: Ignore Latency
+
+```typescript
+// ❌ Bad - Match across regions
+function matchPlayers(players: Player[]) {
+  return [players[0], players[1]]  // Could be different regions!
+}
+```
+
+```typescript
+// ✅ Good - Region-aware matching
+function matchPlayers(players: Player[]) {
+  const region = players[0].region
+  const sameRegion = players.filter(p => p.region === region)
+  // Match within same region
+  return findMatch(sameRegion)
+}
+```
+
+---
+
+## Integration Points
+
+- **Leaderboards** (`38-gaming-features/leaderboards/`) - Rating systems
+- **Real-time Multiplayer** (`38-gaming-features/real-time-multiplayer/`) - Match execution
+- **Game Analytics** (`38-gaming-features/game-analytics/`) - Matchmaking metrics
+
+---
+
+## Further Reading
+
+- [ELO Rating System](https://en.wikipedia.org/wiki/Elo_rating_system)
+- [Glicko-2 Rating System](http://www.glicko.net/glicko/glicko2.pdf)
+- [Matchmaking Algorithms](https://www.gamedeveloper.com/design/matchmaking-algorithms)
 5. **Balance** - Create fair teams
 6. **Timeout** - Handle queue timeouts
 7. **Scaling** - Design for high concurrency

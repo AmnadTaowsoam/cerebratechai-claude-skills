@@ -105,7 +105,7 @@ Complete summary of all setup guides and configurations for CerebraTechAI Skills
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN",
         "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }
@@ -122,7 +122,7 @@ Complete summary of all setup guides and configurations for CerebraTechAI Skills
 codex mcp add cerebratechai-skills \
   --env GITHUB_PERSONAL_ACCESS_TOKEN=YOUR_TOKEN \
   --env GITHUB_OWNER=AmnadTaowsoam \
-  --env GITHUB_REPO=cerebratechai-claude-skills \
+  --env GITHUB_REPO=cerebraSkills \
   --env GITHUB_BRANCH=main \
   -- npx -y @modelcontextprotocol/server-github
 ```
@@ -142,7 +142,7 @@ codex mcp add cerebratechai-skills \
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN",
         "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }
@@ -169,7 +169,7 @@ notepad "$env:APPDATA\Antigravity\mcp_config.json"
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
 
 # 2. Add in Antigravity Settings → Skills → Add Folder
 # 3. Select the cloned folder
@@ -179,10 +179,10 @@ git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
 
 # 2. Open in VS Code
-code cerebratechai-claude-skills
+code cerebraSkills
 
 # 3. Create .vscode/settings.json and .copilot-instructions.md
 # See SETUP_CODEX.md for details
@@ -390,8 +390,8 @@ Create a Next.js API endpoint
 - Contributing: [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ### Community
-- GitHub Issues: https://github.com/AmnadTaowsoam/cerebratechai-claude-skills/issues
-- GitHub Discussions: https://github.com/AmnadTaowsoam/cerebratechai-claude-skills/discussions
+- GitHub Issues: https://github.com/AmnadTaowsoam/cerebraSkills/issues
+- GitHub Discussions: https://github.com/AmnadTaowsoam/cerebraSkills/discussions
 
 ### External Resources
 - MCP Documentation: https://modelcontextprotocol.io
@@ -401,6 +401,6 @@ Create a Next.js API endpoint
 ---
 
 **Last Updated**: January 17, 2026  
-**Repository**: https://github.com/AmnadTaowsoam/cerebratechai-claude-skills  
+**Repository**: https://github.com/AmnadTaowsoam/cerebraSkills  
 **License**: MIT  
 **Maintainer**: CerebraTechAI

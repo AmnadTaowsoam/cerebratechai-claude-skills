@@ -1,8 +1,20 @@
+---
+name: Conversion Optimization (CRO)
+description: Systematically increasing the percentage of website or app visitors who complete desired actions through data-driven experimentation, A/B testing, and continuous improvement.
+---
+
 # Conversion Optimization (CRO)
 
-## What is Conversion Optimization
+> **Current Level:** Intermediate  
+> **Domain:** Business Analytics / Marketing
 
-Conversion Rate Optimization (CRO) is the systematic process of increasing the percentage of website or app visitors who complete a desired action (conversion) through data-driven experimentation and continuous improvement.
+---
+
+## Overview
+
+Conversion Rate Optimization (CRO) is the systematic process of increasing the percentage of website or app visitors who complete a desired action (conversion) through data-driven experimentation and continuous improvement. Effective CRO uses A/B testing, user research, analytics, and iterative improvements to maximize conversions.
+
+## What is Conversion Optimization
 
 ### Core Definition
 
@@ -965,6 +977,107 @@ if (variant === 'A') {
 
 - [ ] Calculate statistical significance
 - [ ] Analyze results
+- [ ] Document findings
+- [ ] Implement winning variant
+```
+
+---
+
+## Quick Start
+
+### A/B Test Setup
+
+```javascript
+// Track conversion
+function trackConversion(goal, variant) {
+  analytics.track('conversion', {
+    goal: goal,  // 'signup', 'purchase', etc.
+    variant: variant,  // 'A' or 'B'
+    timestamp: Date.now()
+  })
+}
+
+// Calculate conversion rate
+function calculateConversionRate(variant, goal) {
+  const visitors = getVisitors(variant)
+  const conversions = getConversions(variant, goal)
+  return (conversions / visitors) * 100
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Hypothesis**: Clear hypothesis and success metric
+- [ ] **A/B Testing**: Set up A/B testing framework
+- [ ] **Tracking**: Implement conversion tracking
+- [ ] **Sample Size**: Calculate required sample size
+- [ ] **Statistical Significance**: Use proper statistical tests
+- [ ] **User Research**: Conduct user research
+- [ ] **Heatmaps**: Use heatmaps to identify issues
+- [ ] **Analytics**: Set up analytics tracking
+- [ ] **Documentation**: Document test results
+- [ ] **Implementation**: Implement winning variants
+- [ ] **Monitoring**: Monitor conversion rates
+- [ ] **Iteration**: Continuous improvement
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Test Everything at Once
+
+```javascript
+// ❌ Bad - Too many changes
+const variant = {
+  newHeader: true,
+  newButton: true,
+  newLayout: true,
+  newColors: true
+  // Which change caused the improvement?
+}
+```
+
+```javascript
+// ✅ Good - One change at a time
+const variant = {
+  newHeader: true  // Test one change
+}
+// Then test next change
+```
+
+### ❌ Don't: No Statistical Significance
+
+```javascript
+// ❌ Bad - No significance test
+if (variantB.rate > variantA.rate) {
+  return 'B wins'  // Could be random!
+}
+```
+
+```javascript
+// ✅ Good - Statistical significance
+const pValue = calculatePValue(variantA, variantB)
+if (pValue < 0.05 && variantB.rate > variantA.rate) {
+  return 'B wins (statistically significant)'
+}
+```
+
+---
+
+## Integration Points
+
+- **A/B Testing Analysis** (`23-business-analytics/ab-testing-analysis/`) - Testing methodology
+- **Dashboard Design** (`23-business-analytics/dashboard-design/`) - Results visualization
+- **Analytics** (`23-business-analytics/`) - Conversion tracking
+
+---
+
+## Further Reading
+
+- [CRO Best Practices](https://www.optimizely.com/optimization-glossary/conversion-rate-optimization/)
+- [A/B Testing Guide](https://www.optimizely.com/optimization-glossary/ab-testing/)
 - [ ] Document learnings
 - [ ] Make recommendation
 

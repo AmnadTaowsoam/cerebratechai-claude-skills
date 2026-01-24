@@ -8,11 +8,11 @@ This workflow describes how to sync skills between your development environment 
 
 ## Directory Structure
 
-- **Development**: `D:\Cerebra\cerebratechai-claude-skills`
+- **Development**: `D:\Cerebra\cerebraSkills`
   - Where you edit and develop skills
   - Connected to GitHub for version control
   
-- **Production**: `D:\AgentSkill\cerebratechai-claude-skills`
+- **Production**: `D:\AgentSkill\cerebraSkills`
   - Where multi-agent systems read skills from
   - Always pulls from GitHub (read-only workflow)
 
@@ -22,7 +22,7 @@ This workflow describes how to sync skills between your development environment 
 
 Work on your skills in the development directory:
 ```
-D:\Cerebra\cerebratechai-claude-skills
+D:\Cerebra\cerebraSkills
 ```
 
 Make your changes to any skill files, add new skills, update documentation, etc.
@@ -32,7 +32,7 @@ Make your changes to any skill files, add new skills, update documentation, etc.
 When you're ready to publish your changes:
 
 ```batch
-cd D:\Cerebra\cerebratechai-claude-skills
+cd D:\Cerebra\cerebraSkills
 sync-to-production.bat
 ```
 
@@ -45,7 +45,7 @@ This script will:
 
 **Alternative manual method:**
 ```batch
-cd D:\Cerebra\cerebratechai-claude-skills
+cd D:\Cerebra\cerebraSkills
 git add .
 git commit -m "Your commit message"
 git push origin main
@@ -55,7 +55,7 @@ git push origin main
 
 Visit your GitHub repository to confirm changes are pushed:
 ```
-https://github.com/AmnadTaowsoam/cerebratechai-claude-skills
+https://github.com/AmnadTaowsoam/cerebraSkills
 ```
 
 ### 4. Update Production (Pull)
@@ -74,7 +74,7 @@ This script will:
 
 **Alternative manual method:**
 ```batch
-cd D:\AgentSkill\cerebratechai-claude-skills
+cd D:\AgentSkill\cerebraSkills
 git fetch origin
 git checkout main
 git pull --ff-only origin main
@@ -84,7 +84,7 @@ git pull --ff-only origin main
 
 Your multi-agent systems can now access the updated skills from:
 ```
-D:\AgentSkill\cerebratechai-claude-skills
+D:\AgentSkill\cerebraSkills
 ```
 
 ## Quick Reference
@@ -98,22 +98,22 @@ Edit (D:\Cerebra) → Push (sync-to-production.bat) → GitHub → Pull (update-
 
 | Script | Location | Purpose |
 |--------|----------|---------|
-| `sync-to-production.bat` | `D:\Cerebra\cerebratechai-claude-skills\` | Push changes to GitHub |
-| `update-skills.bat` | `D:\Cerebra\cerebratechai-claude-skills\` | Pull changes from GitHub to production |
+| `sync-to-production.bat` | `D:\Cerebra\cerebraSkills\` | Push changes to GitHub |
+| `update-skills.bat` | `D:\Cerebra\cerebraSkills\` | Pull changes from GitHub to production |
 
 ## Best Practices
 
 1. **Always commit meaningful changes**: Use descriptive commit messages
 2. **Test before pushing**: Ensure your skills work correctly before syncing to production
 3. **Pull before editing**: Run `update-skills.bat` before starting new edits to avoid conflicts
-4. **Keep production clean**: Never edit files directly in `D:\AgentSkill\cerebratechai-claude-skills`
+4. **Keep production clean**: Never edit files directly in `D:\AgentSkill\cerebraSkills`
 
 ## Troubleshooting
 
 ### Merge Conflicts
 If you get merge conflicts:
 ```batch
-cd D:\Cerebra\cerebratechai-claude-skills
+cd D:\Cerebra\cerebraSkills
 git status
 # Resolve conflicts manually
 git add .
@@ -124,7 +124,7 @@ git push origin main
 ### Production Directory Out of Sync
 If production directory has local changes:
 ```batch
-cd D:\AgentSkill\cerebratechai-claude-skills
+cd D:\AgentSkill\cerebraSkills
 git reset --hard origin/main
 git pull origin main
 ```
@@ -132,7 +132,7 @@ git pull origin main
 ### Push Rejected
 If push is rejected (remote has changes you don't have):
 ```batch
-cd D:\Cerebra\cerebratechai-claude-skills
+cd D:\Cerebra\cerebraSkills
 git pull --rebase origin main
 git push origin main
 ```

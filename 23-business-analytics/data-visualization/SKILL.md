@@ -1,4 +1,18 @@
+---
+name: Data Visualization
+description: Creating effective data visualizations using charts, graphs, and visual representations to communicate insights clearly and accurately following Tufte and Few principles.
+---
+
 # Data Visualization
+
+> **Current Level:** Intermediate  
+> **Domain:** Business Analytics / Data Science
+
+---
+
+## Overview
+
+Data visualization transforms data into visual representations that make insights clear and actionable. Effective data visualization follows principles of clarity, accuracy, and simplicity to help users understand complex data quickly.
 
 ## Data Visualization Principles
 
@@ -823,6 +837,136 @@ plt.show()
 - [ ] Sort by value
 - [ ] Remove chart junk
 - [ ] Add context
+```
+
+---
+
+## Quick Start
+
+### Basic Chart with Chart.js
+
+```javascript
+import { Chart } from 'chart.js'
+
+const ctx = document.getElementById('myChart')
+const chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+    datasets: [{
+      label: 'Revenue',
+      data: [1000, 1200, 1100, 1300],
+      borderColor: 'rgb(75, 192, 192)',
+      tension: 0.1
+    }]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+})
+```
+
+### D3.js Basic Bar Chart
+
+```javascript
+import * as d3 from 'd3'
+
+const data = [10, 20, 30, 40, 50]
+const svg = d3.select('body').append('svg')
+  .attr('width', 400)
+  .attr('height', 300)
+
+svg.selectAll('rect')
+  .data(data)
+  .enter()
+  .append('rect')
+  .attr('x', (d, i) => i * 50)
+  .attr('y', d => 300 - d * 5)
+  .attr('width', 40)
+  .attr('height', d => d * 5)
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Chart Selection**: Choose appropriate chart type for data
+- [ ] **Data Accuracy**: Ensure data is accurate and up-to-date
+- [ ] **Accessibility**: Charts accessible to screen readers
+- [ ] **Responsive**: Charts work on all screen sizes
+- [ ] **Performance**: Charts render efficiently with large datasets
+- [ ] **Color**: Use color-blind friendly palettes
+- [ ] **Labels**: Clear labels and legends
+- [ ] **Context**: Provide context and explanations
+- [ ] **Interactivity**: Add tooltips and interactions where helpful
+- [ ] **Testing**: Test with real data
+- [ ] **Documentation**: Document chart purpose and data source
+- [ ] **Updates**: Keep charts current with data changes
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Misleading Y-Axis
+
+```javascript
+// ❌ Bad - Y-axis doesn't start at zero
+chart.options.scales.y.min = 90  // Misleading!
+```
+
+```javascript
+// ✅ Good - Y-axis starts at zero
+chart.options.scales.y.min = 0  // Accurate representation
+```
+
+### ❌ Don't: Chart Junk
+
+```javascript
+// ❌ Bad - Too many decorations
+chart.options.plugins.legend.display = true
+chart.options.plugins.title.display = true
+chart.options.plugins.annotation = { /* decorations */ }
+// Too much!
+```
+
+```javascript
+// ✅ Good - Clean, focused
+chart.options.plugins.legend.display = true  // Only if needed
+// Remove unnecessary decorations
+```
+
+### ❌ Don't: Wrong Chart Type
+
+```javascript
+// ❌ Bad - Line chart for categories
+type: 'line'  // Categories don't have trends
+```
+
+```javascript
+// ✅ Good - Bar chart for categories
+type: 'bar'  // Better for comparing categories
+```
+
+---
+
+## Integration Points
+
+- **Dashboard Design** (`23-business-analytics/dashboard-design/`) - Dashboard layouts
+- **KPI Metrics** (`23-business-analytics/kpi-metrics/`) - Metric visualization
+- **SQL for Analytics** (`23-business-analytics/sql-for-analytics/`) - Data queries
+
+---
+
+## Further Reading
+
+- [Edward Tufte's Books](https://www.edwardtufte.com/tufte/)
+- [D3.js Documentation](https://d3js.org/)
+- [Chart.js Documentation](https://www.chartjs.org/)
 
 ### After Creation
 

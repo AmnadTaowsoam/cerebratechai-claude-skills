@@ -1,10 +1,26 @@
+---
+name: Deep Linking and Universal Links
+description: Enabling apps to open specific content when users click links from websites, emails, or other apps using URL schemes, Universal Links (iOS), and App Links (Android).
+---
+
 # Deep Linking and Universal Links
+
+> **Current Level:** Intermediate  
+> **Domain:** Mobile Development / UX
+
+---
 
 ## Overview
 
-Deep linking enables apps to open specific content when users click links from websites, emails, or other apps. This guide covers URL schemes, Universal Links, App Links, and deep linking best practices.
+Deep linking enables apps to open specific content when users click links from websites, emails, or other apps. This guide covers URL schemes, Universal Links, App Links, and deep linking best practices for creating seamless user experiences across web and mobile.
 
-## Table of Contents
+---
+
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Deep Linking Concepts](#deep-linking-concepts)
 2. [URL Schemes](#url-schemes)
@@ -1085,10 +1101,134 @@ async function testDeepLinkFlow(link: string): Promise<void> {
 
 ---
 
-## Resources
+---
+
+## Quick Start
+
+### React Navigation Deep Linking
+
+```typescript
+import { Linking } from 'react-native'
+import { NavigationContainer } from '@react-navigation/native'
+
+const linking = {
+  prefixes: ['myapp://', 'https://myapp.com'],
+  config: {
+    screens: {
+      Home: '',
+      Product: 'product/:id',
+      Profile: 'profile/:userId'
+    }
+  }
+}
+
+function App() {
+  return (
+    <NavigationContainer linking={linking}>
+      {/* Navigation */}
+    </NavigationContainer>
+  )
+}
+```
+
+### Handle Deep Links
+
+```typescript
+useEffect(() => {
+  // Handle initial URL
+  Linking.getInitialURL().then(url => {
+    if (url) {
+      handleDeepLink(url)
+    }
+  })
+  
+  // Handle URL changes
+  const subscription = Linking.addEventListener('url', ({ url }) => {
+    handleDeepLink(url)
+  })
+  
+  return () => subscription.remove()
+}, [])
+```
+
+---
+
+## Production Checklist
+
+- [ ] **URL Scheme**: Configure URL scheme (iOS) and intent filters (Android)
+- [ ] **Universal Links**: Set up Universal Links (iOS) and App Links (Android)
+- [ ] **Deep Link Handling**: Handle deep links in app
+- [ ] **Fallback**: Fallback to web if app not installed
+- [ ] **Analytics**: Track deep link usage
+- [ ] **Testing**: Test deep links on real devices
+- [ ] **Error Handling**: Handle invalid or broken links
+- [ ] **Security**: Validate deep link parameters
+- [ ] **Documentation**: Document deep link format
+- [ ] **Branch.io/Adjust**: Consider deep linking service
+- [ ] **Deferred Deep Linking**: Support deferred deep linking
+- [ ] **Attribution**: Track attribution from deep links
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Fallback
+
+```typescript
+// ❌ Bad - No fallback
+const url = 'myapp://product/123'
+Linking.openURL(url)  // Fails if app not installed
+```
+
+```typescript
+// ✅ Good - Fallback to web
+async function openDeepLink(url: string) {
+  const canOpen = await Linking.canOpenURL(url)
+  if (canOpen) {
+    await Linking.openURL(url)
+  } else {
+    // Fallback to web
+    await Linking.openURL(`https://myapp.com${url.replace('myapp://', '')}`)
+  }
+}
+```
+
+### ❌ Don't: No Validation
+
+```typescript
+// ❌ Bad - No validation
+function handleDeepLink(url: string) {
+  const productId = extractProductId(url)  // Could be malicious!
+  navigateToProduct(productId)
+}
+```
+
+```typescript
+// ✅ Good - Validate parameters
+function handleDeepLink(url: string) {
+  const productId = extractProductId(url)
+  if (isValidProductId(productId)) {
+    navigateToProduct(productId)
+  } else {
+    showError('Invalid product ID')
+  }
+}
+```
+
+---
+
+## Integration Points
+
+- **Push Notifications** (`31-mobile-development/push-notifications/`) - Deep links from notifications
+- **React Native Patterns** (`31-mobile-development/react-native-patterns/`) - Navigation patterns
+
+---
+
+## Further Reading
 
 - [React Navigation Deep Linking](https://reactnavigation.org/docs/deep-linking)
 - [Apple Universal Links](https://developer.apple.com/documentation/xcode/inter-app-links)
+- [Android App Links](https://developer.android.com/training/app-links)
 - [Android App Links](https://developer.android.com/training/app-links)
 - [Branch.io Documentation](https://help.branch.io/)
 - [Firebase Dynamic Links](https://firebase.google.com/docs/dynamic-links)

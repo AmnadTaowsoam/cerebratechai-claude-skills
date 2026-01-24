@@ -1,12 +1,24 @@
+---
+name: User Research
+description: Understanding user needs, behaviors, and motivations through research methods to create better products that solve real problems and meet user expectations.
+---
+
 # User Research
 
-## Overview
-
-User research helps understand user needs, behaviors, and motivations to create better products.
+> **Current Level:** Intermediate  
+> **Domain:** UX/UI Design / Product
 
 ---
 
-## 1. User Research Importance
+## Overview
+
+User research helps understand user needs, behaviors, and motivations to create better products. Effective user research uses various methods like interviews, surveys, usability testing, and analytics to gather insights that inform product decisions.
+
+---
+
+## Core Concepts
+
+### 1. User Research Importance
 
 ### Why User Research Matters
 
@@ -1142,3 +1154,137 @@ Sarah works at a tech company managing marketing campaigns. She's always on the 
 - Analytics
 - Surveys
 ```
+
+---
+
+## Quick Start
+
+### User Interview Template
+
+```markdown
+# User Interview: [Feature/Product]
+
+## Objectives
+- Understand user needs for [feature]
+- Identify pain points
+- Gather feedback on [aspect]
+
+## Questions
+
+### Opening
+1. Tell me about yourself and your role
+2. How do you currently [do related task]?
+
+### Main Questions
+3. What's the biggest challenge with [current solution]?
+4. How would you ideally [accomplish goal]?
+5. What would make this easier for you?
+
+### Closing
+6. Is there anything else you'd like to share?
+7. Can we follow up if we have more questions?
+```
+
+### Survey Setup
+
+```javascript
+// Survey questions structure
+const survey = {
+  title: "Product Feedback Survey",
+  questions: [
+    {
+      type: "rating",
+      question: "How satisfied are you with our product?",
+      scale: 1-5
+    },
+    {
+      type: "multiple-choice",
+      question: "What features do you use most?",
+      options: ["Feature A", "Feature B", "Feature C"]
+    },
+    {
+      type: "open-ended",
+      question: "What would you improve?"
+    }
+  ]
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Research Goals**: Define clear research objectives
+- [ ] **Method Selection**: Choose appropriate research methods
+- [ ] **Participant Recruitment**: Recruit representative users
+- [ ] **Consent**: Get informed consent from participants
+- [ ] **Data Collection**: Collect data systematically
+- [ ] **Analysis**: Analyze findings and identify patterns
+- [ ] **Synthesis**: Synthesize insights into actionable recommendations
+- [ ] **Documentation**: Document research process and findings
+- [ ] **Sharing**: Share findings with team and stakeholders
+- [ ] **Action**: Use insights to inform product decisions
+- [ ] **Follow-up**: Follow up on implemented changes
+- [ ] **Ethics**: Ensure ethical research practices
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Leading Questions
+
+```markdown
+# ❌ Bad - Leading question
+"Do you think this feature is amazing?"
+```
+
+```markdown
+# ✅ Good - Neutral question
+"What do you think about this feature?"
+```
+
+### ❌ Don't: Small Sample Size
+
+```javascript
+// ❌ Bad - Too few participants
+const participants = [user1, user2]  // Only 2 users!
+```
+
+```javascript
+// ✅ Good - Adequate sample
+// Qualitative: 5-8 participants per user segment
+// Quantitative: 30+ for statistical significance
+```
+
+### ❌ Don't: Ignore Negative Feedback
+
+```markdown
+# ❌ Bad - Only positive feedback
+## Research Findings
+- Users love the design ✅
+[Ignores all negative feedback]
+```
+
+```markdown
+# ✅ Good - All feedback considered
+## Research Findings
+- Users love the design ✅
+- Navigation is confusing ⚠️ (needs improvement)
+- Feature X is hard to find ❌ (critical issue)
+```
+
+---
+
+## Integration Points
+
+- **Wireframing** (`22-ux-ui-design/wireframing/`) - Test wireframes with users
+- **Design Systems** (`22-ux-ui-design/design-systems/`) - Validate design decisions
+- **Product Discovery** (`48-product-discovery/`) - Research-driven discovery
+
+---
+
+## Further Reading
+
+- [Nielsen Norman Group](https://www.nngroup.com/)
+- [User Research Methods](https://www.usability.gov/how-to-and-tools/methods/)
+- [The Mom Test](https://www.momtestbook.com/)

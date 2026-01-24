@@ -1,8 +1,20 @@
+---
+name: Presence Detection
+description: Tracking user online/offline status, typing indicators, and activity states using WebSocket connections and Redis for real-time presence information.
+---
+
 # Presence Detection
+
+> **Current Level:** Intermediate  
+> **Domain:** Real-time / Backend
+
+---
 
 ## Overview
 
-Presence detection tracks user online/offline status, typing indicators, and activity states. This guide covers implementation patterns using WebSocket and Redis.
+Presence detection tracks user online/offline status, typing indicators, and activity states. This guide covers implementation patterns using WebSocket and Redis to provide real-time presence information for collaborative features, chat applications, and live user status.
+
+---
 
 ## Presence Concepts
 
@@ -550,11 +562,124 @@ async function publishUserOffline(userId: string): Promise<void> {
 }
 ```
 
-## Best Practices
+---
 
-1. **Heartbeat** - Use heartbeat to detect disconnections
-2. **Redis** - Store presence in Redis for performance
-3. **Pub/Sub** - Use pub/sub for multi-server setups
+## Quick Start
+
+### Presence with WebSocket
+
+```javascript
+const io = require('socket.io')(server)
+
+io.on('connection', (socket) => {
+  const userId = socket.handshake.auth.userId
+  
+  // User comes online
+  socket.on('presence:online', () => {
+    redis.set(`presence:${userId}`, 'online', 'EX', 300)  // 5 min TTL
+    io.emit('presence:update', { userId, status: 'online' })
+  })
+  
+  // Heartbeat
+  socket.on('presence:heartbeat', () => {
+    redis.set(`presence:${userId}`, 'online', 'EX', 300)
+  })
+  
+  // User goes offline
+  socket.on('disconnect', () => {
+    redis.del(`presence:${userId}`)
+    io.emit('presence:update', { userId, status: 'offline' })
+  })
+})
+```
+
+### Typing Indicator
+
+```javascript
+const typingUsers = new Map()
+
+socket.on('typing:start', ({ channelId }) => {
+  typingUsers.set(`${userId}:${channelId}`, Date.now())
+  io.to(channelId).emit('typing:update', { userId, typing: true })
+  
+  // Auto-stop after 3 seconds
+  setTimeout(() => {
+    typingUsers.delete(`${userId}:${channelId}`)
+    io.to(channelId).emit('typing:update', { userId, typing: false })
+  }, 3000)
+})
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Heartbeat**: Implement heartbeat to detect disconnections
+- [ ] **Redis**: Store presence in Redis for performance
+- [ ] **Pub/Sub**: Use pub/sub for multi-server setups
+- [ ] **TTL**: Set TTL on presence keys
+- [ ] **Typing Indicators**: Implement typing indicators
+- [ ] **Status States**: Support multiple status states (online, away, busy)
+- [ ] **Privacy**: Respect user privacy settings
+- [ ] **Performance**: Optimize for high user counts
+- [ ] **Monitoring**: Monitor presence system health
+- [ ] **Testing**: Test with network interruptions
+- [ ] **Documentation**: Document presence API
+- [ ] **Rate Limiting**: Limit presence updates
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Heartbeat
+
+```javascript
+// ❌ Bad - No heartbeat
+socket.on('connect', () => {
+  setPresence(userId, 'online')  // Never updates!
+})
+```
+
+```javascript
+// ✅ Good - Heartbeat
+socket.on('connect', () => {
+  setPresence(userId, 'online')
+  
+  // Send heartbeat every 30 seconds
+  const heartbeat = setInterval(() => {
+    socket.emit('presence:heartbeat')
+  }, 30000)
+  
+  socket.on('disconnect', () => clearInterval(heartbeat))
+})
+```
+
+### ❌ Don't: No TTL
+
+```javascript
+// ❌ Bad - Presence never expires
+redis.set(`presence:${userId}`, 'online')  // Stays forever!
+```
+
+```javascript
+// ✅ Good - TTL on presence
+redis.set(`presence:${userId}`, 'online', 'EX', 300)  // Expires in 5 min
+```
+
+---
+
+## Integration Points
+
+- **WebSocket Patterns** (`34-real-time-features/websocket-patterns/`) - WebSocket implementation
+- **Live Chat** (`29-customer-support/live-chat/`) - Chat presence
+- **Redis Caching** (`04-database/redis-caching/`) - Presence storage
+
+---
+
+## Further Reading
+
+- [Socket.io Presence](https://socket.io/docs/v4/rooms/)
+- [Redis Pub/Sub](https://redis.io/docs/manual/pubsub/)
 4. **Debouncing** - Debounce typing indicators
 5. **Idle Detection** - Detect idle users
 6. **Last Seen** - Track last seen timestamp

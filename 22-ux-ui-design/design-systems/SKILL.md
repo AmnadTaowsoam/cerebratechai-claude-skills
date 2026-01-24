@@ -1,12 +1,24 @@
+---
+name: Design Systems
+description: Creating unified sets of design standards, reusable components, and comprehensive documentation for building consistent user interfaces across products and teams.
+---
+
 # Design Systems
 
-## Overview
-
-Design systems provide a unified set of design standards, components, and documentation for building consistent user interfaces.
+> **Current Level:** Intermediate  
+> **Domain:** UX/UI Design / Frontend
 
 ---
 
-## 1. Design System Concepts
+## Overview
+
+Design systems provide a unified set of design standards, components, and documentation for building consistent user interfaces. Effective design systems include component libraries, style guides, usage guidelines, and design tokens that enable teams to build cohesive products efficiently.
+
+---
+
+## Core Concepts
+
+### 1. Design System Concepts
 
 ### What is a Design System
 
@@ -1414,6 +1426,185 @@ https://chakra-ui.com
 - `spacing[4]` (16px)
 - `spacing[8]` (32px)
 - `spacing[12]` (48px)
+```
+
+---
+
+## Quick Start
+
+### Basic Design System Structure
+
+```typescript
+// Design tokens
+export const tokens = {
+  colors: {
+    primary: {
+      50: '#f0f9ff',
+      500: '#3b82f6',
+      900: '#1e3a8a'
+    },
+    gray: {
+      50: '#f9fafb',
+      500: '#6b7280',
+      900: '#111827'
+    }
+  },
+  spacing: {
+    1: '4px',
+    2: '8px',
+    4: '16px',
+    8: '32px'
+  },
+  typography: {
+    fontFamily: {
+      sans: ['Inter', 'sans-serif'],
+      mono: ['Fira Code', 'monospace']
+    },
+    fontSize: {
+      sm: '14px',
+      base: '16px',
+      lg: '18px',
+      xl: '24px'
+    }
+  }
+}
+
+// Component example
+export const Button = ({ variant = 'primary', children, ...props }) => {
+  return (
+    <button
+      className={`btn btn-${variant}`}
+      style={{
+        backgroundColor: tokens.colors.primary[500],
+        padding: tokens.spacing[4],
+        fontSize: tokens.typography.fontSize.base
+      }}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
+```
+
+### Component Library Setup
+
+```bash
+# Create design system package
+mkdir design-system
+cd design-system
+
+# Initialize
+npm init -y
+npm install react react-dom
+npm install --save-dev @types/react typescript
+
+# Structure
+src/
+  components/
+    Button/
+    Input/
+    Card/
+  tokens/
+    colors.ts
+    spacing.ts
+    typography.ts
+  index.ts
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Design Tokens**: Define colors, spacing, typography, shadows
+- [ ] **Component Library**: Build reusable UI components
+- [ ] **Documentation**: Document component usage and props
+- [ ] **Storybook**: Set up Storybook for component showcase
+- [ ] **Versioning**: Version design system releases
+- [ ] **Distribution**: Publish as npm package or internal package
+- [ ] **Usage Guidelines**: Provide clear usage guidelines
+- [ ] **Accessibility**: Ensure components meet accessibility standards
+- [ ] **Testing**: Test components across browsers and devices
+- [ ] **Design-Dev Sync**: Maintain sync between design and code
+- [ ] **Migration Guide**: Provide migration guides for updates
+- [ ] **Feedback Loop**: Collect and incorporate user feedback
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Inconsistent Tokens
+
+```typescript
+// ❌ Bad - Hardcoded values
+<button style={{ backgroundColor: '#3b82f6', padding: '16px' }}>
+```
+
+```typescript
+// ✅ Good - Use design tokens
+<button style={{
+  backgroundColor: tokens.colors.primary[500],
+  padding: tokens.spacing[4]
+}}>
+```
+
+### ❌ Don't: No Documentation
+
+```typescript
+// ❌ Bad - No usage docs
+export const Button = ({ variant, children }) => {
+  // ...
+}
+```
+
+```typescript
+// ✅ Good - Documented component
+/**
+ * Button component for user actions
+ * 
+ * @param variant - Button style variant ('primary' | 'secondary' | 'danger')
+ * @param size - Button size ('sm' | 'md' | 'lg')
+ * @param children - Button content
+ */
+export const Button = ({ variant = 'primary', size = 'md', children }) => {
+  // ...
+}
+```
+
+### ❌ Don't: Breaking Changes Without Migration
+
+```typescript
+// ❌ Bad - Breaking change without notice
+// v2.0.0 - Changed prop name from 'type' to 'variant'
+export const Button = ({ variant }) => {
+  // Old code breaks!
+}
+```
+
+```typescript
+// ✅ Good - Backward compatible or migration guide
+// v2.0.0 - Support both 'type' and 'variant' for migration period
+export const Button = ({ type, variant = type, ...props }) => {
+  // Supports both
+}
+```
+
+---
+
+## Integration Points
+
+- **Accessibility** (`22-ux-ui-design/accessibility/`) - Accessible components
+- **React Best Practices** (`02-frontend/react-best-practices/`) - Component patterns
+- **TypeScript Standards** (`01-foundations/typescript-standards/`) - Type safety
+
+---
+
+## Further Reading
+
+- [Design Systems Handbook](https://www.designbetter.co/design-systems-handbook)
+- [Storybook](https://storybook.js.org/)
+- [Material Design](https://material.io/design)
+- [Ant Design](https://ant.design/)
 
 ### Shadows
 - `shadows.sm`

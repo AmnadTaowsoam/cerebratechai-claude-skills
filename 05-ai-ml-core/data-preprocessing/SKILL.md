@@ -1,13 +1,57 @@
+---
+name: Data Preprocessing
+description: Comprehensive guide for data preprocessing patterns in ML, covering data cleaning, feature engineering, normalization, and pipeline creation.
+---
+
 # Data Preprocessing
 
 ## Overview
-Comprehensive guide for data preprocessing patterns in ML, covering data cleaning, feature engineering, normalization, and pipeline creation.
 
----
+Data preprocessing is a critical step in machine learning pipelines that transforms raw data into a format suitable for model training. This skill covers data cleaning, feature engineering, normalization, encoding categorical variables, scaling, augmentation, pipeline creation, and preprocessing for different data types.
 
-## 1. Data Cleaning
+## Prerequisites
 
-### 1.1 Missing Values
+- Understanding of Python programming
+- Knowledge of pandas and NumPy
+- Familiarity with scikit-learn
+- Understanding of machine learning concepts
+- Basic knowledge of statistics
+
+## Key Concepts
+
+### Data Cleaning
+
+- **Missing Values**: Handling null/NaN values through imputation or removal
+- **Outliers**: Detecting and handling extreme values
+- **Duplicates**: Identifying and removing duplicate records
+- **Data Validation**: Ensuring data integrity and consistency
+
+### Feature Engineering
+
+- **Polynomial Features**: Creating higher-order and interaction features
+- **Date/Time Features**: Extracting temporal patterns from datetime columns
+- **Text Features**: Converting text to numerical representations
+- **Ratio Features**: Creating derived features from combinations
+
+### Normalization and Scaling
+
+- **Standardization**: Z-score normalization (mean=0, std=1)
+- **Min-Max Scaling**: Scaling to fixed range [0, 1]
+- **Robust Scaling**: Using median and IQR for outlier-resistant scaling
+- **Normalization**: Scaling individual samples to unit norm
+
+### Encoding Categorical Variables
+
+- **Label Encoding**: Converting categories to integers
+- **One-Hot Encoding**: Creating binary columns for each category
+- **Target Encoding**: Using target mean for encoding
+- **Ordinal Encoding**: Preserving order in categorical data
+
+## Implementation Guide
+
+### Data Cleaning
+
+#### Missing Values
 
 ```python
 import pandas as pd
@@ -79,7 +123,7 @@ knn_imputer = KNNImputer(n_neighbors=5)
 X_knn = knn_imputer.fit_transform(X_train)
 ```
 
-### 1.2 Outliers
+#### Outliers
 
 ```python
 from scipy import stats
@@ -177,7 +221,7 @@ X_clean = X_train[~outliers]
 y_clean = y_train[~outliers]
 ```
 
-### 1.3 Duplicates
+#### Duplicates
 
 ```python
 class DuplicateHandler:
@@ -226,11 +270,9 @@ duplicates = dup_handler.find_duplicates(X_train)
 X_clean, y_clean = dup_handler.remove_duplicates(X_train, y_train)
 ```
 
----
+### Feature Engineering
 
-## 2. Feature Engineering
-
-### 2.1 Polynomial Features
+#### Polynomial Features
 
 ```python
 from sklearn.preprocessing import PolynomialFeatures
@@ -300,7 +342,7 @@ X_interaction = engineer.create_interaction_features(X_train)
 X_ratio = engineer.create_ratio_features(X_train, pairs=[(0, 1), (0, 2)])
 ```
 
-### 2.2 Date/Time Features
+#### Date/Time Features
 
 ```python
 import pandas as pd
@@ -352,7 +394,7 @@ dt_engineer = DateTimeFeatureEngineer()
 X_dt_features = dt_engineer.extract_features(X_train, datetime_cols=['date_column'])
 ```
 
-### 2.3 Text Features
+#### Text Features
 
 ```python
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
@@ -425,11 +467,9 @@ X_tfidf = text_engineer.create_tfidf_features(text_data)
 X_basic = text_engineer.create_basic_features(text_data)
 ```
 
----
+### Data Normalization/Standardization
 
-## 3. Data Normalization/Standardization
-
-### 3.1 Standardization
+#### Standardization
 
 ```python
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, MaxAbsScaler
@@ -477,7 +517,7 @@ X_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 ```
 
-### 3.2 Normalization
+#### Normalization
 
 ```python
 from sklearn.preprocessing import Normalizer
@@ -506,11 +546,9 @@ normalizer = DataNormalizer(norm='l2')
 X_normalized = normalizer.fit_transform(X_train)
 ```
 
----
+### Encoding Categorical Variables
 
-## 4. Encoding Categorical Variables
-
-### 4.1 Label Encoding
+#### Label Encoding
 
 ```python
 from sklearn.preprocessing import LabelEncoder
@@ -584,7 +622,7 @@ encoder_onehot = CategoricalEncoder(method='onehot')
 X_onehot = encoder_onehot.fit_transform(X_train, categorical_cols=['category_col'])
 ```
 
-### 4.2 Target Encoding
+#### Target Encoding
 
 ```python
 from sklearn.model_selection import KFold
@@ -643,11 +681,9 @@ target_encoder = TargetEncoder(smoothing=1.0, min_samples_leaf=10)
 X_encoded = target_encoder.fit_transform(X_train, y_train, categorical_cols=['category_col'])
 ```
 
----
+### Feature Scaling
 
-## 5. Feature Scaling
-
-### 5.1 Min-Max Scaling
+#### Min-Max Scaling
 
 ```python
 from sklearn.preprocessing import MinMaxScaler
@@ -688,7 +724,7 @@ scaler = MinMaxScalerCustom(feature_range=(0, 1))
 X_scaled = scaler.fit_transform(X_train)
 ```
 
-### 5.2 Robust Scaling
+#### Robust Scaling
 
 ```python
 from sklearn.preprocessing import RobustScaler
@@ -739,140 +775,9 @@ robust_scaler = RobustScalerCustom()
 X_scaled = robust_scaler.fit_transform(X_train)
 ```
 
----
+### Pipeline Creation
 
-## 6. Data Augmentation
-
-### 6.1 Image Augmentation
-
-```python
-import numpy as np
-from PIL import Image, ImageEnhance, ImageOps
-import random
-
-class ImageAugmentor:
-    """Augment images for training."""
-
-    def __init__(self):
-        self.transforms = []
-
-    def add_transform(self, transform, probability=0.5):
-        """Add transform to augmentation pipeline."""
-        self.transforms.append((transform, probability))
-
-    def apply(self, image):
-        """Apply random transforms to image."""
-        for transform, prob in self.transforms:
-            if random.random() < prob:
-                image = transform(image)
-        return image
-
-    @staticmethod
-    def random_flip(image):
-        """Random horizontal flip."""
-        if random.random() > 0.5:
-            return ImageOps.mirror(image)
-        return image
-
-    @staticmethod
-    def random_rotation(image, max_angle=30):
-        """Random rotation."""
-        angle = random.uniform(-max_angle, max_angle)
-        return image.rotate(angle)
-
-    @staticmethod
-    def random_crop(image, crop_ratio=0.8):
-        """Random crop."""
-        width, height = image.size
-        crop_width = int(width * crop_ratio)
-        crop_height = int(height * crop_ratio)
-
-        left = random.randint(0, width - crop_width)
-        top = random.randint(0, height - crop_height)
-
-        return image.crop((left, top, left + crop_width, top + crop_height))
-
-    @staticmethod
-    def random_brightness(image, factor_range=(0.8, 1.2)):
-        """Random brightness adjustment."""
-        factor = random.uniform(*factor_range)
-        enhancer = ImageEnhance.Brightness(image)
-        return enhancer.enhance(factor)
-
-    @staticmethod
-    def random_contrast(image, factor_range=(0.8, 1.2)):
-        """Random contrast adjustment."""
-        factor = random.uniform(*factor_range)
-        enhancer = ImageEnhance.Contrast(image)
-        return enhancer.enhance(factor)
-
-# Usage
-augmentor = ImageAugmentor()
-augmentor.add_transform(ImageAugmentor.random_flip, probability=0.5)
-augmentor.add_transform(lambda img: ImageAugmentor.random_rotation(img, max_angle=15), probability=0.5)
-augmentor.add_transform(ImageAugmentor.random_brightness, probability=0.5)
-
-augmented_image = augmentor.apply(original_image)
-```
-
-### 6.2 Text Augmentation
-
-```python
-import random
-from typing import List
-
-class TextAugmentor:
-    """Augment text for training."""
-
-    @staticmethod
-    def random_deletion(text, p=0.1):
-        """Randomly delete words."""
-        words = text.split()
-        words = [word for word in words if random.random() > p]
-        return ' '.join(words)
-
-    @staticmethod
-    def random_swap(text, n=1):
-        """Randomly swap two words."""
-        words = text.split()
-        for _ in range(n):
-            if len(words) >= 2:
-                idx1, idx2 = random.sample(range(len(words)), 2)
-                words[idx1], words[idx2] = words[idx2], words[idx1]
-        return ' '.join(words)
-
-    @staticmethod
-    def synonym_replacement(text, n=1):
-        """Replace words with synonyms."""
-        # This is a simplified version - in practice, use WordNet or a synonym API
-        words = text.split()
-        for _ in range(n):
-            if words:
-                idx = random.randint(0, len(words) - 1)
-                # In practice, replace with actual synonym
-                words[idx] = words[idx]  # Placeholder
-        return ' '.join(words)
-
-    @staticmethod
-    def random_insertion(text, n=1):
-        """Randomly insert words."""
-        words = text.split()
-        for _ in range(n):
-            idx = random.randint(0, len(words))
-            # In practice, insert a relevant word
-            words.insert(idx, "random")  # Placeholder
-        return ' '.join(words)
-
-# Usage
-text_augmentor = TextAugmentor()
-augmented_text = text_augmentor.random_deletion(original_text, p=0.1)
-```
-
----
-
-## 7. Pipeline Creation
-
-### 7.1 Scikit-learn Pipeline
+#### Scikit-learn Pipeline
 
 ```python
 from sklearn.pipeline import Pipeline
@@ -918,7 +823,7 @@ X_processed = preprocessor.fit_transform(X_train)
 X_test_processed = preprocessor.transform(X_test)
 ```
 
-### 7.2 Custom Pipeline
+#### Custom Pipeline
 
 ```python
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -960,11 +865,9 @@ preprocessor.add_step('encoder', CategoricalEncoder(method='label'))
 X_processed = preprocessor.fit_transform(X_train)
 ```
 
----
+### Preprocessing for Different Data Types
 
-## 8. Preprocessing for Different Data Types
-
-### 8.1 Image Preprocessing
+#### Image Preprocessing
 
 ```python
 import torchvision.transforms as transforms
@@ -1022,7 +925,7 @@ preprocessor = ImagePreprocessor(image_size=(224, 224), augment=True)
 processed_image = preprocessor.preprocess("image.jpg")
 ```
 
-### 8.2 Text Preprocessing
+#### Text Preprocessing
 
 ```python
 import re
@@ -1090,7 +993,7 @@ preprocessor = TextPreprocessor(remove_stopwords=True, lemmatize=True)
 processed_text = preprocessor.preprocess("This is a sample text for preprocessing!")
 ```
 
-### 8.3 Tabular Preprocessing
+#### Tabular Preprocessing
 
 ```python
 import pandas as pd
@@ -1150,11 +1053,9 @@ preprocessor = TabularPreprocessor()
 X_processed = preprocessor.preprocess(X_train)
 ```
 
----
+### Reproducibility
 
-## 9. Reproducibility
-
-### 9.1 Random Seed Setting
+#### Random Seed Setting
 
 ```python
 import random
@@ -1175,7 +1076,7 @@ def set_seed(seed=42):
 set_seed(42)
 ```
 
-### 9.2 Deterministic Preprocessing
+#### Deterministic Preprocessing
 
 ```python
 class DeterministicPreprocessor:
@@ -1210,11 +1111,9 @@ preprocessor = DeterministicPreprocessor(seed=42)
 X_train, X_test, y_train, y_test = preprocessor.train_test_split(X, y)
 ```
 
----
+### Testing Preprocessing
 
-## 10. Testing Preprocessing
-
-### 10.1 Unit Tests
+#### Unit Tests
 
 ```python
 import unittest
@@ -1263,10 +1162,72 @@ if __name__ == '__main__':
     unittest.main()
 ```
 
----
+## Best Practices
 
-## Additional Resources
+1. **Understand Your Data**
+   - Perform exploratory data analysis (EDA)
+   - Check data types and distributions
+   - Identify missing values and outliers
+   - Understand feature relationships
 
-- [Scikit-learn Preprocessing](https://scikit-learn.org/stable/modules/preprocessing.html)
-- [Pandas Documentation](https://pandas.pydata.org/docs/)
-- [Feature Engineering Guide](https://www.kaggle.com/learn/feature-engineering)
+2. **Handle Missing Values Appropriately**
+   - Use mean/median imputation for numeric data
+   - Use most frequent imputation for categorical data
+   - Consider KNN imputation for complex patterns
+   - Document imputation strategy
+
+3. **Detect and Handle Outliers**
+   - Use Z-score for normally distributed data
+   - Use IQR for non-normal distributions
+   - Consider domain knowledge before removing outliers
+   - Cap outliers instead of removing when appropriate
+
+4. **Choose Right Encoding Method**
+   - Label encoding for ordinal variables
+   - One-hot encoding for nominal variables
+   - Target encoding for high-cardinality categorical variables
+   - Avoid creating too many one-hot features
+
+5. **Scale Features Consistently**
+   - Fit scalers on training data only
+   - Use same scaler for train and test data
+   - Consider robust scaling for data with outliers
+   - Store scaler parameters for inference
+
+6. **Create Reusable Pipelines**
+   - Build modular preprocessing steps
+   - Use sklearn Pipeline for reproducibility
+   - Document each preprocessing step
+   - Version control preprocessing code
+
+7. **Ensure Reproducibility**
+   - Set random seeds consistently
+   - Use deterministic algorithms when possible
+   - Save preprocessing parameters
+   - Log preprocessing steps
+
+8. **Test Preprocessing**
+   - Write unit tests for preprocessing functions
+   - Validate output shapes and types
+   - Check for data leakage
+   - Monitor preprocessing performance
+
+9. **Handle Different Data Types**
+   - Use appropriate preprocessing for each data type
+   - Consider multimodal data preprocessing
+   - Preserve information during transformation
+   - Document data type handling
+
+10. **Monitor and Iterate**
+    - Track preprocessing impact on model performance
+    - A/B test different preprocessing strategies
+    - Monitor preprocessing pipeline performance
+    - Continuously improve based on results
+
+## Related Skills
+
+- [`05-ai-ml-core/data-augmentation`](05-ai-ml-core/data-augmentation/SKILL.md)
+- [`05-ai-ml-core/model-training`](05-ai-ml-core/model-training/SKILL.md)
+- [`05-ai-ml-core/model-optimization`](05-ai-ml-core/model-optimization/SKILL.md)
+- [`06-ai-ml-production/rag-implementation`](06-ai-ml-production/rag-implementation/SKILL.md)
+- [`01-foundations/python-standards`](01-foundations/python-standards/SKILL.md)

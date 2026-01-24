@@ -1,20 +1,162 @@
-# Python Coding Standards
+### **04: Python Coding Standards**
+
+> 
+> **Current Level:** Expert (Enterprise Scale) 
+> 
+> 
+> **Domain:** Foundations / Python Development 
+> 
+
+---
+
+### **1. Executive Summary & Strategic Necessity**
+
+* **Context:** ในโลกปี 2025-2026 การพัฒนาซอฟต์แวร์ด้วย Python มีความซับซ้อนเพิ่มขึ้นอย่างมาก การใช้ Python Standards ที่เป็นมาตรฐานช่วยให้ทีมพัฒนาสามารถเขียนโค้ดที่สะอดความ มีประสิทธิภาพ และสามารถบำรุงรักษาได้ง่าย
+* **Business Impact:** การใช้ Python Standards ที่มีประสิทธิภาพช่วย:
+  - เพิ่มความโค้ดที่สะอดความและเป็นมาตรฐาน
+  - ลดความ Bug ที่เกิดขึ้นใน Production
+  - เพิ่มประสิทธิภาพในการพัฒนา
+  - ลดเวลาในการ Code Review
+  - เพิ่มความสามารถในการทำงานร่วมกัน
+  - ลด Technical Debt ที่สะสมในระยะว
+  - เพิ่มความโปร่งใสในการพัฒนา
+* **Product Thinking:** ทักษะนี้ช่วยแก้ปัญหา (Pain Point) ให้กับ:
+  - ทีมพัฒนาที่ต้องการ Python Standards ที่เป็นระบบ
+  - ผู้ทำงานผิดพลาดที่ต้องการ Standards ที่เข้าใจ
+  - ทีมพัฒนาที่ต้องการ Code Quality ที่สูง
+  - ลูกค้าที่ต้องการความเสถียรของระบบ
+  - ทีม Support ที่ต้องการ Debug ของ Code
+
+### **2. Technical Deep Dive (The "How-to")**
+
+* **Core Logic:** Python Standards ประกอบด้วย:
+  - **PEP 8 Compliance:** การปฏิบัติตามมาตรฐาน Python (Naming Conventions, Code Style, Import Organization)
+  - **Type Hints:** การระบุ Type ทุกที่ (Basic Types, TypeVar, Callable, TypedDict, Literal, Self)
+  - **Pydantic Models:** การใช้ Pydantic สำหรับ Validation (Basic Models, Nested Models, Request/Response Models, Custom Types)
+  - **Error Handling:** การจัดการ Error ที่เป็นระบบ (Custom Exception Hierarchy, Try-Except Patterns, Context Managers)
+  - **Async/Await Patterns:** การใช้ Async/Await อย่างถูกต้อง (Basic Async Functions, Parallel Execution, TaskGroup, Semaphore, Timeout Handling)
+  - **Logging Best Practices:** การใช้ Logging ที่เป็นระบบ (Structured Logging, Log Levels, Logging Decorator)
+  - **Dependency Injection:** การใช้ Dependency Injection ด้วย Protocol (Protocol-Based Interfaces, Service with DI, Concrete Implementations)
+  - **Testing Patterns:** การเขียน Tests ที่มีประสิทธิภาพ (Pytest Configuration, Unit Tests, Integration Tests, Mocking)
+
+* **Architecture Diagram Requirements:** แผนผังสถาปัตยกรรมที่ต้องมี:
+  - **Python Project Structure Diagram:** แผนผังแสดงโครงสร้างโปรเจกต์ Python
+  - **Type System Diagram:** แผนผังแสดง Type System ของ Python
+  - **Error Handling Flow Diagram:** แผนผังแสดงกระบวนการ Error Handling
+  - **Async Execution Flow Diagram:** แผนผังแสดงกระบวนการ Async Execution
+  - **Dependency Injection Diagram:** แผนผังแสดง Dependency Injection Pattern
+
+* **Implementation Workflow:**
+  1. **Setup Python Environment:** ตั้งค่า Python Environment และ Dependencies
+  2. **Configure Code Quality Tools:** ตั้งค่า Black, Ruff, Mypy, Pre-commit
+  3. **Define Type Hints Standards:** กำหนด Type Hints Standards สำหรับโปรเจกต์
+  4. **Implement Pydantic Models:** สร้าง Pydantic Models สำหรับ Validation
+  5. **Setup Error Handling:** ตั้งค่า Error Handling ที่เป็นระบบ
+  6. **Configure Logging:** ตั้งค่า Structured Logging
+  7. **Write Tests:** เขียน Tests สำหรับโค้ด
+
+### **3. Tooling & Tech Stack**
+
+* **Enterprise Tools:** เครื่องมือระดับอุตสาหกรรมที่เลือกใช้:
+  - **Code Formatting:** Black, Ruff Format
+  - **Linting:** Ruff, Pylint, Flake8, Bandit
+  - **Type Checking:** Mypy, Pyright
+  - **Testing:** Pytest, Pytest-asyncio, Faker, Coverage.py
+  - **Validation:** Pydantic, Pydantic-Settings
+  - **Logging:** Structlog, Loguru
+  - **Pre-commit:** Pre-commit, Husky
+  - **CI/CD:** GitHub Actions, GitLab CI, Azure Pipelines
+
+* **Configuration Essentials:** ส่วนประกอบสำคัญในการตั้งค่า:
+  - **pyproject.toml:** การตั้งค่า Python Project ที่ทันสมัย
+  - **Black Configuration:** การตั้งค่า Black สำหรับ Formatting
+  - **Ruff Configuration:** การตั้งค่า Ruff สำหรับ Linting
+  - **Mypy Configuration:** การตั้งค่า Mypy สำหรับ Type Checking
+  - **Pytest Configuration:** การตั้งค่า Pytest สำหรับ Testing
+  - **Pre-commit Configuration:** การตั้งค่า Pre-commit Hooks
+
+### **4. Standards, Compliance & Security**
+
+* **International Standards:** มาตรฐานที่เกี่ยวข้อง:
+  - **PEP 8:** Python Enhancement Proposal 8 - Style Guide for Python Code
+  - **PEP 484:** Type Hints for Python
+  - **PEP 585:** Type Hinting Generics In Standard Collections
+  - **PEP 613:** Explicit Type Aliases
+  - **PEP 673:** Self Type
+  - **PEP 695:** Type Parameter Syntax
+
+* **Security Protocol:** กลไกการป้องกัน:
+  - **Input Validation:** การตรวจสอบ Input ด้วย Pydantic
+  - **Secret Management:** การจัดการ Secrets ด้วย Pydantic-Settings
+  - **SQL Injection Prevention:** การป้องกัน SQL Injection ด้วย Parameterized Queries
+  - **XSS Prevention:** การป้องกัน XSS ด้วย Input Sanitization
+  - **Dependency Scanning:** การสแกน Dependencies ด้วย Bandit
+  - **Secret Detection:** การตรวจสอบ Secrets ด้วย detect-secrets
+
+* **Explainability:** ความสามารถในการอธิบาย:
+  - **Type Annotations Documentation:** การบันทึก Type Annotations ที่ชัดเจน
+  - **Error Messages Documentation:** การบันทึก Error Messages ที่ชัดเจน
+  - **Logging Documentation:** การบันทึก Logging ที่ชัดเจน
+  - **Code Comments:** การบันทึก Code Comments ที่ชัดเจน
+
+### **5. Unit Economics & Performance Metrics (KPIs)**
+
+* **Cost Calculation:** สูตรการคำนวณต้นทุนต่อหน่วย (COGS):
+  ```
+  Total Cost = (Development Time × Hourly Rate) + 
+               (Code Review Time × Hourly Rate) + 
+               (Bug Fix Time × Hourly Rate) + 
+               (Tooling Cost)
+  
+  ROI = (Productivity Gain - Total Cost) / Total Cost × 100%
+  
+  Productivity Gain = (Time Saved on Code Reviews) + 
+                      (Time Saved on Bug Fixes) + 
+                      (Time Saved on Onboarding)
+  ```
+
+* **Key Performance Indicators:** ตัวชี้วัดความสำเร็จทางเทคนิค:
+  - **Type Coverage:** % ของ Code ที่มี Type Hints (Target: > 90%)
+  - **Code Quality Score:** คะแนนคุณภาพของโค้ด (Target: > A)
+  - **Test Coverage:** % ของ Code ที่มี Tests (Target: > 80%)
+  - **Bug Detection Rate:** % ของ Bugs ที่ค้นพบก่อน Production (Target: > 80%)
+  - **Code Review Time:** เวลาเฉลี่ยในการ Code Review (Target: < 30 min)
+  - **Team Productivity:** จำนวน Commits ต่อวัน (Target: > 10/day)
+
+### **6. Strategic Recommendations (CTO Insights)**
+
+* **Phase Rollout:** คำแนะนำในการทยอยเริ่มใช้งาน:
+  1. **Phase 1 (Months 1-2):** สร้าง Python Standards และ Guidelines, ฝึกอบรมทีม
+  2. **Phase 2 (Months 3-4):** ตั้งค่า Code Quality Tools และ Pre-commit Hooks
+  3. **Phase 3 (Months 5-6):** ฝึกอบรมทีมเกี่ยวกับ Python Standards และ Best Practices
+  4. **Phase 4 (Year 2+):** ขยายไปยังทุกทีม, สร้าง Culture ของ Python Best Practices
+
+* **Pitfalls to Avoid:** ข้อควรระวังที่มักจะผิดพลาด:
+  - **Over-Engineering:** หลีกเลี่ยงการสร้าง Standards ที่ซับซ้อนเกินไป
+  - **Not Following Standards:** ต้องทบทวนตามหลักการ Python Standards
+  - **Skipping Type Hints:** หลีกเลี่ยงการไม่ใช้ Type Hints
+  - **Not Using Pydantic:** หลีกเลี่ยงการไม่ใช้ Pydantic สำหรับ Validation
+  - **Not Writing Tests:** หลีกเลี่ยงการไม่เขียน Tests
+  - **Not Using Logging:** หลีกเลี่ยงการไม่ใช้ Logging ที่เป็นระบบ
+  - **Not Using Pre-commit:** หลีกเลี่ยงการไม่ใช้ Pre-commit Hooks
+
+---
 
 ## Overview
-มาตรฐานการเขียน Python สำหรับ Backend และ AI/ML Projects
-รองรับ Python 3.11+
+
+Python coding standards for Backend and AI/ML projects. Supports Python 3.11+.
 
 ## Core Principles
+
 - **PEP 8 Compliance**: ปฏิบัติตามมาตรฐาน Python
 - **Type Hints Always**: ระบุ type ทุกที่
 - **Explicit is Better Than Implicit**: ชัดเจนดีกว่าคลุมเครือ
 - **Fail Fast with Clear Error Messages**: ล้มเหลวเร็ว พร้อม error ที่ชัดเจน
 
----
-
-## 1. Python Version and Setup
+## Python Version and Setup
 
 ### pyproject.toml (Modern Python)
+
 ```toml
 [project]
 name = "your-project"
@@ -214,11 +356,10 @@ exclude_lines = [
 ]
 ```
 
----
-
-## 2. Naming Conventions (PEP 8)
+## Naming Conventions (PEP 8)
 
 ### Variables & Functions (snake_case)
+
 ```python
 # ❌ Bad
 UserData = {}
@@ -234,6 +375,7 @@ my_variable = 42
 ```
 
 ### Classes (PascalCase)
+
 ```python
 # ❌ Bad
 class user_service: pass
@@ -248,6 +390,7 @@ class OAuth2Client: pass
 ```
 
 ### Constants (SCREAMING_SNAKE_CASE)
+
 ```python
 # ❌ Bad
 apiKey = "..."
@@ -263,6 +406,7 @@ DEFAULT_TIMEOUT_SECONDS = 30
 ```
 
 ### Private vs Protected vs Public
+
 ```python
 class UserService:
     """Demonstrates naming conventions for visibility."""
@@ -283,7 +427,7 @@ class UserService:
         self.__secret_key = "secret"
 
     def public_method(self) -> str:
-        """Public method - part of the API."""
+        """Public method - part of API."""
         return self._internal_helper()
 
     def _internal_helper(self) -> str:
@@ -296,6 +440,7 @@ class UserService:
 ```
 
 ### Boolean Variables (use is/has/can/should/was prefix)
+
 ```python
 # ❌ Bad
 active = True
@@ -313,6 +458,7 @@ was_processed = False
 ```
 
 ### Module and Package Names
+
 ```python
 # ❌ Bad
 UserService.py
@@ -326,11 +472,10 @@ utils.py
 helpers.py
 ```
 
----
-
-## 3. Type Hints (Modern Python 3.10+ Syntax)
+## Type Hints (Modern Python 3.10+ Syntax)
 
 ### Basic Types
+
 ```python
 # ❌ Bad - no type hints
 def process_data(data):
@@ -361,6 +506,7 @@ def process_users(
 ```
 
 ### TypeVar and Generic Types
+
 ```python
 from typing import TypeVar, Generic
 
@@ -411,6 +557,7 @@ user_repo.save("123", User(id="123", name="John"))
 ```
 
 ### Callable Types
+
 ```python
 from collections.abc import Callable, Awaitable, Coroutine
 from typing import ParamSpec, TypeVar, Concatenate
@@ -451,6 +598,7 @@ def log_calls(func: Callable[P, R]) -> Callable[P, R]:
 ```
 
 ### TypedDict for Structured Dictionaries
+
 ```python
 from typing import TypedDict, Required, NotRequired
 
@@ -481,6 +629,7 @@ class PartialConfig(TypedDict, total=False):
 ```
 
 ### Literal Types
+
 ```python
 from typing import Literal
 
@@ -515,6 +664,7 @@ def fetch_data(format: Literal["json", "text", "bytes"]) -> dict[str, Any] | str
 ```
 
 ### Self Type (Python 3.11+)
+
 ```python
 from typing import Self
 
@@ -542,15 +692,14 @@ class ExtendedBuilder(Builder):
         self._extra = extra
         return self
 
-# Self correctly types the return
+# Self correctly types return
 builder = ExtendedBuilder().with_name("test").with_extra("data")  # Type: ExtendedBuilder
 ```
 
----
-
-## 4. Pydantic Models for Validation
+## Pydantic Models for Validation
 
 ### Basic Model Definition
+
 ```python
 from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
@@ -612,6 +761,7 @@ class User(BaseModel):
 ```
 
 ### Nested Models and Relationships
+
 ```python
 from pydantic import BaseModel, Field
 from enum import Enum
@@ -648,6 +798,7 @@ class UserProfile(BaseModel):
 ```
 
 ### Request/Response Models
+
 ```python
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
@@ -740,6 +891,7 @@ class PaginatedResponse(BaseModel, Generic[T]):
 ```
 
 ### Custom Types with Annotated
+
 ```python
 from typing import Annotated
 from pydantic import Field, AfterValidator, BeforeValidator
@@ -779,11 +931,10 @@ class Article(BaseModel):
     view_count: PositiveInt = 1
 ```
 
----
-
-## 5. Error Handling
+## Error Handling
 
 ### Custom Exception Hierarchy
+
 ```python
 from typing import Any
 from datetime import datetime
@@ -970,6 +1121,7 @@ class ExternalServiceException(AppException):
 ```
 
 ### Try-Except Patterns
+
 ```python
 import logging
 from typing import TypeVar
@@ -1079,6 +1231,7 @@ def process_file(path: str) -> list[str]:
 ```
 
 ### Context Managers
+
 ```python
 from contextlib import contextmanager, asynccontextmanager
 from typing import Generator, AsyncGenerator
@@ -1180,11 +1333,10 @@ with temp_directory() as tmp:
 # Directory automatically cleaned up
 ```
 
----
-
-## 6. Async/Await Patterns
+## Async/Await Patterns
 
 ### Basic Async Functions
+
 ```python
 import asyncio
 from typing import Any
@@ -1219,6 +1371,7 @@ async def fetch_user_from_sync_db(user_id: str) -> User:
 ```
 
 ### Parallel Execution
+
 ```python
 import asyncio
 
@@ -1268,6 +1421,7 @@ async def fetch_all_data_safe() -> tuple[
 ```
 
 ### TaskGroup (Python 3.11+)
+
 ```python
 import asyncio
 
@@ -1306,6 +1460,7 @@ async def process_users_safe(user_ids: list[str]) -> dict[str, User | Exception]
 ```
 
 ### Semaphore for Concurrency Control
+
 ```python
 import asyncio
 
@@ -1365,6 +1520,7 @@ async def process_queue(
 ```
 
 ### Timeout Handling
+
 ```python
 import asyncio
 
@@ -1413,11 +1569,10 @@ async def fetch_with_retry(
     )
 ```
 
----
-
-## 7. Logging Best Practices
+## Logging Best Practices
 
 ### Structured Logging Setup
+
 ```python
 import logging
 import sys
@@ -1462,6 +1617,7 @@ logger = structlog.get_logger()
 ```
 
 ### Using Structured Logging
+
 ```python
 # ❌ Bad - using print
 def process_order_bad(order_id: str) -> None:
@@ -1526,6 +1682,7 @@ async def handle_request(request_id: str, user_id: str) -> None:
 ```
 
 ### Log Levels Usage
+
 ```python
 # DEBUG - Detailed information for debugging
 logger.debug(
@@ -1575,6 +1732,7 @@ except Exception:
 ```
 
 ### Logging Decorator
+
 ```python
 from functools import wraps
 from typing import Callable, ParamSpec, TypeVar
@@ -1661,7 +1819,6 @@ def log_async_function_call(
 def process_data(data: str) -> dict[str, Any]:
     return {"processed": data}
 
-
 @log_async_function_call(logger)
 async def fetch_data(url: str) -> str:
     async with httpx.AsyncClient() as client:
@@ -1669,11 +1826,10 @@ async def fetch_data(url: str) -> str:
         return response.text
 ```
 
----
-
-## 8. Function Patterns (Dependency Injection with Protocol)
+## Function Patterns (Dependency Injection with Protocol)
 
 ### Protocol-Based Interfaces
+
 ```python
 from typing import Protocol, runtime_checkable
 
@@ -1747,6 +1903,7 @@ class CacheService(Protocol):
 ```
 
 ### Service with Dependency Injection
+
 ```python
 class UserService:
     """User service with injected dependencies."""
@@ -1778,7 +1935,7 @@ class UserService:
         if user is None:
             raise NotFoundException("User", user_id)
 
-        # Cache the result
+        # Cache result
         await self._cache.set(cache_key, user.model_dump(), ttl=3600)
 
         return user
@@ -1816,9 +1973,9 @@ class UserService:
 ```
 
 ### Concrete Implementations
+
 ```python
 from sqlalchemy.ext.asyncio import AsyncSession
-
 
 class SQLAlchemyUserRepository:
     """SQLAlchemy implementation of UserRepository."""
@@ -1879,10 +2036,10 @@ class RedisCache:
 ```
 
 ### Dependency Container / Factory
+
 ```python
 from dataclasses import dataclass
 from functools import lru_cache
-
 
 @dataclass
 class Container:
@@ -1942,15 +2099,13 @@ async def get_user(
     return UserResponse.model_validate(user)
 ```
 
----
-
-## 9. Dataclasses vs Pydantic
+## Dataclasses vs Pydantic
 
 ### When to Use Dataclasses
+
 ```python
 from dataclasses import dataclass, field, asdict, astuple
 from typing import ClassVar
-
 
 # ✅ Use dataclass for internal data structures (no validation needed)
 @dataclass
@@ -1961,7 +2116,6 @@ class Point:
 
     def distance_to(self, other: "Point") -> float:
         return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5
-
 
 # ✅ Use frozen dataclass for immutable value objects
 @dataclass(frozen=True)
@@ -1976,7 +2130,6 @@ class Coordinate:
             raise ValueError("Latitude must be between -90 and 90")
         if not -180 <= self.longitude <= 180:
             raise ValueError("Longitude must be between -180 and 180")
-
 
 # ✅ Dataclass with default factory and class variables
 @dataclass
@@ -1996,7 +2149,6 @@ class CacheEntry:
         age = (datetime.utcnow() - self.created_at).total_seconds()
         return age > self.ttl_seconds
 
-
 # ✅ Dataclass with slots for memory efficiency
 @dataclass(slots=True)
 class LogEntry:
@@ -2005,7 +2157,6 @@ class LogEntry:
     level: str
     message: str
     context: dict[str, Any] = field(default_factory=dict)
-
 
 # ✅ Dataclass for internal DTOs
 @dataclass
@@ -2017,9 +2168,9 @@ class UserCreationResult:
 ```
 
 ### When to Use Pydantic
+
 ```python
 from pydantic import BaseModel, Field, field_validator
-
 
 # ✅ Use Pydantic for API request/response models
 class CreateOrderRequest(BaseModel):
@@ -2086,6 +2237,7 @@ class UserFromDB(BaseModel):
 ```
 
 ### Comparison Summary
+
 ```python
 # Summary: Dataclass vs Pydantic
 
@@ -2106,11 +2258,10 @@ class UserFromDB(BaseModel):
 # - Need schema export (OpenAPI)
 ```
 
----
-
-## 10. File Organization and Imports
+## File Organization and Imports
 
 ### Project Structure
+
 ```
 project/
 ├── src/
@@ -2170,898 +2321,11 @@ project/
 ```
 
 ### Import Organization
+
 ```python
-"""Module docstring describing the module's purpose.
+"""Module docstring describing module's purpose.
 
 This module handles user-related operations.
 """
 
 # 1. Future imports (if needed for compatibility)
-from __future__ import annotations
-
-# 2. Standard library imports (alphabetical)
-import logging
-import os
-from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any, TypeVar
-
-# 3. Third-party imports (alphabetical)
-import httpx
-import structlog
-from fastapi import Depends, HTTPException
-from pydantic import BaseModel, Field
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
-# 4. Local application imports (absolute, alphabetical)
-from app.core.config import settings
-from app.core.exceptions import NotFoundException, ValidationException
-from app.models.user import User as UserModel
-from app.repositories.user import UserRepository
-from app.schemas.user import CreateUserRequest, UserResponse
-
-# 5. Relative imports (if within same package)
-from .dependencies import get_db
-from .middleware import RequestContextMiddleware
-
-
-# Constants after imports
-DEFAULT_PAGE_SIZE = 20
-MAX_PAGE_SIZE = 100
-
-
-# Module-level logger
-logger = structlog.get_logger(__name__)
-```
-
-### __init__.py Exports (Barrel Files)
-```python
-# app/schemas/__init__.py
-"""Schema exports for clean imports."""
-
-from .user import (
-    CreateUserRequest,
-    UpdateUserRequest,
-    UserResponse,
-    UserListResponse,
-)
-from .order import (
-    CreateOrderRequest,
-    OrderResponse,
-)
-
-__all__ = [
-    # User schemas
-    "CreateUserRequest",
-    "UpdateUserRequest",
-    "UserResponse",
-    "UserListResponse",
-    # Order schemas
-    "CreateOrderRequest",
-    "OrderResponse",
-]
-
-
-# Usage elsewhere:
-from app.schemas import CreateUserRequest, UserResponse
-```
-
----
-
-## 11. Environment Variables (Pydantic Settings)
-
-### Comprehensive Settings
-```python
-from pydantic import Field, PostgresDsn, RedisDsn, field_validator, model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import Literal, Self
-
-
-class Settings(BaseSettings):
-    """Application settings with validation."""
-
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
-        extra="ignore",
-        env_nested_delimiter="__",
-    )
-
-    # Application
-    app_name: str = Field(default="MyApp")
-    app_version: str = Field(default="0.1.0")
-    debug: bool = Field(default=False)
-    environment: Literal["development", "staging", "production"] = Field(
-        default="development"
-    )
-
-    # Server
-    host: str = Field(default="0.0.0.0")
-    port: int = Field(default=8000, ge=1, le=65535)
-    workers: int = Field(default=4, ge=1, le=32)
-
-    # Database
-    database_url: PostgresDsn
-    db_pool_size: int = Field(default=10, ge=1, le=100)
-    db_pool_max_overflow: int = Field(default=20, ge=0, le=100)
-    db_echo: bool = Field(default=False)
-
-    # Redis
-    redis_url: RedisDsn = Field(default="redis://localhost:6379/0")
-    redis_password: str | None = Field(default=None)
-
-    # Security
-    secret_key: str = Field(..., min_length=32)
-    jwt_algorithm: str = Field(default="HS256")
-    jwt_expiration_minutes: int = Field(default=30, ge=1)
-    refresh_token_expiration_days: int = Field(default=7, ge=1)
-
-    # External Services
-    openai_api_key: str | None = Field(default=None)
-    sendgrid_api_key: str | None = Field(default=None)
-    stripe_api_key: str | None = Field(default=None)
-    stripe_webhook_secret: str | None = Field(default=None)
-
-    # Rate Limiting
-    rate_limit_enabled: bool = Field(default=True)
-    rate_limit_requests: int = Field(default=100, ge=1)
-    rate_limit_window_seconds: int = Field(default=60, ge=1)
-
-    # Logging
-    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = Field(
-        default="INFO"
-    )
-    log_format: Literal["json", "console"] = Field(default="json")
-
-    # CORS
-    cors_origins: list[str] = Field(default=["http://localhost:3000"])
-    cors_allow_credentials: bool = Field(default=True)
-
-    @field_validator("secret_key")
-    @classmethod
-    def validate_secret_key(cls, v: str) -> str:
-        if v == "change-me-in-production":
-            raise ValueError("Must change default secret key in production")
-        return v
-
-    @field_validator("cors_origins", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, v: str | list[str]) -> list[str]:
-        if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
-        return v
-
-    @model_validator(mode="after")
-    def validate_production_settings(self) -> Self:
-        if self.environment == "production":
-            if self.debug:
-                raise ValueError("Debug must be False in production")
-            if not self.openai_api_key:
-                logger.warning("OpenAI API key not set in production")
-        return self
-
-    @property
-    def is_production(self) -> bool:
-        return self.environment == "production"
-
-    @property
-    def is_development(self) -> bool:
-        return self.environment == "development"
-
-    @property
-    def database_url_async(self) -> str:
-        """Convert sync URL to async."""
-        url = str(self.database_url)
-        return url.replace("postgresql://", "postgresql+asyncpg://")
-
-
-# Create singleton instance
-settings = Settings()
-
-
-# Usage
-print(settings.database_url_async)
-print(settings.is_production)
-```
-
-### Environment-Specific Settings
-```python
-from pydantic_settings import BaseSettings
-from functools import lru_cache
-
-
-class BaseConfig(BaseSettings):
-    """Base configuration."""
-    app_name: str = "MyApp"
-    debug: bool = False
-
-
-class DevelopmentConfig(BaseConfig):
-    """Development configuration."""
-    debug: bool = True
-    database_url: str = "postgresql://localhost:5432/dev_db"
-    log_level: str = "DEBUG"
-
-
-class ProductionConfig(BaseConfig):
-    """Production configuration."""
-    debug: bool = False
-    database_url: str  # Required in production
-    log_level: str = "INFO"
-
-
-class TestConfig(BaseConfig):
-    """Test configuration."""
-    debug: bool = True
-    database_url: str = "postgresql://localhost:5432/test_db"
-    log_level: str = "DEBUG"
-
-
-@lru_cache
-def get_settings() -> BaseConfig:
-    """Get settings based on environment."""
-    env = os.getenv("ENVIRONMENT", "development")
-
-    config_map = {
-        "development": DevelopmentConfig,
-        "production": ProductionConfig,
-        "test": TestConfig,
-    }
-
-    config_class = config_map.get(env, DevelopmentConfig)
-    return config_class()
-```
-
----
-
-## 12. Testing Patterns
-
-### Pytest Configuration and Fixtures
-```python
-# tests/conftest.py
-import asyncio
-from collections.abc import AsyncGenerator, Generator
-from typing import Any
-
-import pytest
-import pytest_asyncio
-from faker import Faker
-from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
-
-from app.core.config import settings
-from app.db.session import Base
-from app.main import app
-
-
-fake = Faker()
-
-
-# Event loop fixture for async tests
-@pytest.fixture(scope="session")
-def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
-    """Create event loop for async tests."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
-# Database fixtures
-@pytest_asyncio.fixture
-async def db_engine():
-    """Create test database engine."""
-    engine = create_async_engine(
-        settings.database_url_async.replace("/app", "/test"),
-        echo=False,
-    )
-
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-    yield engine
-
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-
-    await engine.dispose()
-
-
-@pytest_asyncio.fixture
-async def db_session(db_engine) -> AsyncGenerator[AsyncSession, None]:
-    """Create test database session."""
-    async_session = sessionmaker(
-        db_engine,
-        class_=AsyncSession,
-        expire_on_commit=False,
-    )
-
-    async with async_session() as session:
-        yield session
-        await session.rollback()
-
-
-# HTTP client fixture
-@pytest_asyncio.fixture
-async def client() -> AsyncGenerator[AsyncClient, None]:
-    """Create test HTTP client."""
-    async with AsyncClient(
-        transport=ASGITransport(app=app),
-        base_url="http://test",
-    ) as ac:
-        yield ac
-
-
-# Factory fixtures
-@pytest.fixture
-def user_factory() -> callable:
-    """Factory for creating test users."""
-    def create_user(**kwargs: Any) -> User:
-        defaults = {
-            "id": fake.uuid4(),
-            "email": fake.email(),
-            "name": fake.name(),
-            "age": fake.random_int(min=18, max=80),
-            "is_active": True,
-        }
-        defaults.update(kwargs)
-        return User(**defaults)
-    return create_user
-
-
-@pytest.fixture
-def sample_user(user_factory) -> User:
-    """Create a sample user."""
-    return user_factory()
-```
-
-### Unit Tests
-```python
-# tests/unit/test_user_service.py
-import pytest
-from unittest.mock import AsyncMock, Mock
-
-from app.services.user import UserService
-from app.core.exceptions import NotFoundException, ConflictException
-
-
-class TestUserService:
-    """Tests for UserService."""
-
-    @pytest.fixture
-    def mock_user_repo(self) -> AsyncMock:
-        return AsyncMock()
-
-    @pytest.fixture
-    def mock_email_service(self) -> AsyncMock:
-        return AsyncMock()
-
-    @pytest.fixture
-    def mock_cache(self) -> AsyncMock:
-        return AsyncMock()
-
-    @pytest.fixture
-    def mock_logger(self) -> Mock:
-        logger = Mock()
-        logger.bind.return_value = logger
-        return logger
-
-    @pytest.fixture
-    def user_service(
-        self,
-        mock_user_repo,
-        mock_email_service,
-        mock_cache,
-        mock_logger,
-    ) -> UserService:
-        return UserService(
-            user_repo=mock_user_repo,
-            email_service=mock_email_service,
-            cache=mock_cache,
-            logger=mock_logger,
-        )
-
-    async def test_get_user_from_cache(
-        self,
-        user_service: UserService,
-        mock_cache: AsyncMock,
-        sample_user: User,
-    ) -> None:
-        """Test getting user from cache."""
-        # Arrange
-        mock_cache.get.return_value = sample_user.model_dump()
-
-        # Act
-        result = await user_service.get_user(sample_user.id)
-
-        # Assert
-        assert result.id == sample_user.id
-        mock_cache.get.assert_called_once_with(f"user:{sample_user.id}")
-
-    async def test_get_user_from_repository(
-        self,
-        user_service: UserService,
-        mock_cache: AsyncMock,
-        mock_user_repo: AsyncMock,
-        sample_user: User,
-    ) -> None:
-        """Test getting user from repository when not in cache."""
-        # Arrange
-        mock_cache.get.return_value = None
-        mock_user_repo.get_by_id.return_value = sample_user
-
-        # Act
-        result = await user_service.get_user(sample_user.id)
-
-        # Assert
-        assert result.id == sample_user.id
-        mock_user_repo.get_by_id.assert_called_once_with(sample_user.id)
-        mock_cache.set.assert_called_once()
-
-    async def test_get_user_not_found(
-        self,
-        user_service: UserService,
-        mock_cache: AsyncMock,
-        mock_user_repo: AsyncMock,
-    ) -> None:
-        """Test getting non-existent user raises NotFoundException."""
-        # Arrange
-        mock_cache.get.return_value = None
-        mock_user_repo.get_by_id.return_value = None
-
-        # Act & Assert
-        with pytest.raises(NotFoundException) as exc_info:
-            await user_service.get_user("nonexistent")
-
-        assert "User" in str(exc_info.value.message)
-
-    async def test_create_user_success(
-        self,
-        user_service: UserService,
-        mock_user_repo: AsyncMock,
-        mock_email_service: AsyncMock,
-    ) -> None:
-        """Test successful user creation."""
-        # Arrange
-        request = CreateUserRequest(
-            email="test@example.com",
-            name="Test User",
-            password="SecurePass123",
-            age=25,
-        )
-        mock_user_repo.get_by_email.return_value = None
-        mock_user_repo.create.return_value = User(
-            id="new-id",
-            email=request.email,
-            name=request.name,
-            age=request.age,
-        )
-
-        # Act
-        result = await user_service.create_user(request)
-
-        # Assert
-        assert result.email == request.email
-        mock_email_service.send_template_email.assert_called_once()
-
-    async def test_create_user_conflict(
-        self,
-        user_service: UserService,
-        mock_user_repo: AsyncMock,
-        sample_user: User,
-    ) -> None:
-        """Test creating user with existing email raises ConflictException."""
-        # Arrange
-        request = CreateUserRequest(
-            email=sample_user.email,
-            name="New User",
-            password="SecurePass123",
-            age=25,
-        )
-        mock_user_repo.get_by_email.return_value = sample_user
-
-        # Act & Assert
-        with pytest.raises(ConflictException):
-            await user_service.create_user(request)
-```
-
-### Parametrized Tests
-```python
-# tests/unit/test_validators.py
-import pytest
-from app.utils.validators import validate_email, validate_password
-
-
-class TestValidators:
-    """Tests for validation functions."""
-
-    @pytest.mark.parametrize(
-        "email,expected",
-        [
-            ("user@example.com", True),
-            ("user.name@domain.co.uk", True),
-            ("user+tag@example.com", True),
-            ("invalid", False),
-            ("@example.com", False),
-            ("user@", False),
-            ("", False),
-        ],
-        ids=[
-            "valid_simple",
-            "valid_subdomain",
-            "valid_plus_tag",
-            "invalid_no_at",
-            "invalid_no_user",
-            "invalid_no_domain",
-            "invalid_empty",
-        ],
-    )
-    def test_validate_email(self, email: str, expected: bool) -> None:
-        """Test email validation."""
-        assert validate_email(email) == expected
-
-    @pytest.mark.parametrize(
-        "password,is_valid,error_message",
-        [
-            ("ValidPass123", True, None),
-            ("short", False, "at least 8 characters"),
-            ("nouppercase123", False, "uppercase letter"),
-            ("NOLOWERCASE123", False, "lowercase letter"),
-            ("NoDigitsHere", False, "digit"),
-        ],
-    )
-    def test_validate_password(
-        self,
-        password: str,
-        is_valid: bool,
-        error_message: str | None,
-    ) -> None:
-        """Test password validation."""
-        result = validate_password(password)
-
-        if is_valid:
-            assert result.is_valid
-            assert result.errors == []
-        else:
-            assert not result.is_valid
-            assert any(error_message in err for err in result.errors)
-```
-
-### Integration Tests
-```python
-# tests/integration/test_user_api.py
-import pytest
-from httpx import AsyncClient
-
-
-@pytest.mark.integration
-class TestUserAPI:
-    """Integration tests for User API."""
-
-    async def test_create_and_get_user(
-        self,
-        client: AsyncClient,
-    ) -> None:
-        """Test creating and retrieving a user."""
-        # Create user
-        create_response = await client.post(
-            "/api/v1/users",
-            json={
-                "email": "test@example.com",
-                "name": "Test User",
-                "password": "SecurePass123",
-                "age": 25,
-            },
-        )
-        assert create_response.status_code == 201
-        user_data = create_response.json()["data"]
-        user_id = user_data["id"]
-
-        # Get user
-        get_response = await client.get(f"/api/v1/users/{user_id}")
-        assert get_response.status_code == 200
-        assert get_response.json()["data"]["email"] == "test@example.com"
-
-    async def test_create_user_validation_error(
-        self,
-        client: AsyncClient,
-    ) -> None:
-        """Test creating user with invalid data."""
-        response = await client.post(
-            "/api/v1/users",
-            json={
-                "email": "invalid-email",
-                "name": "",
-                "password": "short",
-                "age": -1,
-            },
-        )
-        assert response.status_code == 422
-
-    async def test_get_user_not_found(
-        self,
-        client: AsyncClient,
-    ) -> None:
-        """Test getting non-existent user."""
-        response = await client.get("/api/v1/users/nonexistent-id")
-        assert response.status_code == 404
-        assert response.json()["error"]["code"] == "NOT_FOUND"
-```
-
-### Mocking External Services
-```python
-# tests/unit/test_external_service.py
-import pytest
-from unittest.mock import AsyncMock, patch
-import httpx
-
-
-class TestExternalServiceClient:
-    """Tests for external service client."""
-
-    async def test_fetch_data_success(self) -> None:
-        """Test successful data fetch."""
-        mock_response = httpx.Response(
-            200,
-            json={"status": "success", "data": {"key": "value"}},
-        )
-
-        with patch("httpx.AsyncClient.get", new_callable=AsyncMock) as mock_get:
-            mock_get.return_value = mock_response
-
-            client = ExternalServiceClient()
-            result = await client.fetch_data("test-id")
-
-            assert result["key"] == "value"
-            mock_get.assert_called_once()
-
-    async def test_fetch_data_retry_on_failure(self) -> None:
-        """Test retry logic on transient failures."""
-        # First two calls fail, third succeeds
-        mock_responses = [
-            httpx.HTTPStatusError(
-                "Server Error",
-                request=httpx.Request("GET", "http://test"),
-                response=httpx.Response(500),
-            ),
-            httpx.HTTPStatusError(
-                "Server Error",
-                request=httpx.Request("GET", "http://test"),
-                response=httpx.Response(503),
-            ),
-            httpx.Response(200, json={"status": "success"}),
-        ]
-
-        with patch("httpx.AsyncClient.get", new_callable=AsyncMock) as mock_get:
-            mock_get.side_effect = mock_responses
-
-            client = ExternalServiceClient(max_retries=3)
-            result = await client.fetch_data("test-id")
-
-            assert result["status"] == "success"
-            assert mock_get.call_count == 3
-```
-
----
-
-## 13. Code Quality Tools
-
-### Black (Formatter)
-```bash
-# Format all files
-black src/ tests/
-
-# Check without modifying (CI/CD)
-black --check src/ tests/
-
-# Show diff
-black --diff src/
-
-# Format specific file
-black src/app/services/user.py
-```
-
-### Ruff (Linter - Fast)
-```bash
-# Check for issues
-ruff check src/ tests/
-
-# Fix auto-fixable issues
-ruff check --fix src/ tests/
-
-# Show all violations
-ruff check --show-fixes src/
-
-# Format (alternative to Black)
-ruff format src/ tests/
-```
-
-### Mypy (Type Checker)
-```bash
-# Check types
-mypy src/
-
-# Strict mode
-mypy --strict src/
-
-# Show error codes
-mypy --show-error-codes src/
-
-# Generate type stubs
-stubgen -p app -o stubs/
-```
-
-### Running All Tools
-```bash
-# Create a script: scripts/lint.sh
-#!/bin/bash
-set -e
-
-echo "Running Black..."
-black --check src/ tests/
-
-echo "Running Ruff..."
-ruff check src/ tests/
-
-echo "Running Mypy..."
-mypy src/
-
-echo "All checks passed!"
-```
-
----
-
-## 14. Pre-commit Configuration
-
-### .pre-commit-config.yaml
-```yaml
-# .pre-commit-config.yaml
-default_language_version:
-  python: python3.11
-
-repos:
-  # General hooks
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
-    hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
-        args: [--unsafe]
-      - id: check-json
-      - id: check-toml
-      - id: check-added-large-files
-        args: [--maxkb=1000]
-      - id: check-merge-conflict
-      - id: check-case-conflict
-      - id: detect-private-key
-      - id: debug-statements
-      - id: check-docstring-first
-
-  # Python formatting with Black
-  - repo: https://github.com/psf/black
-    rev: 24.1.1
-    hooks:
-      - id: black
-        language_version: python3.11
-
-  # Import sorting and linting with Ruff
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.14
-    hooks:
-      - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
-
-  # Type checking with Mypy
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
-    hooks:
-      - id: mypy
-        additional_dependencies:
-          - pydantic>=2.5.0
-          - pydantic-settings>=2.1.0
-          - types-redis
-          - sqlalchemy[mypy]>=2.0.0
-        args: [--config-file=pyproject.toml]
-
-  # Security checks
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.7
-    hooks:
-      - id: bandit
-        args: [-c, pyproject.toml]
-        additional_dependencies: ["bandit[toml]"]
-
-  # Detect secrets
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.4.0
-    hooks:
-      - id: detect-secrets
-        args: [--baseline, .secrets.baseline]
-
-  # Commit message format
-  - repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.13.0
-    hooks:
-      - id: commitizen
-        stages: [commit-msg]
-
-ci:
-  autofix_commit_msg: "style: auto-fix by pre-commit hooks"
-  autoupdate_commit_msg: "chore: update pre-commit hooks"
-  skip: [mypy]  # Skip mypy in CI (run separately)
-```
-
-### Installation and Usage
-```bash
-# Install pre-commit
-pip install pre-commit
-
-# Install hooks
-pre-commit install
-pre-commit install --hook-type commit-msg
-
-# Run on all files
-pre-commit run --all-files
-
-# Update hooks
-pre-commit autoupdate
-
-# Skip hooks temporarily
-git commit --no-verify -m "WIP: work in progress"
-```
-
----
-
-## Common Patterns Checklist
-
-When writing Python code, ensure:
-
-### Type Safety
-- [ ] All functions have type hints (parameters and return types)
-- [ ] Using Python 3.10+ syntax (`list[str]` not `List[str]`)
-- [ ] Using `|` for union types (`str | None` not `Optional[str]`)
-- [ ] Generic types use TypeVar with constraints
-- [ ] Protocol used for interfaces
-
-### Data Validation
-- [ ] Pydantic models for API request/response
-- [ ] Pydantic Settings for environment variables
-- [ ] Dataclasses for internal data structures
-- [ ] Field validators for complex validation
-
-### Error Handling
-- [ ] Custom exception hierarchy defined
-- [ ] Specific exceptions caught (not bare `except:`)
-- [ ] Errors logged with context
-- [ ] `from e` used when re-raising exceptions
-- [ ] Context managers for resource cleanup
-
-### Async Code
-- [ ] Async functions properly await I/O operations
-- [ ] `asyncio.gather` for parallel operations
-- [ ] `asyncio.TaskGroup` for structured concurrency
-- [ ] Timeouts on external calls
-- [ ] Semaphores for concurrency limits
-
-### Logging
-- [ ] Structured logging (not print statements)
-- [ ] Appropriate log levels used
-- [ ] Context included in log messages
-- [ ] Sensitive data not logged
-
-### Testing
-- [ ] Unit tests with mocked dependencies
-- [ ] Integration tests for API endpoints
-- [ ] Parametrized tests for multiple cases
-- [ ] Fixtures for test data and setup
-- [ ] Async tests with pytest-asyncio
-
-### Code Quality
-- [ ] Black formatting applied
-- [ ] Ruff linting passes
-- [ ] Mypy type checking passes
-- [ ] Pre-commit hooks configured
-- [ ] PEP 8 naming conventions followed

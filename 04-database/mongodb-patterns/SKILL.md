@@ -1,15 +1,52 @@
+---
+name: MongoDB Patterns and Best Practices
+description: Schema design, querying, indexing, and optimization patterns for MongoDB applications.
+---
+
 # MongoDB Patterns and Best Practices
 
-## 1. Schema Design Principles
+## Overview
 
-### Denormalization for Read Performance
+MongoDB is a document-oriented NoSQL database that provides high performance, high availability, and easy scalability. This skill covers schema design patterns, query optimization, indexing strategies, and best practices for building MongoDB applications.
+
+## Prerequisites
+
+- Understanding of NoSQL database concepts
+- Knowledge of JavaScript/TypeScript
+- Familiarity with document data structures
+- Basic understanding of database indexing
+
+## Key Concepts
+
+### MongoDB Architecture
+
+- **Document Model**: Data stored as BSON documents (JSON-like)
+- **Collections**: Groups of documents (similar to tables in SQL)
+- **Indexes**: B-tree indexes for efficient queries
+- **Replica Sets**: High availability through replication
+- **Sharding**: Horizontal scaling across multiple servers
+
+### Schema Design Philosophy
+
+MongoDB's flexible schema allows:
+- **Embedded Documents**: Related data in a single document
+- **References**: Links between documents
+- **Hybrid Approach**: Combination of both
+- **Schema Validation**: Enforce data structure at database level
+
+## Implementation Guide
+
+### Schema Design Principles
+
+#### Denormalization for Read Performance
+
 ```typescript
 // Good: Denormalize for read-heavy workloads
 interface PostWithAuthor {
   _id: string
   title: string
   content: string
-  authorName: string  // Denormalized for faster reads
+  authorName: string    // Denormalized for faster reads
   authorEmail: string
   createdAt: Date
 }
@@ -19,12 +56,13 @@ interface Post {
   _id: string
   title: string
   content: string
-  authorId: ObjectId // Requires join to get author info
+  authorId: ObjectId  // Requires join to get author info
   createdAt: Date
 }
 ```
 
-### Embed vs Reference
+#### Embed vs Reference
+
 ```typescript
 // Good: Embed for 1-to-few relationships
 interface User {
@@ -33,7 +71,7 @@ interface User {
   preferences: {
     theme: 'light' | 'dark'
     notifications: boolean
-  } // Embedded - small, rarely changes
+  }  // Embedded - small, rarely changes
   createdAt: Date
 }
 
@@ -41,25 +79,26 @@ interface User {
 interface User {
   _id: string
   name: string
-  posts: ObjectId[] // Reference - many posts, can grow
+  posts: ObjectId[]  // Reference - many posts, can grow
   createdAt: Date
 }
 
 interface Post {
   _id: string
   title: string
-  authorId: ObjectId // Reference back to user
+  authorId: ObjectId  // Reference back to user
   createdAt: Date
 }
 ```
 
-### Schema Versioning
+#### Schema Versioning
+
 ```typescript
 interface User {
   _id: string
   name: string
   email: string
-  version: number // Schema version
+  version: number  // Schema version
   createdAt: Date
 }
 
@@ -81,9 +120,10 @@ async function migrateUserSchema() {
 }
 ```
 
-## 2. Mongoose Setup
+### Mongoose Setup
 
-### Connection Configuration
+#### Connection Configuration
+
 ```typescript
 // config/database.ts
 import mongoose from 'mongoose'
@@ -106,7 +146,8 @@ export async function disconnectDatabase() {
 }
 ```
 
-### Connection Pooling
+#### Connection Pooling
+
 ```typescript
 // config/database.ts
 import mongoose from 'mongoose'
@@ -123,7 +164,8 @@ export async function connectDatabase() {
 }
 ```
 
-### Multiple Connections
+#### Multiple Connections
+
 ```typescript
 // config/database.ts
 import mongoose from 'mongoose'
@@ -146,9 +188,10 @@ export async function disconnectAll() {
 }
 ```
 
-## 3. Model Definitions
+### Model Definitions
 
-### Basic Model
+#### Basic Model
+
 ```typescript
 // models/User.ts
 import mongoose, { Document, Schema } from 'mongoose'
@@ -188,7 +231,8 @@ const userSchema = new Schema<IUser>({
 export const User = mongoose.model<IUser>('User', userSchema)
 ```
 
-### Model with Methods
+#### Model with Methods
+
 ```typescript
 // models/User.ts
 import mongoose, { Document, Schema } from 'mongoose'
@@ -214,7 +258,8 @@ userSchema.methods.comparePassword = async function(candidatePassword: string) {
 export const User = mongoose.model<IUser>('User', userSchema)
 ```
 
-### Model with Virtuals
+#### Model with Virtuals
+
 ```typescript
 // models/User.ts
 import mongoose, { Document, Schema } from 'mongoose'
@@ -245,7 +290,8 @@ userSchema.set('toJSON', { virtuals: true })
 export const User = mongoose.model<IUser>('User', userSchema)
 ```
 
-### Model with Hooks
+#### Model with Hooks
+
 ```typescript
 // models/User.ts
 import mongoose, { Schema } from 'mongoose'
@@ -284,9 +330,10 @@ userSchema.post('remove', async function(doc, next) {
 export const User = mongoose.model('User', userSchema)
 ```
 
-## 4. Query Patterns
+### Query Patterns
 
-### Basic CRUD Operations
+#### Basic CRUD Operations
+
 ```typescript
 // Create
 const user = await User.create({
@@ -318,11 +365,12 @@ await User.findByIdAndDelete(userId)
 await User.deleteMany({ status: 'inactive' })
 ```
 
-### Advanced Filtering
+#### Advanced Filtering
+
 ```typescript
 // String queries
 const users = await User.find({
-  name: { $regex: /^John/i }, // Case-insensitive
+  name: { $regex: /^John/i },  // Case-insensitive
   email: { $in: ['test@example.com', 'admin@example.com'] },
 })
 
@@ -342,9 +390,9 @@ const posts = await Post.find({
 
 // Array queries
 const users = await User.find({
-  tags: { $all: ['admin', 'moderator'] }, // Must have all tags
-  tags: { $in: ['admin'] }, // Must have at least one tag
-  tags: { $size: 2 }, // Must have exactly 2 tags
+  tags: { $all: ['admin', 'moderator'] },  // Must have all tags
+  tags: { $in: ['admin'] },  // Must have at least one tag
+  tags: { $size: 2 },  // Must have exactly 2 tags
 })
 
 // Logical operators
@@ -361,12 +409,13 @@ const users = await User.find({
 
 // Negation
 const users = await User.find({
-  email: { $ne: 'admin@example.com' }, // Not equal
+  email: { $ne: 'admin@example.com' },  // Not equal
   status: { $ne: 'inactive' }
 })
 ```
 
-### Projection
+#### Projection
+
 ```typescript
 // Select specific fields
 const users = await User.find({})
@@ -381,7 +430,8 @@ const posts = await Post.find({})
   .select('title author.name author.email')
 ```
 
-### Pagination
+#### Pagination
+
 ```typescript
 // Skip and limit
 const page = 1
@@ -396,7 +446,8 @@ const total = await User.countDocuments()
 const totalPages = Math.ceil(total / limit)
 ```
 
-### Sorting
+#### Sorting
+
 ```typescript
 // Single field sort
 const users = await User.find({}).sort({ name: 1 })
@@ -412,9 +463,10 @@ const users = await User.find({}).sort({
 })
 ```
 
-## 5. Aggregation Pipelines
+### Aggregation Pipelines
 
-### Basic Aggregation
+#### Basic Aggregation
+
 ```typescript
 // Group by and count
 const result = await User.aggregate([
@@ -437,15 +489,16 @@ const result = await Product.aggregate([
 ])
 ```
 
-### Lookup and Unwind
+#### Lookup and Unwind
+
 ```typescript
 // Join users with their posts
 const result = await User.aggregate([
   {
     $lookup: {
       from: 'posts',
-      localField: 'authorId',
-      foreignField: '_id',
+      localField: '_id',
+      foreignField: 'authorId',
       as: 'userPosts'
     }
   },
@@ -455,7 +508,8 @@ const result = await User.aggregate([
 ])
 ```
 
-### Faceted Search
+#### Faceted Search
+
 ```typescript
 // Multi-faceted search with counts
 const result = await Product.aggregate([
@@ -490,7 +544,8 @@ const result = await Product.aggregate([
 ])
 ```
 
-### Time Series Aggregation
+#### Time Series Aggregation
+
 ```typescript
 // Daily aggregation
 const result = await Order.aggregate([
@@ -512,8 +567,7 @@ const result = await Order.aggregate([
       totalSales: { $sum: '$total' },
       avgOrderValue: { $avg: '$total' }
     }
-  }
-},
+  },
   {
     $sort: {
       '_id.year': 1,
@@ -524,7 +578,8 @@ const result = await Order.aggregate([
 ])
 ```
 
-### Pipeline with Multiple Stages
+#### Pipeline with Multiple Stages
+
 ```typescript
 const result = await Order.aggregate([
   // Stage 1: Match documents
@@ -552,9 +607,10 @@ const result = await Order.aggregate([
 ])
 ```
 
-## 6. Indexing Strategies
+### Indexing Strategies
 
-### Single Field Indexes
+#### Single Field Indexes
+
 ```typescript
 // models/User.ts
 import mongoose, { Schema } from 'mongoose'
@@ -566,7 +622,8 @@ const userSchema = new Schema({
 })
 ```
 
-### Compound Indexes
+#### Compound Indexes
+
 ```typescript
 // models/Product.ts
 import mongoose, { Schema } from 'mongoose'
@@ -585,7 +642,8 @@ productSchema.index({ category: 1, price: -1 })
 productSchema.index({ stock: 1, category: 1 })
 ```
 
-### Text Indexes
+#### Text Indexes
+
 ```typescript
 // models/Article.ts
 import mongoose, { Schema } from 'mongoose'
@@ -603,7 +661,8 @@ articleSchema.index({ title: 'text', content: 'text' })
 articleSchema.index({ tags: 1 })
 ```
 
-### Geospatial Indexes
+#### Geospatial Indexes
+
 ```typescript
 // models/Location.ts
 import mongoose, { Schema } from 'mongoose'
@@ -620,7 +679,8 @@ const locationSchema = new Schema({
 })
 ```
 
-### TTL Indexes
+#### TTL Indexes
+
 ```typescript
 // models/Session.ts
 import mongoose, { Schema } from 'mongoose'
@@ -635,9 +695,10 @@ const sessionSchema = new Schema({
 sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 3600 })
 ```
 
-## 7. Transactions
+### Transactions
 
-### Basic Transaction
+#### Basic Transaction
+
 ```typescript
 import mongoose from 'mongoose'
 
@@ -648,7 +709,7 @@ try {
   const order = await Order.create([
     { userId: user[0]._id, total: 100 }
   ], { session })
-  
+
   await session.commitTransaction()
   console.log('Transaction committed')
 } catch (error) {
@@ -657,72 +718,73 @@ try {
 }
 ```
 
-### Transaction with Multiple Operations
+#### Transaction with Multiple Operations
+
 ```typescript
 const session = await mongoose.startSession()
 
 try {
   // Create user
   const user = await User.create([{ name: 'John' }], { session })
-  
+
   // Create posts
-  await Post.create([
+  await Order.create([
     { title: 'Post 1', authorId: user[0]._id },
     { title: 'Post 2', authorId: user[0]._id }
   ], { session })
-  
+
   // Update user stats
   await User.findByIdAndUpdate(
     user[0]._id,
     { postCount: 2 },
     { session }
   )
-  
+
   await session.commitTransaction()
 } catch (error) {
   await session.abortTransaction()
+  throw error
 }
 ```
 
-### Transaction with Error Handling
-```typescript
-import mongoose from 'mongoose'
+#### Transaction with Error Handling
 
+```typescript
 async function transferFunds(fromId: string, toId: string, amount: number) {
   const session = await mongoose.startSession()
-  
+
   try {
     // Get both users
     const [fromUser, toUser] = await User.find({
       _id: { $in: [fromId, toId] }
     }).session(session)
-    
+
     if (!fromUser || !toUser) {
       throw new Error('User not found')
     }
-    
+
     if (fromUser.balance < amount) {
       throw new Error('Insufficient funds')
     }
-    
+
     // Transfer funds
     await User.findByIdAndUpdate(
       fromId,
       { $inc: { balance: -amount } },
       { session }
     )
-    
+
     await User.findByIdAndUpdate(
       toId,
       { $inc: { balance: amount } },
       { session }
     )
-    
+
     // Create transaction record
     await Transaction.create([
       { fromId, toId, amount, type: 'transfer' }
     ], { session })
-    
+
     await session.commitTransaction()
     return { success: true }
   } catch (error) {
@@ -732,9 +794,10 @@ async function transferFunds(fromId: string, toId: string, amount: number) {
 }
 ```
 
-## 8. Change Streams
+### Change Streams
 
-### Watching for Changes
+#### Watching for Changes
+
 ```typescript
 // models/User.ts
 import mongoose, { Schema } from 'mongoose'
@@ -750,7 +813,7 @@ const changeStream = User.watch()
 
 changeStream.on('change', (change) => {
   console.log('Change detected:', change)
-  
+
   switch (change.operationType) {
     case 'insert':
       console.log('New user:', change.fullDocument)
@@ -765,7 +828,8 @@ changeStream.on('change', (change) => {
 })
 ```
 
-### Change Stream with Pipeline
+#### Change Stream with Pipeline
+
 ```typescript
 const userChangeStream = User.watch()
 
@@ -773,7 +837,7 @@ userChangeStream.on('change', async (change) => {
   if (change.operationType === 'update') {
     // Get related data
     const posts = await Post.find({ authorId: change.documentKey })
-    
+
     // Update denormalized data in posts
     await Post.updateMany(
       { authorId: change.documentKey },
@@ -783,23 +847,25 @@ userChangeStream.on('change', async (change) => {
 })
 ```
 
-### Aggregation Change Stream
+#### Aggregation Change Stream
+
 ```typescript
 const changeStream = User.watch()
 
 changeStream.on('change', async (change) => {
   // Aggregate statistics on change
   const stats = await User.aggregate([
-    { $group: { _id: '$status', count: { $sum: 1 } } }
+    { $group: { _id: '$status', count: { $sum: 1 } }
   ])
-  
+
   console.log('Updated stats:', stats)
 })
 ```
 
-## 9. Performance Optimization
+### Performance Optimization
 
-### Query Optimization
+#### Query Optimization
+
 ```typescript
 // Good: Use lean() for read-only operations
 const users = await User.find({}).lean()
@@ -815,7 +881,8 @@ const users = await User.find({})
 const users = await User.find({})
 ```
 
-### Projection for Large Documents
+#### Projection for Large Documents
+
 ```typescript
 // Good: Use projection for large documents
 const posts = await Post.find({})
@@ -825,13 +892,13 @@ const posts = await Post.find({})
 const posts = await Post.find({})
 ```
 
-### Cursor-based Pagination
+#### Cursor-based Pagination
+
 ```typescript
 // Good: Use cursor for large datasets
 const users = await User.find({})
   .sort({ _id: 1 })
   .cursor()
-  .limit(100)
 
 // Bad: Skip/limit for large datasets
 const users = await User.find({})
@@ -839,7 +906,8 @@ const users = await User.find({})
   .limit(100)
 ```
 
-### Bulk Operations
+#### Bulk Operations
+
 ```typescript
 // Good: Use bulk operations for inserts
 const users = await User.insertMany([
@@ -854,7 +922,8 @@ for (const userData of userDataArray) {
 }
 ```
 
-### Index Usage
+#### Index Usage
+
 ```typescript
 // Good: Ensure indexes exist for query fields
 const users = await User.find({ email: 'john@example.com' })
@@ -867,9 +936,10 @@ const products = await Product.find({
 // Category and price have compound index
 ```
 
-## 10. Data Validation
+### Data Validation
 
-### Schema Validation
+#### Schema Validation
+
 ```typescript
 // models/User.ts
 import mongoose, { Schema } from 'mongoose'
@@ -904,7 +974,8 @@ const userSchema = new Schema({
 })
 ```
 
-### Custom Validators
+#### Custom Validators
+
 ```typescript
 // validators/password.validator.ts
 import { Schema } from 'mongoose'
@@ -938,7 +1009,8 @@ const userSchema = new Schema({
 })
 ```
 
-### Async Validation
+#### Async Validation
+
 ```typescript
 // validators/unique.validator.ts
 import { Schema } from 'mongoose'
@@ -962,274 +1034,46 @@ const userSchema = new Schema({
 })
 ```
 
-## 11. Testing
+## Best Practices
 
-### Model Tests
-```typescript
-// tests/models/user.model.test.ts
-import { User } from '../../models/User'
-import { connectDatabase, disconnectDatabase } from '../../config/database'
+1. **Schema Design**
+   - Use embedding for 1-to-few relationships
+   - Use references for 1-to-many or many-to-many
+   - Implement schema versioning
+   - Denormalize for read-heavy workloads
 
-describe('User Model', () => {
-  beforeAll(async () => {
-    await connectDatabase()
-  })
+2. **Query Optimization**
+   - Use lean() for read-only operations
+   - Select only needed fields
+   - Use appropriate indexes
+   - Avoid large result sets
 
-  afterAll(async () => {
-    await disconnectDatabase()
-  })
+3. **Indexing Strategy**
+   - Create indexes on frequently queried fields
+   - Use compound indexes for multi-field queries
+   - Monitor and remove unused indexes
+   - Consider TTL indexes for time-based data
 
-  beforeEach(async () => {
-    await User.deleteMany({})
-  })
+4. **Performance**
+   - Use connection pooling
+   - Implement pagination for large datasets
+   - Use bulk operations when appropriate
+   - Monitor query performance
 
-  describe('create', () => {
-    it('should create a new user', async () => {
-      const userData = {
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: 'hashed_password'
-      }
+5. **Data Integrity**
+   - Implement schema validation
+   - Use transactions for multi-document operations
+   - Handle write conflicts gracefully
+   - Implement proper error handling
 
-      const user = await User.create(userData)
+6. **Change Streams**
+   - Use change streams for real-time updates
+   - Implement proper error handling
+   - Consider aggregation for statistics
+   - Handle reconnection scenarios
 
-      expect(user.name).toBe(userData.name)
-      expect(user.email).toBe(userData.email)
-      expect(user._id).toBeDefined()
-    })
+## Related Skills
 
-    it('should throw error for duplicate email', async () => {
-      const userData = {
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: 'hashed_password'
-      }
-
-      await User.create(userData)
-
-      await expect(User.create(userData)).rejects.toThrow()
-    })
-  })
-
-  describe('find', () => {
-    it('should find user by email', async () => {
-      const userData = {
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: 'hashed_password'
-      }
-
-      await User.create(userData)
-
-      const user = await User.findOne({ email: 'john@example.com' })
-
-      expect(user).toBeDefined()
-      expect(user.email).toBe(userData.email)
-    })
-
-    it('should return null for non-existent user', async () => {
-      const user = await User.findOne({ email: 'nonexistent@example.com' })
-
-      expect(user).toBeNull()
-    })
-  })
-})
-```
-
-### Repository Tests
-```typescript
-// tests/repositories/user.repository.test.ts
-import { UserRepository } from '../../repositories/user.repository'
-import { connectDatabase, disconnectDatabase } from '../../config/database'
-
-describe('UserRepository', () => {
-  let repository: UserRepository
-
-  beforeAll(async () => {
-    await connectDatabase()
-    repository = new UserRepository()
-  })
-
-  afterAll(async () => {
-    await disconnectDatabase()
-  })
-
-  beforeEach(async () => {
-    await repository.deleteAll()
-  })
-
-  describe('create', () => {
-    it('should create a new user', async () => {
-      const userData = {
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: 'hashed_password'
-      }
-
-      const user = await repository.create(userData)
-
-      expect(user).toBeDefined()
-      expect(user.email).toBe(userData.email)
-    })
-
-    it('should throw error for duplicate email', async () => {
-      const userData = {
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: 'hashed_password'
-      }
-
-      await repository.create(userData)
-
-      await expect(repository.create(userData)).rejects.toThrow()
-    })
-  })
-
-  describe('findById', () => {
-    it('should find user by id', async () => {
-      const userData = {
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: 'hashed_password'
-      }
-
-      const user = await repository.create(userData)
-      const found = await repository.findById(user._id)
-
-      expect(found).toEqual(user)
-    })
-
-    it('should return null for non-existent id', async () => {
-      const found = await repository.findById('nonexistent-id')
-
-      expect(found).toBeNull()
-    })
-  })
-})
-```
-
-### Integration Tests
-```typescript
-// tests/integration/user.flow.test.ts
-import request from 'supertest'
-import { app } from '../../app'
-import { connectDatabase, disconnectDatabase } from '../../config/database'
-
-describe('User Flow Integration', () => {
-  let server: any
-
-  beforeAll(async () => {
-    await connectDatabase()
-    server = app.listen(0)
-  })
-
-  afterAll(async () => {
-    await disconnectDatabase()
-    await server.close()
-  })
-
-  describe('Registration and Login', () => {
-    it('should register and login successfully', async () => {
-      // Register
-      const registerResponse = await request(server)
-        .post('/api/users')
-        .send({
-          name: 'John Doe',
-          email: 'john@example.com',
-          password: 'password123'
-        })
-
-      expect(registerResponse.status).toBe(201)
-      const { token } = registerResponse.body.data
-
-      // Login
-      const loginResponse = await request(server)
-        .post('/api/auth/login')
-        .send({
-          email: 'john@example.com',
-          password: 'password123'
-        })
-
-      expect(loginResponse.status).toBe(200)
-      expect(loginResponse.body.data.token).toBeDefined()
-    })
-  })
-})
-```
-
-## 12. Migration Patterns
-
-### Schema Versioning
-```typescript
-// models/User.ts
-import mongoose, { Schema } from 'mongoose'
-
-interface IUser {
-  name: string
-  email: string
-  version: number
-}
-
-const userSchema = new Schema<IUser>({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
-  version: { type: Number, default: 1 }
-})
-```
-
-### Migration Script
-```typescript
-// migrations/002_add_status_field.ts
-import mongoose from 'mongoose'
-
-export async function up() {
-  await User.updateMany(
-    {},
-    { $set: { status: 'active' } }
-  )
-}
-
-export async function down() {
-  await User.updateMany(
-    {},
-    { $unset: { status: 1 } }
-  )
-}
-```
-
-### Data Migration
-```typescript
-// migrations/003_migrate_user_data.ts
-export async function up() {
-  const users = await User.find({})
-
-  for (const user of users) {
-    await User.findByIdAndUpdate(user._id, {
-      $set: {
-        'newField': 'default value'
-      }
-    })
-  }
-}
-
-export async function down() {
-  await User.updateMany(
-    {},
-    { $unset: { newField: 1 } }
-  )
-}
-```
-
-### Index Migration
-```typescript
-// migrations/004_add_indexes.ts
-export async function up() {
-  await User.collection.createIndex({ email: 1 })
-  await User.collection.createIndex({ createdAt: -1 })
-}
-
-export async function down() {
-  await User.collection.dropIndex('email_1')
-  await User.collection.dropIndex('createdAt_-1')
-}
-```
+- [`04-database/database-optimization`](04-database/database-optimization/SKILL.md)
+- [`04-database/redis-caching`](04-database/redis-caching/SKILL.md)
+- [`04-database/vector-database`](04-database/vector-database/SKILL.md)

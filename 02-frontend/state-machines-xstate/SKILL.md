@@ -1,30 +1,113 @@
----
-name: State Machines with XState
-description: Implementing robust state management using finite state machines and statecharts with XState.
----
-
 # State Machines with XState
 
-## Overview
+---
 
-XState is a state management library that allows you to model your application logic as finite state machines and statecharts. It provides predictable state management, visualization tools, and excellent TypeScript support.
+## 1. Executive Summary & Strategic Necessity
 
-## Finite State Machines (FSM) Fundamentals
+### 1.1 Context (ภาษาไทย)
 
-### What is a State Machine?
+XState คือ state management library ที่ใช้ finite state machines และ statecharts สำหรับ modeling application logic ซึ่งช่วยให้ developers สร้าง applications ที่มี predictable state management, visualization tools, และ TypeScript support ที่ยอดเยี่ยม
 
-A state machine is a mathematical model of computation. It consists of:
+XState ใช้ mathematical model ของ finite state machines ซึ่งช่วยให้ developers:
+- **Model complex logic** เป็ state transitions ที่ชัดเจน
+- **Visualize state flow** ด้วย state diagrams และ visualization tools
+- **Type-safe** - Full TypeScript support สำหรับ type safety
+- **Predictable** - Deterministic state transitions ที่ testable ง่าย
+- **Side effect management** - Built-in support สำหรับ async operations
 
-1. **States**: Distinct modes the system can be in
-2. **Events**: Inputs that trigger transitions
-3. **Transitions**: Changes from one state to another
-4. **Initial State**: The starting state
-5. **Final States**: States that terminate the machine
+### 1.2 Business Impact (ภาษาไทย)
 
-### Simple Example
+**ผลกระทบทางธุรกิจ:**
+
+1. **ลด Bugs** - State machines ช่วยลด bugs ที่เกิดจาก complex state logic ได้ถึง 30-40%
+2. **เพิ่ม Maintainability** - Visualized state flow ช่วยเพิ่ม maintainability
+3. **ลด Debugging Time** - Predictable state ช่วยลดเวลาในการ debug
+4. **เพิ่ม Testability** - Deterministic transitions ช่วยเพิ่ม testability
+5. **ปรับปรุง Developer Experience** - Visualization tools และ TypeScript ช่วยเพิ่ม DX
+
+### 1.3 Product Thinking (ภาษาไทย)
+
+**มุมมองด้านผลิตภัณฑ์:**
+
+1. **State-First** - XState ต้องเป็น state management solution หลัก
+2. **Predictable** - State transitions ต้อง deterministic และ predictable
+3. **Visualizable** - State flow ต้องสามารถ visualize ได้
+4. **Testable** - State machines ต้อง testable ง่าย
+5. **Type-Safe** - Full TypeScript support สำหรับ type safety
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+### 2.1 Core Logic
+
+XState ประกอบด้วย:
+
+1. **Finite State Machines (FSM)** - Mathematical model ของ computation
+2. **Statecharts** - Hierarchical state machines สำหรับ complex logic
+3. **States** - Distinct modes ที่ system สามารถอยู่ได้
+4. **Events** - Inputs ที่ trigger transitions
+5. **Transitions** - Changes จาก one state ไปยังอีก state
+6. **Actions** - Side effects ที่เกิดระหว่าง state transitions
+7. **Guards** - Conditions ที่ต้องเป็น true สำหรับ transitions
+
+### 2.2 Architecture Diagram Requirements
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              XState Architecture                        │
+├─────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              State Machine Layer                   │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  States      │  │  Events     │  │  Transitions│  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Context & Actions Layer                │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Context    │  │  Actions     │  │  Guards     │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Integration Layer                       │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  React       │  │  Vue        │  │  Svelte     │  │   │
+│  │  │  Hooks       │  │  Composable  │  │  Hooks      │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Tools Layer                            │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Stately     │  │  DevTools    │  │  Testing    │  │   │
+│  │  │  Editor      │  │  Inspector   │  │  Library    │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 2.3 Implementation Workflow
+
+**Step 1: Install XState**
+
+```bash
+# Install XState
+npm install xstate
+
+# Install React integration
+npm install @xstate/react
+```
+
+**Step 2: Create Simple State Machine**
 
 ```typescript
-// A simple toggle state machine
+import { createMachine } from 'xstate'
+
 const toggleMachine = createMachine({
   id: 'toggle',
   initial: 'inactive',
@@ -40,30 +123,207 @@ const toggleMachine = createMachine({
       },
     },
   },
-});
+})
 ```
 
-### State Diagram
+---
 
+## 3. Tooling & Tech Stack
+
+### 3.1 Enterprise Tools
+
+| Tool | Purpose | Version | License |
+|------|---------|---------|---------|
+| XState | State Management | ^5.0.0 | MIT |
+| @xstate/react | React Integration | ^5.0.0 | MIT |
+| @xstate/vue | Vue Integration | ^5.0.0 | MIT |
+| @xstate/svelte | Svelte Integration | ^5.0.0 | MIT |
+| Stately Editor | Visualization Tool | Latest | MIT |
+
+### 3.2 Configuration Essentials
+
+**TypeScript Configuration:**
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2020"
+  }
+}
 ```
-┌─────────────┐
-│  inactive  │◄───┐
+
+---
+
+## 4. Standards, Compliance & Security
+
+### 4.1 International Standards
+
+- **SCXML** - State Chart XML Notation
+- **W3C State Machines** - State Machine Standards
+- **ISO 9241-11** - Usability Standards
+- **GDPR** - Data Protection สำหรับ User Data
+
+### 4.2 Security Protocol
+
+XState ต้องปฏิบัติตามหลักความปลอดภัย:
+
+1. **Input Validation** - Validate ข้อมูลทั้ง client และ server
+2. **Secure Storage** - ไม่เก็บ sensitive data ใน state context
+3. **CSRF Protection** - ใช้ CSRF tokens สำหรับ forms
+4. **Rate Limiting** - จำกัดจำนวน service calls
+
+### 4.3 Explainability
+
+XState ต้องสามารถอธิบายได้ว่า:
+
+1. **State Transitions** - ทำไม state เปลี่ยนอย่างไร
+2. **Event Handling** - ทำไม events trigger transitions อย่างไร
+3. **Side Effects** - ทำไม actions ทำงานอย่างไร
+4. **Guard Conditions** - ทำไม guards evaluate อย่างไร
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+### 5.1 Cost Calculation
+
+| Metric | Calculation | Target |
+|--------|-------------|--------|
+| State Transition Time | Time per transition | < 10ms |
+| Render Performance | Component render time | < 16ms |
+| Bundle Size | JavaScript bundle size | < 50 KB |
+| Test Coverage | Test coverage percentage | > 80% |
+| State Complexity | Cyclomatic complexity score | < 15 |
+
+### 5.2 Key Performance Indicators
+
+**Technical Metrics:**
+
+1. **State Transition Time** - เวลาในการ state transitions
+2. **Render Performance** - Component render time
+3. **Bundle Size** - JavaScript bundle ที่ใช้งาน
+4. **Test Coverage** - Test coverage ของ state machines
+
+**Business Metrics:**
+
+1. **Bug Reduction** - Bug reduction rate
+2. **Development Velocity** - เวลาในการพัฒนา features
+3. **Maintainability** - Maintainability score
+4. **Code Quality** - Code quality score
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+### 6.1 Phase Rollout
+
+**Phase 1: Foundation (Week 1-2)**
+- Install XState
+- Setup TypeScript configuration
+- Create simple state machines
+- Implement basic patterns
+
+**Phase 2: Advanced Features (Week 3-4)**
+- Implement hierarchical states
+- Add context and actions
+- Implement guards
+- Create services and actors
+
+**Phase 3: Integration (Week 5-6)**
+- Integrate with React
+- Add Vue/Svelte support
+- Implement visualization
+- Setup testing
+
+**Phase 4: Production (Week 7-8)**
+- Performance optimization
+- Documentation and training
+- Monitoring and analytics
+- Best practices documentation
+
+### 6.2 Pitfalls to Avoid
+
+1. **Over-Engineering** - ไม่ใช้ state machines สำหรับ simple logic
+2. **Poor State Design** - ไม่ design states ที่ซับซ้อนเกินไป
+3. **Missing Guards** - ไม่ใช้ guards สำหรับ conditional transitions
+4. **Side Effect Issues** - ไม่ manage side effects อย่างเหมาะสม
+5. **Poor Testing** - ไม่ test state machines อย่างเหมาะสม
+6. **Complex Machines** - ไม่สร้าง machines ที่ซับซ้อนเกินไป
+
+### 6.3 Best Practices Checklist
+
+- [ ] ใช้ finite state machines สำหรับ complex state logic
+- [ ] Implement proper TypeScript types
+- [ ] Visualize state flow ด้วย diagrams
+- [ ] Test state transitions
+- [ ] Use guards สำหรับ conditional transitions
+- [ ] Implement side effects ใน actions
+- [ ] Keep machines focused และ single-purpose
+- [ ] Use context สำหรับ data ที่ persists
+- [ ] Implement services สำหรับ async operations
+- [ ] Test machines independently
+- [ ] Document state flow
+- [ ] Use visualization tools
+- [ ] Optimize performance
+- [ ] Test บนทุก browsers และ devices
+
+---
+
+## 7. Implementation Examples
+
+### 7.1 Finite State Machines (FSM)
+
+**Simple Toggle Machine:**
+```typescript
+import { createMachine } from 'xstate'
+
+const toggleMachine = createMachine({
+  id: 'toggle',
+  initial: 'inactive',
+  states: {
+    inactive: {
+      on: {
+        TOGGLE: 'active',
+      },
+    },
+    active: {
+      on: {
+        TOGGLE: 'inactive',
+      },
+    },
+  },
+})
+```
+
+**State Diagram:**
+```
+┌──────┐
+│ inactive │◄───┐
 └──────┬──────┘    │
        │            │ TOGGLE
-       │ TOGGLE     │
-       ▼            │
-┌─────────────┐    │
-│   active    │────┘
+       │ TOGGLE     │        ▼
+┌───────┐    │
+│   active │────┘
 └─────────────┘
 ```
 
-## Statecharts and Hierarchical States
+### 7.2 Statecharts and Hierarchical States
 
-### Hierarchical States
-
-States can be nested, allowing for more complex state modeling.
-
+**Hierarchical Authentication Machine:**
 ```typescript
+import { createMachine } from 'xstate'
+
 const authMachine = createMachine({
   id: 'auth',
   initial: 'loggedOut',
@@ -99,53 +359,12 @@ const authMachine = createMachine({
       },
     },
   },
-});
+})
 ```
 
-### Statechart Diagram
+### 7.3 XState Core Concepts
 
-```
-┌─────────────────────────────┐
-│       loggedOut            │
-└──────┬──────────────────────┘
-       │ LOGIN
-       ▼
-┌─────────────────────────────┐
-│       loggedIn             │
-│  ┌──────────────────────┐ │
-│  │  idle   ◄─────────┤ │
-│  └───┬──────────────┘ │
-│      │ FETCH_USER        │
-│      ▼                  │
-│  ┌──────────────────────┐ │
-│  │ fetching            │ │
-│  └───┬──────────────┘ │
-│      │ SUCCESS          │
-│      ▼                  │
-│  ┌──────────────────────┐ │
-│  │ idle               │ │
-│  └───┬──────────────┘ │
-│      │ FAILURE          │
-│      ▼                  │
-│  ┌──────────────────────┐ │
-│  │ error              │ │
-│  └───┬──────────────┘ │
-│      │ RETRY           │
-│      ▼                  │
-│  ┌──────────────────────┐ │
-│  │ fetching            │ │
-│  └──────────────────────┘ │
-│      │ LOGOUT           │
-│      └───────────────────┘ │
-└─────────────────────────────┘
-```
-
-## XState Core Concepts
-
-### States
-
-States represent the different conditions or modes your application can be in.
-
+**States:**
 ```typescript
 const trafficLightMachine = createMachine({
   id: 'trafficLight',
@@ -167,13 +386,10 @@ const trafficLightMachine = createMachine({
       },
     },
   },
-});
+})
 ```
 
-### Events
-
-Events trigger transitions between states.
-
+**Events:**
 ```typescript
 const machine = createMachine({
   id: 'app',
@@ -204,13 +420,10 @@ const machine = createMachine({
       },
     },
   },
-});
+})
 ```
 
-### Transitions
-
-Transitions define how the machine moves from one state to another.
-
+**Transitions:**
 ```typescript
 const machine = createMachine({
   id: 'vending',
@@ -241,13 +454,12 @@ const machine = createMachine({
       console.log('Dispensing item...');
     },
   },
-});
+})
 ```
 
-### Actions (Entry, Exit, Transition)
+### 7.4 Actions (Entry, Exit, Transition)
 
-Actions are side effects that occur during state transitions.
-
+**Timer with Entry/Exit Actions:**
 ```typescript
 const machine = createMachine({
   id: 'timer',
@@ -274,13 +486,12 @@ const machine = createMachine({
     startTimer: () => console.log('Timer started'),
     stopTimer: () => console.log('Timer stopped'),
   },
-});
+})
 ```
 
-### Guards (Conditional Transitions)
+### 7.5 Guards (Conditional Transitions)
 
-Guards are conditions that must be true for a transition to occur.
-
+**Door Machine with Guards:**
 ```typescript
 const machine = createMachine({
   id: 'door',
@@ -312,13 +523,12 @@ const machine = createMachine({
       return context.isUnlocked;
     },
   },
-});
+})
 ```
 
-### Context (Extended State)
+### 7.6 Context (Extended State)
 
-Context holds data that persists across state changes.
-
+**Counter with Context:**
 ```typescript
 interface CounterContext {
   count: number;
@@ -371,13 +581,12 @@ const counterMachine = createMachine<CounterContext>({
   guards: {
     notAtMax: (context) => context.count < context.maxCount,
   },
-});
+})
 ```
 
-## Parallel States
+### 7.7 Parallel States
 
-Parallel states allow multiple regions to be active simultaneously.
-
+**Parallel State Machine:**
 ```typescript
 const parallelMachine = createMachine({
   id: 'app',
@@ -422,13 +631,12 @@ const parallelMachine = createMachine({
       },
     },
   },
-});
+})
 ```
 
-## History States
+### 7.8 History States
 
-History states allow returning to a previous state.
-
+**Wizard with History:**
 ```typescript
 const machine = createMachine({
   id: 'wizard',
@@ -463,45 +671,12 @@ const machine = createMachine({
       },
     },
   },
-});
-
-// Using history to go back
-const service = interpret(machine).start();
-service.send({ type: 'BACK' });  // Goes to previous step
+})
 ```
 
-## Delayed Transitions
+### 7.9 Invoking Services and Actors
 
-Transitions can be delayed using `after`.
-
-```typescript
-const notificationMachine = createMachine({
-  id: 'notification',
-  initial: 'hidden',
-  states: {
-    hidden: {
-      on: {
-        SHOW: 'visible',
-      },
-    },
-    visible: {
-      after: {
-        5000: 'hidden',  // Auto-hide after 5 seconds
-      },
-      on: {
-        DISMISS: 'hidden',
-      },
-    },
-  },
-});
-```
-
-## Invoking Services and Actors
-
-### Invoking Services
-
-Services are asynchronous operations that can be invoked from states.
-
+**Service Invocation:**
 ```typescript
 const fetchMachine = createMachine({
   id: 'fetch',
@@ -548,17 +723,14 @@ const fetchMachine = createMachine({
   },
   services: {
     fetchData: async () => {
-      const response = await fetch('/api/data');
-      return await response.json();
+      const response = await fetch('/api/data')
+      return await response.json()
     },
   },
-});
+})
 ```
 
-### Actor Model in XState
-
-Actors are independent state machines that can communicate with each other.
-
+**Actor Model:**
 ```typescript
 const childMachine = createMachine({
   id: 'child',
@@ -575,7 +747,7 @@ const childMachine = createMachine({
       },
     },
   },
-});
+})
 
 const parentMachine = createMachine({
   id: 'parent',
@@ -595,26 +767,19 @@ const parentMachine = createMachine({
     },
     completed: {},
   },
-});
+})
 ```
 
-## XState with React (@xstate/react)
+### 7.10 XState with React (@xstate/react)
 
-### Installation
-
-```bash
-npm install xstate @xstate/react
-```
-
-### useMachine Hook
-
+**useMachine Hook:**
 ```typescript
-import { useMachine } from '@xstate/react';
-import { toggleMachine } from './machines/toggleMachine';
+import { useMachine } from '@xstate/react'
+import { toggleMachine } from './machines/toggleMachine'
 
 function ToggleButton() {
-  const [state, send] = useMachine(toggleMachine);
-  
+  const [state, send] = useMachine(toggleMachine)
+
   return (
     <button
       onClick={() => send({ type: 'TOGGLE' })}
@@ -622,20 +787,19 @@ function ToggleButton() {
     >
       {state.matches('active') ? 'ON' : 'OFF'}
     </button>
-  );
+  )
 }
 ```
 
-### useActor Hook
-
+**useActor Hook:**
 ```typescript
-import { useActor } from '@xstate/react';
+import { useActor } from '@xstate/react'
 
 function ParentComponent() {
-  const [state, send] = useMachine(parentMachine);
-  const childActorRef = useActor(state.context.childRef);
-  const [childState] = useActor(childActorRef);
-  
+  const [state, send] = useMachine(parentMachine)
+  const childActorRef = useActor(state.context.childRef)
+  const [childState] = useActor(childActorRef)
+
   return (
     <div>
       <p>Child state: {childState.value}</p>
@@ -643,1017 +807,48 @@ function ParentComponent() {
         Start Child
       </button>
     </div>
-  );
+  )
 }
 ```
 
-### useService Hook
+### 7.11 Best Practices
+
+**Machine Design:**
+- Keep machines focused and single-purpose
+- Use hierarchical states for complex logic
+- Define clear event names
+- Use TypeScript for type safety
+- Document state flow
+
+**State Management:**
+- Use context for data that persists across states
+- Use guards for conditional transitions
+- Use actions for side effects
+- Keep actions pure when possible
+
+**Testing:**
+- Test machines independently
+- Test state transitions
+- Test guards and actions
+- Test services/mocked services
+
+**Visualization:**
+- Use Stately Editor for visualization
+- Document state flow
+- Share diagrams with team
+- Export for documentation
+
+**Performance:**
+- Avoid unnecessary re-renders
+- Optimize service calls
+- Use memo for expensive computations
+- Test performance metrics
+
+---
+
+## 8. Related Skills
 
-```typescript
-import { useService } from '@xstate/react';
-
-function DataComponent() {
-  const [state, send] = useMachine(fetchMachine);
-  const service = useService(state.context.serviceRef);
-  
-  return (
-    <div>
-      {state.matches('loading') && <p>Loading...</p>}
-      {state.matches('success') && (
-        <div>
-          <pre>{JSON.stringify(state.context.data, null, 2)}</pre>
-          <button onClick={() => send({ type: 'RESET' })}>
-            Reset
-          </button>
-        </div>
-      )}
-      {state.matches('failure') && (
-        <div>
-          <p>Error: {state.context.error?.message}</p>
-          <button onClick={() => send({ type: 'RETRY' })}>
-            Retry
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-```
-
-### useSelector Hook
-
-```typescript
-import { useSelector } from '@xstate/react';
-
-function Counter() {
-  const [state, send] = useMachine(counterMachine);
-  const count = useSelector(state, state => state.context.count);
-  const canIncrement = useSelector(state, state => state.matches('idle'));
-  
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button
-        onClick={() => send({ type: 'INCREMENT' })}
-        disabled={!canIncrement}
-      >
-        Increment
-      </button>
-      <button onClick={() => send({ type: 'RESET' })}>
-        Reset
-      </button>
-    </div>
-  );
-}
-```
-
-## XState with Vue, Svelte
-
-### Vue Integration
-
-```typescript
-import { useMachine } from '@xstate/vue';
-import { toggleMachine } from './machines/toggleMachine';
-
-export default {
-  setup() {
-    const { state, send } = useMachine(toggleMachine);
-    
-    return {
-      state,
-      send,
-    };
-  },
-  template: `
-    <button
-      @click="send({ type: 'TOGGLE' })"
-      :class="{ active: state.matches('active') }"
-    >
-      {{ state.matches('active') ? 'ON' : 'OFF' }}
-    </button>
-  `,
-};
-```
-
-### Svelte Integration
-
-```typescript
-import { useMachine } from '@xstate/svelte';
-import { toggleMachine } from './machines/toggleMachine';
-
-function ToggleButton() {
-  const { state, send } = useMachine(toggleMachine);
-  
-  return (
-    <button
-      on:click={() => send({ type: 'TOGGLE' })}
-      class={state.matches('active') ? 'active' : 'inactive'}
-    >
-      {state.matches('active') ? 'ON' : 'OFF'}
-    </button>
-  );
-}
-```
-
-## Visualizing Machines (Stately Editor)
-
-### Exporting for Stately
-
-```typescript
-import { createMachine } from 'xstate';
-
-const machine = createMachine({
-  id: 'trafficLight',
-  initial: 'red',
-  states: {
-    red: {
-      on: { TIMER: 'yellow' },
-    },
-    yellow: {
-      on: { TIMER: 'green' },
-    },
-    green: {
-      on: { TIMER: 'red' },
-    },
-  },
-});
-
-// Export for Stately Editor
-export const machineDefinition = JSON.stringify(machine.definition, null, 2);
-```
-
-### Using Stately Editor
-
-1. Go to [https://stately.ai/editor](https://stately.ai/editor)
-2. Import your machine definition
-3. Visualize and edit the statechart
-4. Export back to TypeScript
-
-## Testing State Machines
-
-### Unit Testing
-
-```typescript
-import { createMachine } from 'xstate';
-import { counterMachine } from './counterMachine';
-
-describe('Counter Machine', () => {
-  it('should start at idle state', () => {
-    const service = interpret(counterMachine).start();
-    expect(service.getSnapshot().value).toBe('idle');
-  });
-  
-  it('should increment count on INCREMENT event', () => {
-    const service = interpret(counterMachine).start();
-    service.send({ type: 'INCREMENT' });
-    expect(service.getSnapshot().context.count).toBe(1);
-  });
-  
-  it('should not increment beyond max', () => {
-    const service = interpret(counterMachine).start();
-    
-    // Increment to max
-    for (let i = 0; i < 10; i++) {
-      service.send({ type: 'INCREMENT' });
-    }
-    
-    expect(service.getSnapshot().value).toBe('maxed');
-    expect(service.getSnapshot().context.count).toBe(10);
-  });
-});
-```
-
-### Testing with React Testing Library
-
-```typescript
-import { render, screen, fireEvent } from '@testing-library/react';
-import { Counter } from './Counter';
-
-describe('Counter Component', () => {
-  it('should render count', () => {
-    render(<Counter />);
-    expect(screen.getByText('Count: 0')).toBeInTheDocument();
-  });
-  
-  it('should increment on button click', () => {
-    render(<Counter />);
-    const button = screen.getByText('Increment');
-    fireEvent.click(button);
-    expect(screen.getByText('Count: 1')).toBeInTheDocument();
-  });
-});
-```
-
-## TypeScript Integration
-
-### Type-Safe Machines
-
-```typescript
-import { createMachine, assign } from 'xstate';
-
-interface AppContext {
-  user: User | null;
-  error: Error | null;
-  isLoading: boolean;
-}
-
-type AppEvent = 
-  | { type: 'LOGIN'; username: string; password: string }
-  | { type: 'LOGOUT' }
-  | { type: 'FETCH_USER' }
-  | { type: 'FETCH_SUCCESS'; user: User }
-  | { type: 'FETCH_ERROR'; error: Error };
-
-const appMachine = createMachine<AppContext, AppEvent>({
-  id: 'app',
-  initial: 'idle',
-  context: {
-    user: null,
-    error: null,
-    isLoading: false,
-  },
-  states: {
-    idle: {
-      on: {
-        LOGIN: 'authenticating',
-        FETCH_USER: 'fetching',
-      },
-    },
-    authenticating: {
-      entry: assign({
-        isLoading: true,
-        error: null,
-      }),
-      invoke: {
-        src: 'authenticate',
-        onDone: {
-          target: 'authenticated',
-          actions: assign({
-            user: (context, event) => event.data,
-            isLoading: false,
-          }),
-        },
-        onError: {
-          target: 'idle',
-          actions: assign({
-            error: (context, event) => event.data,
-            isLoading: false,
-          }),
-        },
-      },
-    },
-    authenticated: {
-      on: {
-        LOGOUT: 'idle',
-      },
-    },
-    fetching: {
-      entry: assign({
-        isLoading: true,
-        error: null,
-      }),
-      invoke: {
-        src: 'fetchUser',
-        onDone: {
-          target: 'idle',
-          actions: assign({
-            user: (context, event) => event.data,
-            isLoading: false,
-          }),
-        },
-        onError: {
-          target: 'idle',
-          actions: assign({
-            error: (context, event) => event.data,
-            isLoading: false,
-          }),
-        },
-      },
-    },
-  },
-  services: {
-    authenticate: async (context, event) => {
-      if (event.type !== 'LOGIN') return null;
-      const response = await fetch('/api/auth', {
-        method: 'POST',
-        body: JSON.stringify({
-          username: event.username,
-          password: event.password,
-        }),
-      });
-      return await response.json();
-    },
-    fetchUser: async () => {
-      const response = await fetch('/api/user');
-      return await response.json();
-    },
-  },
-});
-```
-
-## Common Patterns
-
-### Form Validation Machine
-
-```typescript
-interface FormContext {
-  values: Record<string, any>;
-  errors: Record<string, string>;
-  touched: Record<string, boolean>;
-  isValid: boolean;
-}
-
-const formMachine = createMachine<FormContext>({
-  id: 'form',
-  initial: 'idle',
-  context: {
-    values: {},
-    errors: {},
-    touched: {},
-    isValid: false,
-  },
-  states: {
-    idle: {
-      on: {
-        FOCUS: 'editing',
-      },
-    },
-    editing: {
-      on: {
-        CHANGE: {
-          actions: ['updateValue', 'validateField'],
-        },
-        BLUR: {
-          actions: ['markTouched', 'validateField'],
-        },
-        SUBMIT: {
-          target: 'submitting',
-          actions: 'validateAll',
-        },
-      },
-    },
-    submitting: {
-      invoke: {
-        src: 'submitForm',
-        onDone: {
-          target: 'success',
-        },
-        onError: {
-          target: 'editing',
-          actions: 'showErrors',
-        },
-      },
-    },
-    success: {
-      on: {
-        RESET: 'idle',
-        actions: 'resetForm',
-      },
-    },
-  },
-  actions: {
-    updateValue: assign({
-      values: (context, event) => ({
-        ...context.values,
-        [event.field]: event.value,
-      }),
-    }),
-    markTouched: assign({
-      touched: (context, event) => ({
-        ...context.touched,
-        [event.field]: true,
-      }),
-    }),
-    validateField: assign({
-      errors: (context, event) => {
-        const error = validateField(event.field, event.value);
-        return {
-          ...context.errors,
-          [event.field]: error,
-        };
-      },
-      isValid: (context) => {
-        return Object.values(context.errors).every(e => !e);
-      },
-    }),
-    validateAll: assign({
-      errors: (context) => {
-        const errors = {};
-        for (const field in context.values) {
-          errors[field] = validateField(field, context.values[field]);
-        }
-        return errors;
-      },
-      isValid: (context) => {
-        return Object.values(context.errors).every(e => !e);
-      },
-    }),
-    showErrors: assign({
-      errors: (context, event) => event.data,
-    }),
-    resetForm: assign({
-      values: {},
-      errors: {},
-      touched: {},
-      isValid: false,
-    }),
-  },
-});
-```
-
-### Async Data Fetching Machine
-
-```typescript
-interface DataContext {
-  data: any[] | null;
-  error: Error | null;
-  page: number;
-  hasMore: boolean;
-}
-
-const dataMachine = createMachine<DataContext>({
-  id: 'data',
-  initial: 'idle',
-  context: {
-    data: null,
-    error: null,
-    page: 1,
-    hasMore: true,
-  },
-  states: {
-    idle: {
-      on: {
-        LOAD: 'loading',
-      },
-    },
-    loading: {
-      invoke: {
-        src: 'fetchData',
-        onDone: {
-          target: 'loaded',
-          actions: assign({
-            data: (context, event) => {
-              const existing = context.data || [];
-              return [...existing, ...event.data];
-            },
-            hasMore: (context, event) => event.hasMore,
-          }),
-        },
-        onError: {
-          target: 'error',
-          actions: assign({
-            error: (context, event) => event.data,
-          }),
-        },
-      },
-    },
-    loaded: {
-      on: {
-        LOAD_MORE: 'loadingMore',
-        REFRESH: 'loading',
-      },
-    },
-    loadingMore: {
-      entry: assign({
-        page: (context) => context.page + 1,
-      }),
-      invoke: {
-        src: 'fetchMoreData',
-        onDone: {
-          target: 'loaded',
-          actions: assign({
-            data: (context, event) => {
-              const existing = context.data || [];
-              return [...existing, ...event.data];
-            },
-            hasMore: (context, event) => event.hasMore,
-          }),
-        },
-        onError: {
-          target: 'loaded',
-          actions: assign({
-            error: (context, event) => event.data,
-          }),
-        },
-      },
-    },
-    error: {
-      on: {
-        RETRY: 'loading',
-        RESET: 'idle',
-      },
-    },
-  },
-  services: {
-    fetchData: async (context) => {
-      const response = await fetch(`/api/data?page=${context.page}`);
-      const result = await response.json();
-      return {
-        data: result.items,
-        hasMore: result.hasMore,
-      };
-    },
-    fetchMoreData: async (context) => {
-      const response = await fetch(`/api/data?page=${context.page}`);
-      const result = await response.json();
-      return {
-        data: result.items,
-        hasMore: result.hasMore,
-      };
-    },
-  },
-});
-```
-
-### Multi-Step Wizard Machine
-
-```typescript
-interface WizardContext {
-  step: number;
-  data: Record<string, any>;
-  errors: Record<string, string>;
-}
-
-const wizardMachine = createMachine<WizardContext>({
-  id: 'wizard',
-  initial: 'step1',
-  context: {
-    step: 1,
-    data: {},
-    errors: {},
-  },
-  states: {
-    step1: {
-      on: {
-        NEXT: {
-          target: 'step2',
-          actions: ['validateStep1', 'saveStep1'],
-          guard: 'step1Valid',
-        },
-      },
-    },
-    step2: {
-      on: {
-        NEXT: {
-          target: 'step3',
-          actions: ['validateStep2', 'saveStep2'],
-          guard: 'step2Valid',
-        },
-        PREV: 'step1',
-      },
-    },
-    step3: {
-      on: {
-        NEXT: {
-          target: 'step4',
-          actions: ['validateStep3', 'saveStep3'],
-          guard: 'step3Valid',
-        },
-        PREV: 'step2',
-      },
-    },
-    step4: {
-      on: {
-        FINISH: {
-          target: 'complete',
-          actions: ['validateStep4', 'submitWizard'],
-          guard: 'step4Valid',
-        },
-        PREV: 'step3',
-      },
-    },
-    complete: {
-      on: {
-        RESET: 'step1',
-        actions: 'resetWizard',
-      },
-    },
-  },
-  actions: {
-    validateStep1: assign({
-      errors: (context) => ({
-        ...context.errors,
-        ...validateStep1(context.data),
-      }),
-    }),
-    saveStep1: assign({
-      data: (context, event) => ({
-        ...context.data,
-        ...event.data,
-      }),
-    }),
-    validateStep2: assign({
-      errors: (context) => ({
-        ...context.errors,
-        ...validateStep2(context.data),
-      }),
-    }),
-    saveStep2: assign({
-      data: (context, event) => ({
-        ...context.data,
-        ...event.data,
-      }),
-    }),
-    validateStep3: assign({
-      errors: (context) => ({
-        ...context.errors,
-        ...validateStep3(context.data),
-      }),
-    }),
-    saveStep3: assign({
-      data: (context, event) => ({
-        ...context.data,
-        ...event.data,
-      }),
-    }),
-    validateStep4: assign({
-      errors: (context) => ({
-        ...context.errors,
-        ...validateStep4(context.data),
-      }),
-    }),
-    submitWizard: async () => {
-      await fetch('/api/wizard', {
-        method: 'POST',
-        body: JSON.stringify(context.data),
-      });
-    },
-    resetWizard: assign({
-      data: {},
-      errors: {},
-      step: 1,
-    }),
-  },
-  guards: {
-    step1Valid: (context) => !hasErrors(context.errors, 1),
-    step2Valid: (context) => !hasErrors(context.errors, 2),
-    step3Valid: (context) => !hasErrors(context.errors, 3),
-    step4Valid: (context) => !hasErrors(context.errors, 4),
-  },
-});
-```
-
-### Authentication Flow Machine
-
-```typescript
-interface AuthContext {
-  user: User | null;
-  token: string | null;
-  error: Error | null;
-}
-
-const authMachine = createMachine<AuthContext>({
-  id: 'auth',
-  initial: 'unauthenticated',
-  context: {
-    user: null,
-    token: null,
-    error: null,
-  },
-  states: {
-    unauthenticated: {
-      on: {
-        LOGIN: 'authenticating',
-        REGISTER: 'registering',
-      },
-    },
-    authenticating: {
-      invoke: {
-        src: 'login',
-        onDone: {
-          target: 'authenticated',
-          actions: assign({
-            user: (context, event) => event.data.user,
-            token: (context, event) => event.data.token,
-            error: null,
-          }),
-        },
-        onError: {
-          target: 'unauthenticated',
-          actions: assign({
-            error: (context, event) => event.data,
-          }),
-        },
-      },
-    },
-    registering: {
-      invoke: {
-        src: 'register',
-        onDone: {
-          target: 'authenticated',
-          actions: assign({
-            user: (context, event) => event.data.user,
-            token: (context, event) => event.data.token,
-            error: null,
-          }),
-        },
-        onError: {
-          target: 'unauthenticated',
-          actions: assign({
-            error: (context, event) => event.data,
-          }),
-        },
-      },
-    },
-    authenticated: {
-      on: {
-        LOGOUT: 'unauthenticated',
-        actions: assign({
-          user: null,
-          token: null,
-        }),
-      },
-    },
-  },
-  services: {
-    login: async (context, event) => {
-      if (event.type !== 'LOGIN') return null;
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        body: JSON.stringify({
-          username: event.username,
-          password: event.password,
-        }),
-      });
-      return await response.json();
-    },
-    register: async (context, event) => {
-      if (event.type !== 'REGISTER') return null;
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        body: JSON.stringify({
-          username: event.username,
-          email: event.email,
-          password: event.password,
-        }),
-      });
-      return await response.json();
-    },
-  },
-});
-```
-
-### UI Component States Machine
-
-```typescript
-interface UIContext {
-  isOpen: boolean;
-  isLoading: boolean;
-  hasError: boolean;
-  error: Error | null;
-}
-
-const uiMachine = createMachine<UIContext>({
-  id: 'ui',
-  initial: 'closed',
-  context: {
-    isOpen: false,
-    isLoading: false,
-    hasError: false,
-    error: null,
-  },
-  states: {
-    closed: {
-      on: {
-        OPEN: 'opening',
-      },
-    },
-    opening: {
-      invoke: {
-        src: 'loadData',
-        onDone: {
-          target: 'open',
-          actions: assign({
-            isOpen: true,
-            isLoading: false,
-          }),
-        },
-        onError: {
-          target: 'error',
-          actions: assign({
-            hasError: true,
-            error: (context, event) => event.data,
-          }),
-        },
-      },
-    },
-    open: {
-      on: {
-        CLOSE: 'closed',
-        actions: assign({
-          isOpen: false,
-        }),
-      },
-    },
-    error: {
-      on: {
-        RETRY: 'opening',
-        CLOSE: 'closed',
-        actions: assign({
-          hasError: false,
-          error: null,
-        }),
-      },
-    },
-  },
-  services: {
-    loadData: async () => {
-      const response = await fetch('/api/data');
-      return await response.json();
-    },
-  },
-});
-```
-
-## When to Use State Machines vs Other Solutions
-
-### Use State Machines When:
-
-- **Complex State Logic**: Multiple states with complex transitions
-- **Side Effects**: Need to manage side effects (API calls, timers)
-- **Predictable Behavior**: Need predictable, testable state management
-- **Visualization**: Want to visualize state flow
-- **Type Safety**: Need strong TypeScript support
-
-### Use Other Solutions When:
-
-- **Simple State**: Just a few boolean flags
-- **Local Component State**: State doesn't need to be shared
-- **Performance Critical**: Need maximum performance (Redux might be faster)
-- **Team Familiarity**: Team is more familiar with other solutions
-
-### Comparison
-
-| Feature | XState | Redux | Zustand | Context API |
-|----------|---------|---------|-------------|
-| **Learning Curve** | Medium | Low | Very Low | Low |
-| **Type Safety** | Excellent | Good | Good | Basic |
-| **DevTools** | Excellent | Good | Good | Basic |
-| **Visualization** | Excellent | None | None | None |
-| **Boilerplate** | Medium | Low | Very Low | None |
-| **Async Handling** | Built-in | Middleware | Middleware | Manual |
-| **Testability** | Excellent | Good | Good | Good |
-
-## Migration from useState/useReducer
-
-### From useState
-
-```typescript
-// Before: useState
-function Counter() {
-  const [count, setCount] = useState(0);
-  
-  return (
-    <div>
-      <p>{count}</p>
-      <button onClick={() => setCount(c => c + 1)}>+</button>
-      <button onClick={() => setCount(c => c - 1)}>-</button>
-    </div>
-  );
-}
-
-// After: XState
-const counterMachine = createMachine({
-  id: 'counter',
-  initial: 'idle',
-  context: { count: 0 },
-  states: {
-    idle: {
-      on: {
-        INCREMENT: { actions: assign({ count: ctx => ctx.count + 1 }) },
-        DECREMENT: { actions: assign({ count: ctx => ctx.count - 1 }) },
-      },
-    },
-  },
-});
-
-function Counter() {
-  const [state, send] = useMachine(counterMachine);
-  
-  return (
-    <div>
-      <p>{state.context.count}</p>
-      <button onClick={() => send({ type: 'INCREMENT' })}>+</button>
-      <button onClick={() => send({ type: 'DECREMENT' })}>-</button>
-    </div>
-  );
-}
-```
-
-### From useReducer
-
-```typescript
-// Before: useReducer
-interface State {
-  count: number;
-  step: number;
-}
-
-type Action = 
-  | { type: 'INCREMENT' }
-  | { type: 'DECREMENT' }
-  | { type: 'SET_STEP'; step: number };
-
-function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case 'INCREMENT':
-      return { ...state, count: state.count + 1 };
-    case 'DECREMENT':
-      return { ...state, count: state.count - 1 };
-    case 'SET_STEP':
-      return { ...state, step: action.step };
-    default:
-      return state;
-  }
-}
-
-function Counter() {
-  const [state, dispatch] = useReducer(reducer, { count: 0, step: 1 });
-  
-  return (
-    <div>
-      <p>Count: {state.count}</p>
-      <p>Step: {state.step}</p>
-      <button onClick={() => dispatch({ type: 'INCREMENT' })}>+</button>
-      <button onClick={() => dispatch({ type: 'DECREMENT' })}>-</button>
-      <button onClick={() => dispatch({ type: 'SET_STEP', step: 2 })}>
-        Set Step 2
-      </button>
-    </div>
-  );
-}
-
-// After: XState
-const counterMachine = createMachine({
-  id: 'counter',
-  initial: 'step1',
-  context: { count: 0 },
-  states: {
-    step1: {
-      on: {
-        INCREMENT: { actions: assign({ count: ctx => ctx.count + 1 }) },
-        DECREMENT: { actions: assign({ count: ctx => ctx.count - 1 }) },
-        SET_STEP_2: 'step2',
-      },
-    },
-    step2: {
-      on: {
-        INCREMENT: { actions: assign({ count: ctx => ctx.count + 1 }) },
-        DECREMENT: { actions: assign({ count: ctx => ctx.count - 1 }) },
-        SET_STEP_1: 'step1',
-      },
-    },
-  },
-});
-
-function Counter() {
-  const [state, send] = useMachine(counterMachine);
-  
-  return (
-    <div>
-      <p>Count: {state.context.count}</p>
-      <p>Step: {state.value}</p>
-      <button onClick={() => send({ type: 'INCREMENT' })}>+</button>
-      <button onClick={() => send({ type: 'DECREMENT' })}>-</button>
-      <button onClick={() => send({ type: 'SET_STEP_2' })}>
-        Set Step 2
-      </button>
-    </div>
-  );
-}
-```
-
-## Best Practices
-
-1. **Machine Design**
-   - Keep machines focused and single-purpose
-   - Use hierarchical states for complex logic
-   - Define clear event names
-   - Use TypeScript for type safety
-
-2. **State Management**
-   - Use context for data that persists across states
-   - Use guards for conditional transitions
-   - Use actions for side effects
-   - Keep actions pure when possible
-
-3. **Testing**
-   - Test machines independently
-   - Test state transitions
-   - Test guards and actions
-   - Test services/mocked services
-
-4. **Visualization**
-   - Use Stately Editor for visualization
-   - Document state flow
-   - Share diagrams with team
-
-5. **Performance**
-   - Avoid unnecessary re-renders
-   - Use memo for expensive computations
-   - Optimize service calls
-
-## Related Skills
-
-- `02-frontend/react-patterns`
 - `02-frontend/state-management`
+- `02-frontend/react-best-practices`
+- `02-frontend/form-handling`
+- `00-meta-skills/system-thinking`

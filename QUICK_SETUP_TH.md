@@ -7,7 +7,7 @@
 ## 📍 ระบบของคุณ (2 Directory)
 
 ```
-D:\Cerebra\cerebratechai-claude-skills     ← แก้ไข Skills
+D:\Cerebra\cerebraSkills     ← แก้ไข Skills
          ↓
     sync-to-production.bat                 ← Push ขึ้น GitHub
          ↓
@@ -15,7 +15,7 @@ D:\Cerebra\cerebratechai-claude-skills     ← แก้ไข Skills
          ↓
     update-skills.bat                      ← Pull มา Production
          ↓
-D:\AgentSkill\cerebratechai-claude-skills  ← Multi-Agent ใช้งาน
+D:\AgentSkill\cerebraSkills  ← Multi-Agent ใช้งาน
 ```
 
 ---
@@ -25,7 +25,7 @@ D:\AgentSkill\cerebratechai-claude-skills  ← Multi-Agent ใช้งาน
 ### 1. ตรวจสอบว่ามี D:\AgentSkill หรือยัง
 
 ```batch
-dir D:\AgentSkill\cerebratechai-claude-skills
+dir D:\AgentSkill\cerebraSkills
 ```
 
 **ถ้ามีแล้ว** → ข้ามไปขั้นตอนที่ 2  
@@ -33,7 +33,7 @@ dir D:\AgentSkill\cerebratechai-claude-skills
 
 ```batch
 cd D:\AgentSkill
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
 ```
 
 ### 2. สร้าง Junction Links (สำคัญ!) 🔗
@@ -50,7 +50,7 @@ git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
 mkdir .agentskills
 
 # สร้าง junction link ไปที่ skills
-mklink /J .agentskills\skills D:\AgentSkill\cerebratechai-claude-skills
+mklink /J .agentskills\skills D:\AgentSkill\cerebraSkills
 
 # สร้าง junction link สำหรับ Codex
 mklink /J .codex .agentskills
@@ -60,7 +60,7 @@ mklink /J .codex .agentskills
 ```
 your-project/
 ├── .agentskills/
-│   └── skills/  → D:\AgentSkill\cerebratechai-claude-skills
+│   └── skills/  → D:\AgentSkill\cerebraSkills
 └── .codex/      → .agentskills/
 ```
 
@@ -85,7 +85,7 @@ update-skills.bat
 1. เปิด Antigravity
 2. Ctrl+, (Settings)
 3. Skills → Add Folder
-4. เลือก: D:\AgentSkill\cerebratechai-claude-skills
+4. เลือก: D:\AgentSkill\cerebraSkills
 5. ตั้งชื่อ: cerebratechai-skills
 6. ✅ Enable
 7. Save
@@ -102,7 +102,7 @@ List available skills
 
 ```
 1. File → Open Folder
-2. เลือก: D:\AgentSkill\cerebratechai-claude-skills
+2. เลือก: D:\AgentSkill\cerebraSkills
 3. สร้างไฟล์ .cursorrules (ดูตัวอย่างด้านล่าง)
 4. Settings → Codebase Indexing → Reindex
 ```
@@ -168,7 +168,7 @@ update-skills.bat
 ### กลางวัน - แก้ไข Skills
 
 ```
-1. แก้ไขใน D:\Cerebra\cerebratechai-claude-skills
+1. แก้ไขใน D:\Cerebra\cerebraSkills
 2. ทดสอบให้แน่ใจว่าถูกต้อง
 ```
 
@@ -176,7 +176,7 @@ update-skills.bat
 
 ```batch
 # Push ขึ้น GitHub
-cd D:\Cerebra\cerebratechai-claude-skills
+cd D:\Cerebra\cerebraSkills
 sync-to-production.bat
 # (ใส่ commit message)
 
@@ -227,7 +227,7 @@ List available skills
 ### Agent ไม่เห็น Skills
 
 ```
-1. ตรวจสอบ path: D:\AgentSkill\cerebratechai-claude-skills
+1. ตรวจสอบ path: D:\AgentSkill\cerebraSkills
 2. Restart agent
 3. Reindex (ถ้ามี)
 ```
@@ -259,7 +259,7 @@ update-skills.bat
 
 ## ✅ Checklist
 
-- [ ] มี D:\AgentSkill\cerebratechai-claude-skills แล้ว
+- [ ] มี D:\AgentSkill\cerebraSkills แล้ว
 - [ ] ทดสอบ update-skills.bat สำเร็จ
 - [ ] ตั้งค่า Agent แล้ว (Antigravity/Cursor/Copilot)
 - [ ] ทดสอบ Agent เห็น skills แล้ว
@@ -270,5 +270,5 @@ update-skills.bat
 ---
 
 **อัปเดตล่าสุด**: 17 มกราคม 2026  
-**Repository**: https://github.com/AmnadTaowsoam/cerebratechai-claude-skills  
+**Repository**: https://github.com/AmnadTaowsoam/cerebraSkills  
 **License**: MIT

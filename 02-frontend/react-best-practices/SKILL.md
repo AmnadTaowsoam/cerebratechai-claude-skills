@@ -1,8 +1,114 @@
 # React Best Practices and Patterns
 
-## 1. Component Patterns
+---
 
-### Functional Components
+## 1. Executive Summary & Strategic Necessity
+
+### 1.1 Context (ภาษาไทย)
+
+React คือ JavaScript library สำหรับการสร้าง user interfaces ที่ใช้ component-based architecture และ virtual DOM สำหรับ performance ที่ดี React มี hooks สำหรับ state management และ side effects ซึ่งช่วยให้การจัดการ logic ที่ซับซ้อนง่ายขึ้น
+
+React 18+ มี features ที่สำคัญ เช่น:
+- **Functional Components** - Components แบบ functional ที่ใช้ hooks
+- **Custom Hooks** - Reusable logic ที่แยกออกจาก components
+- **Context API** - State management ที่ global
+- **Suspense** - Async rendering และ loading states
+- **Concurrent Features** - Improved performance ด้วย concurrent rendering
+
+### 1.2 Business Impact (ภาษาไทย)
+
+**ผลกระทบทางธุรกิจ:**
+
+1. **ลด Development Time** - Component reuse และ hooks ช่วยลดเวลาพัฒนา
+2. **เพิ่ม Maintainability** - Code ที่ organized ช่วยลด maintenance cost
+3. **เพิ่ม Performance** - Virtual DOM และ optimization ช่วยเพิ่ม performance
+4. **เพิ่ม User Experience** - Fast rendering และ smooth interactions
+5. **ปรับปรุง Code Quality** - TypeScript และ patterns ช่วยเพิ่ม code quality
+
+### 1.3 Product Thinking (ภาษาไทย)
+
+**มุมมองด้านผลิตภัณฑ์:**
+
+1. **Component-First** - React components ต้อง reusable และ composable
+2. **State Management** - State ต้องจัดการอย่างเหมาะสม
+3. **Performance-First** - React ต้องไม่ส่งผลกระทบต่อ performance
+4. **Accessibility-First** - Components ต้องเข้าถึงได้และใช้งานได้สำหรับผู้ใช้ทุกคน
+5. **Testable** - Components ต้อง testable ง่าย
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+### 2.1 Core Logic
+
+React ประกอบด้วย:
+
+1. **Component Architecture** - Functional components ที่ใช้ hooks
+2. **State Management** - useState, useReducer, Context API
+3. **Side Effects** - useEffect สำหรับ side effects
+4. **Performance Optimization** - useMemo, useCallback, React.memo
+5. **Custom Hooks** - Reusable logic
+6. **Composition Patterns** - Component composition สำหรับ reusability
+7. **Error Boundaries** - Error handling สำหรับ React components
+
+### 2.2 Architecture Diagram Requirements
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              React Architecture                       │
+├─────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Component Layer                       │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Functional │  │  Class      │  │  Custom    │  │   │
+│  │  │  Components│  │  Components│  │  Hooks     │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              State Management Layer                 │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  useState   │  │  useReducer │  │  Context   │  │   │
+│  │  │  Hook      │  │  Hook       │  │  API       │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  External   │  │  Server     │  │  Optimized │  │   │
+│  │  │  State      │  │  State      │  │  State     │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Effect Layer                          │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  useEffect   │  │  useLayout │  │  useInsert  │  │   │
+│  │  │  Hook       │  │  Effect     │  │  Effect    │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Performance Layer                    │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  useMemo     │  │  useCallback │  │  React.memo│  │   │
+│  │  │  Hook       │  │  Hook       │  │  HOC       │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Rendering Layer                       │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Virtual    │  │  Fiber      │  │  Concurrent │  │   │
+│  │  │  DOM        │  │  Architecture│  │  Rendering │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 2.3 Implementation Workflow
+
+**Step 1: Create Functional Component**
+
 ```typescript
 // Simple presentational component
 type ButtonProps = {
@@ -38,7 +144,228 @@ export function Button({
 }
 ```
 
-### Custom Hooks
+---
+
+## 3. Tooling & Tech Stack
+
+### 3.1 Enterprise Tools
+
+| Tool | Purpose | Version | License |
+|------|---------|---------|---------|
+| React | UI Library | ^18.0.0 | MIT |
+| TypeScript | Type Safety | ^5.0.0 | Apache 2.0 |
+| @testing-library/react | Testing | ^14.0.0 | MIT |
+| react-error-boundary | Error Handling | ^4.0.0 | MIT |
+| react-window | Virtualization | ^1.8.0 | MIT |
+
+### 3.2 Configuration Essentials
+
+**TypeScript Configuration:**
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2020"
+  }
+}
+```
+
+---
+
+## 4. Standards, Compliance & Security
+
+### 4.1 International Standards
+
+- **WCAG 2.1 Level AA** - Components ต้องเข้าถึงได้และใช้งานได้สำหรับผู้ใช้ทุกคน
+- **ISO 9241-11** - Usability Standards สำหรับ UI Components
+- **GDPR** - Data Protection สำหรับ User Data
+
+### 4.2 Security Protocol
+
+React ต้องปฏิบัติตามหลักความปลอดภัย:
+
+1. **XSS Prevention** - React escapes content โดย default
+2. **Input Validation** - Validate ข้อมูลทั้ง client และ server
+3. **Secure Storage** - ไม่เก็บ sensitive data ใน localStorage
+4. **CSRF Protection** - ใช้ CSRF tokens สำหรับ forms
+
+```typescript
+// Secure form handling
+function SecureForm() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+  })
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    // Sanitize input if needed
+    const sanitized = value.replace(/[<>]/g, '')
+    setFormData(prev => ({ ...prev, [name]: sanitized }))
+  }
+  
+  return (
+    <form>
+      <input
+        name="name"
+        value={formData.name}
+        onChange={handleChange}
+      />
+    </form>
+  )
+}
+```
+
+### 4.3 Explainability
+
+React ต้องสามารถอธิบายได้ว่า:
+
+1. **Component Behavior** - ทำไม component render อย่างไร
+2. **State Changes** - ทำไม state เปลี่ยน
+3. **Effect Execution** - ทำไม effect ทำงาน
+4. **Performance** - ทำไม re-render เกิดขึ้น
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+### 5.1 Cost Calculation
+
+| Metric | Calculation | Target |
+|--------|-------------|--------|
+| Component Render Time | Time per component render | < 16ms |
+| Re-render Count | Number of re-renders | < 5/interaction |
+| Bundle Size | JavaScript bundle size | < 300 KB |
+| Time to Interactive | Interactive time | < 3.8s |
+| Accessibility Score | WCAG compliance score | > 95% |
+
+### 5.2 Key Performance Indicators
+
+**Technical Metrics:**
+
+1. **Component Render Time** - เวลาในการ render components
+2. **Re-render Count** - จำนวน re-renders
+3. **Bundle Size** - JavaScript bundle ที่ใช้งาน
+4. **Memory Usage** - Memory ที่ใช้งาน
+
+**Business Metrics:**
+
+1. **Development Velocity** - เวลาในการพัฒนา features
+2. **Code Quality** - Code quality score
+3. **User Experience** - User experience score
+4. **Accessibility Compliance** - Accessibility compliance rate
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+### 6.1 Phase Rollout
+
+**Phase 1: Foundation (Week 1-2)**
+- Setup React project
+- Configure TypeScript and ESLint
+- Create base components
+- Implement component patterns
+
+**Phase 2: State Management (Week 3-4)**
+- Implement useState patterns
+- Add useReducer for complex state
+- Create Context API setup
+- Implement custom hooks
+
+**Phase 3: Performance (Week 5-6)**
+- Add performance optimization
+- Implement React.memo
+- Add useMemo and useCallback
+- Create virtualization for lists
+
+**Phase 4: Production (Week 7-8)**
+- Add error boundaries
+- Implement accessibility
+- Testing setup
+- Documentation and training
+
+### 6.2 Pitfalls to Avoid
+
+1. **Mutating State Directly** - ไม่ mutate state โดยตรง
+2. **Missing Dependencies** - ไม่ลืม dependencies ใน useEffect
+3. **Over-optimization** - ไม่ optimize เกินไป
+4. **Poor Component Design** - ไม่ design components ให้ reusable
+5. **Ignoring Accessibility** - ไม่คำนึงถึง accessibility
+6. **Complex State** - ไม่ใช้ state ที่ซับซ้อนเกินไป
+
+### 6.3 Best Practices Checklist
+
+- [ ] ใช้ functional components โดย default
+- [ ] Implement custom hooks สำหรับ reusable logic
+- [ ] ใช้ Context API สำหรับ global state
+- [ ] Implement performance optimization ด้วย useMemo/useCallback
+- [ ] ใช้ React.memo สำหรับ expensive components
+- [ ] Implement error boundaries สำหรับ error handling
+- [ ] คำนึงถึง accessibility ในทุก components
+- [ ] Test components ด้วย React Testing Library
+- [ ] ใช้ TypeScript สำหรับ type safety
+- [ ] Implement proper cleanup ใน useEffect
+- [ ] ใช้ composition patterns สำหรับ reusable components
+- [ ] Avoid anti-patterns ใน React
+- [ ] Implement proper form handling
+- [ ] ใช้ virtualization สำหรับ long lists
+- [ ] Monitor performance metrics
+
+---
+
+## 7. Implementation Examples
+
+### 7.1 Component Patterns
+
+**Functional Components:**
+```typescript
+// Simple presentational component
+type ButtonProps = {
+  children: React.ReactNode
+  onClick?: () => void
+  variant?: 'primary' | 'secondary'
+  disabled?: boolean
+}
+
+export function Button({ 
+  children, 
+  onClick, 
+  variant = 'primary',
+  disabled = false 
+}: ButtonProps) {
+  const baseStyles = 'px-4 py-2 rounded font-medium transition-colors'
+  const variantStyles = {
+    primary: 'bg-blue-500 text-white hover:bg-blue-600',
+    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+  }
+  
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`${baseStyles} ${variantStyles[variant]} ${
+        disabled ? 'opacity-50 cursor-not-allowed' : ''
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+```
+
+**Custom Hooks:**
 ```typescript
 // useLocalStorage.ts - Persist state to localStorage
 import { useState, useEffect } from 'react'
@@ -87,48 +414,7 @@ function ThemeToggle() {
 }
 ```
 
-### Custom Hook with Async Operations
-```typescript
-// useFetch.ts
-import { useState, useEffect, useCallback } from 'react'
-
-type UseFetchResult<T> = {
-  data: T | null
-  loading: boolean
-  error: Error | null
-  refetch: () => Promise<void>
-}
-
-function useFetch<T>(url: string): UseFetchResult<T> {
-  const [data, setData] = useState<T | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
-  
-  const fetchData = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    
-    try {
-      const response = await fetch(url)
-      if (!response.ok) throw new Error('Network response was not ok')
-      const result = await response.json()
-      setData(result)
-    } catch (err) {
-      setError(err as Error)
-    } finally {
-      setLoading(false)
-    }
-  }, [url])
-  
-  useEffect(() => {
-    fetchData()
-  }, [fetchData])
-  
-  return { data, loading, error, refetch: fetchData }
-}
-```
-
-### Composition Patterns
+**Composition Patterns:**
 ```typescript
 // Card component with composition
 type CardProps = {
@@ -190,42 +476,10 @@ function CardFooter({ children }: { children: React.ReactNode }) {
 </Card>
 ```
 
-### Render Props Pattern
-```typescript
-// MouseTracker.tsx
-import { useState, ReactNode } from 'react'
-
-type MouseTrackerProps = {
-  render: (position: { x: number; y: number }) => ReactNode
-}
-
-function MouseTracker({ render }: MouseTrackerProps) {
-  const [position, setPosition] = useState({ x: 0, y: 0 })
-  
-  return (
-    <div
-      onMouseMove={e => setPosition({ x: e.clientX, y: e.clientY })}
-      className="relative h-64 border"
-    >
-      {render(position)}
-    </div>
-  )
-}
-
-// Usage
-<MouseTracker
-  render={({ x, y }) => (
-    <div>
-      Mouse position: {x}, {y}
-    </div>
-  )}
-/>
-```
-
-### Compound Components Pattern
+**Compound Components Pattern:**
 ```typescript
 // Tabs.tsx
-import { createContext, useContext, useState, ReactNode, cloneElement } from 'react'
+import { createContext, useContext, useState, ReactNode } from 'react'
 
 type TabsContextValue = {
   activeTab: string
@@ -316,9 +570,9 @@ function TabPanel({ value, children }: TabPanelProps) {
 </Tabs>
 ```
 
-## 2. State Management
+### 7.2 State Management
 
-### useState Pattern
+**useState Pattern:**
 ```typescript
 // Simple state
 function Counter() {
@@ -363,7 +617,7 @@ function UserForm() {
 }
 ```
 
-### useReducer Pattern
+**useReducer Pattern:**
 ```typescript
 // Complex state with reducer
 type State = {
@@ -479,60 +733,7 @@ function TodoApp() {
 }
 ```
 
-### Lifting State Up
-```typescript
-// Parent component holds state
-function TemperatureCalculator() {
-  const [celsius, setCelsius] = useState('')
-  const [fahrenheit, setFahrenheit] = useState('')
-  
-  const handleCelsiusChange = (value: string) => {
-    setCelsius(value)
-    setFahrenheit(value ? ((parseFloat(value) * 9) / 5 + 32).toString() : '')
-  }
-  
-  const handleFahrenheitChange = (value: string) => {
-    setFahrenheit(value)
-    setCelsius(value ? (((parseFloat(value) - 32) * 5) / 9).toString() : '')
-  }
-  
-  return (
-    <div>
-      <TemperatureInput
-        label="Celsius"
-        value={celsius}
-        onChange={handleCelsiusChange}
-      />
-      <TemperatureInput
-        label="Fahrenheit"
-        value={fahrenheit}
-        onChange={handleFahrenheitChange}
-      />
-    </div>
-  )
-}
-
-type TemperatureInputProps = {
-  label: string
-  value: string
-  onChange: (value: string) => void
-}
-
-function TemperatureInput({ label, value, onChange }: TemperatureInputProps) {
-  return (
-    <div>
-      <label>{label}</label>
-      <input
-        type="number"
-        value={value}
-        onChange={e => onChange(e.target.value)}
-      />
-    </div>
-  )
-}
-```
-
-### Context API Usage
+**Context API Usage:**
 ```typescript
 // ThemeContext.tsx
 import { createContext, useContext, useState, ReactNode } from 'react'
@@ -591,69 +792,9 @@ function Header() {
 }
 ```
 
-### Context with Multiple Values
-```typescript
-// AuthContext.tsx
-import { createContext, useContext, useState, ReactNode } from 'react'
+### 7.3 Performance Optimization
 
-type User = {
-  id: string
-  name: string
-  email: string
-}
-
-type AuthContextValue = {
-  user: User | null
-  login: (email: string, password: string) => Promise<void>
-  logout: () => void
-  isAuthenticated: boolean
-}
-
-const AuthContext = createContext<AuthContextValue | undefined>(undefined)
-
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  
-  const login = async (email: string, password: string) => {
-    // Simulate API call
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password })
-    })
-    const data = await response.json()
-    setUser(data.user)
-  }
-  
-  const logout = () => {
-    setUser(null)
-  }
-  
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        login,
-        logout,
-        isAuthenticated: !!user
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  )
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider')
-  }
-  return context
-}
-```
-
-## 3. Performance Optimization
-
-### useMemo
+**useMemo:**
 ```typescript
 import { useMemo } from 'react'
 
@@ -680,7 +821,7 @@ function UserProfile({ user }: { user: { id: string; name: string } }) {
 }
 ```
 
-### useCallback
+**useCallback:**
 ```typescript
 import { useCallback } from 'react'
 
@@ -711,7 +852,7 @@ const ChildComponent = React.memo(function ChildComponent({
 })
 ```
 
-### React.memo
+**React.memo:**
 ```typescript
 import { memo } from 'react'
 
@@ -752,911 +893,44 @@ const UserCardWithCustomCompare = memo(
 )
 ```
 
-### Code Splitting with React.lazy
-```typescript
-import { lazy, Suspense } from 'react'
+### 7.4 Best Practices
 
-// Lazy load heavy components
-const HeavyChart = lazy(() => import('./HeavyChart'))
-const AdminPanel = lazy(() => import('./AdminPanel'))
+**Component Design:**
+- Use functional components by default
+- Implement proper TypeScript types
+- Create reusable components
+- Use composition patterns
 
-function Dashboard() {
-  const [isAdmin, setIsAdmin] = useState(false)
-  
-  return (
-    <div>
-      <h1>Dashboard</h1>
-      
-      <Suspense fallback={<div>Loading chart...</div>}>
-        <HeavyChart />
-      </Suspense>
-      
-      {isAdmin && (
-        <Suspense fallback={<div>Loading admin panel...</div>}>
-          <AdminPanel />
-        </Suspense>
-      )}
-    </div>
-  )
-}
-```
+**State Management:**
+- Use useState for simple state
+- Use useReducer for complex state
+- Use Context API for global state
+- Implement custom hooks for reusable logic
 
-### Virtualization for Long Lists
-```typescript
-import { FixedSizeList } from 'react-window'
+**Performance:**
+- Use useMemo for expensive calculations
+- Use useCallback for event handlers
+- Use React.memo for expensive components
+- Implement virtualization for long lists
 
-function VirtualizedList({ items }: { items: string[] }) {
-  const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => (
-    <div style={style} className="p-4 border-b">
-      {items[index]}
-    </div>
-  )
-  
-  return (
-    <FixedSizeList
-      height={400}
-      itemCount={items.length}
-      itemSize={50}
-      width="100%"
-    >
-      {Row}
-    </FixedSizeList>
-  )
-}
-```
+**Error Handling:**
+- Implement error boundaries
+- Handle errors gracefully
+- Log errors to tracking service
+- Provide fallback UI
 
-## 4. Side Effects (useEffect)
+**Accessibility:**
+- Use semantic HTML
+- Implement keyboard navigation
+- Add ARIA attributes
+- Test with screen readers
 
-### Basic useEffect
-```typescript
-import { useEffect, useState } from 'react'
+---
 
-function UserProfile({ userId }: { userId: string }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-  
-  useEffect(() => {
-    let cancelled = false
-    
-    async function fetchUser() {
-      try {
-        const response = await fetch(`/api/users/${userId}`)
-        const data = await response.json()
-        
-        if (!cancelled) {
-          setUser(data)
-        }
-      } catch (error) {
-        console.error('Failed to fetch user:', error)
-      } finally {
-        if (!cancelled) {
-          setLoading(false)
-        }
-      }
-    }
-    
-    fetchUser()
-    
-    return () => {
-      cancelled = true
-    }
-  }, [userId])
-  
-  if (loading) return <div>Loading...</div>
-  return <div>{user?.name}</div>
-}
-```
+## 8. Related Skills
 
-### useEffect with Dependencies
-```typescript
-// Correct: All dependencies listed
-function SearchComponent() {
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState([])
-  
-  useEffect(() => {
-    if (query.length > 2) {
-      fetch(`/api/search?q=${query}`)
-        .then(res => res.json())
-        .then(data => setResults(data))
-    }
-  }, [query]) // query is a dependency
-  
-  return (
-    <div>
-      <input value={query} onChange={e => setQuery(e.target.value)} />
-      <ul>
-        {results.map((item, i) => (
-          <li key={i}>{item}</li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-
-// Wrong: Missing dependency
-function BadExample() {
-  const [count, setCount] = useState(0)
-  
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount(c => c + 1) // This works because of functional update
-    }, 1000)
-    
-    return () => clearInterval(interval)
-  }, []) // Empty array is correct here since we use functional update
-}
-```
-
-### Cleanup Functions
-```typescript
-// Event listener cleanup
-function WindowSize() {
-  const [size, setSize] = useState({ width: 0, height: 0 })
-  
-  useEffect(() => {
-    const handleResize = () => {
-      setSize({
-        width: window.innerWidth,
-        height: window.innerHeight
-      })
-    }
-    
-    window.addEventListener('resize', handleResize)
-    handleResize() // Initial call
-    
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
-  
-  return (
-    <div>
-      Width: {size.width}, Height: {size.height}
-    </div>
-  )
-}
-
-// WebSocket cleanup
-function ChatRoom({ roomId }: { roomId: string }) {
-  const [messages, setMessages] = useState([])
-  
-  useEffect(() => {
-    const ws = new WebSocket(`wss://api.example.com/rooms/${roomId}`)
-    
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data)
-      setMessages(prev => [...prev, message])
-    }
-    
-    return () => {
-      ws.close()
-    }
-  }, [roomId])
-  
-  return (
-    <div>
-      {messages.map((msg, i) => (
-        <div key={i}>{msg.text}</div>
-      ))}
-    </div>
-  )
-}
-```
-
-### Common Pitfalls
-```typescript
-// Pitfall 1: Infinite loop
-function BadComponent() {
-  const [count, setCount] = useState(0)
-  
-  useEffect(() => {
-    setCount(count + 1) // This causes infinite loop
-  }, [count]) // count changes, effect runs, count changes again...
-  
-  return <div>{count}</div>
-}
-
-// Fix: Use functional update
-function GoodComponent() {
-  const [count, setCount] = useState(0)
-  
-  useEffect(() => {
-    setCount(c => c + 1)
-  }, []) // No dependency needed
-  
-  return <div>{count}</div>
-}
-
-// Pitfall 2: Missing async function
-function BadAsyncEffect() {
-  useEffect(async () => { // Error: useEffect callback cannot be async
-    const data = await fetchData()
-  }, [])
-}
-
-// Fix: Define async function inside
-function GoodAsyncEffect() {
-  useEffect(() => {
-    async function fetchData() {
-      const data = await fetchData()
-    }
-    fetchData()
-  }, [])
-}
-
-// Pitfall 3: Stale closure
-function Counter() {
-  const [count, setCount] = useState(0)
-  
-  useEffect(() => {
-    const id = setInterval(() => {
-      console.log(count) // Always logs 0 (stale closure)
-    }, 1000)
-    
-    return () => clearInterval(id)
-  }, []) // Empty dependency array
-  
-  return <button onClick={() => setCount(c => c + 1)}>Increment</button>
-}
-
-// Fix: Use ref or add count to dependencies
-function CounterFixed() {
-  const [count, setCount] = useState(0)
-  const countRef = useRef(count)
-  
-  useEffect(() => {
-    countRef.current = count
-  }, [count])
-  
-  useEffect(() => {
-    const id = setInterval(() => {
-      console.log(countRef.current) // Always gets latest value
-    }, 1000)
-    
-    return () => clearInterval(id)
-  }, [])
-  
-  return <button onClick={() => setCount(c => c + 1)}>Increment</button>
-}
-```
-
-## 5. Forms Handling
-
-### Controlled Components
-```typescript
-function ContactForm() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  })
-  
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log(formData)
-    // Submit form data...
-  }
-  
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        placeholder="Name"
-        required
-      />
-      <input
-        name="email"
-        type="email"
-        value={formData.email}
-        onChange={handleChange}
-        placeholder="Email"
-        required
-      />
-      <textarea
-        name="message"
-        value={formData.message}
-        onChange={handleChange}
-        placeholder="Message"
-        required
-      />
-      <button type="submit">Send</button>
-    </form>
-  )
-}
-```
-
-### Form with Validation
-```typescript
-type FormErrors = {
-  name?: string
-  email?: string
-  password?: string
-}
-
-function RegistrationForm() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: ''
-  })
-  const [errors, setErrors] = useState<FormErrors>({})
-  const [touched, setTouched] = useState<Record<string, boolean>>({})
-  
-  const validate = (): boolean => {
-    const newErrors: FormErrors = {}
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required'
-    } else if (formData.name.length < 2) {
-      newErrors.name = 'Name must be at least 2 characters'
-    }
-    
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Invalid email format'
-    }
-    
-    if (!formData.password) {
-      newErrors.password = 'Password is required'
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters'
-    }
-    
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-  
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-    
-    // Clear error when user starts typing
-    if (errors[name as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }))
-    }
-  }
-  
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name } = e.target
-    setTouched(prev => ({ ...prev, [name]: true }))
-    validate()
-  }
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (validate()) {
-      // Submit form...
-      console.log('Form submitted:', formData)
-    }
-  }
-  
-  return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <input
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          placeholder="Name"
-        />
-        {touched.name && errors.name && (
-          <span className="error">{errors.name}</span>
-        )}
-      </div>
-      
-      <div>
-        <input
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          placeholder="Email"
-        />
-        {touched.email && errors.email && (
-          <span className="error">{errors.email}</span>
-        )}
-      </div>
-      
-      <div>
-        <input
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          placeholder="Password"
-        />
-        {touched.password && errors.password && (
-          <span className="error">{errors.password}</span>
-        )}
-      </div>
-      
-      <button type="submit">Register</button>
-    </form>
-  )
-}
-```
-
-## 6. Error Boundaries
-
-```typescript
-// ErrorBoundary.tsx
-import { Component, ReactNode } from 'react'
-
-type ErrorBoundaryState = {
-  hasError: boolean
-  error: Error | null
-}
-
-type ErrorBoundaryProps = {
-  children: ReactNode
-  fallback?: ReactNode
-  onError?: (error: Error, errorInfo: any) => void
-}
-
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props)
-    this.state = { hasError: false, error: null }
-  }
-  
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error }
-  }
-  
-  componentDidCatch(error: Error, errorInfo: any) {
-    console.error('Error caught by boundary:', error, errorInfo)
-    this.props.onError?.(error, errorInfo)
-  }
-  
-  render() {
-    if (this.state.hasError) {
-      return (
-        this.props.fallback || (
-          <div className="error-boundary">
-            <h2>Something went wrong</h2>
-            <p>{this.state.error?.message}</p>
-            <button onClick={() => window.location.reload()}>
-              Reload page
-            </button>
-          </div>
-        )
-      )
-    }
-    
-    return this.props.children
-  }
-}
-
-// Usage
-function App() {
-  return (
-    <ErrorBoundary
-      onError={(error, errorInfo) => {
-        // Log to error tracking service
-        logErrorToService(error, errorInfo)
-      }}
-    >
-      <MainContent />
-    </ErrorBoundary>
-  )
-}
-
-// Functional Error Boundary (with react-error-boundary)
-import { ErrorBoundary } from 'react-error-boundary'
-
-function ErrorFallback({ error, resetErrorBoundary }: any) {
-  return (
-    <div>
-      <h2>Something went wrong!</h2>
-      <pre>{error.message}</pre>
-      <button onClick={resetErrorBoundary}>Try again</button>
-    </div>
-  )
-}
-
-function App() {
-  return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <MainContent />
-    </ErrorBoundary>
-  )
-}
-```
-
-## 7. Accessibility (a11y)
-
-### Semantic HTML
-```typescript
-function AccessibleForm() {
-  return (
-    <form>
-      <fieldset>
-        <legend>Personal Information</legend>
-        
-        <div>
-          <label htmlFor="name">Full Name</label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            required
-            aria-required="true"
-          />
-        </div>
-        
-        <div>
-          <label htmlFor="email">Email Address</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            aria-required="true"
-            aria-describedby="email-hint"
-          />
-          <span id="email-hint">We'll never share your email</span>
-        </div>
-      </fieldset>
-      
-      <button type="submit">Submit</button>
-    </form>
-  )
-}
-```
-
-### ARIA Attributes
-```typescript
-function AccessibleModal({ isOpen, onClose, children }: any) {
-  if (!isOpen) return null
-  
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-    >
-      <h2 id="modal-title">Modal Title</h2>
-      <button
-        onClick={onClose}
-        aria-label="Close modal"
-      >
-        ×
-      </button>
-      {children}
-    </div>
-  )
-}
-
-function AccessibleTabs({ tabs, activeTab, onTabChange }: any) {
-  return (
-    <div role="tablist">
-      {tabs.map((tab: string, index: number) => (
-        <button
-          key={tab}
-          role="tab"
-          aria-selected={activeTab === index}
-          aria-controls={`panel-${index}`}
-          id={`tab-${index}`}
-          onClick={() => onTabChange(index)}
-        >
-          {tab}
-        </button>
-      ))}
-      
-      {tabs.map((tab: string, index: number) => (
-        <div
-          key={tab}
-          role="tabpanel"
-          id={`panel-${index}`}
-          aria-labelledby={`tab-${index}`}
-          hidden={activeTab !== index}
-        >
-          {tab} content
-        </div>
-      ))}
-    </div>
-  )
-}
-```
-
-### Focus Management
-```typescript
-import { useRef, useEffect } from 'react'
-
-function FocusTrap({ children, isActive }: any) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const firstFocusableRef = useRef<HTMLElement | null>(null)
-  const lastFocusableRef = useRef<HTMLElement | null>(null)
-  
-  useEffect(() => {
-    if (!isActive || !containerRef.current) return
-    
-    const focusableElements = containerRef.current.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    )
-    
-    firstFocusableRef.current = focusableElements[0] as HTMLElement
-    lastFocusableRef.current = focusableElements[
-      focusableElements.length - 1
-    ] as HTMLElement
-    
-    firstFocusableRef.current?.focus()
-    
-    const handleTab = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return
-      
-      if (e.shiftKey) {
-        if (document.activeElement === firstFocusableRef.current) {
-          e.preventDefault()
-          lastFocusableRef.current?.focus()
-        }
-      } else {
-        if (document.activeElement === lastFocusableRef.current) {
-          e.preventDefault()
-          firstFocusableRef.current?.focus()
-        }
-      }
-    }
-    
-    document.addEventListener('keydown', handleTab)
-    return () => document.removeEventListener('keydown', handleTab)
-  }, [isActive])
-  
-  return <div ref={containerRef}>{children}</div>
-}
-```
-
-## 8. Testing Components
-
-### Testing with React Testing Library
-```typescript
-// Button.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react'
-import { Button } from './Button'
-
-describe('Button', () => {
-  it('renders children correctly', () => {
-    render(<Button>Click me</Button>)
-    expect(screen.getByText('Click me')).toBeInTheDocument()
-  })
-  
-  it('calls onClick when clicked', () => {
-    const handleClick = jest.fn()
-    render(<Button onClick={handleClick}>Click me</Button>)
-    
-    fireEvent.click(screen.getByText('Click me'))
-    expect(handleClick).toHaveBeenCalledTimes(1)
-  })
-  
-  it('is disabled when disabled prop is true', () => {
-    render(<Button disabled>Click me</Button>)
-    expect(screen.getByText('Click me')).toBeDisabled()
-  })
-})
-
-// Form.test.tsx
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { ContactForm } from './ContactForm'
-
-describe('ContactForm', () => {
-  it('submits form with valid data', async () => {
-    const handleSubmit = jest.fn()
-    render(<ContactForm onSubmit={handleSubmit} />)
-    
-    fireEvent.change(screen.getByLabelText(/name/i), {
-      target: { value: 'John Doe' }
-    })
-    fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: 'john@example.com' }
-    })
-    
-    fireEvent.click(screen.getByRole('button', { name: /send/i }))
-    
-    await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith({
-        name: 'John Doe',
-        email: 'john@example.com'
-      })
-    })
-  })
-})
-```
-
-## 9. Common Anti-Patterns to Avoid
-
-### Don't Mutate State Directly
-```typescript
-// Bad
-function BadComponent() {
-  const [items, setItems] = useState([1, 2, 3])
-  
-  const addItem = () => {
-    items.push(4) // Mutation!
-    setItems(items)
-  }
-}
-
-// Good
-function GoodComponent() {
-  const [items, setItems] = useState([1, 2, 3])
-  
-  const addItem = () => {
-    setItems([...items, 4]) // New array
-  }
-}
-```
-
-### Don't Use useEffect for Derived State
-```typescript
-// Bad
-function BadComponent({ items }: { items: number[] }) {
-  const [total, setTotal] = useState(0)
-  
-  useEffect(() => {
-    setTotal(items.reduce((sum, item) => sum + item, 0))
-  }, [items])
-  
-  return <div>Total: {total}</div>
-}
-
-// Good
-function GoodComponent({ items }: { items: number[] }) {
-  const total = items.reduce((sum, item) => sum + item, 0)
-  
-  return <div>Total: {total}</div>
-}
-```
-
-### Don't Over-optimize
-```typescript
-// Bad: Premature optimization
-function BadComponent({ data }: { data: string[] }) {
-  const processed = useMemo(() => data.map(d => d.toUpperCase()), [data])
-  return <div>{processed.join(', ')}</div>
-}
-
-// Good: Simple computation doesn't need memoization
-function GoodComponent({ data }: { data: string[] }) {
-  const processed = data.map(d => d.toUpperCase())
-  return <div>{processed.join(', ')}</div>
-}
-```
-
-## 10. TypeScript with React
-
-### Type Definitions
-```typescript
-// Component props with TypeScript
-type ButtonProps = {
-  children: React.ReactNode
-  variant?: 'primary' | 'secondary' | 'danger'
-  size?: 'sm' | 'md' | 'lg'
-  disabled?: boolean
-  onClick?: () => void
-  className?: string
-}
-
-export function Button({
-  children,
-  variant = 'primary',
-  size = 'md',
-  disabled = false,
-  onClick,
-  className = ''
-}: ButtonProps) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`
-        ${variantStyles[variant]}
-        ${sizeStyles[size]}
-        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-        ${className}
-      `}
-    >
-      {children}
-    </button>
-  )
-}
-
-// Generic component
-type ListProps<T> = {
-  items: T[]
-  renderItem: (item: T) => React.ReactNode
-  keyExtractor: (item: T) => string
-}
-
-export function List<T>({ items, renderItem, keyExtractor }: ListProps<T>) {
-  return (
-    <ul>
-      {items.map(item => (
-        <li key={keyExtractor(item)}>{renderItem(item)}</li>
-      ))}
-    </ul>
-  )
-}
-
-// Usage
-<List
-  items={users}
-  renderItem={user => <span>{user.name}</span>}
-  keyExtractor={user => user.id}
-/>
-```
-
-### Type Guards
-```typescript
-function isUser(obj: any): obj is User {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    typeof obj.id === 'string' &&
-    typeof obj.name === 'string'
-  )
-}
-
-function UserProfile({ user }: { user: unknown }) {
-  if (!isUser(user)) {
-    return <div>Invalid user data</div>
-  }
-  
-  return <div>{user.name}</div>
-}
-```
-
-### Discriminated Unions
-```typescript
-type ApiResponse =
-  | { status: 'success'; data: any }
-  | { status: 'error'; error: string }
-
-function handleResponse(response: ApiResponse) {
-  if (response.status === 'success') {
-    console.log(response.data) // TypeScript knows this is available
-  } else {
-    console.log(response.error) // TypeScript knows this is available
-  }
-}
-```
-
-### Event Handler Types
-```typescript
-function FormComponent() {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value)
-  }
-  
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-  }
-  
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    console.log('Clicked')
-  }
-  
-  return (
-    <form onSubmit={handleSubmit}>
-      <input onChange={handleChange} />
-      <button onClick={handleClick}>Submit</button>
-    </form>
-  )
-}
-```
+- `02-frontend/nextjs-patterns`
+- `02-frontend/state-management`
+- `02-frontend/form-handling`
+- `02-frontend/error-boundaries-react`
+- `22-ux-ui-design/accessibility`

@@ -1,10 +1,24 @@
+---
+name: Mobile App Distribution and Deployment
+description: Submitting, testing, and releasing mobile apps to app stores including App Store and Google Play submission, beta testing, OTA updates, and release management.
+---
+
 # Mobile App Distribution and Deployment
+
+> **Current Level:** Intermediate  
+> **Domain:** Mobile Development / DevOps
+
+---
 
 ## Overview
 
-App distribution covers the process of submitting, testing, and releasing mobile apps to app stores. This guide covers App Store and Google Play submission, beta testing, OTA updates, and release management.
+App distribution covers the process of submitting, testing, and releasing mobile apps to app stores. This guide covers App Store and Google Play submission, beta testing, OTA updates, and release management for successful app launches and updates.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [App Store Submission](#app-store-submission)
 2. [App Metadata](#app-metadata)
@@ -979,10 +993,104 @@ const postReleaseChecklist = [
 
 ---
 
-## Resources
+---
+
+## Quick Start
+
+### App Store Submission
+
+```bash
+# Build iOS app
+xcodebuild -workspace MyApp.xcworkspace \
+  -scheme MyApp \
+  -configuration Release \
+  -archivePath MyApp.xcarchive \
+  archive
+
+# Export IPA
+xcodebuild -exportArchive \
+  -archivePath MyApp.xcarchive \
+  -exportPath ./build \
+  -exportOptionsPlist ExportOptions.plist
+```
+
+### Google Play Submission
+
+```bash
+# Build Android app bundle
+./gradlew bundleRelease
+
+# Upload to Play Console
+# Use Google Play Console web interface or API
+```
+
+---
+
+## Production Checklist
+
+- [ ] **App Store Setup**: App Store Connect account configured
+- [ ] **Google Play Setup**: Google Play Console account configured
+- [ ] **App Metadata**: Complete app metadata (name, description, screenshots)
+- [ ] **Screenshots**: Screenshots for all device sizes
+- [ ] **App Icon**: App icon in all required sizes
+- [ ] **Privacy Policy**: Privacy policy URL
+- [ ] **Versioning**: Semantic versioning strategy
+- [ ] **Beta Testing**: Beta testing setup (TestFlight, Internal Testing)
+- [ ] **OTA Updates**: OTA update mechanism (for React Native)
+- [ ] **Staged Rollout**: Staged rollout strategy
+- [ ] **Monitoring**: Monitor app performance post-release
+- [ ] **ASO**: App Store Optimization
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Beta Testing
+
+```markdown
+# ❌ Bad - Direct to production
+Build → Submit → Release
+# No testing!
+```
+
+```markdown
+# ✅ Good - Beta testing first
+Build → TestFlight/Internal Testing → Fix issues → Release
+```
+
+### ❌ Don't: Poor Metadata
+
+```markdown
+# ❌ Bad - Incomplete metadata
+Name: "My App"
+Description: "App"
+# No screenshots, no keywords
+```
+
+```markdown
+# ✅ Good - Complete metadata
+Name: "My App - Task Manager"
+Description: "Powerful task management app..."
+Keywords: "task, todo, productivity"
+Screenshots: All device sizes
+```
+
+---
+
+## Integration Points
+
+- **Mobile CI/CD** (`31-mobile-development/mobile-ci-cd/`) - Automated builds
+- **React Native Patterns** (`31-mobile-development/react-native-patterns/`) - App patterns
+- **Versioning** (`01-foundations/versioning/`) - Version strategy
+
+---
+
+## Further Reading
 
 - [App Store Connect](https://appstoreconnect.apple.com/)
 - [Google Play Console](https://play.google.com/console)
+- [App Store Review Guidelines](https://developer.apple.com/app-store/review/guidelines/)
+- [Google Play Policies](https://play.google.com/about/developer-content-policy/)
 - [Fastlane Documentation](https://docs.fastlane.tools/)
 - [CodePush Documentation](https://microsoft.github.io/code-push/)
 - [Expo Updates](https://docs.expo.dev/eas-update/introduction/)

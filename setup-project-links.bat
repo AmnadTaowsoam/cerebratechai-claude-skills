@@ -26,7 +26,7 @@ if %errorLevel% neq 0 (
     exit /b 1
 )
 
-set SKILLS_PATH=D:\AgentSkill\cerebratechai-claude-skills
+set SKILLS_PATH=D:\AgentSkill\cerebraSkills
 
 REM ตรวจสอบว่า skills directory มีอยู่จริง
 if not exist "%SKILLS_PATH%" (
@@ -34,7 +34,7 @@ if not exist "%SKILLS_PATH%" (
     echo.
     echo กรุณา clone repository ก่อน:
     echo cd D:\AgentSkill
-    echo git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+    echo git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
     echo.
     pause
     exit /b 1

@@ -1,10 +1,24 @@
+---
+name: Marketing Campaign Management
+description: Planning, executing, tracking, and analyzing marketing campaigns across multiple channels to achieve business objectives and maximize return on investment with proper budget management and performance metrics.
+---
+
 # Marketing Campaign Management
+
+> **Current Level:** Intermediate  
+> **Domain:** Marketing / Analytics
+
+---
 
 ## Overview
 
-Campaign management involves planning, executing, tracking, and analyzing marketing campaigns across multiple channels to achieve business objectives and maximize return on investment.
+Campaign management involves planning, executing, tracking, and analyzing marketing campaigns across multiple channels to achieve business objectives and maximize return on investment. Effective campaign management includes budget allocation, performance tracking, ROI calculation, and multi-channel coordination.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Campaign Lifecycle](#campaign-lifecycle)
 2. [Campaign Planning](#campaign-planning)
@@ -2113,6 +2127,126 @@ const campaignChecklist: CampaignChecklist = {
 ```
 
 ---
+
+## Quick Start
+
+### Campaign Creation
+
+```typescript
+interface Campaign {
+  id: string
+  name: string
+  type: 'email' | 'social' | 'paid' | 'content'
+  status: 'draft' | 'scheduled' | 'active' | 'paused' | 'completed'
+  budget: number
+  startDate: Date
+  endDate: Date
+  channels: string[]
+}
+
+async function createCampaign(campaign: Campaign) {
+  return await db.campaigns.create({
+    data: campaign
+  })
+}
+```
+
+### Campaign Tracking
+
+```typescript
+async function trackCampaignEvent(
+  campaignId: string,
+  event: 'impression' | 'click' | 'conversion',
+  userId?: string
+) {
+  await db.campaignEvents.create({
+    data: {
+      campaignId,
+      event,
+      userId,
+      timestamp: new Date()
+    }
+  })
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Campaign Planning**: Plan campaigns with clear objectives
+- [ ] **Budget Management**: Allocate and track budgets
+- [ ] **Multi-Channel**: Coordinate across multiple channels
+- [ ] **Tracking**: Implement campaign tracking (UTM, pixels)
+- [ ] **Performance Metrics**: Track KPIs (CTR, conversion, ROI)
+- [ ] **ROI Calculation**: Calculate return on investment
+- [ ] **Reporting**: Regular campaign reports
+- [ ] **Optimization**: Optimize based on performance
+- [ ] **A/B Testing**: Test campaign variations
+- [ ] **Documentation**: Document campaign learnings
+- [ ] **Automation**: Automate campaign workflows
+- [ ] **Integration**: Integrate with analytics tools
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Tracking
+
+```markdown
+# ❌ Bad - No tracking
+Campaign: "Summer Sale"
+# How did it perform?
+```
+
+```markdown
+# ✅ Good - Complete tracking
+Campaign: "Summer Sale"
+UTM: ?utm_source=email&utm_campaign=summer_sale
+Impressions: 10,000
+Clicks: 500
+Conversions: 50
+ROI: 300%
+```
+
+### ❌ Don't: No Budget Control
+
+```typescript
+// ❌ Bad - No budget control
+async function runCampaign(campaignId: string) {
+  // Spend unlimited!
+}
+```
+
+```typescript
+// ✅ Good - Budget control
+async function runCampaign(campaignId: string) {
+  const campaign = await getCampaign(campaignId)
+  const spent = await getSpent(campaignId)
+  
+  if (spent >= campaign.budget) {
+    await pauseCampaign(campaignId)
+    return
+  }
+  
+  // Continue campaign
+}
+```
+
+---
+
+## Integration Points
+
+- **Marketing Automation** (`28-marketing-integration/marketing-automation/`) - Automated campaigns
+- **Email Marketing** (`28-marketing-integration/email-marketing/`) - Email campaigns
+- **Analytics** (`23-business-analytics/`) - Campaign analytics
+
+---
+
+## Further Reading
+
+- [Campaign Management Best Practices](https://www.hubspot.com/marketing/campaign-management)
+- [UTM Tracking](https://support.google.com/analytics/answer/1033863)
 
 ## Resources
 

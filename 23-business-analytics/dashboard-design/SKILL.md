@@ -1,8 +1,18 @@
+---
+name: Dashboard Design
+description: Creating visual displays of key metrics and data points that provide at-a-glance insights for monitoring, analysis, and data-driven decision-making.
+---
+
 # Dashboard Design
 
-## What is a Dashboard
+> **Current Level:** Intermediate  
+> **Domain:** Business Analytics / Data Visualization
 
-A dashboard is a visual display of key metrics and data points that provides at-a-glance insights for monitoring, analysis, and decision-making.
+---
+
+## Overview
+
+A dashboard is a visual display of key metrics and data points that provides at-a-glance insights for monitoring, analysis, and decision-making. Effective dashboards present the right information at the right time, using appropriate visualizations and clear hierarchy to help users understand and act on data.
 
 ### Dashboard Purpose
 
@@ -18,6 +28,10 @@ A dashboard is a visual display of key metrics and data points that provides at-
 - **Save time**: Quick access to key information
 - **Improve decisions**: Data-driven insights
 - **Increase alignment**: Shared understanding
+
+---
+
+## Core Concepts
 - **Enable action**: Identify issues and opportunities
 
 ## Dashboard Types
@@ -1037,6 +1051,143 @@ Track:
 
 - [ ] Implement dashboard
 - [ ] Add interactivity
+- [ ] Test with users
+- [ ] Iterate based on feedback
+```
+
+---
+
+## Quick Start
+
+### Basic Dashboard Layout
+
+```typescript
+// Dashboard component structure
+const Dashboard = () => {
+  return (
+    <div className="dashboard">
+      {/* Header */}
+      <header>
+        <h1>Dashboard</h1>
+        <DateRangePicker />
+      </header>
+      
+      {/* Key Metrics Row */}
+      <div className="metrics-row">
+        <MetricCard title="Revenue" value="$12,345" trend="+5%" />
+        <MetricCard title="Users" value="1,234" trend="+12%" />
+        <MetricCard title="Orders" value="567" trend="-3%" />
+      </div>
+      
+      {/* Charts */}
+      <div className="charts-grid">
+        <Chart type="line" data={revenueData} />
+        <Chart type="bar" data={userData} />
+      </div>
+    </div>
+  )
+}
+```
+
+### Key Metrics Selection
+
+```markdown
+# Dashboard Metrics Selection
+
+## Process
+1. Identify business goals
+2. Map goals to metrics
+3. Prioritize metrics (5-7 max)
+4. Choose visualization type
+5. Design layout
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Audience**: Understand dashboard audience and their needs
+- [ ] **Metrics**: Select 5-7 key metrics (not too many)
+- [ ] **Visualization**: Choose appropriate chart types
+- [ ] **Layout**: Design clear visual hierarchy
+- [ ] **Interactivity**: Add filters, drill-downs, date ranges
+- [ ] **Performance**: Optimize for fast loading
+- [ ] **Responsive**: Works on mobile and desktop
+- [ ] **Accessibility**: Accessible to all users
+- [ ] **Real-time**: Update data appropriately
+- [ ] **Documentation**: Document metric definitions
+- [ ] **Testing**: Test with real users
+- [ ] **Iteration**: Iterate based on usage data
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Too Many Metrics
+
+```typescript
+// ❌ Bad - Information overload
+<Dashboard>
+  <MetricCard title="Metric 1" />
+  <MetricCard title="Metric 2" />
+  // ... 20 more metrics
+</Dashboard>
+```
+
+```typescript
+// ✅ Good - Focused metrics
+<Dashboard>
+  <MetricCard title="Revenue" />      // Top priority
+  <MetricCard title="Users" />        // Top priority
+  <MetricCard title="Orders" />       // Top priority
+  // Only 5-7 key metrics
+</Dashboard>
+```
+
+### ❌ Don't: Wrong Chart Type
+
+```typescript
+// ❌ Bad - Line chart for categories
+<LineChart data={categories} />  // Categories don't have trends
+```
+
+```typescript
+// ✅ Good - Bar chart for categories
+<BarChart data={categories} />  // Better for comparing categories
+```
+
+### ❌ Don't: No Context
+
+```typescript
+// ❌ Bad - Just numbers
+<MetricCard value="1234" />
+```
+
+```typescript
+// ✅ Good - With context
+<MetricCard 
+  title="Active Users"
+  value="1,234"
+  trend="+12%"
+  period="vs last month"
+/>
+```
+
+---
+
+## Integration Points
+
+- **Data Visualization** (`23-business-analytics/data-visualization/`) - Chart types
+- **KPI Metrics** (`23-business-analytics/kpi-metrics/`) - Metric selection
+- **SQL for Analytics** (`23-business-analytics/sql-for-analytics/`) - Data queries
+
+---
+
+## Further Reading
+
+- [Dashboard Design Best Practices](https://www.tableau.com/learn/articles/dashboards)
+- [Information Dashboard Design](https://www.edwardtufte.com/)
+- [Data Visualization Guide](https://www.d3js.org/)
 - [ ] Optimize performance
 - [ ] Test on multiple devices
 

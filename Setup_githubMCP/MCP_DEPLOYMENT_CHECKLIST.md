@@ -3,7 +3,7 @@
 ## 📋 Pre-Deployment Checklist
 
 ### Repository Preparation
-- [x] Repository exists on GitHub: `AmnadTaowsoam/cerebratechai-claude-skills`
+- [x] Repository exists on GitHub: `AmnadTaowsoam/cerebraSkills`
 - [x] All skill files are committed and pushed
 - [x] README.md updated with MCP setup instructions
 - [x] Setup guides created (English & Thai)
@@ -22,7 +22,7 @@
 ## 🚀 Deployment Steps
 
 ### Step 1: Verify Repository
-- [ ] Visit: https://github.com/AmnadTaowsoam/cerebratechai-claude-skills
+- [ ] Visit: https://github.com/AmnadTaowsoam/cerebraSkills
 - [ ] Confirm all files are visible
 - [ ] Check that skills are organized in folders (00-meta-skills, 01-foundations, etc.)
 - [ ] Verify README.md displays correctly
@@ -32,7 +32,7 @@
 - [ ] Create Fine-grained token with:
   - [ ] Name: `Claude MCP - Skills`
   - [ ] Expiration: 90 days (or custom)
-  - [ ] Repository: `cerebratechai-claude-skills`
+  - [ ] Repository: `cerebraSkills`
   - [ ] Permissions: `Contents: Read-only`
 - [ ] Copy token (starts with `github_pat_`)
 - [ ] Save token securely (password manager)
@@ -132,7 +132,7 @@
 
 ### Issue: "Repository Not Found"
 - [ ] Verify `GITHUB_OWNER` is correct: `AmnadTaowsoam`
-- [ ] Verify `GITHUB_REPO` is correct: `cerebratechai-claude-skills`
+- [ ] Verify `GITHUB_REPO` is correct: `cerebraSkills`
 - [ ] Check repository visibility (public/private)
 - [ ] Confirm token has access to the repository
 
@@ -185,8 +185,8 @@ Your deployment is successful when:
 - 🐙 GitHub MCP Server: https://github.com/modelcontextprotocol/servers
 
 ### Getting Help
-- 🐛 Report Issues: https://github.com/AmnadTaowsoam/cerebratechai-claude-skills/issues
-- 💬 Discussions: https://github.com/AmnadTaowsoam/cerebratechai-claude-skills/discussions
+- 🐛 Report Issues: https://github.com/AmnadTaowsoam/cerebraSkills/issues
+- 💬 Discussions: https://github.com/AmnadTaowsoam/cerebraSkills/discussions
 
 ---
 

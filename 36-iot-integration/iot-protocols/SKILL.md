@@ -1,10 +1,26 @@
+---
+name: IoT Protocols
+description: Communication protocols for IoT devices including MQTT, CoAP, AMQP, and protocol selection strategies for efficient device-to-cloud communication.
+---
+
 # IoT Protocols
+
+> **Current Level:** Intermediate  
+> **Domain:** IoT / Networking
+
+---
 
 ## Overview
 
-IoT protocols enable communication between devices, gateways, and cloud services. This guide covers MQTT, CoAP, AMQP, and protocol selection.
+IoT protocols enable communication between devices, gateways, and cloud services. This guide covers MQTT, CoAP, AMQP, and protocol selection strategies for building efficient IoT systems that handle constrained devices, low bandwidth, and unreliable networks.
 
-## IoT Protocol Comparison
+---
+
+---
+
+## Core Concepts
+
+### IoT Protocol Comparison
 
 | Protocol | Transport | Overhead | Use Case | QoS |
 |----------|-----------|----------|----------|-----|
@@ -486,16 +502,133 @@ export class IoTWebSocketServer {
 }
 ```
 
-## Best Practices
+---
 
-1. **Protocol Selection** - Choose based on constraints
-2. **QoS Levels** - Use appropriate QoS for reliability
-3. **Topic Design** - Use hierarchical topic structure
-4. **Security** - Always use TLS/DTLS in production
-5. **Error Handling** - Handle disconnections gracefully
-6. **Reconnection** - Implement exponential backoff
-7. **Message Size** - Keep messages small
-8. **Retained Messages** - Use for last known state
+## Quick Start
+
+### MQTT Client Setup
+
+```javascript
+const mqtt = require('mqtt')
+
+const client = mqtt.connect('mqtt://broker.example.com', {
+  clientId: 'device-001',
+  username: 'device-user',
+  password: 'device-password'
+})
+
+client.on('connect', () => {
+  // Subscribe to topic
+  client.subscribe('devices/001/data')
+  
+  // Publish message
+  client.publish('devices/001/data', JSON.stringify({
+    temperature: 25.5,
+    humidity: 60
+  }))
+})
+
+client.on('message', (topic, message) => {
+  const data = JSON.parse(message.toString())
+  console.log('Received:', data)
+})
+```
+
+### MQTT Server (Mosquitto)
+
+```bash
+# Install Mosquitto
+sudo apt-get install mosquitto mosquitto-clients
+
+# Start broker
+mosquitto -c /etc/mosquitto/mosquitto.conf
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Protocol Selection**: Choose appropriate protocol (MQTT, CoAP, AMQP)
+- [ ] **QoS Levels**: Use appropriate QoS for message reliability
+- [ ] **Topic Design**: Hierarchical topic structure
+- [ ] **Security**: TLS/DTLS encryption in production
+- [ ] **Authentication**: Device authentication configured
+- [ ] **Error Handling**: Handle disconnections gracefully
+- [ ] **Reconnection**: Exponential backoff for reconnection
+- [ ] **Message Size**: Keep messages small for constrained devices
+- [ ] **Retained Messages**: Use for last known state
+- [ ] **Monitoring**: Monitor device connectivity and message rates
+- [ ] **Rate Limiting**: Prevent message flooding
+- [ ] **Testing**: Test with real devices
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Security
+
+```javascript
+// ❌ Bad - No encryption
+const client = mqtt.connect('mqtt://broker.example.com')  // Plain text!
+```
+
+```javascript
+// ✅ Good - TLS encryption
+const client = mqtt.connect('mqtts://broker.example.com', {
+  ca: fs.readFileSync('ca.crt'),
+  cert: fs.readFileSync('client.crt'),
+  key: fs.readFileSync('client.key')
+})
+```
+
+### ❌ Don't: Large Messages
+
+```javascript
+// ❌ Bad - Large payload
+client.publish('topic', largeJsonString)  // Too big for IoT!
+```
+
+```javascript
+// ✅ Good - Small, efficient messages
+client.publish('topic', JSON.stringify({
+  t: 25.5,  // temperature
+  h: 60     // humidity
+}))
+```
+
+### ❌ Don't: No Reconnection Logic
+
+```javascript
+// ❌ Bad - No reconnection
+client.on('close', () => {
+  // Device stays disconnected!
+})
+```
+
+```javascript
+// ✅ Good - Automatic reconnection
+client.on('close', () => {
+  setTimeout(() => {
+    client.reconnect()  // Reconnect with backoff
+  }, 5000)
+})
+```
+
+---
+
+## Integration Points
+
+- **IoT Security** (`36-iot-integration/iot-security/`) - Device security
+- **Device Management** (`36-iot-integration/device-management/`) - Device lifecycle
+- **MQTT Integration** (`08-messaging-queue/mqtt-integration/`) - MQTT patterns
+
+---
+
+## Further Reading
+
+- [MQTT Specification](https://mqtt.org/mqtt-specification/)
+- [Eclipse Mosquitto](https://mosquitto.org/)
+- [CoAP Specification](https://coap.technology/)
 9. **LWT** - Implement Last Will and Testament
 10. **Monitoring** - Monitor protocol performance
 

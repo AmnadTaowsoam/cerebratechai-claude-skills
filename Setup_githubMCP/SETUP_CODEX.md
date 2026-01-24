@@ -32,7 +32,7 @@ Complete guide for using CerebraTechAI Skills with OpenAI Codex and GitHub Copil
 1. Go to: https://github.com/settings/tokens
 2. Create **Fine-grained token**:
    - Name: `Codex MCP - Skills`
-   - Repository: `cerebratechai-claude-skills`
+   - Repository: `cerebraSkills`
    - Permissions: `Contents: Read-only`
 3. Copy token (starts with `github_pat_`)
 
@@ -44,7 +44,7 @@ Complete guide for using CerebraTechAI Skills with OpenAI Codex and GitHub Copil
 codex mcp add cerebratechai-skills \
   --env GITHUB_PERSONAL_ACCESS_TOKEN=YOUR_TOKEN_HERE \
   --env GITHUB_OWNER=AmnadTaowsoam \
-  --env GITHUB_REPO=cerebratechai-claude-skills \
+  --env GITHUB_REPO=cerebraSkills \
   --env GITHUB_BRANCH=main \
   -- npx -y @modelcontextprotocol/server-github
 ```
@@ -61,7 +61,7 @@ args = ["-y", "@modelcontextprotocol/server-github"]
 [mcp_servers.cerebratechai-skills.env]
 GITHUB_PERSONAL_ACCESS_TOKEN = "YOUR_TOKEN_HERE"
 GITHUB_OWNER = "AmnadTaowsoam"
-GITHUB_REPO = "cerebratechai-claude-skills"
+GITHUB_REPO = "cerebraSkills"
 GITHUB_BRANCH = "main"
 ```
 
@@ -118,10 +118,10 @@ Create a Next.js API endpoint
 cd ~/projects
 
 # Clone the repository
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
 
 # Enter directory
-cd cerebratechai-claude-skills
+cd cerebraSkills
 ```
 
 ### Step 3: Open in VS Code
@@ -131,7 +131,7 @@ cd cerebratechai-claude-skills
 code .
 ```
 
-Or: File → Open Folder → Select `cerebratechai-claude-skills`
+Or: File → Open Folder → Select `cerebraSkills`
 
 ### Step 4: Configure Copilot Workspace
 
@@ -396,7 +396,7 @@ Always review Copilot's suggestions against the actual skill files.
 ### 5. Update Regularly
 ```bash
 # Pull latest skills
-cd ~/projects/cerebratechai-claude-skills
+cd ~/projects/cerebraSkills
 git pull origin main
 ```
 
@@ -408,7 +408,7 @@ To get the latest skills:
 
 ```bash
 # Navigate to repository
-cd ~/projects/cerebratechai-claude-skills
+cd ~/projects/cerebraSkills
 
 # Pull latest changes
 git pull origin main
@@ -495,5 +495,5 @@ git pull origin main
 ---
 
 **Last Updated**: January 17, 2026  
-**Repository**: https://github.com/AmnadTaowsoam/cerebratechai-claude-skills  
+**Repository**: https://github.com/AmnadTaowsoam/cerebraSkills  
 **License**: MIT

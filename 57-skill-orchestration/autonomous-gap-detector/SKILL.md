@@ -21,7 +21,7 @@ When triggered, you must perform these steps:
 
 1.  **Run Scanner:** Execute the diagnostic script:
     ```cmd
-    python d:\Cerebra\cerebratechai-claude-skills\scripts\skill_watcher.py --target .
+    python d:\Cerebra\cerebraSkills\scripts\skill_watcher.py --target .
     ```
 2.  **Analyze `GAP_REPORT.md`:** 
     *   If **RED GAPS** are found: 
@@ -42,7 +42,7 @@ Any gaps identified should be reported to the user in this format:
 ## Technical Details
 
 ### Scanner Script
-*   Location: `d:\Cerebra\cerebratechai-claude-skills\scripts\skill_watcher.py`
+*   Location: `d:\Cerebra\cerebraSkills\scripts\skill_watcher.py`
 *   Config: Edit `LIB_MAPPING` to add new technology associations.
 
 ### Logic Flow

@@ -1,8 +1,18 @@
+---
+name: Feature Engineering
+description: Creating meaningful features from raw data to improve model performance, including numerical, categorical, text, and time-based feature engineering techniques.
+---
+
 # Feature Engineering
+
+> **Current Level:** Advanced  
+> **Domain:** Data Science / Machine Learning
+
+---
 
 ## Overview
 
-Feature engineering creates meaningful features from raw data to improve model performance. This guide covers numerical, categorical, text, and time-based features.
+Feature engineering creates meaningful features from raw data to improve model performance. This guide covers numerical, categorical, text, and time-based features for building better machine learning models through domain knowledge and data transformation.
 
 ## Feature Engineering Concepts
 
@@ -399,18 +409,103 @@ pipeline.fit(X_train, y_train)
 y_pred = pipeline.predict(X_test)
 ```
 
-## Best Practices
+---
 
-1. **Domain Knowledge** - Use domain expertise
-2. **Avoid Leakage** - Don't use future information
-3. **Handle Missing** - Impute or flag missing values
-4. **Scaling** - Scale features appropriately
-5. **Encoding** - Choose right encoding method
-6. **Interactions** - Create meaningful interactions
-7. **Selection** - Remove irrelevant features
-8. **Validation** - Use cross-validation
-9. **Documentation** - Document feature logic
-10. **Automation** - Use pipelines for reproducibility
+## Quick Start
+
+### Numerical Feature Engineering
+
+```python
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+
+# Create features
+df['price_per_sqft'] = df['price'] / df['sqft']
+df['age'] = pd.Timestamp.now().year - df['year_built']
+df['log_price'] = np.log1p(df['price'])
+
+# Scale features
+scaler = StandardScaler()
+df[['price', 'sqft']] = scaler.fit_transform(df[['price', 'sqft']])
+```
+
+### Categorical Encoding
+
+```python
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+
+# Label encoding
+le = LabelEncoder()
+df['category_encoded'] = le.fit_transform(df['category'])
+
+# One-hot encoding
+df_encoded = pd.get_dummies(df, columns=['category'])
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Domain Knowledge**: Use domain expertise
+- [ ] **Data Exploration**: Explore data thoroughly
+- [ ] **Missing Values**: Handle missing values
+- [ ] **Feature Creation**: Create meaningful features
+- [ ] **Scaling**: Scale features appropriately
+- [ ] **Encoding**: Choose right encoding method
+- [ ] **Interactions**: Create feature interactions
+- [ ] **Feature Selection**: Remove irrelevant features
+- [ ] **Validation**: Use cross-validation
+- [ ] **Documentation**: Document feature logic
+- [ ] **Automation**: Use pipelines for reproducibility
+- [ ] **Testing**: Test feature engineering
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Data Leakage
+
+```python
+# ❌ Bad - Using future information
+df['future_price'] = df['price'].shift(-1)  # Leakage!
+model.fit(X, df['future_price'])
+```
+
+```python
+# ✅ Good - No leakage
+# Only use past/current data
+df['past_avg_price'] = df['price'].rolling(30).mean()
+model.fit(X, df['price'])
+```
+
+### ❌ Don't: Ignore Missing Values
+
+```python
+# ❌ Bad - Ignore missing values
+model.fit(X, y)  # NaN values cause errors!
+```
+
+```python
+# ✅ Good - Handle missing values
+df['age'].fillna(df['age'].median(), inplace=True)
+# Or
+df['age_missing'] = df['age'].isna().astype(int)
+```
+
+---
+
+## Integration Points
+
+- **Data Preprocessing** (`05-ai-ml-core/data-preprocessing/`) - Data cleaning
+- **Model Training** (`05-ai-ml-core/model-training/`) - Model training
+- **ML Serving** (`39-data-science-ml/ml-serving/`) - Feature serving
+
+---
+
+## Further Reading
+
+- [Feature Engineering Guide](https://www.kaggle.com/learn/feature-engineering)
+- [Feature Engineering Best Practices](https://towardsdatascience.com/feature-engineering-best-practices)
 
 ## Resources
 

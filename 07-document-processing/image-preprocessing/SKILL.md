@@ -1,8 +1,32 @@
+---
+name: Image Preprocessing
+description: Comprehensive guide to image preprocessing for OCR and computer vision tasks using Python and OpenCV
+---
+
 # Image Preprocessing
 
 ## Overview
 
 Comprehensive guide to image preprocessing for OCR and computer vision tasks using Python and OpenCV.
+
+## Prerequisites
+
+- **Python Programming**: Intermediate level Python knowledge
+- **OpenCV Basics**: Understanding of image processing fundamentals
+- **NumPy**: Familiarity with array operations and matrix manipulations
+- **PIL/Pillow**: Basic knowledge of image loading and manipulation
+- **Computer Vision Concepts**: Understanding of pixels, color spaces, and image representations
+
+## Key Concepts
+
+- **Color Spaces**: RGB, Grayscale, HSV, LAB, and YUV color models
+- **Image Filtering**: Gaussian blur, median filter, bilateral filter for noise reduction
+- **Thresholding**: Binary, Otsu's, and adaptive thresholding techniques
+- **Morphological Operations**: Erosion, dilation, opening, closing for shape manipulation
+- **Edge Detection**: Canny, Sobel, and Laplacian edge detection algorithms
+- **Deskewing**: Image rotation and skew correction using Hough transform and projection profiles
+- **Contrast Enhancement**: Histogram equalization and CLAHE for improving image quality
+- **OCR Optimization**: Text region extraction, line removal, and document enhancement
 
 ## Table of Contents
 
@@ -980,6 +1004,15 @@ def safe_preprocess(image_path: str, fallback_image: np.ndarray = None) -> np.nd
 ```
 
 ---
+
+## Related Skills
+
+- [Document Ingestion Pipeline](../07-document-processing/document-ingestion-pipeline/SKILL.md) - Document loading and processing workflows
+- [Document Parsing](../07-document-processing/document-parsing/SKILL.md) - Structured data extraction from documents
+- [OCR with Tesseract](../07-document-processing/ocr-tesseract/SKILL.md) - Text extraction using Tesseract OCR
+- [OCR with PaddleOCR](../07-document-processing/ocr-paddleocr/SKILL.md) - Text extraction using PaddleOCR
+- [PDF Processing](../07-document-processing/pdf-processing/SKILL.md) - PDF-specific processing techniques
+- [RAG Implementation](../06-ai-ml-production/rag-implementation/SKILL.md) - Retrieval-Augmented Generation patterns
 
 ## Additional Resources
 

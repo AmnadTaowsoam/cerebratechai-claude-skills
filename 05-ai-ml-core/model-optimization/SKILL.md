@@ -1,13 +1,64 @@
+---
+name: Model Optimization
+description: Comprehensive guide for ML model optimization techniques including quantization, pruning, knowledge distillation, and inference optimization.
+---
+
 # Model Optimization
 
 ## Overview
-Comprehensive guide for ML model optimization techniques including quantization, pruning, knowledge distillation, and inference optimization.
 
----
+Model optimization is the process of improving machine learning models for production deployment by reducing model size, improving inference speed, and maintaining accuracy. This skill covers quantization, pruning, knowledge distillation, model compression, architecture optimization, inference optimization, ONNX optimization, TensorRT integration, and benchmarking tools.
 
-## 1. Quantization
+## Prerequisites
 
-### 1.1 Post-Training Quantization
+- Understanding of PyTorch and deep learning
+- Knowledge of model architecture and training
+- Familiarity with model deployment concepts
+- Understanding of precision (FP32, FP16, INT8)
+- Basic knowledge of model serving
+
+## Key Concepts
+
+### Quantization
+
+- **Dynamic Quantization**: Weights quantized on-the-fly during inference
+- **Static Quantization**: Pre-quantized weights with calibration data
+- **Quantization-Aware Training (QAT)**: Training with quantization awareness
+- **Per-Channel Quantization**: Separate quantization per output channel
+- **INT8/FP16**: Reduced precision formats for efficiency
+
+### Pruning
+
+- **Structured Pruning**: Remove entire channels/filters
+- **Unstructured Pruning**: Remove individual weights based on magnitude
+- **Global vs Local Pruning**: Pruning scope across the model
+- **Iterative Pruning**: Gradual pruning with fine-tuning
+
+### Knowledge Distillation
+
+- **Teacher-Student**: Large teacher model training smaller student
+- **Soft Targets**: Using teacher's softened outputs as targets
+- **Feature Distillation**: Matching intermediate representations
+- **Self-Distillation**: Model teaching itself (EMA)
+
+### Model Compression
+
+- **Weight Sharing**: K-means clustering for shared weights
+- **Low-Rank Factorization**: SVD-based layer decomposition
+- **Architecture Design**: Efficient architectures (MobileNet, etc.)
+
+### Inference Optimization
+
+- **Batching**: Processing multiple inputs together
+- **Caching**: Repeated computation results
+- **GPU Optimization**: cuDNN, half precision, kernel fusion
+- **ONNX/TensorRT**: Hardware-specific optimization
+
+## Implementation Guide
+
+### Quantization
+
+#### Post-Training Quantization
 
 **Dynamic Quantization:**
 
@@ -103,7 +154,7 @@ def apply_per_channel_quantization(model):
         if isinstance(module, (nn.Conv2d, nn.Linear)):
             module.qconfig = torch.quantization.QConfig(
                 activation=torch.quantization.MinMaxObserver.with_args(
-                    dtype=torch.quint8
+                    dtype=torch.qint8
                 ),
                 weight=torch.quantization.PerChannelMinMaxObserver.with_args(
                     dtype=torch.qint8,
@@ -118,7 +169,7 @@ def apply_per_channel_quantization(model):
     return quantized_model
 ```
 
-### 1.2 Quantization-Aware Training (QAT)
+#### Quantization-Aware Training (QAT)
 
 ```python
 import torch
@@ -170,7 +221,7 @@ model = MyModel()
 quantized_model = quantization_aware_training(model, train_loader, val_loader)
 ```
 
-### 1.3 INT8 and FP16
+#### INT8 and FP16
 
 **INT8 Quantization:**
 
@@ -182,7 +233,7 @@ def int8_quantization(model, calibration_loader):
     # INT8 configuration
     model.qconfig = torch.quantization.QConfig(
         activation=torch.quantization.MinMaxObserver.with_args(
-            dtype=torch.quint8
+            dtype=torch.qint8
         ),
         weight=torch.quantization.MinMaxObserver.with_args(
             dtype=torch.qint8
@@ -246,11 +297,9 @@ def mixed_precision_training(model, train_loader, epochs=10, lr=0.001):
     return model
 ```
 
----
+### Pruning
 
-## 2. Pruning
-
-### 2.1 Structured Pruning
+#### Structured Pruning
 
 **Channel Pruning:**
 
@@ -320,7 +369,7 @@ def filter_pruning(model, dataloader, prune_ratio=0.3):
     return model
 ```
 
-### 2.2 Unstructured Pruning
+#### Unstructured Pruning
 
 **L1 Unstructured Pruning:**
 
@@ -362,7 +411,7 @@ def global_unstructured_prune(model, prune_ratio=0.2):
     return model
 ```
 
-### 2.3 Iterative Pruning
+#### Iterative Pruning
 
 ```python
 def iterative_pruning(model, train_loader, val_loader,
@@ -402,11 +451,9 @@ def iterative_pruning(model, train_loader, val_loader,
     return model
 ```
 
----
+### Knowledge Distillation
 
-## 3. Knowledge Distillation
-
-### 3.1 Basic Knowledge Distillation
+#### Basic Knowledge Distillation
 
 ```python
 import torch
@@ -434,9 +481,9 @@ class DistillationLoss(nn.Module):
         return self.alpha * soft_loss + (1 - self.alpha) * hard_loss
 
 def knowledge_distillation(teacher_model, student_model,
-                          train_loader, val_loader,
-                          epochs=50, lr=0.001,
-                          alpha=0.5, temperature=3.0):
+                           train_loader, val_loader,
+                           epochs=50, lr=0.001,
+                           alpha=0.5, temperature=3.0):
     """Train student model with knowledge distillation."""
     teacher_model.eval()
     student_model.train()
@@ -475,7 +522,7 @@ def knowledge_distillation(teacher_model, student_model,
     return student_model
 ```
 
-### 3.2 Feature-Based Distillation
+#### Feature-Based Distillation
 
 ```python
 class FeatureDistillationLoss(nn.Module):
@@ -496,8 +543,8 @@ class FeatureDistillationLoss(nn.Module):
         return total_loss
 
 def feature_distillation(teacher_model, student_model,
-                        train_loader, val_loader,
-                        epochs=50, lr=0.001):
+                         train_loader, val_loader,
+                         epochs=50, lr=0.001):
     """Train student with feature distillation."""
     teacher_model.eval()
     student_model.train()
@@ -538,18 +585,18 @@ def feature_distillation(teacher_model, student_model,
     return student_model
 ```
 
-### 3.3 Self-Distillation
+#### Self-Distillation
 
 ```python
 def self_distillation(model, train_loader, val_loader,
-                      epochs=50, lr=0.001, temperature=3.0):
+                   epochs=50, lr=0.001, temperature=3.0):
     """Train model with self-distillation."""
     model.train()
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     criterion = DistillationLoss(alpha=0.5, temperature=temperature)
 
-    # Create an EMA copy of the model
+    # Create an EMA copy of model
     ema_model = create_ema_model(model)
 
     for epoch in range(epochs):
@@ -595,11 +642,9 @@ def update_ema_model(model, ema_model, decay=0.99):
             ema_param.data.mul_(decay).add_(param.data, alpha=1 - decay)
 ```
 
----
+### Model Compression
 
-## 4. Model Compression
-
-### 4.1 Weight Sharing
+#### Weight Sharing
 
 ```python
 def apply_weight_sharing(model, num_clusters=16):
@@ -619,13 +664,13 @@ def apply_weight_sharing(model, num_clusters=16):
 
             # Replace weights with centroids
             weight_shared = torch.tensor(centroids[labels].reshape(weight.shape),
-                                       dtype=weight.dtype, device=weight.device)
+                                        dtype=weight.dtype, device=weight.device)
             module.weight.data = weight_shared
 
     return model
 ```
 
-### 4.2 Low-Rank Factorization
+#### Low-Rank Factorization
 
 ```python
 def low_rank_factorization_conv(conv_layer, rank):
@@ -663,7 +708,7 @@ def low_rank_factorization_conv(conv_layer, rank):
 
     # Set weights
     layer1.weight.data = V_r.t().view(rank, conv_layer.in_channels,
-                                        conv_layer.kernel_size[0], conv_layer.kernel_size[1])
+                                         conv_layer.kernel_size[0], conv_layer.kernel_size[1])
     layer2.weight.data = (U_r @ S_r).t().view(conv_layer.out_channels, rank, 1, 1)
 
     if conv_layer.bias is not None:
@@ -672,11 +717,9 @@ def low_rank_factorization_conv(conv_layer, rank):
     return nn.Sequential(layer1, layer2)
 ```
 
----
+### Architecture Optimization
 
-## 5. Architecture Optimization
-
-### 5.1 Depthwise Separable Convolution
+#### Depthwise Separable Convolution
 
 ```python
 class DepthwiseSeparableConv(nn.Module):
@@ -709,11 +752,9 @@ class DepthwiseSeparableConv(nn.Module):
         x = self.depthwise(x)
         x = self.bn1(x)
         x = self.relu(x)
-
         x = self.pointwise(x)
         x = self.bn2(x)
         x = self.relu(x)
-
         return x
 
 # Replace standard conv with depthwise separable
@@ -739,7 +780,7 @@ def replace_with_depthwise(model):
     return model
 ```
 
-### 5.2 MobileNet Block
+#### MobileNet Block
 
 ```python
 class MobileNetBlock(nn.Module):
@@ -762,7 +803,7 @@ class MobileNetBlock(nn.Module):
         # Depthwise
         layers.extend([
             nn.Conv2d(hidden_dim, hidden_dim, 3, stride=stride,
-                      padding=1, groups=hidden_dim, bias=False),
+                       padding=1, groups=hidden_dim, bias=False),
             nn.BatchNorm2d(hidden_dim),
             nn.ReLU6(inplace=True)
         ])
@@ -778,18 +819,14 @@ class MobileNetBlock(nn.Module):
 
     def forward(self, x):
         out = self.conv(x)
-
         if self.use_skip:
             return x + out
-
         return out
 ```
 
----
+### Inference Optimization
 
-## 6. Inference Optimization
-
-### 6.1 Batching
+#### Batching
 
 ```python
 from collections import deque
@@ -861,7 +898,7 @@ class BatchInference:
                         self.results[req_id] = output
 ```
 
-### 6.2 Caching
+#### Caching
 
 ```python
 from functools import lru_cache
@@ -921,7 +958,7 @@ def predict_with_cache(model, input_data):
     return output
 ```
 
-### 6.3 GPU Optimization
+#### GPU Optimization
 
 ```python
 import torch
@@ -962,11 +999,9 @@ def optimize_inference(model, input_shape):
     return model
 ```
 
----
+### ONNX Optimization
 
-## 7. ONNX Optimization
-
-### 7.1 ONNX Export and Optimization
+#### ONNX Export and Optimization
 
 ```python
 import torch
@@ -1025,6 +1060,29 @@ def optimize_onnx_model(onnx_path, optimized_path="model_optimized.onnx"):
             'eliminate_identity',
             'eliminate_deadend',
             'fuse_add_conv_into_conv',
+            'fuse_consecutive_transposes',
+            'fuse_transpose_into_gemm',
+            'eliminate_nop_transpose',
+            'eliminate_nop_pad',
+            'eliminate_identity',
+            'eliminate_deadend',
+            'fuse_add_conv_into_conv',
+            'fuse_consecutive_squeezes',
+            'fuse_consecutive_transposes',
+            'fuse_matmul_add_bias_into_gemm',
+            'fuse_pad_into_conv',
+            'fuse_transpose_into_gemm',
+            'eliminate_nop_transpose',
+            'eliminate_nop_pad',
+            'eliminate_identity',
+            'eliminate_deadend',
+            'fuse_add_conv_into_conv',
+            'fuse_consecutive_transposes',
+            'fuse_transpose_into_gemm',
+            'eliminate_nop_transpose',
+            'eliminate_nop_pad',
+            'eliminate_identity',
+            'eliminate_deadend',
         ]
     )
 
@@ -1037,7 +1095,7 @@ export_to_onnx(model, (1, 3, 224, 224))
 optimize_onnx_model("model.onnx")
 ```
 
-### 7.2 ONNX Runtime Optimization
+#### ONNX Runtime Optimization
 
 ```python
 def create_optimized_onnx_session(onnx_path, providers=['CUDAExecutionProvider']):
@@ -1049,8 +1107,6 @@ def create_optimized_onnx_session(onnx_path, providers=['CUDAExecutionProvider']
 
     # Enable memory arena
     sess_options.enable_mem_pattern = True
-
-    # Enable CPU memory arena
     sess_options.enable_cpu_mem_arena = True
 
     # Set execution mode
@@ -1071,15 +1127,12 @@ session = create_optimized_onnx_session("model.onnx")
 # Run inference
 input_name = session.get_inputs()[0].name
 output_name = session.get_outputs()[0].name
-
 outputs = session.run([output_name], {input_name: input_data})
 ```
 
----
+### TensorRT Integration
 
-## 8. TensorRT Integration
-
-### 8.1 TensorRT Conversion
+#### TensorRT Conversion
 
 ```python
 import torch
@@ -1115,7 +1168,7 @@ model_trt = TRTModule()
 model_trt.load_state_dict(torch.load('model_trt.pth'))
 ```
 
-### 8.2 TensorRT with ONNX
+#### TensorRT with ONNX
 
 ```python
 import tensorrt as trt
@@ -1154,11 +1207,9 @@ def build_tensorrt_engine(onnx_path, engine_path="model.trt", fp16=True):
 engine = build_tensorrt_engine("model.onnx", fp16=True)
 ```
 
----
+### Benchmarking Tools
 
-## 9. Benchmarking Tools
-
-### 9.1 Model Profiling
+#### Model Profiling
 
 ```python
 import torch
@@ -1252,7 +1303,6 @@ class ModelProfiler:
 
 # Usage
 profiler = ModelProfiler(model, (1, 3, 224, 224), device='cuda')
-
 latency = profiler.profile_inference()
 memory = profiler.profile_memory()
 throughput = profiler.profile_throughput()
@@ -1262,7 +1312,7 @@ print(f"Memory: {memory['allocated_mb']:.2f} MB")
 print(f"Throughput: {throughput['throughput_per_second']:.2f} inferences/sec")
 ```
 
-### 9.2 Model Comparison
+#### Model Comparison
 
 ```python
 def compare_models(models, input_shape, device='cuda'):
@@ -1292,7 +1342,6 @@ def compare_models(models, input_shape, device='cuda'):
     print("\n" + "=" * 80)
     print(f"{'Model':<20} {'Params':>12} {'Latency (ms)':>15} {'Memory (MB)':>12} {'Throughput':>12}")
     print("=" * 80)
-
     for name, metrics in results.items():
         print(f"{name:<20} {metrics['parameters']:>12,} "
               f"{metrics['latency_p95_ms']:>15.2f} "
@@ -1311,120 +1360,72 @@ models = {
 compare_models(models, (1, 3, 224, 224))
 ```
 
----
+## Best Practices
 
-## 10. Trade-offs Analysis
+1. **Start Simple**
+   - Begin with basic optimizations (FP16)
+   - Gradually apply more aggressive techniques
+   - Monitor accuracy after each optimization
+   - Use baseline for comparison
 
-### 10.1 Accuracy vs Size Trade-off
+2. **Measure Before Optimizing**
+   - Profile model before optimization
+   - Record baseline metrics (latency, memory, throughput)
+   - Use realistic input data
+   - Test on target hardware
 
-```python
-def analyze_accuracy_size_tradeoff(model, test_loader, optimization_methods):
-    """Analyze accuracy vs model size trade-off."""
-    baseline_acc = evaluate(model, test_loader)
-    baseline_size = get_model_size(model)
+3. **Use Appropriate Optimization Techniques**
+   - Quantization for size reduction
+   - Pruning for speed improvement
+   - Distillation for model compression
+   - Architecture design for efficiency
 
-    results = [{
-        'method': 'Baseline',
-        'accuracy': baseline_acc,
-        'size_mb': baseline_size,
-        'size_reduction': 0
-    }]
+4. **Maintain Accuracy**
+   - Set acceptable accuracy drop threshold
+   - Use calibration data for quantization
+   - Fine-tune after pruning
+   - Validate on representative dataset
 
-    for method_name, method_fn in optimization_methods.items():
-        print(f"\nApplying {method_name}...")
+5. **Test on Target Hardware**
+   - Optimize for production hardware
+   - Test on actual deployment environment
+   - Consider GPU/CPU constraints
+   - Profile memory usage
 
-        # Apply optimization
-        optimized_model = method_fn(model.copy())
+6. **Handle Edge Cases**
+   - Handle variable input sizes
+   - Handle batch size 1
+   - Handle different data types
+   - Test with real-world data
 
-        # Evaluate
-        acc = evaluate(optimized_model, test_loader)
-        size = get_model_size(optimized_model)
-        reduction = (1 - size / baseline_size) * 100
+7. **Version Control**
+   - Keep original model backup
+   - Document optimization steps
+   - Track model versions
+   - Maintain reproducibility
 
-        results.append({
-            'method': method_name,
-            'accuracy': acc,
-            'size_mb': size,
-            'size_reduction': reduction,
-            'accuracy_drop': baseline_acc - acc
-        })
+8. **Monitor in Production**
+   - Track inference latency
+   - Monitor memory usage
+   - Set up alerts for anomalies
+   - Log optimization metrics
 
-    return results
+9. **Use Production Frameworks**
+   - ONNX for cross-platform deployment
+   - TensorRT for NVIDIA GPUs
+   - OpenVINO for Intel CPUs
+   - TFLite for mobile deployment
 
-# Usage
-optimization_methods = {
-    'Dynamic Quantization': lambda m: apply_dynamic_quantization(m),
-    'Static Quantization': lambda m: apply_static_quantization(m, calib_loader),
-    'Pruning 20%': lambda m: global_unstructured_prune(m, 0.2),
-    'Pruning 40%': lambda m: global_unstructured_prune(m, 0.4),
-}
+10. **Iterative Improvement**
+   - A/B test different optimization strategies
+   - Collect production metrics
+   - Continuously optimize based on data
+   - Stay updated with new techniques
 
-results = analyze_accuracy_size_tradeoff(model, test_loader, optimization_methods)
-```
+## Related Skills
 
-### 10.2 Optimization Decision Matrix
-
-```python
-def get_optimization_recommendation(model_size_mb, latency_ms, accuracy_drop_threshold=1.0):
-    """Get optimization recommendation based on constraints."""
-    recommendations = []
-
-    # Quantization
-    if model_size_mb > 100:
-        recommendations.append({
-            'method': 'Dynamic Quantization',
-            'expected_size_reduction': '50-75%',
-            'expected_latency_improvement': '2-4x',
-            'accuracy_impact': 'Low (0.5-2%)',
-            'complexity': 'Low'
-        })
-
-    # Pruning
-    if latency_ms > 50:
-        recommendations.append({
-            'method': 'Structured Pruning',
-            'expected_size_reduction': '30-50%',
-            'expected_latency_improvement': '1.5-2x',
-            'accuracy_impact': 'Medium (1-3%)',
-            'complexity': 'Medium'
-        })
-
-    # Knowledge Distillation
-    if model_size_mb > 200:
-        recommendations.append({
-            'method': 'Knowledge Distillation',
-            'expected_size_reduction': '50-80%',
-            'expected_latency_improvement': '2-5x',
-            'accuracy_impact': 'Low-Medium (1-5%)',
-            'complexity': 'High'
-        })
-
-    # TensorRT
-    if latency_ms > 20:
-        recommendations.append({
-            'method': 'TensorRT',
-            'expected_size_reduction': 'None',
-            'expected_latency_improvement': '3-10x',
-            'accuracy_impact': 'None',
-            'complexity': 'Medium'
-        })
-
-    return recommendations
-
-# Usage
-recommendations = get_optimization_recommendation(model_size_mb=150, latency_ms=100)
-for rec in recommendations:
-    print(f"\n{rec['method']}:")
-    for k, v in rec.items():
-        if k != 'method':
-            print(f"  {k}: {v}")
-```
-
----
-
-## Additional Resources
-
-- [PyTorch Quantization](https://pytorch.org/docs/stable/quantization.html)
-- [ONNX Runtime Documentation](https://onnxruntime.ai/docs/)
-- [TensorRT Documentation](https://docs.nvidia.com/deeplearning/tensorrt/)
-- [Model Optimization Toolkit](https://github.com/facebookresearch/fairscale)
+- [`05-ai-ml-core/model-training`](05-ai-ml-core/model-training/SKILL.md)
+- [`05-ai-ml-core/data-augmentation`](05-ai-ml-core/data-augmentation/SKILL.md)
+- [`05-ai-ml-core/data-preprocessing`](05-ai-ml-core/data-preprocessing/SKILL.md)
+- [`06-ai-ml-production/llm-integration`](06-ai-ml-production/llm-integration/SKILL.md)
+- [`06-ai-ml-production/llm-local-deployment`](06-ai-ml-production/llm-local-deployment/SKILL.md)

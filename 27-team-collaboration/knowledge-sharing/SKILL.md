@@ -1,4 +1,18 @@
+---
+name: Knowledge Sharing
+description: Creating processes and tools for sharing knowledge across teams to reduce silos, onboard faster, improve team resilience, and foster innovation through cross-pollination of ideas.
+---
+
 # Knowledge Sharing
+
+> **Current Level:** Intermediate  
+> **Domain:** Team Collaboration / Culture
+
+---
+
+## Overview
+
+Knowledge sharing is the practice of distributing knowledge across teams and individuals. Effective knowledge sharing reduces silos, speeds up onboarding, improves team resilience, and fosters innovation through collaboration and documentation.
 
 ## Why Knowledge Sharing Matters
 
@@ -817,12 +831,109 @@ const satisfaction = {
 - One-on-one
 ```
 
-## Summary Checklist
+---
 
-### Planning
+## Quick Start
 
-- [ ] Knowledge sharing strategy defined
-- [ ] Formats selected
+### Knowledge Base Setup
+
+```markdown
+# Team Knowledge Base
+
+## Architecture Decisions
+- [ADR-001: Database Choice](./adr/001-database-choice.md)
+- [ADR-002: API Design](./adr/002-api-design.md)
+
+## Runbooks
+- [Deployment Process](./runbooks/deployment.md)
+- [Incident Response](./runbooks/incident-response.md)
+
+## Code Patterns
+- [Error Handling](./patterns/error-handling.md)
+- [Testing Strategy](./patterns/testing.md)
+```
+
+### Weekly Tech Talks
+
+```markdown
+# Tech Talk Schedule
+
+## Week 1: Database Optimization
+- Speaker: [Name]
+- Topic: Query optimization techniques
+- Recording: [Link]
+
+## Week 2: API Design
+- Speaker: [Name]
+- Topic: RESTful API best practices
+- Recording: [Link]
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Knowledge Base**: Set up team knowledge base
+- [ ] **Documentation**: Document key processes and decisions
+- [ ] **Tech Talks**: Regular tech talks or brown bags
+- [ ] **Code Reviews**: Use code reviews for knowledge sharing
+- [ ] **Pair Programming**: Encourage pair programming
+- [ ] **Mentorship**: Pair junior with senior developers
+- [ ] **Onboarding Docs**: Comprehensive onboarding documentation
+- [ ] **Architecture Decisions**: Document architecture decisions (ADRs)
+- [ ] **Runbooks**: Create runbooks for operations
+- [ ] **Wiki/Confluence**: Centralized knowledge repository
+- [ ] **Search**: Make knowledge searchable
+- [ ] **Updates**: Keep knowledge base updated
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Knowledge Silos
+
+```markdown
+# ❌ Bad - Knowledge in one person's head
+"Only John knows how the payment system works"
+```
+
+```markdown
+# ✅ Good - Documented knowledge
+# Payment System Documentation
+- Architecture: [link]
+- Runbook: [link]
+- Contact: [team channel]
+```
+
+### ❌ Don't: Outdated Documentation
+
+```markdown
+# ❌ Bad - Outdated docs
+# Last updated: 2020
+# System changed in 2024!
+```
+
+```markdown
+# ✅ Good - Regular updates
+# Last updated: 2024-01-15
+# Review schedule: Monthly
+```
+
+---
+
+## Integration Points
+
+- **Onboarding** (`27-team-collaboration/onboarding/`) - Knowledge transfer
+- **Code Review Culture** (`27-team-collaboration/code-review-culture/`) - Review process
+- **Documentation** (`21-documentation/`) - Documentation practices
+
+---
+
+## Further Reading
+
+- [Knowledge Management](https://www.atlassian.com/work-management/knowledge-management)
+- [Architecture Decision Records](https://adr.github.io/)
+- [Confluence Best Practices](https://www.atlassian.com/software/confluence/guides)
 - [ ] Schedule established
 - [ ] Resources allocated
 - [ ] Goals set

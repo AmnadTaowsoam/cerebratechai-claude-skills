@@ -1,13 +1,64 @@
-# Model Training Workflows
-
-## Overview
-Comprehensive guide for machine learning model training workflows using PyTorch, covering data preparation, training loops, hyperparameter tuning, and experiment tracking.
-
+---
+name: Model Training
+description: Comprehensive guide for machine learning model training workflows using PyTorch, covering data preparation, training loops, hyperparameter tuning, and experiment tracking.
 ---
 
-## 1. Training Pipeline Design
+# Model Training
 
-### 1.1 Pipeline Architecture
+## Overview
+
+Model training is the process of teaching machine learning models to make predictions or decisions based on data. This skill covers comprehensive training workflows including pipeline design, data preparation, training loops, hyperparameter tuning, experiment tracking, checkpoint management, early stopping, learning rate scheduling, distributed training, and model evaluation.
+
+## Prerequisites
+
+- Understanding of PyTorch and deep learning fundamentals
+- Knowledge of neural network architectures
+- Familiarity with data preprocessing and augmentation
+- Understanding of loss functions and optimizers
+- Basic knowledge of machine learning metrics
+
+## Key Concepts
+
+### Training Pipeline Architecture
+
+- **Modular Design**: Separation of data, model, optimizer, and training logic
+- **Configuration Management**: YAML-based configuration for reproducibility
+- **Checkpoint Management**: Saving and loading model states
+- **Early Stopping**: Preventing overfitting by stopping early
+- **Experiment Tracking**: Recording metrics and hyperparameters
+
+### Data Preparation
+
+- **Train/Val/Test Splits**: Proper data partitioning for model evaluation
+- **Custom Datasets**: Implementing PyTorch Dataset classes
+- **Data Loaders**: Efficient data loading with batching and shuffling
+- **Data Augmentation**: Increasing data diversity for better generalization
+
+### Training Loop Patterns
+
+- **Basic Training Loop**: Standard forward/backward pass
+- **Mixed Precision Training**: Using FP16 for faster training
+- **Gradient Accumulation**: Simulating larger batch sizes
+- **Distributed Training**: Multi-GPU and multi-node training
+
+### Hyperparameter Tuning
+
+- **Grid Search**: Exhaustive search over parameter space
+- **Random Search**: Random sampling of parameters
+- **Bayesian Optimization**: Smart parameter exploration with Optuna
+
+### Learning Rate Scheduling
+
+- **StepLR**: Periodic learning rate decay
+- **CosineAnnealingLR**: Cosine annealing schedule
+- **ReduceLROnPlateau**: Adaptive learning rate based on metrics
+- **OneCycleLR**: One cycle learning rate policy
+
+## Implementation Guide
+
+### Training Pipeline Design
+
+#### Pipeline Architecture
 
 ```python
 import torch
@@ -136,7 +187,7 @@ class TrainingPipeline:
         return checkpoint['epoch'], checkpoint['metrics']
 ```
 
-### 1.2 Configuration Management
+#### Configuration Management
 
 ```python
 # config.yaml
@@ -190,11 +241,9 @@ config = load_config("config.yaml")
 pipeline = TrainingPipeline(config)
 ```
 
----
+### Data Preparation
 
-## 2. Data Preparation
-
-### 2.1 Train/Val/Test Splits
+#### Train/Val/Test Splits
 
 ```python
 from torch.utils.data import random_split, DataLoader
@@ -238,7 +287,7 @@ def stratified_split(dataset, labels, train_ratio=0.8, val_ratio=0.1, seed=42):
     return train_indices, val_indices, test_indices
 ```
 
-### 2.2 Custom Dataset
+#### Custom Dataset
 
 ```python
 from torch.utils.data import Dataset
@@ -310,7 +359,7 @@ class CustomTextDataset(Dataset):
         }
 ```
 
-### 2.3 Data Loaders
+#### Data Loaders
 
 ```python
 from torchvision import transforms
@@ -376,7 +425,7 @@ def create_data_loaders(config):
     return train_loader, val_loader, test_loader
 ```
 
-### 2.4 Data Augmentation
+#### Data Augmentation
 
 ```python
 from torchvision import transforms
@@ -442,11 +491,9 @@ class AlbumentationsDataset(Dataset):
         return image, label
 ```
 
----
+### Training Loop Patterns
 
-## 3. Training Loop Patterns
-
-### 3.1 Basic Training Loop
+#### Basic Training Loop
 
 ```python
 import torch
@@ -491,7 +538,7 @@ def train_epoch(model, train_loader, criterion, optimizer, device):
     return {'loss': avg_loss, 'accuracy': accuracy}
 ```
 
-### 3.2 Validation Loop
+#### Validation Loop
 
 ```python
 def validate(model, val_loader, criterion, device):
@@ -519,7 +566,7 @@ def validate(model, val_loader, criterion, device):
     return {'loss': avg_loss, 'accuracy': accuracy}
 ```
 
-### 3.3 Training with Mixed Precision
+#### Training with Mixed Precision
 
 ```python
 from torch.cuda.amp import autocast, GradScaler
@@ -558,7 +605,7 @@ def train_epoch_amp(model, train_loader, criterion, optimizer, device, scaler=No
     return {'loss': avg_loss, 'accuracy': accuracy}
 ```
 
-### 3.4 Training with Gradient Accumulation
+#### Training with Gradient Accumulation
 
 ```python
 def train_epoch_accumulation(model, train_loader, criterion, optimizer, device, accumulation_steps=4):
@@ -602,11 +649,9 @@ def train_epoch_accumulation(model, train_loader, criterion, optimizer, device, 
     return {'loss': avg_loss, 'accuracy': accuracy}
 ```
 
----
+### Hyperparameter Tuning
 
-## 4. Hyperparameter Tuning
-
-### 4.1 Grid Search
+#### Grid Search
 
 ```python
 import itertools
@@ -662,7 +707,7 @@ results = grid_search(MyModel, train_loader, val_loader, param_grid, device)
 print(f"Best params: {results[0]['params']}")
 ```
 
-### 4.2 Random Search
+#### Random Search
 
 ```python
 import random
@@ -711,7 +756,7 @@ param_ranges = {
 }
 ```
 
-### 4.3 Bayesian Optimization with Optuna
+#### Bayesian Optimization with Optuna
 
 ```python
 import optuna
@@ -770,11 +815,9 @@ def run_optuna_study(model_class, train_loader, val_loader, device, n_trials=50)
 study = run_optuna_study(MyModel, train_loader, val_loader, device, n_trials=50)
 ```
 
----
+### Experiment Tracking
 
-## 5. Experiment Tracking
-
-### 5.1 MLflow Integration
+#### MLflow Integration
 
 ```python
 import mlflow
@@ -834,7 +877,7 @@ tracker.log_model(model)
 tracker.end_run()
 ```
 
-### 5.2 Weights & Biases Integration
+#### Weights & Biases Integration
 
 ```python
 import wandb
@@ -881,7 +924,7 @@ tracker.log_model(model)
 tracker.finish()
 ```
 
-### 5.3 TensorBoard Integration
+#### TensorBoard Integration
 
 ```python
 from torch.utils.tensorboard import SummaryWriter
@@ -930,11 +973,9 @@ for epoch in range(100):
 tracker.close()
 ```
 
----
+### Checkpoint Management
 
-## 6. Checkpoint Management
-
-### 6.1 Checkpoint Saving and Loading
+#### Checkpoint Saving and Loading
 
 ```python
 import os
@@ -1013,9 +1054,7 @@ class CheckpointManager:
         return best_checkpoint
 ```
 
----
-
-## 7. Early Stopping
+### Early Stopping
 
 ```python
 class EarlyStopping:
@@ -1072,11 +1111,9 @@ for epoch in range(100):
         break
 ```
 
----
+### Learning Rate Scheduling
 
-## 8. Learning Rate Scheduling
-
-### 8.1 Common Schedulers
+#### Common Schedulers
 
 ```python
 import torch.optim as optim
@@ -1127,10 +1164,11 @@ scheduler_warm = optim.lr_scheduler.CosineAnnealingWarmRestarts(
 )
 ```
 
-### 8.2 Custom Scheduler
+#### Custom Scheduler
 
 ```python
 from torch.optim.lr_scheduler import _LRScheduler
+import numpy as np
 
 class WarmupCosineScheduler(_LRScheduler):
     """Learning rate scheduler with warmup and cosine annealing."""
@@ -1163,11 +1201,9 @@ scheduler = WarmupCosineScheduler(
 )
 ```
 
----
+### Distributed Training
 
-## 9. Distributed Training
-
-### 9.1 DataParallel (Single Node, Multi-GPU)
+#### DataParallel (Single Node, Multi-GPU)
 
 ```python
 import torch.nn as nn
@@ -1185,7 +1221,7 @@ for epoch in range(epochs):
     val_metrics = validate(model, val_loader, criterion, device)
 ```
 
-### 9.2 DistributedDataParallel (Multi-Node, Multi-GPU)
+#### DistributedDataParallel (Multi-Node, Multi-GPU)
 
 ```python
 import torch.distributed as dist
@@ -1257,11 +1293,9 @@ def train_distributed(rank, world_size, config):
 # torchrun --nproc_per_node=4 train_script.py
 ```
 
----
+### Model Evaluation
 
-## 10. Model Evaluation
-
-### 10.1 Classification Metrics
+#### Classification Metrics
 
 ```python
 from sklearn.metrics import (
@@ -1308,7 +1342,7 @@ def evaluate_classification(model, dataloader, device, num_classes):
     return metrics, predictions, probabilities
 ```
 
-### 10.2 Object Detection Metrics
+#### Object Detection Metrics
 
 ```python
 from collections import defaultdict
@@ -1391,219 +1425,237 @@ def calculate_ap(predictions, targets, iou_threshold=0.5, num_classes=80):
     return mAP, ap_per_class
 ```
 
----
+## Best Practices
 
-## 11. Best Practices
+### Training Tips
 
-### 11.1 Training Tips
+1. **Set Random Seeds for Reproducibility**
+   ```python
+   def set_seed(seed=42):
+       torch.manual_seed(seed)
+       torch.cuda.manual_seed(seed)
+       torch.cuda.manual_seed_all(seed)
+       np.random.seed(seed)
+       torch.backends.cudnn.deterministic = True
+       torch.backends.cudnn.benchmark = False
+   ```
 
-```python
-# 1. Always set random seeds for reproducibility
-def set_seed(seed=42):
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-    np.random.seed(seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
+2. **Use Gradient Clipping**
+   ```python
+   torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+   ```
 
-# 2. Use gradient clipping to prevent exploding gradients
-torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+3. **Use Learning Rate Finder**
+   ```python
+   def find_lr(model, train_loader, criterion, device, init_lr=1e-7, final_lr=10, num_iter=100):
+       """Find optimal learning rate."""
+       model.train()
+       optimizer = torch.optim.Adam(model.parameters(), lr=init_lr)
+       gamma = (final_lr / init_lr) ** (1 / num_iter)
 
-# 3. Use learning rate finder
-def find_lr(model, train_loader, criterion, device, init_lr=1e-7, final_lr=10, num_iter=100):
-    """Find optimal learning rate."""
-    model.train()
-    optimizer = torch.optim.Adam(model.parameters(), lr=init_lr)
-    gamma = (final_lr / init_lr) ** (1 / num_iter)
+       lrs = []
+       losses = []
 
-    lrs = []
-    losses = []
+       for i, (inputs, targets) in enumerate(train_loader):
+           if i >= num_iter:
+               break
 
-    for i, (inputs, targets) in enumerate(train_loader):
-        if i >= num_iter:
-            break
+           inputs, targets = inputs.to(device), targets.to(device)
 
-        inputs, targets = inputs.to(device), targets.to(device)
+           optimizer.zero_grad()
+           outputs = model(inputs)
+           loss = criterion(outputs, targets)
+           loss.backward()
+           optimizer.step()
 
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, targets)
-        loss.backward()
-        optimizer.step()
+           lrs.append(optimizer.param_groups[0]['lr'])
+           losses.append(loss.item())
 
-        lrs.append(optimizer.param_groups[0]['lr'])
-        losses.append(loss.item())
+           optimizer.param_groups[0]['lr'] *= gamma
 
-        optimizer.param_groups[0]['lr'] *= gamma
+       return lrs, losses
+   ```
 
-    return lrs, losses
+4. **Use Model Checkpointing with Best Validation Metric**
+   ```python
+   best_val_loss = float('inf')
+   for epoch in range(epochs):
+       val_loss = validate(model, val_loader, criterion, device)['loss']
+       if val_loss < best_val_loss:
+           best_val_loss = val_loss
+           torch.save(model.state_dict(), 'best_model.pt')
+   ```
 
-# 4. Use model checkpointing with best validation metric
-best_val_loss = float('inf')
-for epoch in range(epochs):
-    val_loss = validate(model, val_loader, criterion, device)['loss']
-    if val_loss < best_val_loss:
-        best_val_loss = val_loss
-        torch.save(model.state_dict(), 'best_model.pt')
+5. **Use Gradient Accumulation for Larger Effective Batch Size**
+   ```python
+   accumulation_steps = 4
+   for i, (inputs, targets) in enumerate(train_loader):
+       loss = criterion(model(inputs), targets) / accumulation_steps
+       loss.backward()
 
-# 5. Use gradient accumulation for larger effective batch size
-accumulation_steps = 4
-for i, (inputs, targets) in enumerate(train_loader):
-    loss = criterion(model(inputs), targets) / accumulation_steps
-    loss.backward()
+       if (i + 1) % accumulation_steps == 0:
+           optimizer.step()
+           optimizer.zero_grad()
+   ```
 
-    if (i + 1) % accumulation_steps == 0:
-        optimizer.step()
-        optimizer.zero_grad()
-```
+### Debugging Tips
 
-### 11.2 Debugging Tips
+1. **Overfit a Single Batch**
+   ```python
+   def overfit_single_batch(model, train_loader, criterion, optimizer, device, epochs=100):
+       """Overfit a single batch to verify model."""
+       model.train()
 
-```python
-# 1. Overfit a single batch to verify model works
-def overfit_single_batch(model, train_loader, criterion, optimizer, device, epochs=100):
-    """Overfit a single batch to verify model."""
-    model.train()
+       inputs, targets = next(iter(train_loader))
+       inputs, targets = inputs.to(device), targets.to(device)
 
-    inputs, targets = next(iter(train_loader))
-    inputs, targets = inputs.to(device), targets.to(device)
+       for epoch in range(epochs):
+           optimizer.zero_grad()
+           outputs = model(inputs)
+           loss = criterion(outputs, targets)
+           loss.backward()
+           optimizer.step()
 
-    for epoch in range(epochs):
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, targets)
-        loss.backward()
-        optimizer.step()
+           if epoch % 10 == 0:
+               print(f"Epoch {epoch}, Loss: {loss.item():.4f}")
+   ```
 
-        if epoch % 10 == 0:
-            print(f"Epoch {epoch}, Loss: {loss.item():.4f}")
+2. **Check for NaN in Gradients**
+   ```python
+   def check_nan_gradients(model):
+       """Check for NaN in gradients."""
+       for name, param in model.named_parameters():
+           if param.grad is not None:
+               if torch.isnan(param.grad).any():
+                   print(f"NaN gradient found in {name}")
+                   return True
+       return False
+   ```
 
-# 2. Check for NaN in gradients
-def check_nan_gradients(model):
-    """Check for NaN in gradients."""
-    for name, param in model.named_parameters():
-        if param.grad is not None:
-            if torch.isnan(param.grad).any():
-                print(f"NaN gradient found in {name}")
-                return True
-    return False
+3. **Monitor Gradient Norms**
+   ```python
+   def get_gradient_norm(model):
+       """Calculate gradient norm."""
+       total_norm = 0
+       for p in model.parameters():
+           if p.grad is not None:
+               param_norm = p.grad.data.norm(2)
+               total_norm += param_norm.item() ** 2
+       total_norm = total_norm ** 0.5
+       return total_norm
+   ```
 
-# 3. Monitor gradient norms
-def get_gradient_norm(model):
-    """Calculate gradient norm."""
-    total_norm = 0
-    for p in model.parameters():
-        if p.grad is not None:
-            param_norm = p.grad.data.norm(2)
-            total_norm += param_norm.item() ** 2
-    total_norm = total_norm ** 0.5
-    return total_norm
-```
+### Common Pitfalls
 
----
+1. **Forgetting to Call model.eval() During Validation**
+   ```python
+   # WRONG:
+   for inputs, targets in val_loader:
+       outputs = model(inputs)  # Model is still in train mode!
 
-## 12. Common Pitfalls
+   # CORRECT:
+   model.eval()
+   with torch.no_grad():
+       for inputs, targets in val_loader:
+           outputs = model(inputs)
+   ```
 
-### 12.1 Common Mistakes
+2. **Not Using .to(device) Consistently**
+   ```python
+   # WRONG:
+   inputs = inputs.to(device)
+   outputs = model(inputs)  # Model might be on CPU!
 
-```python
-# MISTAKE 1: Forgetting to call model.eval() during validation
-# WRONG:
-for inputs, targets in val_loader:
-    outputs = model(inputs)  # Model is still in train mode!
+   # CORRECT:
+   model = model.to(device)
+   inputs, targets = inputs.to(device), targets.to(device)
+   outputs = model(inputs)
+   ```
 
-# CORRECT:
-model.eval()
-with torch.no_grad():
-    for inputs, targets in val_loader:
-        outputs = model(inputs)
+3. **Using Softmax Before CrossEntropyLoss**
+   ```python
+   # WRONG:
+   outputs = model(inputs)
+   outputs = torch.softmax(outputs, dim=1)
+   loss = criterion(outputs, targets)  # Double softmax!
 
-# MISTAKE 2: Not using .to(device) consistently
-# WRONG:
-inputs = inputs.to(device)
-outputs = model(inputs)  # Model might be on CPU!
+   # CORRECT:
+   outputs = model(inputs)
+   loss = criterion(outputs, targets)  # CrossEntropyLoss includes LogSoftmax
+   ```
 
-# CORRECT:
-model = model.to(device)
-inputs, targets = inputs.to(device), targets.to(device)
-outputs = model(inputs)
+4. **Not Shuffling Training Data**
+   ```python
+   # WRONG:
+   train_loader = DataLoader(dataset, batch_size=32, shuffle=False)
 
-# MISTAKE 3: Using softmax before CrossEntropyLoss
-# WRONG:
-outputs = model(inputs)
-outputs = torch.softmax(outputs, dim=1)
-loss = criterion(outputs, targets)  # Double softmax!
+   # CORRECT:
+   train_loader = DataLoader(dataset, batch_size=32, shuffle=True)
+   ```
 
-# CORRECT:
-outputs = model(inputs)
-loss = criterion(outputs, targets)  # CrossEntropyLoss includes LogSoftmax
+5. **Using Test Data for Hyperparameter Tuning**
+   ```python
+   # WRONG:
+   # Tuning hyperparameters on test set leads to overfitting
 
-# MISTAKE 4: Not shuffling training data
-# WRONG:
-train_loader = DataLoader(dataset, batch_size=32, shuffle=False)
+   # CORRECT:
+   # Use validation set for tuning, keep test set separate
+   ```
 
-# CORRECT:
-train_loader = DataLoader(dataset, batch_size=32, shuffle=True)
+### Performance Optimization
 
-# MISTAKE 5: Using test data for hyperparameter tuning
-# WRONG:
-# Tuning hyperparameters on test set leads to overfitting
+1. **Increase num_workers for Faster Data Loading**
+   ```python
+   train_loader = DataLoader(
+       dataset,
+       batch_size=32,
+       num_workers=8,  # Increase based on CPU cores
+       pin_memory=True  # Faster GPU transfer
+   )
+   ```
 
-# CORRECT:
-# Use validation set for tuning, keep test set separate
-```
+2. **Use Mixed Precision Training**
+   ```python
+   scaler = GradScaler()
+   with autocast():
+       outputs = model(inputs)
+       loss = criterion(outputs, targets)
+   scaler.scale(loss).backward()
+   scaler.step(optimizer)
+   scaler.update()
+   ```
 
-### 12.2 Performance Issues
+3. **Use Gradient Checkpointing for Memory Efficiency**
+   ```python
+   from torch.utils.checkpoint import checkpoint
 
-```python
-# 1. Slow data loading - Increase num_workers
-train_loader = DataLoader(
-    dataset,
-    batch_size=32,
-    num_workers=8,  # Increase based on CPU cores
-    pin_memory=True  # Faster GPU transfer
-)
+   class CheckpointedModel(nn.Module):
+       def forward(self, x):
+           # Use checkpointing for memory-intensive layers
+           x = checkpoint(self.layer1, x)
+           x = checkpoint(self.layer2, x)
+           return x
+   ```
 
-# 2. Slow training - Use mixed precision
-scaler = GradScaler()
-with autocast():
-    outputs = model(inputs)
-    loss = criterion(outputs, targets)
-scaler.scale(loss).backward()
-scaler.step(optimizer)
-scaler.update()
+4. **Handle Out of Memory Issues**
+   ```python
+   # Option 1: Reduce batch size
+   batch_size = 16  # Instead of 32
 
-# 3. Memory issues - Use gradient checkpointing
-from torch.utils.checkpoint import checkpoint
+   # Option 2: Use gradient accumulation
+   accumulation_steps = 4
+   for i, (inputs, targets) in enumerate(train_loader):
+       loss = criterion(model(inputs), targets) / accumulation_steps
+       loss.backward()
+       if (i + 1) % accumulation_steps == 0:
+           optimizer.step()
+           optimizer.zero_grad()
+   ```
 
-class CheckpointedModel(nn.Module):
-    def forward(self, x):
-        # Use checkpointing for memory-intensive layers
-        x = checkpoint(self.layer1, x)
-        x = checkpoint(self.layer2, x)
-        return x
+## Related Skills
 
-# 4. Out of memory - Reduce batch size or use gradient accumulation
-# Option 1: Reduce batch size
-batch_size = 16  # Instead of 32
-
-# Option 2: Use gradient accumulation
-accumulation_steps = 4
-for i, (inputs, targets) in enumerate(train_loader):
-    loss = criterion(model(inputs), targets) / accumulation_steps
-    loss.backward()
-    if (i + 1) % accumulation_steps == 0:
-        optimizer.step()
-        optimizer.zero_grad()
-```
-
----
-
-## Additional Resources
-
-- [PyTorch Documentation](https://pytorch.org/docs/stable/index.html)
-- [PyTorch Tutorials](https://pytorch.org/tutorials/)
-- [MLflow Documentation](https://mlflow.org/docs/latest/index.html)
-- [Weights & Biases Documentation](https://docs.wandb.ai/)
-- [Optuna Documentation](https://optuna.readthedocs.io/)
+- [`05-ai-ml-core/data-augmentation`](05-ai-ml-core/data-augmentation/SKILL.md)
+- [`05-ai-ml-core/data-preprocessing`](05-ai-ml-core/data-preprocessing/SKILL.md)
+- [`05-ai-ml-core/model-optimization`](05-ai-ml-core/model-optimization/SKILL.md)
+- [`05-ai-ml-core/label-studio-setup`](05-ai-ml-core/label-studio-setup/SKILL.md)
+- [`06-ai-ml-production/llm-integration`](06-ai-ml-production/llm-integration/SKILL.md)

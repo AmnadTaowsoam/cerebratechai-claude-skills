@@ -1,10 +1,22 @@
+---
+name: Server-Sent Events (SSE)
+description: Enabling servers to push updates to clients over HTTP using unidirectional event streams for real-time updates without WebSocket complexity.
+---
+
 # Server-Sent Events (SSE)
+
+> **Current Level:** Intermediate  
+> **Domain:** Real-time / Backend
+
+---
 
 ## Overview
 
-Server-Sent Events (SSE) enable servers to push updates to clients over HTTP. This guide covers implementation, use cases, and best practices.
+Server-Sent Events (SSE) enable servers to push updates to clients over HTTP. This guide covers implementation, use cases, and best practices for building real-time features using unidirectional event streams.
 
-## SSE Concepts
+## Core Concepts
+
+### SSE Concepts
 
 ```
 Client                    Server
@@ -512,9 +524,155 @@ app.post('/notify', async (req, res) => {
 });
 ```
 
-## Best Practices
+---
 
-1. **Heartbeat** - Send periodic heartbeats to keep connection alive
+## Quick Start
+
+### SSE Server (Express)
+
+```javascript
+const express = require('express')
+const app = express()
+
+app.get('/events', (req, res) => {
+  // Set SSE headers
+  res.setHeader('Content-Type', 'text/event-stream')
+  res.setHeader('Cache-Control', 'no-cache')
+  res.setHeader('Connection', 'keep-alive')
+  
+  // Send initial connection message
+  res.write('data: Connected\n\n')
+  
+  // Send periodic updates
+  const interval = setInterval(() => {
+    res.write(`data: ${JSON.stringify({ time: new Date() })}\n\n`)
+  }, 1000)
+  
+  // Clean up on client disconnect
+  req.on('close', () => {
+    clearInterval(interval)
+    res.end()
+  })
+})
+```
+
+### SSE Client
+
+```javascript
+const eventSource = new EventSource('/events')
+
+eventSource.onmessage = (event) => {
+  const data = JSON.parse(event.data)
+  console.log('Received:', data)
+}
+
+eventSource.onerror = (error) => {
+  console.error('SSE error:', error)
+  // EventSource automatically reconnects
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Headers**: Set proper SSE headers (Content-Type, Cache-Control)
+- [ ] **Heartbeat**: Send periodic heartbeats to keep connection alive
+- [ ] **Error Handling**: Handle client disconnections gracefully
+- [ ] **Reconnection**: Client automatically reconnects (built-in)
+- [ ] **Authentication**: Authenticate SSE connections
+- [ ] **Rate Limiting**: Limit connections per user
+- [ ] **CORS**: Configure CORS if needed
+- [ ] **Monitoring**: Monitor connection counts and message rates
+- [ ] **Testing**: Test with network interruptions
+- [ ] **Documentation**: Document event format
+- [ ] **Fallback**: Fallback to polling if SSE unavailable
+- [ ] **Security**: Validate and sanitize event data
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Heartbeat
+
+```javascript
+// ❌ Bad - No heartbeat, connection may timeout
+app.get('/events', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream')
+  // No heartbeat - connection may die
+})
+```
+
+```javascript
+// ✅ Good - Periodic heartbeat
+app.get('/events', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream')
+  
+  // Send heartbeat every 30 seconds
+  const heartbeat = setInterval(() => {
+    res.write(': heartbeat\n\n')
+  }, 30000)
+  
+  req.on('close', () => clearInterval(heartbeat))
+})
+```
+
+### ❌ Don't: No Error Handling
+
+```javascript
+// ❌ Bad - No error handling
+app.get('/events', (req, res) => {
+  res.write('data: message\n\n')  // What if client disconnects?
+})
+```
+
+```javascript
+// ✅ Good - Handle disconnections
+app.get('/events', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream')
+  
+  req.on('close', () => {
+    // Clean up resources
+    console.log('Client disconnected')
+    res.end()
+  })
+  
+  // Send messages
+  res.write('data: message\n\n')
+})
+```
+
+### ❌ Don't: Large Event Payloads
+
+```javascript
+// ❌ Bad - Large payload
+res.write(`data: ${JSON.stringify(largeObject)}\n\n`)  // Too big!
+```
+
+```javascript
+// ✅ Good - Small, focused events
+res.write(`data: ${JSON.stringify({
+  type: 'update',
+  id: itemId,
+  status: 'completed'
+})}\n\n`)  // Only necessary data
+```
+
+---
+
+## Integration Points
+
+- **WebSocket Patterns** (`34-real-time-features/websocket-patterns/`) - Alternative for bidirectional
+- **Real-time Dashboard** (`34-real-time-features/real-time-dashboard/`) - Dashboard updates
+- **Live Notifications** (`34-real-time-features/live-notifications/`) - Notification delivery
+
+---
+
+## Further Reading
+
+- [MDN Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
+- [EventSource API](https://developer.mozilla.org/en-US/docs/Web/API/EventSource)
+- [SSE vs WebSocket](https://www.html5rocks.com/en/tutorials/eventsource/basics/)
 2. **Reconnection** - Implement exponential backoff
 3. **Authentication** - Secure event streams
 4. **Event IDs** - Use event IDs for tracking

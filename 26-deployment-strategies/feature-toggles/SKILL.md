@@ -1,8 +1,20 @@
+---
+name: Feature Toggles (Feature Flags)
+description: Using runtime switches to enable or disable features without deploying new code, decoupling deployment from release and enabling gradual rollouts, A/B testing, and emergency feature disabling.
+---
+
 # Feature Toggles (Feature Flags)
 
-## What are Feature Toggles
+> **Current Level:** Intermediate  
+> **Domain:** DevOps / Feature Management
 
-Feature toggles are runtime switches that enable or disable features without deploying new code. They decouple deployment from release.
+---
+
+## Overview
+
+Feature toggles are runtime switches that enable or disable features without deploying new code. They decouple deployment from release, enabling gradual rollouts, A/B testing, and emergency feature disabling without code changes.
+
+## What are Feature Toggles
 
 ### Core Concept
 
@@ -1210,6 +1222,133 @@ setInterval(() => {
 - [ ] Integration tests complete
 - [ ] Feature branch tests complete
 - [ ] Performance tests complete
+```
+
+---
+
+## Quick Start
+
+### LaunchDarkly Integration
+
+```javascript
+const LaunchDarkly = require('launchdarkly-node-server-sdk')
+
+const client = LaunchDarkly.init(process.env.LAUNCHDARKLY_SDK_KEY)
+
+// Check feature flag
+const flagValue = await client.variation('new-checkout-flow', user, false)
+if (flagValue) {
+  // New checkout flow
+} else {
+  // Old checkout flow
+}
+```
+
+### Custom Feature Toggle
+
+```typescript
+interface FeatureToggle {
+  name: string
+  enabled: boolean
+  percentage?: number
+  userIds?: string[]
+}
+
+class FeatureToggleService {
+  async isEnabled(toggleName: string, userId: string): Promise<boolean> {
+    const toggle = await db.featureToggles.findUnique({
+      where: { name: toggleName }
+    })
+    
+    if (!toggle || !toggle.enabled) return false
+    
+    // Percentage rollout
+    if (toggle.percentage) {
+      const hash = this.hashUserId(userId)
+      return hash % 100 < toggle.percentage
+    }
+    
+    // User list
+    if (toggle.userIds?.includes(userId)) {
+      return true
+    }
+    
+    return false
+  }
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Toggle Service**: Set up feature toggle service
+- [ ] **Toggle Management**: UI for managing toggles
+- [ ] **Gradual Rollout**: Support percentage-based rollout
+- [ ] **User Targeting**: Support user-specific toggles
+- [ ] **Monitoring**: Monitor toggle usage and impact
+- [ ] **Documentation**: Document each feature toggle
+- [ ] **Cleanup**: Remove toggles after feature is stable
+- [ ] **Testing**: Test with toggles on/off
+- [ ] **Fallback**: Fallback behavior when toggle fails
+- [ ] **Performance**: Minimal performance impact
+- [ ] **Security**: Secure toggle configuration
+- [ ] **Audit**: Audit log of toggle changes
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Toggle Debt
+
+```typescript
+// ❌ Bad - Toggle never removed
+if (featureToggle('old-feature')) {
+  // Old code still here!
+}
+```
+
+```typescript
+// ✅ Good - Remove after feature stable
+// Toggle removed after 2 weeks of 100% rollout
+// Old code removed
+```
+
+### ❌ Don't: No Fallback
+
+```typescript
+// ❌ Bad - No fallback
+const value = await getToggle('feature')
+if (value) {
+  newFeature()  // What if toggle service fails?
+}
+```
+
+```typescript
+// ✅ Good - Fallback to safe default
+const value = await getToggle('feature').catch(() => false)  // Default: off
+if (value) {
+  newFeature()
+} else {
+  oldFeature()  // Safe fallback
+}
+```
+
+---
+
+## Integration Points
+
+- **Canary Deployment** (`26-deployment-strategies/canary-deployment/`) - Gradual rollout
+- **A/B Testing** (`23-business-analytics/ab-testing-analysis/`) - Feature testing
+- **Monitoring** (`14-monitoring-observability/`) - Toggle monitoring
+
+---
+
+## Further Reading
+
+- [Feature Toggles (Martin Fowler)](https://martinfowler.com/articles/feature-toggles.html)
+- [LaunchDarkly Documentation](https://docs.launchdarkly.com/)
+- [Unleash Feature Flags](https://www.getunleash.io/)
 
 ### Cleanup
 

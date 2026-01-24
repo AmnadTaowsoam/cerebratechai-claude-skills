@@ -8,14 +8,14 @@
 
 ### Development (สำหรับแก้ไข)
 ```
-D:\Cerebra\cerebratechai-claude-skills
+D:\Cerebra\cerebraSkills
 ```
 - ✏️ แก้ไขและพัฒนา skills ที่นี่
 - 📤 Push ขึ้น GitHub ด้วย `sync-to-production.bat`
 
 ### Production (สำหรับ Multi-Agent)
 ```
-D:\AgentSkill\cerebratechai-claude-skills
+D:\AgentSkill\cerebraSkills
 ```
 - 🤖 Multi-agent อ่าน skills จากที่นี่
 - 📥 Pull จาก GitHub ด้วย `update-skills.bat`
@@ -27,7 +27,7 @@ D:\AgentSkill\cerebratechai-claude-skills
 ```
 1. แก้ไข Skills
    ↓
-   D:\Cerebra\cerebratechai-claude-skills
+   D:\Cerebra\cerebraSkills
    
 2. Push ขึ้น GitHub
    ↓
@@ -35,7 +35,7 @@ D:\AgentSkill\cerebratechai-claude-skills
    
 3. GitHub Repository
    ↓
-   https://github.com/AmnadTaowsoam/cerebratechai-claude-skills
+   https://github.com/AmnadTaowsoam/cerebraSkills
    
 4. Pull มา Production
    ↓
@@ -43,7 +43,7 @@ D:\AgentSkill\cerebratechai-claude-skills
    
 5. Multi-Agent ใช้งาน
    ↓
-   D:\AgentSkill\cerebratechai-claude-skills
+   D:\AgentSkill\cerebraSkills
 ```
 
 ---
@@ -83,10 +83,8 @@ setup-project-links.bat
 mkdir .agentskills
 
 # สร้าง junction link ไปที่ skills
-mklink /J .agentskills\skills D:\AgentSkill\cerebratechai-claude-skills
+mklink /J .agentskills\skills D:\AgentSkill\cerebraSkills
 
-# สร้าง junction link สำหรับ Codex
-mklink /J .codex .agentskills
 ```
 
 ### ผลลัพธ์
@@ -94,8 +92,8 @@ mklink /J .codex .agentskills
 ```
 your-project/
 ├── .agentskills/
-│   └── skills/  → D:\AgentSkill\cerebratechai-claude-skills
-└── .codex/      → .agentskills/
+    └── skills/  → D:\AgentSkill\cerebraSkills
+
 ```
 
 ### ตรวจสอบว่าสำเร็จ
@@ -113,7 +111,6 @@ dir .agentskills\skills
 ```gitignore
 # Agent Skills Junction Links
 .agentskills/
-.codex/
 ```
 
 **หมายเหตุ:** Junction links จะไม่ถูก commit ขึ้น git (เป็น symbolic link)
@@ -138,7 +135,7 @@ Settings → Skills → Add Folder
 
 **3. เลือก Production Directory**
 ```
-D:\AgentSkill\cerebratechai-claude-skills
+D:\AgentSkill\cerebraSkills
 ```
 
 **4. ตั้งชื่อ**
@@ -184,10 +181,10 @@ update-skills.bat
 
 **1. เปิด Production Repository**
 ```bash
-cursor D:\AgentSkill\cerebratechai-claude-skills
+cursor D:\AgentSkill\cerebraSkills
 ```
 
-หรือ: `File → Open Folder → เลือก D:\AgentSkill\cerebratechai-claude-skills`
+หรือ: `File → Open Folder → เลือก D:\AgentSkill\cerebraSkills`
 
 **2. สร้างไฟล์ .cursorrules** (ใน root ของ repository)
 
@@ -275,8 +272,8 @@ Cmd+Shift+P → "Developer: Reload Window"
 **1. Clone Repository**
 ```bash
 cd ~/projects
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
-cd cerebratechai-claude-skills
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
+cd cerebraSkills
 ```
 
 **2. เปิดใน VS Code**
@@ -341,7 +338,7 @@ Repository นี้มี 473+ production-ready coding skills
 #### อัพเดท Skills
 
 ```bash
-cd ~/projects/cerebratechai-claude-skills
+cd ~/projects/cerebraSkills
 git pull origin main
 
 # Reload VS Code
@@ -400,7 +397,7 @@ List available skills
 ### Agent ไม่เห็น Skills
 
 **ตรวจสอบ:**
-1. ✅ Path ถูกต้อง: `D:\AgentSkill\cerebratechai-claude-skills`
+1. ✅ Path ถูกต้อง: `D:\AgentSkill\cerebraSkills`
 2. ✅ มีไฟล์ SKILL.md ในโฟลเดอร์
 3. ✅ Restart agent / Reload window
 
@@ -460,5 +457,5 @@ Production (D:\AgentSkill)
 ---
 
 **อัปเดตล่าสุด**: 17 มกราคม 2026  
-**Repository**: https://github.com/AmnadTaowsoam/cerebratechai-claude-skills  
+**Repository**: https://github.com/AmnadTaowsoam/cerebraSkills  
 **License**: MIT

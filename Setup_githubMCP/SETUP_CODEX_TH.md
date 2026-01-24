@@ -32,7 +32,7 @@
 1. ไปที่: https://github.com/settings/tokens
 2. สร้าง **Fine-grained token**:
    - ชื่อ: `Codex MCP - Skills`
-   - Repository: `cerebratechai-claude-skills`
+   - Repository: `cerebraSkills`
    - สิทธิ์: `Contents: Read-only`
 3. คัดลอก token (ขึ้นต้นด้วย `github_pat_`)
 
@@ -44,7 +44,7 @@
 codex mcp add cerebratechai-skills \
   --env GITHUB_PERSONAL_ACCESS_TOKEN=YOUR_TOKEN_HERE \
   --env GITHUB_OWNER=AmnadTaowsoam \
-  --env GITHUB_REPO=cerebratechai-claude-skills \
+  --env GITHUB_REPO=cerebraSkills \
   --env GITHUB_BRANCH=main \
   -- npx -y @modelcontextprotocol/server-github
 ```
@@ -61,7 +61,7 @@ args = ["-y", "@modelcontextprotocol/server-github"]
 [mcp_servers.cerebratechai-skills.env]
 GITHUB_PERSONAL_ACCESS_TOKEN = "YOUR_TOKEN_HERE"
 GITHUB_OWNER = "AmnadTaowsoam"
-GITHUB_REPO = "cerebratechai-claude-skills"
+GITHUB_REPO = "cerebraSkills"
 GITHUB_BRANCH = "main"
 ```
 
@@ -113,10 +113,10 @@ Create a Next.js API endpoint
 cd ~/projects
 
 # Clone repository
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
 
 # เข้าไปในโฟลเดอร์
-cd cerebratechai-claude-skills
+cd cerebraSkills
 ```
 
 ### ขั้นที่ 3: เปิดใน VS Code
@@ -126,7 +126,7 @@ cd cerebratechai-claude-skills
 code .
 ```
 
-หรือ: File → Open Folder → เลือก `cerebratechai-claude-skills`
+หรือ: File → Open Folder → เลือก `cerebraSkills`
 
 ### ขั้นที่ 4: ตั้งค่า Copilot Workspace
 
@@ -306,7 +306,7 @@ const userService = // Copilot แนะนำ implementation
 ### 5. อัปเดตเป็นประจำ
 ```bash
 # Pull skills ล่าสุด
-cd ~/projects/cerebratechai-claude-skills
+cd ~/projects/cerebraSkills
 git pull origin main
 ```
 
@@ -318,7 +318,7 @@ git pull origin main
 
 ```bash
 # ไปที่ repository
-cd ~/projects/cerebratechai-claude-skills
+cd ~/projects/cerebraSkills
 
 # Pull การเปลี่ยนแปลงล่าสุด
 git pull origin main
@@ -399,5 +399,5 @@ git pull origin main
 ---
 
 **อัปเดตล่าสุด**: 17 มกราคม 2026  
-**Repository**: https://github.com/AmnadTaowsoam/cerebratechai-claude-skills  
+**Repository**: https://github.com/AmnadTaowsoam/cerebraSkills  
 **License**: MIT

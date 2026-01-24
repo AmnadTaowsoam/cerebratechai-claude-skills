@@ -1,46 +1,590 @@
----
-name: Error Boundaries in React
-description: Implementing error boundaries for graceful error handling and improved user experience in React applications.
----
-
 # Error Boundaries in React
 
-## Overview
+---
 
-Error Boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of crashing the entire application. They catch errors during rendering, in lifecycle methods, and in constructors of the whole tree below them.
+## 1. Executive Summary & Strategic Necessity
 
-## What are Error Boundaries
+### 1.1 Context (ภาษาไทย)
 
-Error Boundaries are a React feature introduced in React 16 that allows you to:
+Error Boundaries เป็นคุณลักษณะที่สำคัญใน React ที่ช่วยจัดการข้อผิดพลาด (Error Handling) ในแอปพลิเคชัน React โดยการจับ JavaScript errors ที่เกิดขึ้นใน component tree และแสดง fallback UI แทนที่จะทำให้ทั้งแอปพลิเคชัน crash นี่เป็นสิ่งสำคัญในการสร้างแอปพลิเคชันที่มีความเสถียรและให้ประสบการณ์ผู้ใช้ที่ดี
 
-1. **Catch errors** in component trees
-2. **Display fallback UI** when errors occur
-3. **Log errors** for debugging
-4. **Recover from errors** gracefully
+Error Boundaries ถูกนำเสนอใน React 16 และเป็นส่วนสำคัญของการสร้างแอปพลิเคชัน React ที่มีความทนทาน (Resilient) และสามารถกู้คืนจากข้อผิดพลาดได้อย่างสวยงาม
 
-**What Error Boundaries DO Catch:**
+### 1.2 Business Impact (ภาษาไทย)
+
+**ผลกระทบทางธุรกิจ:**
+
+1. **ลด Downtime** - Error Boundaries ช่วยลดเวลาที่แอปพลิเคชันไม่สามารถใช้งานได้เนื่องจากข้อผิดพลาด โดยการจับและจัดการข้อผิดพลาดในระดับ component แทนที่จะทำให้ทั้งแอป crash
+
+2. **เพิ่ม User Retention** - ผู้ใช้มักจะออกจากแอปพลิเคชันที่มีข้อผิดพลาดบ่อย Error Boundaries ช่วยให้แอปพลิเคชันยังคงใช้งานได้แม้จะมีข้อผิดพลาดในบางส่วน
+
+3. **ลด Support Cost** - Error Reporting ที่ดีช่วยให้ทีมพัฒนาสามารถระบุและแก้ไขปัญหาได้เร็วขึ้น ทำให้ลดคำถามและปัญหาจากผู้ใช้
+
+4. **เพิ่ม Trust** - แอปพลิเคชันที่มีการจัดการข้อผิดพลาดที่ดีสร้างความไว้วางใจให้กับผู้ใช้
+
+5. **ปรับปรุง User Experience** - Fallback UI ที่ดีช่วยให้ผู้ใช้เข้าใจสถานการณ์และมีตัวเลือกในการกู้คืน
+
+### 1.3 Product Thinking (ภาษาไทย)
+
+**มุมมองด้านผลิตภัณฑ์:**
+
+1. **Graceful Degradation** - Error Boundaries ช่วยให้แอปพลิเคชันสามารถทำงานได้แม้จะมีบางส่วนที่ไม่ทำงาน ผู้ใช้ยังสามารถใช้งานส่วนอื่นๆ ของแอปพลิเคชันได้
+
+2. **Error Recovery** - ให้ผู้ใช้มีตัวเลือกในการกู้คืนจากข้อผิดพลาด เช่น Retry, Go Home, Contact Support
+
+3. **Contextual Error Messages** - Error messages ต้องเข้าใจง่ายและให้ข้อมูลที่เป็นประโยชน์แก่ผู้ใช้
+
+4. **Error Tracking** - Error reporting ต้องมี context เพียงพอสำหรับการ debug เช่น component stack, user info, environment
+
+5. **User-Centric Design** - Fallback UI ต้องออกแบบให้ใช้งานง่ายและให้ผู้ใช้มีความรู้สึกดีแม้จะเกิดข้อผิดพลาด
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+### 2.1 Core Logic
+
+Error Boundaries คือ React components ที่:
+1. จับ JavaScript errors ใน component tree ของตนเอง
+2. Log errors สำหรับการ debug
+3. แสดง fallback UI แทน component tree ที่ crashed
+
+**สิ่งที่ Error Boundaries จับได้:**
 - Rendering errors
-- Errors in lifecycle methods
-- Errors in constructors
+- Errors ใน lifecycle methods
+- Errors ใน constructors
 
-**What Error Boundaries DO NOT Catch:**
+**สิ่งที่ Error Boundaries ไม่จับได้:**
 - Event handlers
 - Asynchronous code (setTimeout, promises)
 - Server-side rendering errors
-- Errors thrown in error boundary itself
+- Errors ที่เกิดใน error boundary เอง
 
-## componentDidCatch and getDerivedStateFromError
+### 2.2 Architecture Diagram Requirements
 
-### getDerivedStateFromError
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  Error Boundary Architecture                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌───────────────────────────────────────────────────────────┐   │
+│  │              Global Error Boundary                        │   │
+│  │  ┌─────────────────────────────────────────────────────┐  │   │
+│  │  │         App Component                             │  │   │
+│  │  │                                                   │  │   │
+│  │  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐ │  │   │
+│  │  │  │   Header    │  │  Feature 1  │  │  Footer   │ │  │   │
+│  │  │  └─────────────┘  └──────┬──────┘  └───────────┘ │  │   │
+│  │  │                       │                          │  │   │
+│  │  │  ┌─────────────────────▼──────────────────────┐  │  │   │
+│  │  │  │      Feature Error Boundary               │  │  │   │
+│  │  │  │  ┌─────────────┐  ┌─────────────┐        │  │   │
+│  │  │  │  │ Component A │  │ Component B │        │  │   │
+│  │  │  │  └─────────────┘  └─────────────┘        │  │   │
+│  │  │  │                                           │  │   │
+│  │  │  │  ┌─────────────┐  ┌─────────────┐        │  │   │
+│  │  │  │  │ Component C │  │ Component D │        │  │   │
+│  │  │  │  └─────────────┘  └─────────────┘        │  │   │
+│  │  │  └───────────────────────────────────────────┘  │  │   │
+│  │  │                                                   │  │   │
+│  │  │  ┌─────────────────────────────────────────────┐  │  │   │
+│  │  │  │      Error Reporting Service               │  │  │   │
+│  │  │  │  ┌─────────┐  ┌─────────┐  ┌─────────┐ │  │   │
+│  │  │  │  │  Sentry │  │LogRocket│  │ Custom  │ │  │   │
+│  │  │  │  └─────────┘  └─────────┘  └─────────┘ │  │   │
+│  │  │  └─────────────────────────────────────────────┘  │  │   │
+│  │  └─────────────────────────────────────────────────────┘  │   │
+│  └───────────────────────────────────────────────────────────┘   │
+│                                                                  │
+│  ┌───────────────────────────────────────────────────────────┐   │
+│  │              Fallback UI Layer                            │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐     │   │
+│  │  │   Simple    │  │   Detailed  │  │   Themed    │     │   │
+│  │  │  Fallback   │  │  Fallback   │  │  Fallback   │     │   │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘     │   │
+│  └───────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-Used to update state in response to an error. Called during render phase.
+### 2.3 Implementation Workflow
+
+**Step 1: Create Base Error Boundary Component**
+
+```typescript
+// components/ErrorBoundary.tsx
+import React, { Component, ErrorInfo, ReactNode } from 'react'
+
+interface Props {
+  children: ReactNode
+  fallback?: ReactNode
+  onError?: (error: Error, errorInfo: ErrorInfo) => void
+}
+
+interface State {
+  hasError: boolean
+  error: Error | null
+  errorInfo: ErrorInfo | null
+}
+
+export class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props)
+    this.state = { hasError: false, error: null, errorInfo: null }
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    // Update state so the next render will show the fallback UI
+    return { hasError: true, error, errorInfo: null }
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Log the error to an error reporting service
+    console.error('Error caught by boundary:', error, errorInfo)
+    
+    // Call custom error handler
+    this.props.onError?.(error, errorInfo)
+    
+    // Store error info for display
+    this.setState({ errorInfo })
+  }
+
+  resetError = () => {
+    this.setState({ hasError: false, error: null, errorInfo: null })
+  }
+
+  render() {
+    if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback
+      }
+      
+      // Default fallback
+      return (
+        <div className="error-boundary">
+          <h2>Something went wrong</h2>
+          {this.state.error && (
+            <p className="error-message">{this.state.error.message}</p>
+          )}
+          <button onClick={this.resetError}>Try Again</button>
+        </div>
+      )
+    }
+
+    return this.props.children
+  }
+}
+```
+
+**Step 2: Create Error Reporting Service**
+
+```typescript
+// services/ErrorReportingService.ts
+import * as Sentry from '@sentry/react'
+
+export class ErrorReportingService {
+  static async report(error: Error, errorInfo?: ErrorInfo, context?: Record<string, any>) {
+    // Send to Sentry
+    Sentry.withScope((scope) => {
+      if (errorInfo) {
+        scope.setExtra('componentStack', errorInfo.componentStack)
+      }
+      
+      // Add custom context
+      if (context) {
+        Object.entries(context).forEach(([key, value]) => {
+          scope.setExtra(key, value)
+        })
+      }
+      
+      scope.setTag('errorBoundary', 'true')
+      Sentry.captureException(error)
+    })
+    
+    // Also log to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error reported:', error, errorInfo, context)
+    }
+  }
+  
+  static setUser(user: { id: string; email?: string; username?: string }) {
+    Sentry.setUser(user)
+  }
+  
+  static setTag(key: string, value: string) {
+    Sentry.setTag(key, value)
+  }
+  
+  static clearUser() {
+    Sentry.setUser(null)
+  }
+}
+```
+
+**Step 3: Create Fallback UI Components**
+
+```typescript
+// components/ErrorFallback.tsx
+import React from 'react'
+
+interface SimpleFallbackProps {
+  error?: Error | null
+  onReset?: () => void
+}
+
+export function SimpleFallback({ error, onReset }: SimpleFallbackProps) {
+  return (
+    <div className="error-boundary simple">
+      <h2>Something went wrong</h2>
+      <p>We're sorry for the inconvenience.</p>
+      {error && <p className="error-message">{error.message}</p>}
+      {onReset && <button onClick={onReset}>Try Again</button>}
+    </div>
+  )
+}
+
+interface DetailedFallbackProps {
+  error?: Error | null
+  errorInfo?: ErrorInfo | null
+  onReset?: () => void
+  eventId?: string
+}
+
+export function DetailedFallback({ error, errorInfo, onReset, eventId }: DetailedFallbackProps) {
+  return (
+    <div className="error-boundary detailed">
+      <div className="error-icon">⚠️</div>
+      <h2>Oops! Something went wrong</h2>
+      
+      <div className="error-details">
+        <h3>Error Message</h3>
+        <p>{error?.message || 'Unknown error'}</p>
+        
+        {errorInfo && (
+          <details>
+            <summary>Technical Details</summary>
+            <pre>{errorInfo.componentStack}</pre>
+          </details>
+        )}
+      </div>
+      
+      <div className="error-actions">
+        {onReset && (
+          <button onClick={onReset} className="btn-primary">
+            Try Again
+          </button>
+        )}
+        <button onClick={() => window.location.href = '/'} className="btn-secondary">
+          Go Home
+        </button>
+        <button onClick={() => window.location.reload()} className="btn-tertiary">
+          Reload Page
+        </button>
+      </div>
+      
+      {eventId && (
+        <p className="error-event-id">
+          Error ID: <code>{eventId}</code>
+        </p>
+      )}
+      
+      <p className="error-contact">
+        Need help? <a href="/support">Contact Support</a>
+      </p>
+    </div>
+  )
+}
+```
+
+**Step 4: Implement Placement Strategy**
+
+```typescript
+// App.tsx
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { DetailedFallback } from './components/ErrorFallback'
+import { ErrorReportingService } from './services/ErrorReportingService'
+
+function App() {
+  return (
+    // Global boundary for catastrophic errors
+    <ErrorBoundary
+      fallback={<DetailedFallback />}
+      onError={(error, errorInfo) => {
+        ErrorReportingService.report(error, errorInfo, {
+          location: 'global',
+          timestamp: new Date().toISOString(),
+        })
+      }}
+    >
+      <div className="app-layout">
+        <Header />
+        
+        <main>
+          {/* Feature-specific boundaries */}
+          <ErrorBoundary
+            fallback={
+              <DetailedFallback
+                error={null}
+                onReset={() => window.location.href = '/dashboard'}
+              />
+            }
+            onError={(error, errorInfo) => {
+              ErrorReportingService.report(error, errorInfo, {
+                location: 'dashboard',
+                feature: 'dashboard',
+              })
+            }}
+          >
+            <Dashboard />
+          </ErrorBoundary>
+          
+          <ErrorBoundary
+            fallback={
+              <DetailedFallback
+                error={null}
+                onReset={() => window.location.href = '/projects'}
+              />
+            }
+            onError={(error, errorInfo) => {
+              ErrorReportingService.report(error, errorInfo, {
+                location: 'projects',
+                feature: 'projects',
+              })
+            }}
+          >
+            <Projects />
+          </ErrorBoundary>
+        </main>
+        
+        <Footer />
+      </div>
+    </ErrorBoundary>
+  )
+}
+```
+
+---
+
+## 3. Tooling & Tech Stack
+
+### 3.1 Enterprise Tools
+
+| Tool | Purpose | Version | License |
+|------|---------|---------|---------|
+| React | UI Library | ^18.0.0 | MIT |
+| react-error-boundary | Error Boundary Library | ^4.0.0 | MIT |
+| Sentry | Error Tracking | ^7.0.0 | Commercial/Free |
+| LogRocket | Session Recording | ^3.0.0 | Commercial |
+| TypeScript | Type Safety | ^5.0.0 | Apache 2.0 |
+
+### 3.2 Configuration Essentials
+
+**Sentry Setup:**
+```typescript
+// sentry.ts
+import * as Sentry from '@sentry/react'
+import { BrowserTracing } from '@sentry/tracing'
+
+Sentry.init({
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  environment: process.env.NODE_ENV,
+  release: process.env.NEXT_PUBLIC_APP_VERSION,
+  
+  integrations: [
+    new BrowserTracing(),
+    new Sentry.Replay({
+      maskAllText: true,
+      blockAllMedia: true,
+    }),
+  ],
+  
+  tracesSampleRate: 0.1,
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+  
+  beforeSend(event) {
+    // Filter out sensitive data
+    if (event.request?.cookies) {
+      delete event.request.cookies
+    }
+    return event
+  },
+})
+```
+
+**react-error-boundary Setup:**
+```bash
+npm install react-error-boundary
+```
+
+```typescript
+// ErrorBoundaryProvider.tsx
+import { ErrorBoundary } from 'react-error-boundary'
+
+export function AppErrorBoundary({ children }: { children: React.ReactNode }) {
+  const logError = (error: Error, info: { componentStack: string }) => {
+    console.error('Error caught by boundary:', error, info)
+    // Send to error tracking service
+    ErrorReportingService.report(error, info)
+  }
+
+  return (
+    <ErrorBoundary
+      FallbackComponent={DetailedFallback}
+      onError={logError}
+      onReset={() => {
+        // Optional: reset app state
+        window.location.href = '/'
+      }}
+    >
+      {children}
+    </ErrorBoundary>
+  )
+}
+```
+
+---
+
+## 4. Standards, Compliance & Security
+
+### 4.1 International Standards
+
+- **WCAG 2.1 Level AA** - Error messages ต้องเข้าถึงได้และเข้าใจง่าย
+- **ISO 25010** - Quality Model สำหรับ Reliability และ Recoverability
+- **OWASP** - Error Handling Best Practices สำหรับ Security
+
+### 4.2 Security Protocol
+
+Error Boundaries ต้องปฏิบัติตามหลักความปลอดภัย:
+
+1. **No Sensitive Data in Errors** - ไม่แสดงข้อมูลที่ละเอียดอ่อนใน error messages
+2. **Error Logging** - Log errors อย่างปลอดภัยโดยไม่เก็บข้อมูลส่วนบุคคล
+3. **Sanitization** - Sanitize error messages ก่อนแสดงใน UI
+4. **Rate Limiting** - จำกัดจำนวน errors ที่ส่งไปยัง error tracking service
+
+```typescript
+// Secure Error Reporting
+export class SecureErrorReportingService {
+  static sanitizeError(error: Error): Error {
+    // Remove sensitive data from error message
+    const sanitizedMessage = error.message
+      .replace(/password=["'][^"']*["']/gi, 'password="***"')
+      .replace(/token=["'][^"']*["']/gi, 'token="***"')
+      .replace(/api[_-]?key=["'][^"']*["']/gi, 'api_key="***"')
+    
+    return new Error(sanitizedMessage)
+  }
+  
+  static report(error: Error, errorInfo?: ErrorInfo) {
+    const sanitizedError = this.sanitizeError(error)
+    // Send to error tracking service
+    ErrorReportingService.report(sanitizedError, errorInfo)
+  }
+}
+```
+
+### 4.3 Explainability
+
+Error Boundaries ต้องสามารถอธิบายได้ว่า:
+
+1. **Error Context** - Error เกิดขึ้นที่ไหนและเมื่อไร
+2. **User Impact** - Error นี้ส่งผลกระทบต่อผู้ใช้อย่างไร
+3. **Recovery Path** - ผู้ใช้สามารถกู้คืนจาก error ได้อย่างไร
+4. **Debug Information** - ข้อมูลที่จำเป็นสำหรับการ debug
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+### 5.1 Cost Calculation
+
+| Metric | Calculation | Target |
+|--------|-------------|--------|
+| Error Rate | Errors / Total Requests | < 0.1% |
+| Crash Rate | Crashes / Total Sessions | < 0.01% |
+| Recovery Rate | Recovered Errors / Total Errors | > 95% |
+| MTTR (Mean Time To Recovery) | Average recovery time | < 5 min |
+| Error Reporting Latency | Time to report error | < 1s |
+
+### 5.2 Key Performance Indicators
+
+**Technical Metrics:**
+
+1. **Error Rate** - จำนวน errors ต่อจำนวน requests
+2. **Crash Rate** - จำนวน crashes ต่อจำนวน sessions
+3. **Recovery Rate** - อัตราการกู้คืนจาก errors
+4. **Error Reporting Latency** - เวลาในการ report error
+
+**Business Metrics:**
+
+1. **User Retention** - อัตราการกลับมาใช้งานหลังจากเกิด error
+2. **Support Tickets** - จำนวน support tickets ที่เกี่ยวข้องกับ errors
+3. **User Satisfaction** - ความพึงพอใจของผู้ใช้หลังจากเกิด error
+4. **Time to Resolution** - เวลาในการแก้ไข errors
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+### 6.1 Phase Rollout
+
+**Phase 1: Foundation (Week 1-2)**
+- Create base Error Boundary component
+- Setup error reporting service (Sentry)
+- Create fallback UI components
+- Implement global error boundary
+
+**Phase 2: Feature-Level Boundaries (Week 3-4)**
+- Add feature-level error boundaries
+- Implement contextual fallback UIs
+- Add error reporting for each feature
+- Test error boundaries with intentional errors
+
+**Phase 3: Advanced Features (Week 5-6)**
+- Implement retry mechanisms
+- Add error rate monitoring
+- Create error recovery strategies
+- Implement error boundary composition
+
+**Phase 4: Optimization (Week 7-8)**
+- Performance audit
+- Error rate analysis
+- User feedback collection
+- Documentation and training
+
+### 6.2 Pitfalls to Avoid
+
+1. **Over-Engineering** - Error boundaries มากเกินไปทำให้โค้ดซับซ้อน
+2. **Ignoring Non-Catchable Errors** - ไม่จัดการ async errors และ event handler errors
+3. **Poor Fallback UI** - Fallback UI ที่ไม่เป็นประโยชน์สำหรับผู้ใช้
+4. **Missing Error Context** - Error reporting ไม่มี context เพียงพอ
+5. **No Recovery Mechanism** - ไม่มีวิธีให้ผู้ใช้กู้คืนจาก errors
+
+### 6.3 Best Practices Checklist
+
+- [ ] ใช้ global error boundary สำหรับ catastrophic errors
+- [ ] ใช้ feature-level error boundaries สำหรับ better UX
+- [ ] Integrate กับ error tracking service (Sentry, LogRocket)
+- [ ] Provide fallback UI ที่ชัดเจนและเป็นประโยชน์
+- [ ] Implement retry mechanisms
+- [ ] Log errors ด้วย context เพียงพอ
+- [ ] Test error boundaries ด้วย intentional errors
+- [ ] Monitor error rates และ set up alerts
+- [ ] Sanitize error messages ก่อนแสดงใน UI
+- [ ] Document error boundary patterns
+
+---
+
+## 7. Implementation Examples
+
+### 7.1 Basic Error Boundary
 
 ```jsx
 class ErrorBoundary extends React.Component {
   state = { hasError: false, error: null };
   
   static getDerivedStateFromError(error) {
-    // Update state so the next render shows the fallback UI
+    // Update state so next render shows fallback UI
     return { hasError: true, error };
   }
   
@@ -53,9 +597,7 @@ class ErrorBoundary extends React.Component {
 }
 ```
 
-### componentDidCatch
-
-Called after an error has been thrown by a descendant component. Used for side effects like logging.
+### 7.2 Error Boundary with componentDidCatch
 
 ```jsx
 class ErrorBoundary extends React.Component {
@@ -66,7 +608,7 @@ class ErrorBoundary extends React.Component {
   }
   
   componentDidCatch(error, errorInfo) {
-    // Log the error to an error reporting service
+    // Log error to an error reporting service
     logErrorToService(error, errorInfo);
     
     // Store error info for display
@@ -93,7 +635,7 @@ function logErrorToService(error, errorInfo) {
 }
 ```
 
-### Complete Example
+### 7.3 Complete Error Boundary Example
 
 ```jsx
 class ErrorBoundary extends React.Component {
@@ -162,9 +704,7 @@ class ErrorBoundary extends React.Component {
 </ErrorBoundary>
 ```
 
-## Error Boundary Limitations
-
-### What Error Boundaries Don't Catch
+### 7.4 Error Boundary Limitations
 
 ```jsx
 class MyComponent extends React.Component {
@@ -199,7 +739,7 @@ class MyComponent extends React.Component {
 }
 ```
 
-### Handling Non-Catchable Errors
+### 7.5 Handling Non-Catchable Errors
 
 ```jsx
 // For async errors, wrap in try-catch
@@ -229,9 +769,7 @@ class MyComponent extends React.Component {
 }
 ```
 
-## Placement Strategies
-
-### Granular vs Global
+### 7.6 Placement Strategies
 
 **Granular (Feature-Level):**
 
@@ -273,7 +811,7 @@ function App() {
 }
 ```
 
-### Hybrid Approach
+**Hybrid Approach:**
 
 ```jsx
 function App() {
@@ -301,16 +839,16 @@ function App() {
 }
 ```
 
-## Fallback UI Patterns
+### 7.7 Fallback UI Patterns
 
-### Simple Fallback
+**Simple Fallback:**
 
 ```jsx
 function SimpleFallback({ error, resetError }) {
   return (
     <div className="error-boundary">
       <h2>Something went wrong</h2>
-      <p>We're sorry for the inconvenience.</p>
+      <p>We're sorry for inconvenience.</p>
       {error && <p className="error-message">{error.message}</p>}
       <button onClick={resetError}>Try Again</button>
     </div>
@@ -318,7 +856,7 @@ function SimpleFallback({ error, resetError }) {
 }
 ```
 
-### Detailed Fallback
+**Detailed Fallback:**
 
 ```jsx
 function DetailedFallback({ error, errorInfo, resetError }) {
@@ -359,7 +897,7 @@ function DetailedFallback({ error, errorInfo, resetError }) {
 }
 ```
 
-### Themed Fallback
+**Themed Fallback:**
 
 ```jsx
 function ThemedFallback({ error, resetError }) {
@@ -388,9 +926,9 @@ function ThemedFallback({ error, resetError }) {
 }
 ```
 
-## Error Reporting Integration
+### 7.8 Error Reporting Integration
 
-### Sentry Integration
+**Sentry Integration:**
 
 ```jsx
 import * as Sentry from '@sentry/react';
@@ -435,7 +973,7 @@ Sentry.init({
 });
 ```
 
-### LogRocket Integration
+**LogRocket Integration:**
 
 ```jsx
 import LogRocket from 'logrocket';
@@ -470,7 +1008,7 @@ LogRocket.init('YOUR_APP_ID', {
 });
 ```
 
-### Custom Error Service
+**Custom Error Service:**
 
 ```jsx
 class ErrorReportingService {
@@ -510,9 +1048,9 @@ class ReportingErrorBoundary extends React.Component {
 }
 ```
 
-## Retry Mechanisms
+### 7.9 Retry Mechanisms
 
-### Simple Retry
+**Simple Retry:**
 
 ```jsx
 function RetryableComponent() {
@@ -543,7 +1081,7 @@ function RetryableComponent() {
 }
 ```
 
-### Exponential Backoff Retry
+**Exponential Backoff Retry:**
 
 ```jsx
 function ExponentialRetryComponent() {
@@ -586,7 +1124,7 @@ function ExponentialRetryComponent() {
 }
 ```
 
-### Smart Retry
+**Smart Retry:**
 
 ```jsx
 function SmartRetryComponent() {
@@ -633,9 +1171,9 @@ function SmartRetryComponent() {
 }
 ```
 
-## Error Boundaries with React Query/SWR
+### 7.10 Error Boundaries with React Query/SWR
 
-### React Query Error Boundaries
+**React Query Error Boundaries:**
 
 ```jsx
 import { useQuery, QueryErrorResetBoundary } from '@tanstack/react-query';
@@ -665,7 +1203,7 @@ function App() {
 }
 ```
 
-### SWR Error Boundaries
+**SWR Error Boundaries:**
 
 ```jsx
 import useSWR from 'swr';
@@ -699,7 +1237,7 @@ function handleError(error) {
 }
 ```
 
-### Combined Approach
+**Combined Approach:**
 
 ```jsx
 function DataComponent() {
@@ -733,9 +1271,9 @@ function App() {
 }
 ```
 
-## Error Boundaries with Suspense
+### 7.11 Error Boundaries with Suspense
 
-### Suspense + Error Boundary Pattern
+**Suspense + Error Boundary Pattern:**
 
 ```jsx
 import { Suspense } from 'react';
@@ -765,7 +1303,7 @@ function App() {
 }
 ```
 
-### Multiple Suspense Boundaries
+**Multiple Suspense Boundaries:**
 
 ```jsx
 function App() {
@@ -793,9 +1331,9 @@ function App() {
 }
 ```
 
-## Error Boundaries in Server Components (Next.js)
+### 7.12 Error Boundaries in Server Components (Next.js)
 
-### Next.js App Router
+**Next.js App Router:**
 
 ```jsx
 // app/error.js
@@ -834,7 +1372,7 @@ export default function GlobalError({ error }) {
 }
 ```
 
-### Next.js Pages Router
+**Next.js Pages Router:**
 
 ```jsx
 // pages/_error.js
@@ -860,7 +1398,7 @@ class ErrorPage extends React.Component {
 export default ErrorPage;
 ```
 
-### Component-Level Error Boundary
+**Component-Level Error Boundary:**
 
 ```jsx
 'use client';
@@ -894,15 +1432,15 @@ export default function MyComponent() {
 }
 ```
 
-## react-error-boundary Library
+### 7.13 react-error-boundary Library
 
-### Installation
+**Installation:**
 
 ```bash
 npm install react-error-boundary
 ```
 
-### Basic Usage
+**Basic Usage:**
 
 ```jsx
 import { ErrorBoundary } from 'react-error-boundary';
@@ -933,7 +1471,7 @@ function ErrorFallback({ error, resetErrorBoundary }) {
 }
 ```
 
-### withErrorBoundary HOC
+**withErrorBoundary HOC:**
 
 ```jsx
 import { withErrorBoundary } from 'react-error-boundary';
@@ -955,7 +1493,7 @@ export default withErrorBoundary(MyComponent, {
 });
 ```
 
-### ErrorBoundaryType
+**ErrorBoundaryType:**
 
 ```jsx
 import { ErrorBoundary, ErrorBoundaryType } from 'react-error-boundary';
@@ -976,9 +1514,9 @@ function ComponentFallback({ error, resetErrorBoundary }) {
 }
 ```
 
-## Testing Error Boundaries
+### 7.14 Testing Error Boundaries
 
-### Unit Testing
+**Unit Testing:**
 
 ```jsx
 import { render, screen } from '@testing-library/react';
@@ -1017,7 +1555,7 @@ describe('ErrorBoundary', () => {
 });
 ```
 
-### Testing with React Testing Library
+**Testing with React Testing Library:**
 
 ```jsx
 import { render, screen } from '@testing-library/react';
@@ -1051,9 +1589,9 @@ describe('ErrorBoundary Integration', () => {
 });
 ```
 
-## Error Boundary Composition
+### 7.15 Error Boundary Composition
 
-### Nested Boundaries
+**Nested Boundaries:**
 
 ```jsx
 function App() {
@@ -1085,7 +1623,7 @@ function App() {
 }
 ```
 
-### Boundary Hierarchy
+**Boundary Hierarchy:**
 
 ```jsx
 // Outer boundary catches everything
@@ -1103,9 +1641,9 @@ function App() {
 </ErrorBoundary>
 ```
 
-## Recovering from Errors
+### 7.16 Recovering from Errors
 
-### State Reset
+**State Reset:**
 
 ```jsx
 class RecoverableErrorBoundary extends React.Component {
@@ -1138,7 +1676,7 @@ class RecoverableErrorBoundary extends React.Component {
 }
 ```
 
-### Route Reset
+**Route Reset:**
 
 ```jsx
 function ErrorFallback({ error, onReset }) {
@@ -1160,7 +1698,7 @@ function ErrorFallback({ error, onReset }) {
 }
 ```
 
-### Data Refresh
+**Data Refresh:**
 
 ```jsx
 function RefreshableErrorBoundary({ children, fallback }) {
@@ -1191,9 +1729,9 @@ function RefreshableErrorBoundary({ children, fallback }) {
 }
 ```
 
-## User-Friendly Error Messages
+### 7.17 User-Friendly Error Messages
 
-### Contextual Messages
+**Contextual Messages:**
 
 ```jsx
 function ContextualFallback({ error, component }) {
@@ -1225,7 +1763,7 @@ function ContextualFallback({ error, component }) {
 }
 ```
 
-### Action-Oriented Messages
+**Action-Oriented Messages:**
 
 ```jsx
 function ActionFallback({ error, onRetry, onGoHome, onContact }) {
@@ -1233,7 +1771,7 @@ function ActionFallback({ error, onRetry, onGoHome, onContact }) {
     <div className="error-fallback">
       <div className="error-icon">⚠️</div>
       <h2>Something went wrong</h2>
-      <p>We're sorry for the inconvenience.</p>
+      <p>We're sorry for inconvenience.</p>
       
       <div className="error-actions">
         <button onClick={onRetry} className="btn-primary">
@@ -1251,41 +1789,9 @@ function ActionFallback({ error, onRetry, onGoHome, onContact }) {
 }
 ```
 
-## Error Boundary Best Practices
+### 7.18 Common Patterns
 
-1. **Placement Strategy**
-   - Use global boundary for catastrophic errors
-   - Use feature-level boundaries for better UX
-   - Place boundaries at logical component boundaries
-   - Consider nested boundaries for complex apps
-
-2. **Fallback Design**
-   - Provide clear, actionable error messages
-   - Include retry mechanisms
-   - Offer alternative actions (go home, contact support)
-   - Match your app's design language
-
-3. **Error Reporting**
-   - Integrate with error tracking services (Sentry, LogRocket)
-   - Include context (component stack, user info)
-   - Log errors for debugging
-   - Set up alerts for critical errors
-
-4. **Recovery Strategies**
-   - Implement reset mechanisms
-   - Provide data refresh options
-   - Consider navigation resets
-   - Allow graceful degradation
-
-5. **Testing**
-   - Test error boundary with intentional errors
-   - Verify fallback UI renders correctly
-   - Test error reporting integration
-   - Verify recovery mechanisms work
-
-## Common Patterns
-
-### Page-Level Boundaries
+**Page-Level Boundaries:**
 
 ```jsx
 function PageWrapper({ children, pageName }) {
@@ -1305,7 +1811,7 @@ function PageWrapper({ children, pageName }) {
 </PageWrapper>
 ```
 
-### Component-Level Boundaries
+**Component-Level Boundaries:**
 
 ```jsx
 function ComponentWrapper({ children, componentName }) {
@@ -1325,7 +1831,7 @@ function ComponentWrapper({ children, componentName }) {
 </ComponentWrapper>
 ```
 
-### Feature-Level Boundaries
+**Feature-Level Boundaries:**
 
 ```jsx
 function FeatureWrapper({ children, featureName }) {
@@ -1347,9 +1853,9 @@ function FeatureWrapper({ children, featureName }) {
 </FeatureWrapper>
 ```
 
-## Monitoring and Alerting
+### 7.19 Monitoring and Alerting
 
-### Error Rate Monitoring
+**Error Rate Monitoring:**
 
 ```jsx
 class ErrorRateMonitor {
@@ -1399,8 +1905,9 @@ class MonitoredErrorBoundary extends React.Component {
 }
 ```
 
-## Related Skills
+## 8. Related Skills
 
-- `02-frontend/react-patterns`
-- `02-frontend/nextjs-guide`
+- `02-frontend/react-best-practices`
+- `02-frontend/nextjs-patterns`
 - `14-monitoring-observability/error-tracking`
+- `01-foundations/code-review`

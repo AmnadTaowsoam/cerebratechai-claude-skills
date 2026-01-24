@@ -1,290 +1,126 @@
-# Architectural Reviews
+### **00: Architectural Reviews**
 
-## Overview
+> 
+> **Current Level:** Expert (Enterprise Scale) 
+> 
+> 
+> 
+> **Domain:** Meta Skills / Architecture 
+> 
+> 
 
-Architectural reviews evaluate system design decisions to ensure they meet requirements, follow best practices, and avoid common pitfalls. This guide covers review types, processes, checklists, and best practices.
+---
 
-## Purpose of Architecture Reviews
+### **1. Executive Summary & Strategic Necessity**
 
-**Goals:**
-- **Validate** design meets requirements
-- **Identify** potential issues early
-- **Share** knowledge across team
-- **Ensure** alignment with standards
-- **Document** decisions and rationale
-- **Reduce** risk of costly mistakes
+* **Context:** ในโลกปี 2025-2026 ระบบซอฟต์แวร์มีความซับซ้อนเพิ่มขึ้นอย่างมาก การทบทวนสถาปัตยกรรม (Architectural Reviews) เป็นกระบวนการสำคัญที่ช่วยลดความเสี่ยงของการเกิดปัญหาในระบบขนาดใหญ่ การตัดสินใจที่ผิดพลาดในระยะเริ่มต้นสามารถสร้างความเสียหายที่มีมูลค่าหลายล้านดอลลาร์และใช้เวลาหลายเดือนในการแก้ไข
+* **Business Impact:** การทบทวนสถาปัตยกรรมที่มีประสิทธิภาพช่วย:
+  - ลด Technical Debt ที่สะสมในระยะยาว
+  - เพิ่มความเสถียรของระบบ (System Stability)
+  - ลด Downtime และปัญหาที่เกิดจากข้อบกพร่องของการออกแบบ
+  - เพิ่มประสิทธิภาพของทีมพัฒนา (Team Velocity)
+  - ลดต้นทุนในการบำรุงรักษาและ Refactoring
+* **Product Thinking:** ทักษะนี้ช่วยแก้ปัญหา (Pain Point) ให้กับ:
+  - ทีมพัฒนาที่ต้องการความชัดเจนในการออกแบบ
+  - ผู้บริหารที่ต้องการความมั่นใจในการลงทุน
+  - ลูกค้าที่ต้องการระบบที่เสถียรและขยายได้
+  - ทีม DevOps ที่ต้องการความเข้าใจในการ Deploy และ Monitor
 
-**Benefits:**
-- Catch design flaws before implementation
-- Improve code quality
-- Knowledge transfer
-- Consistent architecture across projects
-- Better decision-making
+### **2. Technical Deep Dive (The "How-to")**
 
-## When to Conduct Reviews
+* **Core Logic:** Architectural Reviews เป็นกระบวนการที่ประเมินการออกแบบระบบก่อนการนำไปใช้งานจริง โดยใช้กลไกต่อไปนี้:
+  - **Review Triggers:** การตัดสินใจว่าเมื่อไรควรทบทวนสถาปัตยกรรม (เช่น การเริ่มโปรเจกต์ใหม่, การเปลี่ยนเทคโนโลยี, การทำการเปลี่ยนแปลงที่สำคัญ)
+  - **Review Types:** ประเภทของการทบทวน (Design Review, Code Review, Post-Implementation Review, Periodic Health Checks)
+  - **Checklist Framework:** รายการตรวจสอบที่ครอบคลุมทุกแง่มุม (Requirements, Scalability, Security, Maintainability, Testability, Cost, Operations, Technology Choices)
+  - **Decision Framework:** กระบวนการตัดสินใจและการบันทึกผลลัพธ์
 
-### Review Triggers
+* **Architecture Diagram Requirements:** แผนผังสถาปัตยกรรมที่ต้องมี:
+  - **C4 Model:** System Context, Container Diagram, Component Diagram, Code Diagram
+  - **Sequence Diagrams:** การแสดงการไหลของข้อมูลและการโต้ตอบระหว่างคอมโพเนนต์
+  - **4+1 Architectural Views:** Logical View, Process View, Development View, Physical View, Scenarios
+  - **Data Flow Diagrams:** การแสดงการไหลของข้อมูลผ่านระบบ
+  - **Deployment Diagrams:** การแสดงการ Deploy และ Infrastructure
 
-✅ **Conduct Review When:**
-- Starting new project or major feature
-- Introducing new technology
-- Making significant architectural changes
-- Before major refactoring
-- After production incidents (retrospective)
-- Quarterly architecture health checks
-- Before major releases
+* **Implementation Workflow:**
+  1. **Request Review:** ผู้ขอทบทวนส่งคำขอพร้อมเอกสาร
+  2. **Prepare Materials:** ผู้นำเสนอเตรียมเอกสารและแผนผัง
+  3. **Schedule Review:** กำหนดเวลาและเชิญผู้เข้าร่วม
+  4. **Conduct Review:** ดำเนินการทบทวนตาม Agenda
+  5. **Document Decisions:** บันทึกการตัดสินใจและ Action Items
+  6. **Follow-up Actions:** ติดตามการดำเนินการตามที่ตกลง
+  7. **Close Review:** ปิดการทบทวนเมื่อ Action Items ครบถ้วน
 
-❌ **Don't Need Review For:**
-- Minor bug fixes
-- Small feature additions within existing patterns
-- Routine maintenance
-- Configuration changes
+### **3. Tooling & Tech Stack**
 
-### Decision Threshold
+* **Enterprise Tools:** เครื่องมือระดับอุตสาหกรรมที่เลือกใช้:
+  - **Architecture Documentation:** Structurizr, C4-Model, Mermaid.js, PlantUML
+  - **Decision Records:** ADR Tools, MADR (Markdown ADR), log4brains
+  - **Collaboration:** Confluence, Notion, GitHub Discussions
+  - **Diagram Tools:** Draw.io, Lucidchart, Miro, Excalidraw
+  - **Review Management:** GitHub PRs, GitLab MRs, Code Review Tools
 
-```
-Review Needed = (Impact × Complexity × Reversibility) > Threshold
+* **Configuration Essentials:** ส่วนประกอบสำคัญในการตั้งค่า:
+  - **Review Templates:** Template มาตรฐานสำหรับการทบทวนแต่ละประเภท
+  - **Checklist Automation:** การใช้ Script หรือ Tool เพื่อตรวจสอบ Checklist
+  - **Integration with CI/CD:** การผนวกการทบทวนเข้ากับ Pipeline
+  - **Notification System:** การแจ้งเตือนอัตโนมัติเมื่อมีการทบทวน
+  - **Metrics Collection:** การเก็บข้อมูลเกี่ยวกับประสิทธิภาพของการทบทวน
 
-Where:
-- Impact: How many users/systems affected?
-- Complexity: How difficult to implement?
-- Reversibility: How hard to undo?
+### **4. Standards, Compliance & Security**
 
-Example:
-- Add new microservice: High impact, high complexity, hard to reverse → REVIEW
-- Change button color: Low impact, low complexity, easy to reverse → NO REVIEW
-```
+* **International Standards:** มาตรฐานที่เกี่ยวข้อง:
+  - **ISO/IEC 25010:** Software Quality Model
+  - **ISO/IEC 27001:** Information Security Management
+  - **TOGAF:** The Open Group Architecture Framework
+  - **Zachman Framework:** Enterprise Architecture Framework
 
-## Types of Reviews
+* **Security Protocol:** กลไกการป้องกัน:
+  - **Security Review Checklist:** รายการตรวจสอบความปลอดภัย (OWASP Top 10, Security Headers, Input Validation)
+  - **Threat Modeling:** การวิเคราะห์ความเสี่ยงด้านความปลอดภัย (STRIDE, PASTA)
+  - **Compliance Review:** การตรวจสอบความสอดคล้องกับ GDPR, HIPAA, PCI DSS
+  - **Security Best Practices:** การใช้ HTTPS, Authentication, Authorization, Encryption
 
-### 1. Design Review (Before Implementation)
+* **Explainability:** ความสามารถในการอธิบาย:
+  - **ADR Documentation:** การบันทึก Architecture Decision Records
+  - **Rationale Documentation:** การอธิบายเหตุผลของการตัดสินใจ
+  - **Trade-off Analysis:** การวิเคราะห์ข้อดีและข้อเสียของแต่ละทางเลือก
+  - **Visual Documentation:** การใช้แผนผังเพื่ออธิบายแนวคิดที่ซับซ้อน
 
-**When:** Before writing code
-**Purpose:** Validate design approach
-**Duration:** 1-2 hours
+### **5. Unit Economics & Performance Metrics (KPIs)**
 
-**Agenda:**
-```markdown
-1. Context & Requirements (10 min)
-   - What problem are we solving?
-   - Who are the users?
-   - What are the constraints?
+* **Cost Calculation:** สูตรการคำนวณต้นทุนต่อหน่วย (COGS):
+  ```
+  Total Cost = (Review Hours × Hourly Rate) + (Tool Costs) + (Opportunity Cost)
+  
+  ROI = (Cost Avoided - Review Cost) / Review Cost × 100%
+  
+  Cost Avoided = (Potential Incident Cost × Probability) + (Refactoring Cost Saved)
+  ```
 
-2. Proposed Design (30 min)
-   - Architecture diagrams
-   - Component breakdown
-   - Data flow
-   - Technology choices
+* **Key Performance Indicators:** ตัวชี้วัดความสำเร็จทางเทคนิค:
+  - **Review Coverage:** % ของการเปลี่ยนแปลงที่ผ่านการทบทวน (Target: > 90%)
+  - **Review Turnaround Time:** เวลาเฉลี่ยในการทบทวน (Target: < 5 business days)
+  - **Defect Detection Rate:** % ของปัญหาที่ค้นพบก่อน Production (Target: > 80%)
+  - **Post-Review Issues:** จำนวนปัญหาที่เกิดขึ้นหลังการทบทวน (Target: < 5%)
+  - **Team Satisfaction:** ความพึงพอใจของทีม (Target: > 4/5)
 
-3. Discussion (30 min)
-   - Questions
-   - Concerns
-   - Alternative approaches
+### **6. Strategic Recommendations (CTO Insights)**
 
-4. Decision (10 min)
-   - Approve
-   - Approve with changes
-   - Reject (needs rework)
+* **Phase Rollout:** คำแนะนำในการทยอยเริ่มใช้งาน:
+  1. **Phase 1 (Months 1-3):** สร้าง Template และ Checklist, ฝึกอบรมทีม
+  2. **Phase 2 (Months 4-6):** เริ่มทบทวนโปรเจกต์สำคัญ, สร้าง ADRs
+  3. **Phase 3 (Months 7-12):** ผนวกเข้ากับ CI/CD, วัดผลและปรับปรุง
+  4. **Phase 4 (Year 2+):** ขยายไปยังทุกทีม, สร้าง Culture ของการทบทวน
 
-5. Action Items (10 min)
-   - What needs to change?
-   - Who owns what?
-   - When to reconvene?
-```
+* **Pitfalls to Avoid:** ข้อควรระวังที่มักจะผิดพลาด:
+  - **Over-Engineering:** หลีกเลี่ยงการทบทวนที่ซับซ้อนเกินไปสำหรับโปรเจกต์เล็ก
+  - **Bikeshedding:** หลีกเลี่ยงการถกเถียงเรื่องเล็กน้อยเป็นเวลานาน
+  - **Missing Follow-up:** ต้องติดตาม Action Items จนเสร็จสิ้น
+  - **Lack of Documentation:** ต้องบันทึกการตัดสินใจและเหตุผลอย่างชัดเจน
+  - **Ignoring Context:** ต้องพิจารณาบริบทและข้อจำกัดของแต่ละโปรเจกต์
+  - **One-Size-Fits-All:** ต้องปรับแต่งกระบวนการให้เหมาะกับขนาดและความซับซ้อนของโปรเจกต์
 
-### 2. Code Review (Architecture-Focused)
-
-**When:** During implementation
-**Purpose:** Ensure code follows design
-**Duration:** Ongoing
-
-**Focus Areas:**
-- Does code match design?
-- Are patterns followed correctly?
-- Are abstractions appropriate?
-- Is coupling minimized?
-- Are dependencies managed well?
-
-### 3. Post-Implementation Review
-
-**When:** After deployment
-**Purpose:** Learn from implementation
-**Duration:** 1 hour
-
-**Questions:**
-- Did design work as expected?
-- What surprised us?
-- What would we do differently?
-- What should we document?
-
-### 4. Periodic Architecture Health Checks
-
-**When:** Quarterly or bi-annually
-**Purpose:** Assess overall system health
-**Duration:** Half day
-
-**Assessment:**
-- Technical debt level
-- Architecture drift
-- Performance trends
-- Security posture
-- Scalability readiness
-
-## Review Checklist
-
-### Requirements Alignment
-
-```markdown
-## Requirements
-
-- [ ] Functional requirements clearly defined
-- [ ] Non-functional requirements specified
-  - [ ] Performance targets (latency, throughput)
-  - [ ] Scalability requirements (users, data volume)
-  - [ ] Availability requirements (uptime %)
-  - [ ] Security requirements
-  - [ ] Compliance requirements
-- [ ] Constraints documented
-  - [ ] Budget constraints
-  - [ ] Time constraints
-  - [ ] Technology constraints
-- [ ] Success criteria defined
-```
-
-### Scalability and Performance
-
-```markdown
-## Scalability
-
-- [ ] Expected load defined (users, requests/sec, data volume)
-- [ ] Scaling strategy documented (vertical vs horizontal)
-- [ ] Bottlenecks identified
-- [ ] Caching strategy defined
-- [ ] Database scaling approach
-- [ ] Load testing plan
-- [ ] Auto-scaling configured (if applicable)
-
-## Performance
-
-- [ ] Performance targets specified
-  - [ ] API response time < X ms
-  - [ ] Page load time < Y seconds
-  - [ ] Database query time < Z ms
-- [ ] Performance testing planned
-- [ ] Monitoring and alerting configured
-- [ ] CDN usage considered
-- [ ] Database indexes planned
-```
-
-### Security and Compliance
-
-```markdown
-## Security
-
-- [ ] Authentication mechanism defined
-- [ ] Authorization model documented
-- [ ] Data encryption (at rest and in transit)
-- [ ] Input validation strategy
-- [ ] Security headers configured
-- [ ] Rate limiting implemented
-- [ ] Secrets management approach
-- [ ] Security testing planned
-- [ ] Threat model created
-- [ ] OWASP Top 10 addressed
-
-## Compliance
-
-- [ ] GDPR compliance (if applicable)
-- [ ] HIPAA compliance (if applicable)
-- [ ] PCI DSS compliance (if applicable)
-- [ ] Data retention policy
-- [ ] Audit logging
-```
-
-### Maintainability
-
-```markdown
-## Maintainability
-
-- [ ] Code organization clear
-- [ ] Naming conventions defined
-- [ ] Documentation plan
-  - [ ] API documentation
-  - [ ] Architecture diagrams
-  - [ ] Runbooks
-- [ ] Testing strategy
-  - [ ] Unit tests
-  - [ ] Integration tests
-  - [ ] End-to-end tests
-- [ ] CI/CD pipeline
-- [ ] Monitoring and logging
-- [ ] Error handling strategy
-```
-
-### Testability
-
-```markdown
-## Testability
-
-- [ ] Unit testing approach
-- [ ] Integration testing approach
-- [ ] Test data strategy
-- [ ] Mocking/stubbing strategy
-- [ ] Test coverage targets
-- [ ] Test automation plan
-- [ ] Performance testing plan
-- [ ] Security testing plan
-```
-
-### Cost Implications
-
-```markdown
-## Cost
-
-- [ ] Infrastructure costs estimated
-  - [ ] Compute costs
-  - [ ] Storage costs
-  - [ ] Network costs
-  - [ ] Third-party services
-- [ ] Development costs estimated
-- [ ] Operational costs estimated
-- [ ] Cost optimization opportunities identified
-- [ ] Budget approved
-```
-
-### Operational Complexity
-
-```markdown
-## Operations
-
-- [ ] Deployment strategy defined
-- [ ] Rollback plan documented
-- [ ] Monitoring strategy
-  - [ ] Metrics to track
-  - [ ] Alerting rules
-  - [ ] Dashboards
-- [ ] Logging strategy
-- [ ] Backup and recovery plan
-- [ ] Disaster recovery plan
-- [ ] On-call procedures
-- [ ] Runbooks created
-```
-
-### Technology Choices Justification
-
-```markdown
-## Technology Decisions
-
-For each major technology choice:
-
-- [ ] Rationale documented
-- [ ] Alternatives considered
-- [ ] Trade-offs analyzed
-- [ ] Team has expertise (or training plan)
-- [ ] Community support verified
-- [ ] License compatibility checked
-- [ ] Long-term viability assessed
-```
+---
 
 ## Review Process and Workflow
 

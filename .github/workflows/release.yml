@@ -56,15 +56,15 @@ jobs:
             Clone the repository with minimal history for faster download:
             
             ```bash
-            git clone --depth 1 --branch ${{ github.ref_name }} https://github.com/${{ github.repository }}.git cerebratechai-claude-skills
-            cd cerebratechai-claude-skills
+            git clone --depth 1 --branch ${{ github.ref_name }} https://github.com/${{ github.repository }}.git cerebraSkills
+            cd cerebraSkills
             ```
             
             ### Alternative Installation Methods
             
             **Using SSH (requires SSH key setup):**
             ```bash
-            git clone --depth 1 --branch ${{ github.ref_name }} git@github.com:${{ github.repository }}.git cerebratechai-claude-skills
+            git clone --depth 1 --branch ${{ github.ref_name }} git@github.com:${{ github.repository }}.git cerebraSkills
             ```
             
             **Download Release Archive:**

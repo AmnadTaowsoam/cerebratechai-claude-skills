@@ -1,10 +1,24 @@
+---
+name: A/B Testing Implementation
+description: User experience research methodology where two versions of a variable are shown to different segments to determine which version drives better business metrics with proper statistical significance testing.
+---
+
 # A/B Testing Implementation
+
+> **Current Level:** Intermediate  
+> **Domain:** Marketing / Analytics
+
+---
 
 ## Overview
 
 A/B testing (split testing) is a user experience research methodology where two versions of a variable (webpage, app screen, email, etc.) are shown to different segments of visitors at the same time to determine which version leaves the maximum impact and drives business metrics.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [A/B Testing Concepts](#ab-testing-concepts)
 2. [Experiment Design](#experiment-design)
@@ -1451,6 +1465,100 @@ function getChiSquareCriticalValue(df: number, alpha: number): number {
 
 - [GrowthBook Documentation](https://docs.growthbook.io/)
 - [Statsig Documentation](https://docs.statsig.com/)
+---
+
+## Quick Start
+
+### A/B Test Implementation
+
+```typescript
+// Assign variant
+function assignVariant(userId: string): 'A' | 'B' {
+  const hash = hashUserId(userId)
+  return hash % 2 === 0 ? 'A' : 'B'
+}
+
+// Track conversion
+function trackConversion(userId: string, variant: string, converted: boolean) {
+  analytics.track('ab_test_conversion', {
+    userId,
+    variant,
+    converted,
+    testName: 'button-color-test'
+  })
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Hypothesis**: Clear hypothesis and success metric
+- [ ] **Sample Size**: Calculate required sample size
+- [ ] **Randomization**: Proper random assignment
+- [ ] **Tracking**: Implement conversion tracking
+- [ ] **Statistical Significance**: Use proper statistical tests
+- [ ] **Duration**: Run test for sufficient duration
+- [ ] **No Peeking**: Don't peek at results early
+- [ ] **Documentation**: Document test setup and results
+- [ ] **Implementation**: Implement winning variant
+- [ ] **Monitoring**: Monitor test performance
+- [ ] **Testing**: Test implementation
+- [ ] **Learning**: Document learnings
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Peek Early
+
+```typescript
+// ❌ Bad - Check results too early
+if (day === 1) {
+  checkResults()  // Too early!
+}
+```
+
+```typescript
+// ✅ Good - Wait for sample size
+const requiredSampleSize = calculateSampleSize(alpha, power, effectSize)
+if (totalVisitors >= requiredSampleSize) {
+  checkResults()
+}
+```
+
+### ❌ Don't: No Statistical Significance
+
+```typescript
+// ❌ Bad - No significance test
+if (variantB.rate > variantA.rate) {
+  return 'B wins'  // Could be random!
+}
+```
+
+```typescript
+// ✅ Good - Statistical significance
+const pValue = calculatePValue(variantA, variantB)
+if (pValue < 0.05 && variantB.rate > variantA.rate) {
+  return 'B wins (statistically significant)'
+}
+```
+
+---
+
+## Integration Points
+
+- **A/B Testing Analysis** (`23-business-analytics/ab-testing-analysis/`) - Analysis methodology
+- **Conversion Optimization** (`23-business-analytics/conversion-optimization/`) - CRO
+- **Analytics** (`23-business-analytics/`) - Tracking
+
+---
+
+## Further Reading
+
+- [A/B Testing Guide](https://www.optimizely.com/optimization-glossary/ab-testing/)
+- [Statistical Significance](https://www.investopedia.com/terms/s/statistical-significance.asp)
+
 - [LaunchDarkly Documentation](https://docs.launchdarkly.com/)
 - [Google Optimize](https://optimize.google.com/)
 - [A/B Testing Calculator](https://www.optimizely.com/sample-size-calculator/)

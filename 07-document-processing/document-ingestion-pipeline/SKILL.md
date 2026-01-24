@@ -1,3 +1,8 @@
+---
+name: Document Ingestion Pipeline
+description: Complete workflow of processing raw documents from various sources, extracting content, and preparing them for RAG systems
+---
+
 # Document Ingestion Pipeline
 
 ## Overview
@@ -667,6 +672,17 @@ class PipelineMonitor:
 6. **No source tracking** - Track document sources for debugging
 7. **No metadata** - Metadata is crucial for retrieval
 8. **No async processing** - Synchronous processing blocks pipeline
+
+## Related Skills
+
+- [`07-document-processing/document-parsing`](07-document-processing/document-parsing/SKILL.md)
+- [`07-document-processing/image-preprocessing`](07-document-processing/image-preprocessing/SKILL.md)
+- [`07-document-processing/ocr-paddleocr`](07-document-processing/ocr-paddleocr/SKILL.md)
+- [`07-document-processing/ocr-tesseract`](07-document-processing/ocr-tesseract/SKILL.md)
+- [`07-document-processing/pdf-processing`](07-document-processing/pdf-processing/SKILL.md)
+- [`06-ai-ml-production/rag-implementation`](06-ai-ml-production/rag-implementation/SKILL.md)
+- [`06-ai-ml-production/embedding-models`](06-ai-ml-production/embedding-models/SKILL.md)
+- [`04-database/database-connections`](04-database/database-connections/SKILL.md)
 
 ## Additional Resources
 

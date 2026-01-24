@@ -1,7 +1,44 @@
+---
+name: Vector Search
+description: Comprehensive guide for vector search implementation
+---
+
 # Vector Search
 
 ## Overview
 Comprehensive guide for vector search implementation.
+
+## Prerequisites
+
+- Understanding of vector mathematics and linear algebra
+- Familiarity with numpy and numerical computing
+- Knowledge of similarity metrics (cosine, Euclidean, dot product)
+- Understanding of indexing and data structures
+- Experience with FAISS or similar libraries
+- Knowledge of GPU computing concepts
+
+## Key Concepts
+
+- **Vector Search**: Finding nearest neighbors in high-dimensional vector space using similarity metrics
+- **HNSW (Hierarchical Navigable Small World)**: Approximate nearest neighbor algorithm using graph-based indexing
+- **IVF (Inverted File Index)**: Clustering vectors into Voronoi cells for faster search
+- **Flat Index**: Exact nearest neighbor search without approximation
+- **Cosine Similarity**: Measures similarity between vectors using cosine of the angle between them
+- **Euclidean Distance**: Measures straight-line distance between two vectors in vector space
+- **Dot Product**: Measures similarity by computing the dot product of vectors
+- **FAISS**: Facebook AI Similarity Search library for efficient vector search
+- **GPU Acceleration**: Using GPU for faster vector operations and search
+- **Metadata Filtering**: Filtering search results based on associated metadata
+- **Hybrid Search**: Combining vector search with keyword search for better results
+- **Query Optimization**: Techniques for improving query performance (normalization, expansion, augmentation)
+- **Re-ranking**: Improving search results using secondary scoring methods
+- **Index Compression**: Reducing index size using quantization techniques
+- **Sharding**: Distributing vector index across multiple shards for horizontal scaling
+- **Replication**: Creating multiple copies of vector index for high availability
+- **Recall@K**: Evaluation metric measuring recall at different k values
+- **MAP (Mean Average Precision)**: Evaluation metric for ranking quality
+- **Incremental Updates**: Adding new vectors without rebuilding entire index
+- **Batch Processing**: Processing multiple operations together for efficiency
 
 ---
 
@@ -1806,6 +1843,13 @@ print(f"Found {len(indices[0])} results for {len(queries)} queries")
 ```
 
 ---
+
+## Related Skills
+
+- [`06-ai-ml-production/embedding-models`](06-ai-ml-production/embedding-models/SKILL.md)
+- [`06-ai-ml-production/rag-implementation`](06-ai-ml-production/rag-implementation/SKILL.md)
+- [`06-ai-ml-production/vector-search-patterns`](06-ai-ml-production/vector-search-patterns/SKILL.md)
+- [`04-database/vector-database`](04-database/vector-database/SKILL.md)
 
 ## Additional Resources
 

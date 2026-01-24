@@ -1,7 +1,36 @@
+---
+name: Local LLM Deployment
+description: Comprehensive guide for deploying LLMs locally using Ollama, vLLM, and llama.cpp
+---
+
 # Local LLM Deployment
 
 ## Overview
 Comprehensive guide for deploying LLMs locally using Ollama, vLLM, and llama.cpp.
+
+## Prerequisites
+
+- Basic understanding of Docker and containerization
+- GPU hardware knowledge (NVIDIA CUDA)
+- Python programming skills
+- Linux command line familiarity
+- Understanding of model quantization and optimization
+
+## Key Concepts
+
+- **Ollama**: User-friendly tool for running LLMs locally with simple CLI and API
+- **vLLM**: High-performance LLM serving engine with optimized inference
+- **llama.cpp**: Lightweight C++ implementation for running LLMs on consumer hardware
+- **GGUF Format**: Efficient binary format for quantized models used by llama.cpp
+- **Quantization**: Reducing model precision to decrease memory usage and improve speed
+- **Tensor Parallelism**: Splitting model layers across multiple GPUs
+- **Pipeline Parallelism**: Splitting model pipeline stages across multiple GPUs
+- **Modelfile**: Ollama's configuration file for custom models
+- **Context Window**: Maximum number of tokens a model can process
+- **GPU Memory Utilization**: Percentage of GPU memory allocated to the model
+- **Swap Space**: CPU memory used as overflow for GPU memory
+- **Batch Processing**: Processing multiple prompts simultaneously for efficiency
+- **Streaming**: Real-time token-by-token response delivery
 
 ---
 
@@ -1031,6 +1060,14 @@ monitor.stop()
   - [ ] Known issues documented
 
 ---
+
+## Related Skills
+
+- [`06-ai-ml-production/llm-integration`](06-ai-ml-production/llm-integration/SKILL.md)
+- [`06-ai-ml-production/ai-observability`](06-ai-ml-production/ai-observability/SKILL.md)
+- [`06-ai-ml-production/embedding-models`](06-ai-ml-production/embedding-models/SKILL.md)
+- [`06-ai-ml-production/agent-patterns`](06-ai-ml-production/agent-patterns/SKILL.md)
+- [`05-ai-ml-core/pytorch-deployment`](05-ai-ml-core/pytorch-deployment/SKILL.md)
 
 ## Additional Resources
 

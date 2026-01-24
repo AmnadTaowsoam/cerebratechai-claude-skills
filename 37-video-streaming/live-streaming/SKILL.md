@@ -1,10 +1,26 @@
+---
+name: Live Streaming
+description: Real-time video broadcasting using RTMP, HLS, WebRTC protocols with streaming servers and cloud platforms for low-latency live video delivery.
+---
+
 # Live Streaming
+
+> **Current Level:** Advanced  
+> **Domain:** Video Streaming / Media
+
+---
 
 ## Overview
 
-Live streaming enables real-time video broadcasting. This guide covers RTMP, HLS, WebRTC, streaming servers, and cloud platforms.
+Live streaming enables real-time video broadcasting. This guide covers RTMP, HLS, WebRTC, streaming servers, and cloud platforms for building scalable live streaming solutions with appropriate latency and quality.
 
-## Live Streaming Protocols
+---
+
+---
+
+## Core Concepts
+
+### Live Streaming Protocols
 
 | Protocol | Latency | Use Case | Browser Support |
 |----------|---------|----------|-----------------|
@@ -462,10 +478,123 @@ ffmpeg -i input.mp4 \
 9. **Analytics** - Track viewer metrics
 10. **Compliance** - Follow content policies
 
-## Resources
+---
+
+## Quick Start
+
+### Basic RTMP Stream
+
+```bash
+# Stream to RTMP server
+ffmpeg -re -i input.mp4 \
+  -c:v libx264 -preset veryfast -maxrate 3000k \
+  -bufsize 6000k -pix_fmt yuv420p -g 50 \
+  -c:a aac -b:a 160k -ac 2 -ar 44100 \
+  -f flv rtmp://server/live/stream_key
+```
+
+### HLS Playback
+
+```html
+<!-- HLS.js for browser playback -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<video id="video"></video>
+
+<script>
+  const video = document.getElementById('video')
+  const hls = new Hls()
+  hls.loadSource('https://server/stream.m3u8')
+  hls.attachMedia(video)
+</script>
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Streaming Protocol**: Choose protocol (RTMP, HLS, WebRTC)
+- [ ] **Streaming Server**: Set up streaming server (NGINX-RTMP, Wowza)
+- [ ] **CDN**: Use CDN for global distribution
+- [ ] **Adaptive Bitrate**: Implement adaptive bitrate streaming
+- [ ] **Authentication**: Secure stream keys
+- [ ] **Monitoring**: Monitor stream health and viewer metrics
+- [ ] **Backup**: Failover streams for reliability
+- [ ] **Analytics**: Track viewer metrics
+- [ ] **Compliance**: Follow content policies
+- [ ] **Testing**: Test with various devices and networks
+- [ ] **Error Handling**: Handle stream failures gracefully
+- [ ] **Documentation**: Document streaming setup
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Authentication
+
+```bash
+# ❌ Bad - Public stream key
+rtmp://server/live/public_key  # Anyone can stream!
+```
+
+```bash
+# ✅ Good - Secure stream key
+rtmp://server/live/secure-random-key-12345
+# Rotate keys regularly
+```
+
+### ❌ Don't: Single Bitrate
+
+```bash
+# ❌ Bad - One quality only
+ffmpeg -i input.mp4 -b:v 3000k output.m3u8
+```
+
+```bash
+# ✅ Good - Adaptive bitrate
+ffmpeg -i input.mp4 \
+  -b:v:0 3000k -b:v:1 1500k -b:v:2 800k \
+  -var_stream_map "v:0 v:1 v:2" \
+  output.m3u8
+```
+
+### ❌ Don't: No Monitoring
+
+```javascript
+// ❌ Bad - No stream health checks
+stream.on('data', (chunk) => {
+  // No monitoring!
+})
+```
+
+```javascript
+// ✅ Good - Monitor stream health
+stream.on('data', (chunk) => {
+  metrics.increment('stream.bytes')
+  metrics.gauge('stream.bitrate', calculateBitrate(chunk))
+})
+
+// Alert on issues
+if (bitrate < threshold) {
+  alert('Low bitrate detected')
+}
+```
+
+---
+
+## Integration Points
+
+- **CDN Delivery** (`37-video-streaming/cdn-delivery/`) - CDN setup
+- **Adaptive Bitrate** (`37-video-streaming/adaptive-bitrate/`) - ABR streaming
+- **Video Analytics** (`37-video-streaming/video-analytics/`) - Viewer metrics
+
+---
+
+## Further Reading
 
 - [NGINX-RTMP](https://github.com/arut/nginx-rtmp-module)
 - [AWS IVS](https://aws.amazon.com/ivs/)
+- [HLS.js](https://github.com/video-dev/hls.js/)
+- [WebRTC](https://webrtc.org/)
 - [Mux](https://mux.com/)
 - [WebRTC](https://webrtc.org/)
 - [OBS Studio](https://obsproject.com/)

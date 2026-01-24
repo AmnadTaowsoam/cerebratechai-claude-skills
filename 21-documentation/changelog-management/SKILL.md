@@ -1,12 +1,182 @@
+---
+name: Changelog Management
+description: Documenting changes to software over time using structured changelog formats, semantic versioning, and clear categorization to help users and developers understand what has changed.
+---
+
 # Changelog Management
 
-## Overview
-
-Changelogs document changes to software over time, helping users and developers understand what has changed.
+> **Current Level:** Expert (Enterprise Scale)
+> **Domain:** Documentation / Version Control
 
 ---
 
-## 1. Changelog Importance
+## Overview
+
+Changelogs document changes to software over time, helping users and developers understand what has changed. Well-maintained changelogs follow structured formats, use semantic versioning, categorize changes clearly, and provide context for breaking changes and migrations.
+
+---
+
+## 1. Executive Summary & Strategic Necessity
+
+* **Context:** ในปี 2025-2026 Changelog Management ด้วย Semantic Versioning ช่วย Version Control ที่มีอัตโนมาติการทำงานอัตโนมาติ (Changelog Management) ใน Enterprise Scale
+
+* **Business Impact:** Changelog Management ช่วยลด Downtime ของระบบ Customer Support ผ่านการตอบคำถามอัตโนมาติการเปลี่ยนแบบ (Reduce support burden), ลดต้นทุนการจัดการทีม (Increase transparency), เพิ่มอัตรากำไร Gross Margin ผ่านการทำงานอัตโนมาติ (Faster communication), และปรับประสบทการทำงาน (Consistent quality)
+
+* **Product Thinking:** Changelog Management ช่วยแก้ปัญหา (Pain Point) ความต้องการมีการเปลี่ยนแบบที่ชัดเจน (Users need clear change history) ผ่านการทำงานอัตโนมาติ (Structured changelogs)
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+* **Core Logic:** Changelog Management ใช้ Semantic Versioning ช่วย Version Control ทำงานอัตโนมาติ:
+  1. **Semantic Versioning**: กำหนด Version format (MAJOR.MINOR.PATCH)
+  2. **Change Categorization**: จัดหมวดหมวดของ changes (Added, Changed, Deprecated, Removed, Fixed, Security)
+  3. **Conventional Commits**: ใช้ Conventional Commits format (feat:, fix:, docs:, etc.)
+  4. **Automation**: สร้าง Changelog อัตโนมาติจาก Git commits (semantic-release, standard-version)
+  5. **Release Notes**: สร้าง Release notes สำหรับ end users
+
+* **Architecture Diagram Requirements:** แผนผังระบบ Changelog Management ต้องมีองค์ประกอบ:
+  1. **Git Repository**: Git repository สำหรับการจัดเก็บ Source code และ Version history
+  2. **Conventional Commits**: Commit message format สำหรับการจัดเก็บ Changes (feat:, fix:, docs:, etc.)
+  3. **Semantic Versioning**: Version format สำหรับการจัดเก็บ Versions (MAJOR.MINOR.PATCH)
+  4. **Changelog Generator**: Tool สำหรับการสร้าง Changelog จาก Git commits (semantic-release, standard-version)
+  5. **CI/CD Pipeline**: CI/CD pipeline สำหรับการสร้าง Release อัตโนมาติ
+  6. **Release Notes Generator**: Tool สำหรับการสร้าง Release notes สำหรับ end users
+  7. **Observability**: Logging, Monitoring, Tracing สำหรับการ debug และปรับสิทท
+
+* **Implementation Workflow:** ขั้นตอนการนำ Changelog Management ไปใช้งานจริง:
+  1. **Planning Phase**: กำหนด Requirement และเลือก Changelog format ที่เหมาะสม
+  2. **Conventional Commits Setup**: ตั้งค่า Conventional Commits format สำหรับ Git repository
+  3. **Semantic Versioning Setup**: ตั้งค่า Semantic Versioning rules สำหรับ Version bumping
+  4. **Changelog Generator Setup**: ตั้งค่า Changelog generator (semantic-release, standard-version)
+  5. **CI/CD Integration**: ผสาน Changelog generator เข้ากับ CI/CD pipeline
+  6. **Testing Phase**: Unit test, Integration test, E2E test ด้วยจริง Scenario
+  7. **Deployment**: Deploy ด้วย CI/CD pipeline, Set up automated releases
+  8. **Optimization**: Optimize changelog generation, Add release notes, Improve UX
+  9. **Maintenance**: Monitor changelog quality, Update changelog format, Handle edge cases
+
+---
+
+## 3. Tooling & Tech Stack
+
+* **Enterprise Tools:** เครื่องมือระดับอุตสาหกรรมที่เลือกใช้สำหรับ Changelog Management ใน Enterprise Scale:
+  1. **Git**: Version control system สำหรับการจัดเก็บ Source code และ Version history
+  2. **Conventional Commits**: Commit message format สำหรับการจัดเก็บ Changes (feat:, fix:, docs:, etc.)
+  3. **semantic-release**: Automated changelog และ release generation จาก Git commits
+  4. **standard-version**: Changelog และ version bumping tool สำหรับ JavaScript projects
+  5. **lerna-changelog**: Changelog generator สำหรับ monorepos
+  6. **Release Drafter**: GitHub App สำหรับ automated release notes
+  7. **GitHub Actions**: CI/CD platform สำหรับ automated releases
+  8. **GitLab CI**: CI/CD platform สำหรับ automated releases
+  9. **Husky**: Git hooks สำหรับ enforcing commit message format
+  10. **Commitlint**: Commit message linter สำหรับ enforcing conventional commits
+
+* **Configuration Essentials:** การตั้งค่าสำคัญสำหรับให้ระบบเสถียร Changelog Management:
+  1. **Commit Message Format**: ตั้งค่า Conventional Commits format (feat:, fix:, docs:, etc.)
+  2. **Semantic Versioning Rules**: ตั้งค่า Semantic Versioning rules (MAJOR, MINOR, PATCH)
+  3. **Changelog Format**: เลือก Changelog format ตาม requirement (Keep a Changelog, Conventional Changelog)
+  4. **Release Branch**: ตั้งค่า Release branch (main, master, develop)
+  5. **Tag Format**: ตั้งค่า Tag format (v1.0.0, v1.1.0, etc.)
+  6. **Release Notes Format**: ตั้งค่า Release notes format ตาม target audience
+  7. **CI/CD Configuration**: ตั้งค่า CI/CD pipeline สำหรับ automated releases
+  8. **Husky Hooks**: ตั้งค่า Git hooks สำหรับ enforcing commit message format
+  9. **Commitlint Rules**: ตั้งค่า Commitlint rules สำหรับ enforcing conventional commits
+  10. **Release Drafter Configuration**: ตั้งค่า Release Drafter สำหรับ automated release notes
+
+---
+
+## 4. Standards, Compliance & Security
+
+* **International Standards:** มาตรฐานที่เกี่ยวข้อง:
+  1. **ISO/IEC 27001**: Information Security Management - สำหรับการจัดการ Secrets และ Access Control
+  2. **ISO/IEC 27017**: Code of Practice for Information Security Controls - สำหรับ Secure Development
+  3. **GDPR**: General Data Protection Regulation - สำหรับการจัดการ Personal Data และ User Consent
+  4. **SOC 2 Type II**: Security Controls - สำหรับการ Audit และ Compliance
+  5. **Semantic Versioning**: Industry standard สำหรับ Versioning (MAJOR.MINOR.PATCH)
+
+* **Security Protocol:** กลไกการป้องกัน Changelog Management:
+  1. **Input Validation**: Validate และ Sanitize ทุก Input ก่อน processing (Prevent XSS, SQL injection)
+  2. **Output Sanitization**: Filter sensitive information จาก changelog (API keys, Secrets)
+  3. **Access Control**: RBAC (Role-Based Access Control) สำหรับ changelog access - บาง changelogs internal only
+  4. **Audit Trail**: Log ทุก changelog access ด้วย Timestamp, User ID, และ Page accessed (สำหรับ Forensics และ Compliance)
+  5. **Rate Limiting**: Per-user และ Per-IP rate limits สำหรับป้องกัน Abuse (100-1000 requests/hour)
+  6. **Secure Communication**: TLS 1.3 สำหรับ HTTPS access
+  7. **Secret Management**: Use Environment variables หรือ Secret Manager (AWS Secrets Manager, HashiCorp Vault)
+  8. **Content Security**: CSP headers สำหรับ preventing XSS attacks
+  9. **Authentication**: Implement authentication สำหรับ internal changelogs (SSO, OAuth)
+  10. **Data Encryption**: Encrypt sensitive data ที่ rest ใน Database (AES-256 หรือ Customer-managed keys)
+
+* **Explainability:** (สำหรับ Changelog) ความสามารถในการอธิบายผลลัพธ์ผ่านเทคนิค:
+  1. **Clear Structure**: เก็บ changelog structure สำหรับ easy navigation
+  2. **Detailed Changes**: Provide detailed change descriptions สำหรับ common use cases
+  3. **Breaking Change Documentation**: Document all breaking changes ด้วย clear explanations
+  4. **Migration Guides**: Provide migration guides สำหรับ breaking changes
+  5. **Issue References**: Link to issues and PRs สำหรับ traceability
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+* **Cost Calculation:** สูตรการคำนวณต้นทุนต่อหน่วย Changelog Management:
+  1. **CI/CD Cost** = CI/CD minutes × Cost per minute
+     - GitHub Actions: Free tier + $0.008/minute
+     - GitLab CI: Free tier + $0.014/minute
+  2. **Storage Cost** = Changelog storage × Cost per GB/month
+     - GitHub Pages: Free
+     - GitLab Pages: Free
+     - S3: $0.023/GB/month
+  3. **Domain Cost** = Domain registration ($10-15/year)
+  4. **SSL Certificate Cost** = $0 (Let's Encrypt) or $50-100/year (paid)
+  5. **Total Monthly Cost** = CI/CD Cost + Storage Cost + Domain Cost + SSL Cost
+  6. **Infrastructure Costs** = Compute ($0/month for static sites) + Storage ($0/month for static sites) + Monitoring ($0/month for static sites)
+
+* **Key Performance Indicators:** ตัวชี้วัดความสำเร็จทางเทคนิค:
+  1. **Changelog Usage**: จำนวย visitors ต่อเดือน (Target: >1,000 visitors/month)
+  2. **Page Load Time**: เวลาการโหลดหน้า (Target: <2 seconds p95)
+  3. **Release Accuracy**: เปอร์เซ็นต์ของ releases ที่สำเร็จ (Target: >98%)
+  4. **Change Documentation Coverage**: เปอร์เซ็นต์ของ changes ที่มี documentation (Target: >95%)
+  5. **User Satisfaction Score**: 1-5 rating จาก User feedback (Target: >4.0)
+  6. **Error Rate**: อัตราการ Error (Target: <1%)
+  7. **Release Time**: เวลาการสร้าง Release (Target: <30 minutes)
+  8. **Changelog Generation Time**: เวลาการสร้าง Changelog (Target: <5 minutes)
+  9. **Breaking Change Detection Rate**: เปอร์เซ็นต์ของ breaking changes ที่ตรวจจับได้ (Target: >95%)
+  10. **Migration Guide Availability**: เปอร์เซ็นต์ของ migration guides สำหรับ breaking changes (Target: >90%)
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+* **Phase Rollout:** คำแนะนำในการทยอยเริ่มใช้งาน Changelog Management เพื่อลดความเสี่ยง:
+  1. **Phase 1: MVP (1-2 เดือน)**: Deploy Simple Changelog Management ด้วย Conventional Commits และ Manual changelog สำหรับ Internal team ก่อนเปิดให้ Public
+     - **Goal**: Validate Changelog Management architecture และ gather feedback
+     - **Success Criteria**: >80% changelog coverage, <5s generation time
+     - **Risk Mitigation**: Internal-only access, Manual review ก่อน Public
+  2. **Phase 2: Beta (2-3 เดือน)**: Expand ด้วย Automated changelog generation และ Semantic Versioning สำหรับ Selected customers
+     - **Goal**: Test scalability และ Changelog reliability
+     - **Success Criteria**: >90% changelog coverage, <3s generation time
+     - **Risk Mitigation**: Canary deployment, Feature flags, Gradual rollout
+  3. **Phase 3: GA (3-6 เดือน)**: Full rollout ด้วย Advanced features (Release notes, Migration guides, Multi-language support)
+     - **Goal**: Enterprise-grade changelog และ Performance
+     - **Success Criteria**: >95% changelog coverage, <2s generation time, 99.9% uptime
+     - **Risk Mitigation**: Load testing, Disaster recovery, Blue-green deployment
+
+* **Pitfalls to Avoid:** ข้อควรระวังที่มักจะผิดพลาดในระดับ Enterprise Scale:
+  1. **Over-engineering**: สร้าง Changelog Management ที่ซ้อนเกินไป (Too many features, Complex automation) → เริ่มจาก Simple และ iterate
+  2. **No Rate Limiting**: ไม่มี Rate limits ทำให้ Cost blowout และ API abuse → Implement per-IP และ per-user limits
+  3. **Outdated Changelogs**: Changelogs ไม่ sync กับ releases → Implement automated changelog generation จาก Git commits
+  4. **Missing Breaking Changes**: ไม่มี Breaking changes documentation ทำให้ users สับสนใจ → Document all breaking changes ด้วย migration guides
+  5. **No Version Management**: ไม่มี Version management ทำให้ developers สับสนใจ → Implement clear versioning strategy
+  6. **No Release Notes**: ไม่มี Release notes ทำให้ users ยากในการ understand changes → Provide user-friendly release notes
+  7. **No Automation**: ไม่มี Automation ทำให้ manual work เยอะมาก → Implement automated changelog generation
+  8. **Poor Commit Messages**: Commit messages ไม่ follow format ทำให้ changelog generation ล้มเหลว → Enforce conventional commits
+  9. **No Migration Guides**: ไม่มี Migration guides สำหรับ breaking changes → Provide migration guides สำหรับ all breaking changes
+  10. **Single Point of Failure**: ไม่มี Redundancy หรือ Fallback → Deploy multiple instances ด้วย CDN
+
+---
+
+## Core Concepts
+
+### 1. Changelog Importance
 
 ### Why Changelogs Matter
 
@@ -647,7 +817,7 @@ Closes #789
 docs: update API documentation
 
 Added new endpoints and updated examples
-for the user management API.
+for user management API.
 
 Closes #101
 ```
@@ -677,7 +847,6 @@ Closes #101
     }
   }
 }
-```
 ```
 
 ### Release Notes Generation
@@ -981,10 +1150,10 @@ npm install -g crowdin-cli
 crowdin init
 
 # Upload source
-crowin upload sources
+crowdin upload sources
 
 # Download translations
-crowin download
+crowdin download
 ```
 
 ### Lokalise
@@ -1244,7 +1413,7 @@ lokalise download
 ```
 
 ## Conventional Commit Template
-```
+```markdown
 [type]: [description]
 
 [optional body]
@@ -1265,20 +1434,173 @@ lokalise download
 ## Categories
 - Added: New features
 - Changed: Modifications
-- Deprecated: Will be removed
+- Deprecated: Soon-to-be removed
 - Removed: Removed features
 - Fixed: Bug fixes
-- Security: Security fixes
-
-## Commit Types
-- feat: New feature
-- fix: Bug fix
-- docs: Documentation
-- style: Formatting
-- refactor: Refactoring
-- test: Tests
-- chore: Maintenance
-- perf: Performance
-- ci: CI/CD
-- revert: Revert
+- Security: Security updates
 ```
+
+---
+
+## Quick Start
+
+### Basic Changelog Format
+
+```markdown
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.2.0] - 2024-01-15
+
+### Added
+- New user dashboard feature
+- Email notifications for important events
+
+### Changed
+- Improved API response times
+- Updated documentation
+
+### Fixed
+- Resolved login issue on mobile devices
+- Fixed data export bug
+
+## [1.1.0] - 2024-01-01
+
+### Added
+- Initial release
+```
+
+### Automated Changelog Generation
+
+```bash
+# Using standard-version
+npm install --save-dev standard-version
+
+# Add to package.json
+{
+  "scripts": {
+    "release": "standard-version"
+  }
+}
+
+# Generate changelog
+npm run release
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Format**: Use consistent changelog format (Keep a Changelog)
+- [ ] **Versioning**: Follow semantic versioning (MAJOR.MINOR.PATCH)
+- [ ] **Categories**: Use standard categories (Added, Changed, Deprecated, Removed, Fixed, Security)
+- [ ] **Dates**: Include release dates for each version
+- [ ] **Breaking Changes**: Clearly mark breaking changes
+- [ ] **Links**: Link to relevant issues, PRs, or commits
+- [ ] **Migration Guides**: Provide migration guides for breaking changes
+- [ ] **Automation**: Automate changelog generation from commits
+- [ ] **Review**: Review changelog before release
+- [ ] **Accessibility**: Make changelog easy to find and read
+- [ ] **History**: Maintain full changelog history
+- [ ] **Unreleased**: Track unreleased changes
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Vague Change Descriptions
+
+```markdown
+# ❌ Bad - Vague
+## [1.2.0] - 2024-01-15
+- Fixed bugs
+- Updated stuff
+```
+
+```markdown
+# ✅ Good - Specific
+## [1.2.0] - 2024-01-15
+### Fixed
+- Fixed login timeout issue on mobile Safari browsers
+- Resolved data export failing for files larger than 100MB
+```
+
+### ❌ Don't: No Version Dates
+
+```markdown
+# ❌ Bad - No dates
+## [1.2.0]
+- Added new feature
+```
+
+```markdown
+# ✅ Good - With dates
+## [1.2.0] - 2024-01-15
+- Added new feature
+```
+
+### ❌ Don't: Mixing Categories
+
+```markdown
+# ❌ Bad - Unclear categories
+## [1.2.0] - 2024-01-15
+- New feature added
+- Bug fixed
+- Performance improved
+```
+
+```markdown
+# ✅ Good - Clear categories
+## [1.2.0] - 2024-01-15
+### Added
+- New dashboard feature
+
+### Fixed
+- Login timeout bug
+
+### Changed
+- Improved API response times
+```
+
+### ❌ Don't: No Breaking Changes Documentation
+
+```markdown
+# ❌ Bad - Breaking change not documented
+## [2.0.0] - 2024-01-15
+### Changed
+- Updated API endpoints
+```
+
+```markdown
+# ✅ Good - Breaking changes clearly marked
+## [2.0.0] - 2024-01-15
+
+### ⚠️ Breaking Changes
+- API endpoints changed from `/v1/` to `/v2/`
+- Authentication now requires Bearer token instead of API key
+
+### Migration Guide
+See [Migration Guide](migration-v2.md) for detailed upgrade instructions.
+```
+
+---
+
+## Integration Points
+
+- **API Documentation** (`21-documentation/api-documentation/`) - Document API changes
+- **Version Control** (`01-foundations/git-workflow/`) - Link to commits and PRs
+- **Technical Writing** (`21-documentation/technical-writing/`) - Clear change descriptions
+
+---
+
+## Further Reading
+
+- [Keep a Changelog](https://keepachangelog.com/)
+- [Semantic Versioning](https://semver.org/)
+- [Conventional Commits](https://www.conventionalcommits.org/)
+- [semantic-release](https://github.com/semantic-release/semantic-release)
+- [standard-version](https://github.com/fisker/standard-version)

@@ -1,8 +1,18 @@
+---
+name: CDN for Video Delivery
+description: Distributing video content globally using Content Delivery Networks (CDNs) like CloudFront and Cloudflare for fast, reliable delivery with optimization strategies and caching.
+---
+
 # CDN for Video Delivery
+
+> **Current Level:** Intermediate  
+> **Domain:** Video Streaming / Infrastructure
+
+---
 
 ## Overview
 
-Content Delivery Networks (CDNs) distribute video content globally for fast, reliable delivery. This guide covers CloudFront, Cloudflare, and optimization strategies.
+Content Delivery Networks (CDNs) distribute video content globally for fast, reliable delivery. This guide covers CloudFront, Cloudflare, and optimization strategies for building scalable video delivery systems that serve content from edge locations worldwide.
 
 ## CDN for Video Streaming
 
@@ -537,6 +547,117 @@ export class CDNFailoverService {
 8. **Failover** - Implement multi-CDN strategy
 9. **Invalidation** - Invalidate cache when needed
 10. **Testing** - Test from different regions
+
+---
+
+## Quick Start
+
+### CloudFront Setup
+
+```yaml
+# CloudFormation
+Resources:
+  VideoDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: video.example.com
+            Id: video-origin
+            CustomOriginConfig:
+              HTTPPort: 80
+              OriginProtocolPolicy: https-only
+        DefaultCacheBehavior:
+          TargetOriginId: video-origin
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad  # CachingOptimized
+          Compress: true
+```
+
+### Signed URLs
+
+```typescript
+import { CloudFrontSigner } from '@aws-sdk/cloudfront-signer'
+
+const signer = new CloudFrontSigner({
+  keyPairId: process.env.CF_KEY_PAIR_ID,
+  privateKey: process.env.CF_PRIVATE_KEY
+})
+
+// Generate signed URL (valid for 1 hour)
+const signedUrl = signer.getSignedUrl({
+  url: 'https://cdn.example.com/video.mp4',
+  expiresIn: 3600
+})
+```
+
+---
+
+## Production Checklist
+
+- [ ] **CDN Setup**: CDN configured (CloudFront, Cloudflare)
+- [ ] **Origin**: Origin server configured
+- [ ] **Cache Control**: Appropriate cache headers
+- [ ] **Compression**: Enable compression (Gzip/Brotli)
+- [ ] **HTTPS**: HTTPS enabled
+- [ ] **Signed URLs**: Signed URLs for premium content
+- [ ] **Geographic Distribution**: Edge locations globally
+- [ ] **Monitoring**: Monitor CDN performance
+- [ ] **Analytics**: CDN analytics
+- [ ] **Error Handling**: Handle CDN errors
+- [ ] **Testing**: Test CDN delivery
+- [ ] **Documentation**: Document CDN setup
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Caching
+
+```http
+# ❌ Bad - No cache headers
+HTTP/1.1 200 OK
+Content-Type: video/mp4
+# No cache!
+```
+
+```http
+# ✅ Good - Cache headers
+HTTP/1.1 200 OK
+Content-Type: video/mp4
+Cache-Control: public, max-age=31536000
+# Cached for 1 year
+```
+
+### ❌ Don't: Single Origin
+
+```markdown
+# ❌ Bad - Single origin
+All users → Origin server
+# High latency for distant users!
+```
+
+```markdown
+# ✅ Good - CDN
+Users → Nearest edge location → Origin (if needed)
+# Low latency globally
+```
+
+---
+
+## Integration Points
+
+- **Adaptive Bitrate** (`37-video-streaming/adaptive-bitrate/`) - ABR delivery
+- **Live Streaming** (`37-video-streaming/live-streaming/`) - Live CDN
+- **Video Analytics** (`37-video-streaming/video-analytics/`) - CDN metrics
+
+---
+
+## Further Reading
+
+- [AWS CloudFront](https://aws.amazon.com/cloudfront/)
+- [Cloudflare CDN](https://www.cloudflare.com/cdn/)
+- [CDN Best Practices](https://www.cloudflare.com/learning/cdn/what-is-a-cdn/)
 
 ## Resources
 

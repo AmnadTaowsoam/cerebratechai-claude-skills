@@ -18,7 +18,7 @@
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN",
         "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }
@@ -29,7 +29,7 @@
 ### Option B: Local Clone
 
 ```bash
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
 ```
 
 ---

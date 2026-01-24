@@ -1,8 +1,20 @@
+---
+name: Incident Response
+description: Systematic approach to handling security breaches and incidents to minimize damage, reduce recovery time, preserve evidence, and prevent future occurrences through structured response procedures.
+---
+
 # Incident Response
 
-## What is Incident Response
+> **Current Level:** Intermediate  
+> **Domain:** Security / Operations
 
-Incident response is the systematic approach to handling security breaches and incidents to minimize damage, reduce recovery time, and prevent future occurrences.
+---
+
+## Overview
+
+Incident response is the systematic approach to handling security breaches and incidents to minimize damage, reduce recovery time, and prevent future occurrences. Effective incident response includes preparation, detection, containment, eradication, recovery, and lessons learned.
+
+## What is Incident Response
 
 ### Incident Response Goals
 
@@ -741,15 +753,113 @@ print(metrics)
 4. **Recovery**: Verified no lateral movement
 5. **Lessons**: Implemented MFA, security awareness training
 
-## Summary Checklist
+---
 
-### Preparation
+## Quick Start
 
-- [ ] Incident response plan documented
-- [ ] Incident response team identified
-- [ ] Tools and resources available
-- [ ] Training and drills conducted
-- [ ] Contact lists maintained
+### Incident Response Plan
+
+```markdown
+# Incident Response Plan
+
+## Team
+- Incident Commander: [Name]
+- Security Lead: [Name]
+- Engineering Lead: [Name]
+- Communications: [Name]
+
+## Phases
+1. **Preparation** - Tools, training, documentation
+2. **Detection** - Monitoring, alerts, identification
+3. **Containment** - Isolate affected systems
+4. **Eradication** - Remove threat
+5. **Recovery** - Restore services
+6. **Lessons Learned** - Post-mortem, improvements
+```
+
+### Incident Detection
+
+```typescript
+// Monitor for security incidents
+async function detectIncident(alert: SecurityAlert) {
+  if (alert.severity === 'critical') {
+    await createIncident({
+      title: alert.title,
+      severity: 'critical',
+      status: 'open',
+      detectedAt: new Date()
+    })
+    
+    await notifyIncidentTeam()
+  }
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Response Plan**: Documented incident response plan
+- [ ] **Team**: Incident response team identified
+- [ ] **Tools**: Security tools and resources available
+- [ ] **Training**: Regular training and drills
+- [ ] **Communication**: Communication channels established
+- [ ] **Monitoring**: Security monitoring in place
+- [ ] **Containment**: Containment procedures defined
+- [ ] **Recovery**: Recovery procedures documented
+- [ ] **Post-mortem**: Post-mortem process
+- [ ] **Documentation**: Document all incidents
+- [ ] **Improvement**: Continuous improvement
+- [ ] **Compliance**: Meet compliance requirements
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Plan
+
+```markdown
+# ❌ Bad - No plan
+"Figure it out when it happens"
+```
+
+```markdown
+# ✅ Good - Documented plan
+# Incident Response Plan
+- Team roles defined
+- Procedures documented
+- Tools ready
+- Regular drills
+```
+
+### ❌ Don't: Slow Response
+
+```markdown
+# ❌ Bad - Slow response
+Incident detected → Wait 24 hours → Respond
+# Damage spreads!
+```
+
+```markdown
+# ✅ Good - Fast response
+Incident detected → Immediate containment → Investigation
+# Minimize damage
+```
+
+---
+
+## Integration Points
+
+- **Vulnerability Management** (`24-security-practices/vulnerability-management/`) - Vulnerability handling
+- **Security Audit** (`24-security-practices/security-audit/`) - Security reviews
+- **Monitoring** (`14-monitoring-observability/`) - Security monitoring
+
+---
+
+## Further Reading
+
+- [NIST Incident Response Guide](https://www.nist.gov/publications/computer-security-incident-handling-guide)
+- [SANS Incident Response](https://www.sans.org/reading-room/whitepapers/incident/incident-handlers-handbook-33901)
 
 ### During Incident
 

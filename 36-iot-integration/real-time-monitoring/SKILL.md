@@ -1,8 +1,18 @@
+---
+name: Real-time Monitoring
+description: Providing live visibility into IoT device status and sensor data through real-time dashboards, alerts, WebSocket implementation, and time-series data visualization.
+---
+
 # Real-time Monitoring
+
+> **Current Level:** Intermediate  
+> **Domain:** IoT / Monitoring / Real-time
+
+---
 
 ## Overview
 
-Real-time monitoring provides live visibility into IoT device status and sensor data. This guide covers dashboards, alerts, and WebSocket implementation.
+Real-time monitoring provides live visibility into IoT device status and sensor data. This guide covers dashboards, alerts, and WebSocket implementation for building monitoring systems that provide instant insights into IoT device health and performance.
 
 ## Monitoring Architecture
 
@@ -466,9 +476,195 @@ export class DataAggregator {
 9. **Offline** - Handle offline gracefully
 10. **Security** - Authenticate WebSocket connections
 
-## Resources
+---
+
+## Quick Start
+
+### Real-time Dashboard
+
+```typescript
+// Server - WebSocket
+io.on('connection', (socket) => {
+  // Send initial data
+  socket.emit('dashboard:data', getDashboardData())
+  
+  // Send updates every second
+  const interval = setInterval(() => {
+    socket.emit('dashboard:update', getDashboardData())
+  }, 1000)
+  
+  socket.on('disconnect', () => {
+    clearInterval(interval)
+  })
+})
+
+// Client
+socket.on('dashboard:update', (data) => {
+  updateDashboard(data)
+})
+```
+
+---
+
+## Production Checklist
+
+- [ ] **WebSocket**: WebSocket connection for real-time
+- [ ] **Data Aggregation**: Aggregate data on backend
+- [ ] **Throttling**: Throttle high-frequency updates
+- [ ] **Caching**: Cache dashboard data
+- [ ] **Lazy Loading**: Load historical data on demand
+- [ ] **Alerts**: Threshold-based alerts
+- [ ] **Performance**: Optimize chart rendering
+- [ ] **Mobile**: Responsive dashboards
+- [ ] **Offline**: Handle offline gracefully
+- [ ] **Security**: Authenticate WebSocket connections
+- [ ] **Testing**: Test with real devices
+- [ ] **Documentation**: Document monitoring system
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Too Frequent Updates
+
+```typescript
+// ❌ Bad - Update every millisecond
+setInterval(() => {
+  socket.emit('update', data)
+}, 1)  // Too frequent!
+```
+
+```typescript
+// ✅ Good - Throttled updates
+const throttle = require('lodash/throttle')
+const sendUpdate = throttle((data) => {
+  socket.emit('update', data)
+}, 1000)  // Max once per second
+```
+
+### ❌ Don't: No Aggregation
+
+```typescript
+// ❌ Bad - Send raw data
+socket.emit('update', rawSensorData)  // Too much data!
+```
+
+```typescript
+// ✅ Good - Aggregate first
+const aggregated = aggregateSensorData(rawSensorData)
+socket.emit('update', aggregated)  // Summary data
+```
+
+---
+
+## Integration Points
+
+- **Device Management** (`36-iot-integration/device-management/`) - Device data
+- **IoT Protocols** (`36-iot-integration/iot-protocols/`) - Device communication
+- **Real-time Dashboard** (`34-real-time-features/real-time-dashboard/`) - Dashboard patterns
+
+---
+
+## Further Reading
 
 - [Socket.IO](https://socket.io/)
+- [IoT Monitoring Best Practices](https://aws.amazon.com/iot-core/features/device-management/)
+
+---
+
+## Quick Start
+
+### Real-time Dashboard
+
+```typescript
+// Server - WebSocket
+io.on('connection', (socket) => {
+  // Send initial data
+  socket.emit('dashboard:data', getDashboardData())
+  
+  // Send updates every second
+  const interval = setInterval(() => {
+    socket.emit('dashboard:update', getDashboardData())
+  }, 1000)
+  
+  socket.on('disconnect', () => {
+    clearInterval(interval)
+  })
+})
+
+// Client
+socket.on('dashboard:update', (data) => {
+  updateDashboard(data)
+})
+```
+
+---
+
+## Production Checklist
+
+- [ ] **WebSocket**: WebSocket connection for real-time
+- [ ] **Data Aggregation**: Aggregate data on backend
+- [ ] **Throttling**: Throttle high-frequency updates
+- [ ] **Caching**: Cache dashboard data
+- [ ] **Lazy Loading**: Load historical data on demand
+- [ ] **Alerts**: Threshold-based alerts
+- [ ] **Performance**: Optimize chart rendering
+- [ ] **Mobile**: Responsive dashboards
+- [ ] **Offline**: Handle offline gracefully
+- [ ] **Security**: Authenticate WebSocket connections
+- [ ] **Testing**: Test with real devices
+- [ ] **Documentation**: Document monitoring system
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Too Frequent Updates
+
+```typescript
+// ❌ Bad - Update every millisecond
+setInterval(() => {
+  socket.emit('update', data)
+}, 1)  // Too frequent!
+```
+
+```typescript
+// ✅ Good - Throttled updates
+const throttle = require('lodash/throttle')
+const sendUpdate = throttle((data) => {
+  socket.emit('update', data)
+}, 1000)  // Max once per second
+```
+
+### ❌ Don't: No Aggregation
+
+```typescript
+// ❌ Bad - Send raw data
+socket.emit('update', rawSensorData)  // Too much data!
+```
+
+```typescript
+// ✅ Good - Aggregate first
+const aggregated = aggregateSensorData(rawSensorData)
+socket.emit('update', aggregated)  // Summary data
+```
+
+---
+
+## Integration Points
+
+- **Device Management** (`36-iot-integration/device-management/`) - Device data
+- **IoT Protocols** (`36-iot-integration/iot-protocols/`) - Device communication
+- **Real-time Dashboard** (`34-real-time-features/real-time-dashboard/`) - Dashboard patterns
+
+---
+
+## Further Reading
+
+- [Socket.IO](https://socket.io/)
+- [IoT Monitoring Best Practices](https://aws.amazon.com/iot-core/features/device-management/)
+
+## Resources
 - [Chart.js](https://www.chartjs.org/)
 - [Leaflet](https://leafletjs.com/)
 - [React Leaflet](https://react-leaflet.js.org/)

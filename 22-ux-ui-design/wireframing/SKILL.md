@@ -1,12 +1,24 @@
+---
+name: Wireframing
+description: Creating low-fidelity visual representations of website or application structure and layout to plan information architecture, user flows, and interface design before implementation.
+---
+
 # Wireframing
 
-## Overview
-
-Wireframes are low-fidelity visual representations of a website or application's structure and layout.
+> **Current Level:** Intermediate  
+> **Domain:** UX/UI Design / Planning
 
 ---
 
-## 1. Wireframing Concepts
+## Overview
+
+Wireframes are low-fidelity visual representations of a website or application's structure and layout. Effective wireframes help teams plan information architecture, user flows, and interface design before investing in detailed design and development.
+
+---
+
+## Core Concepts
+
+### 1. Wireframing Concepts
 
 ### What are Wireframes
 
@@ -1020,6 +1032,154 @@ Accessibility:
 - **Accessibility**: ARIA, keyboard, screen reader
 
 ## Responsive Breakpoints
+- Mobile: 320px - 767px
+- Tablet: 768px - 1023px
+- Desktop: 1024px+
+```
+
+---
+
+## Quick Start
+
+### Basic Wireframe Structure
+
+```html
+<!-- Low-fidelity wireframe structure -->
+<div class="wireframe">
+  <!-- Header -->
+  <header>
+    [Logo] [Navigation] [User Menu]
+  </header>
+  
+  <!-- Main Content -->
+  <main>
+    <section class="hero">
+      [Hero Image/Content]
+      [CTA Button]
+    </section>
+    
+    <section class="features">
+      [Feature Card 1]
+      [Feature Card 2]
+      [Feature Card 3]
+    </section>
+  </main>
+  
+  <!-- Footer -->
+  <footer>
+    [Links] [Copyright]
+  </footer>
+</div>
+```
+
+### Wireframe Tools
+
+```markdown
+# Popular Wireframing Tools
+
+## Free
+- Figma (free tier)
+- Draw.io
+- Pencil Project
+
+## Paid
+- Sketch
+- Adobe XD
+- Balsamiq
+```
+
+---
+
+## Production Checklist
+
+- [ ] **User Flow**: Map user flows before wireframing
+- [ ] **Information Architecture**: Plan content structure
+- [ ] **Low-Fidelity First**: Start with low-fidelity wireframes
+- [ ] **Annotations**: Add notes explaining behavior and states
+- [ ] **Responsive**: Wireframe for mobile, tablet, desktop
+- [ ] **User Testing**: Test wireframes with users
+- [ ] **Iteration**: Iterate based on feedback
+- [ ] **Handoff**: Prepare wireframes for design handoff
+- [ ] **Documentation**: Document wireframe decisions
+- [ ] **Version Control**: Version wireframes like code
+- [ ] **Accessibility**: Consider accessibility in wireframes
+- [ ] **Consistency**: Maintain consistent wireframe style
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Too Much Detail Too Early
+
+```html
+<!-- ❌ Bad - High-fidelity wireframe too early -->
+<div style="background: #f0f0f0; padding: 20px; border-radius: 8px;">
+  <h2 style="color: #333; font-size: 24px;">Feature Title</h2>
+  <!-- Too detailed for wireframe stage -->
+</div>
+```
+
+```html
+<!-- ✅ Good - Low-fidelity wireframe -->
+<div class="wireframe-box">
+  [Feature Title]
+  [Description text]
+  [Button]
+</div>
+```
+
+### ❌ Don't: No Annotations
+
+```html
+<!-- ❌ Bad - No explanation -->
+<div>[Button]</div>
+```
+
+```html
+<!-- ✅ Good - Annotated -->
+<div>
+  [Button]
+  <!-- Annotation: Opens modal with form -->
+</div>
+```
+
+### ❌ Don't: Ignore Mobile
+
+```html
+<!-- ❌ Bad - Desktop only -->
+<div class="desktop-layout">
+  [Content]
+</div>
+```
+
+```html
+<!-- ✅ Good - Responsive wireframes -->
+<!-- Mobile -->
+<div class="mobile-layout">
+  [Stacked content]
+</div>
+
+<!-- Desktop -->
+<div class="desktop-layout">
+  [Side-by-side content]
+</div>
+```
+
+---
+
+## Integration Points
+
+- **User Research** (`22-ux-ui-design/user-research/`) - Test wireframes with users
+- **Design Systems** (`22-ux-ui-design/design-systems/`) - Wireframe with design tokens
+- **Responsive Design** (`22-ux-ui-design/responsive-design/`) - Responsive wireframes
+
+---
+
+## Further Reading
+
+- [Wireframing Guide](https://www.interaction-design.org/literature/topics/wireframing)
+- [Figma Wireframing](https://www.figma.com/resource-library/wireframing/)
+- [Balsamiq Wireframing](https://balsamiq.com/learn/wireframing/)
 - **Mobile**: 320px - 480px
 - **Small Tablet**: 481px - 768px
 - **Tablet**: 769px - 1024px

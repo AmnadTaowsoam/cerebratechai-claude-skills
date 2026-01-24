@@ -1,8 +1,346 @@
 # Backend Error Handling Patterns
 
-## 1. Error Types and Classification
+---
 
-### Error Categories
+## 1. Executive Summary & Strategic Necessity
+
+### 1.1 Context (ภาษาไทย)
+
+Error Handling เป็นส่วนสำคัญของ backend development ที่ช่วยให้ applications ทำงานได้อย่าง reliable, maintainable, และ debuggable โดยมี patterns และ best practices สำหรับ handling, logging, และ monitoring errors
+
+Error Handling ประกอบด้วย:
+- **Error Classification** - แยกแยะ error types (operational vs programmer errors)
+- **Custom Error Classes** - สร้าง error classes ที่ domain-specific
+- **Error Middleware** - Global error handlers สำหรับ consistent responses
+- **Error Logging** - Logging errors สำหรับ debugging และ monitoring
+- **Error Monitoring** - External monitoring services (Sentry, etc.)
+- **Error Recovery** - Retry, fallback, และ circuit breaker patterns
+
+### 1.2 Business Impact (ภาษาไทย)
+
+**ผลกระทบทางธุรกิจ:**
+
+1. **ลด Downtime** - Proper error handling ช่วยลด downtime ได้ถึง 40-60%
+2. **เพิ่ม User Experience** - Graceful error handling ช่วยเพิ่ม UX
+3. **ลด Debugging Time** - Structured error logging ช่วยลดเวลา debug
+4. **เพิ่ม Maintainability** - Consistent error handling ช่วยเพิ่ม maintainability
+5. **ปรับปรุง Reliability** - Error recovery patterns ช่วยเพิ่ม reliability
+
+### 1.3 Product Thinking (ภาษาไทย)
+
+**มุมมองด้านผลิตภัณฑ์:**
+
+1. **User-Friendly** - Error messages ต้อง user-friendly และ actionable
+2. **Secure** - ไม่ expose sensitive information ใน error responses
+3. **Observable** - Errors ต้อง observable ด้วย logging และ monitoring
+4. **Recoverable** - Errors ต้อง recoverable ด้วย retry และ fallback
+5. **Testable** - Error handling ต้อง testable ง่าย
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+### 2.1 Core Logic
+
+Backend Error Handling ประกอบด้วย:
+
+1. **Error Classification** - Operational vs Programmer errors
+2. **Custom Error Classes** - Domain-specific error types
+3. **Error Middleware** - Global error handlers
+4. **Error Responses** - Consistent response formats
+5. **Error Logging** - Structured logging
+6. **Error Monitoring** - External monitoring services
+7. **Error Recovery** - Retry, fallback, circuit breaker
+
+### 2.2 Architecture Diagram Requirements
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              Error Handling Architecture               │
+├─────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Request Layer                         │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  HTTP       │  │  WebSocket  │  │  gRPC       │  │   │
+│  │  │  Requests   │  │  Requests   │  │  Requests   │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Application Layer                    │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Business   │  │  Validation │  │  Services  │  │   │
+│  │  │  Logic      │  │  Layer      │  │            │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Error Handling Layer                │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Error      │  │  Error      │  │  Error     │  │   │
+│  │  │  Classes    │  │  Middleware │  │  Factory   │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Monitoring Layer                      │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Logging    │  │  Monitoring │  │  Alerts    │  │   │
+│  │  │  System     │  │  Services   │  │            │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 2.3 Implementation Workflow
+
+**Step 1: Create Error Classes**
+
+```typescript
+// types/errors.ts
+export class OperationalError extends Error {
+  constructor(
+    public statusCode: number = 500,
+    public message: string = "An error occurred",
+    public isOperational: boolean = true
+  ) {
+    super(message)
+    this.name = this.constructor.name
+    Error.captureStackTrace(this, this.constructor)
+  }
+}
+```
+
+**Step 2: Create Error Middleware**
+
+```typescript
+// middleware/error.middleware.ts
+export function errorHandler(
+  error: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  // Handle errors
+}
+```
+
+**Step 3: Setup Logging**
+
+```typescript
+// utils/logger.ts
+const logger = winston.createLogger({
+  // Configure logger
+})
+```
+
+---
+
+## 3. Tooling & Tech Stack
+
+### 3.1 Enterprise Tools
+
+| Tool | Purpose | Version | License |
+|------|---------|---------|---------|
+| Winston | Logging Library | ^3.11.0 | MIT |
+| Sentry | Error Monitoring | ^7.0.0 | BSD-3-Clause |
+| Express Validator | Validation Middleware | ^7.0.0 | MIT |
+| Zod | Schema Validation | ^3.22.0 | MIT |
+| Axios | HTTP Client | ^1.6.0 | MIT |
+| p-retry | Retry Utility | ^6.2.0 | MIT |
+| opossum | Circuit Breaker | ^8.1.0 | Apache-2.0 |
+
+### 3.2 Configuration Essentials
+
+**Winston Configuration:**
+```typescript
+// utils/logger.ts
+import winston from "winston"
+
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || "info",
+  format: winston.format.combine(
+    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+      ),
+    }),
+    new winston.transports.File({
+      filename: "logs/combined.log",
+      level: "info",
+    }),
+    new winston.transports.File({
+      filename: "logs/error.log",
+      level: "error",
+    }),
+  ],
+  exceptionHandlers: [
+    new winston.transports.File({
+      filename: "logs/exceptions.log",
+    }),
+  ],
+})
+
+export default logger
+```
+
+**Sentry Configuration:**
+```typescript
+// monitoring/sentry.ts
+import * as Sentry from "@sentry/node"
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  environment: process.env.NODE_ENV || "development",
+  tracesSampleRate: 1.0,
+  beforeSend(event) {
+    // Filter out operational errors
+    if (event.exception?.values?.[0]?.mechanism?.type === "express") {
+      const error = event.request?.error as any
+      if (error?.isOperational) {
+        return null
+      }
+    }
+    return event
+  },
+})
+
+export { Sentry }
+```
+
+---
+
+## 4. Standards, Compliance & Security
+
+### 4.1 International Standards
+
+- **RFC 7807** - Problem Details for HTTP APIs
+- **OWASP** - Security Best Practices
+- **GDPR** - Data Protection สำหรับ Error Logs
+- **HIPAA** - Healthcare Data Protection
+- **PCI DSS** - Payment Card Industry Standards
+
+### 4.2 Security Protocol
+
+Error Handling ต้องปฏิบัติตามหลักความปลอดภัย:
+
+1. **No Sensitive Data** - ไม่ expose sensitive information ใน error responses
+2. **Secure Logging** - ไม่ log passwords, tokens, หรือ sensitive data
+3. **Error Sanitization** - Sanitize error messages ก่อนส่งให้ client
+4. **Rate Limiting** - จำกัดจำนวน error reports
+5. **Secure Monitoring** - ใช้ secure connections สำหรับ monitoring
+
+### 4.3 Explainability
+
+Error Handling ต้องสามารถอธิบายได้ว่า:
+
+1. **Error Classification** - ทำไม error ถูก classify อย่างไร
+2. **Error Logging** - ทำไม errors ถูก log อย่างไร
+3. **Error Monitoring** - ทำไม errors ถูก monitor อย่างไร
+4. **Error Recovery** - ทำไม errors ถูก recover อย่างไร
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+### 5.1 Cost Calculation
+
+| Metric | Calculation | Target |
+|--------|-------------|--------|
+| Error Rate | Errors / Total Requests | < 1% |
+| Recovery Rate | Recovered Errors / Total Errors | > 90% |
+| MTTR (Mean Time to Recovery) | Average recovery time | < 5 min |
+| Error Response Time | Error handling latency | < 100ms |
+| Logging Overhead | Logging performance impact | < 5% |
+
+### 5.2 Key Performance Indicators
+
+**Technical Metrics:**
+
+1. **Error Rate** - Error rate ต่อ requests
+2. **Recovery Rate** - Error recovery rate
+3. **MTTR** - Mean Time to Recovery
+4. **Error Response Time** - Error handling latency
+
+**Business Metrics:**
+
+1. **User Impact** - Users affected by errors
+2. **Downtime** - System downtime
+3. **Support Tickets** - Support tickets จาก errors
+4. **Customer Satisfaction** - CSAT score
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+### 6.1 Phase Rollout
+
+**Phase 1: Foundation (Week 1-2)**
+- Create error classes
+- Setup error middleware
+- Implement basic logging
+- Create error response formats
+
+**Phase 2: Advanced Features (Week 3-4)**
+- Add error classification
+- Implement error monitoring
+- Add error recovery patterns
+- Create error factory
+
+**Phase 3: Integration (Week 5-6)**
+- Integrate with monitoring services
+- Add alerting
+- Implement circuit breakers
+- Setup error dashboards
+
+**Phase 4: Production (Week 7-8)**
+- Performance optimization
+- Documentation and training
+- Error reporting workflows
+- Best practices documentation
+
+### 6.2 Pitfalls to Avoid
+
+1. **Swallowing Errors** - ไม่ catch และ ignore errors
+2. **Exposing Stack Traces** - ไม่ expose stack traces ใน production
+3. **Poor Error Messages** - ไม่ใช้ error messages ที่ user-friendly
+4. **Missing Logging** - ไม่ log errors อย่างเหมาะสม
+5. **No Monitoring** - ไม่ monitor errors
+6. **Poor Recovery** - ไม่ implement error recovery
+
+### 6.3 Best Practices Checklist
+
+- [ ] ใช้ custom error classes สำหรับ domain-specific errors
+- [ ] Classify errors เป็น operational vs programmer errors
+- [ ] Implement global error middleware
+- [ ] Use consistent error response formats
+- [ ] Log errors ด้วย structured logging
+- [ ] Monitor errors ด้วย external services
+- [ ] Implement error recovery patterns
+- [ ] Use circuit breakers สำหรับ external services
+- [ ] Test error scenarios
+- [ ] Sanitize error messages สำหรับ production
+- [ ] Implement retry logic สำหรับ transient errors
+- [ ] Use fallback strategies สำหรับ critical failures
+- [ ] Document error codes และ messages
+- [ ] Setup alerting สำหรับ critical errors
+- [ ] Review error logs regularly
+
+---
+
+## 7. Implementation Examples
+
+### 7.1 Error Types and Classification
+
+**Error Categories:**
 ```typescript
 // types/errors.ts
 
@@ -79,7 +417,7 @@ export class ServiceUnavailableError extends OperationalError {
 }
 ```
 
-### Error Classification
+**Error Classification:**
 ```typescript
 // utils/error-classifier.ts
 import { OperationalError, ProgrammerError } from "../types/errors"
@@ -103,9 +441,9 @@ export function isTrustedError(error: Error): boolean {
 }
 ```
 
-## 2. Custom Error Classes
+### 7.2 Custom Error Classes
 
-### Base Error Class
+**Base Error Class:**
 ```typescript
 // errors/app.error.ts
 export class AppError extends Error {
@@ -122,7 +460,7 @@ export class AppError extends Error {
 }
 ```
 
-### Validation Error
+**Validation Error:**
 ```typescript
 // errors/validation.error.ts
 import { AppError } from "./app.error"
@@ -143,7 +481,7 @@ export class ValidationError extends AppError {
 }
 ```
 
-### Database Error
+**Database Error:**
 ```typescript
 // errors/database.error.ts
 import { AppError } from "./app.error"
@@ -167,7 +505,7 @@ export class DuplicateRecordError extends AppError {
 }
 ```
 
-### Authentication Error
+**Authentication Error:**
 ```typescript
 // errors/auth.error.ts
 import { AppError } from "./app.error"
@@ -191,7 +529,7 @@ export class InvalidTokenError extends AppError {
 }
 ```
 
-### Authorization Error
+**Authorization Error:**
 ```typescript
 // errors/authorization.error.ts
 import { AppError } from "./app.error"
@@ -209,9 +547,9 @@ export class RoleRequiredError extends AppError {
 }
 ```
 
-## 3. Error Middleware (Express)
+### 7.3 Error Middleware (Express)
 
-### Global Error Handler
+**Global Error Handler:**
 ```typescript
 // middleware/error.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -303,7 +641,7 @@ export function errorHandler(
 }
 ```
 
-### 404 Handler
+**404 Handler:**
 ```typescript
 // middleware/not-found.middleware.ts
 import { Request, Response } from "express"
@@ -316,7 +654,7 @@ export function notFoundHandler(req: Request, res: Response): void {
 }
 ```
 
-### Async Error Wrapper
+**Async Error Wrapper:**
 ```typescript
 // middleware/async-handler.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -330,9 +668,9 @@ export function asyncHandler(
 }
 ```
 
-## 4. Error Responses Format
+### 7.4 Error Responses Format
 
-### Standard Response Format
+**Standard Response Format:**
 ```typescript
 // utils/response.util.ts
 import { Response } from "express"
@@ -364,7 +702,7 @@ export function sendErrorResponse(
 }
 ```
 
-### Validation Error Response
+**Validation Error Response:**
 ```typescript
 export interface ValidationErrorResponse extends ErrorResponse {
   errors: Array<{
@@ -389,9 +727,9 @@ export function sendValidationError(
 }
 ```
 
-## 5. Logging Errors
+### 7.5 Logging Errors
 
-### Logger Configuration
+**Logger Configuration:**
 ```typescript
 // utils/logger.ts
 import winston from "winston"
@@ -432,7 +770,7 @@ const logger = winston.createLogger({
 export default logger
 ```
 
-### Error Logging Middleware
+**Error Logging Middleware:**
 ```typescript
 // middleware/error-logging.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -462,9 +800,9 @@ export function errorLoggingMiddleware(
 }
 ```
 
-## 6. Error Monitoring
+### 7.6 Error Monitoring
 
-### Sentry Integration
+**Sentry Integration:**
 ```typescript
 // monitoring/sentry.ts
 import * as Sentry from "@sentry/node"
@@ -488,7 +826,7 @@ Sentry.init({
 export { Sentry }
 ```
 
-### Error Tracking Middleware
+**Error Tracking Middleware:**
 ```typescript
 // middleware/error-tracking.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -519,9 +857,9 @@ export function errorTrackingMiddleware(
 }
 ```
 
-## 7. Validation Errors
+### 7.7 Validation Errors
 
-### Express Validator Errors
+**Express Validator Errors:**
 ```typescript
 // middleware/validation.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -552,7 +890,7 @@ export function handleValidationErrors(
 }
 ```
 
-### Zod Validation Errors
+**Zod Validation Errors:**
 ```typescript
 // middleware/zod-validation.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -582,9 +920,9 @@ export function handleZodErrors(
 }
 ```
 
-## 8. Database Errors
+### 7.8 Database Errors
 
-### Prisma Error Handling
+**Prisma Error Handling:**
 ```typescript
 // errors/prisma.error.ts
 import { Prisma } from "@prisma/client"
@@ -595,12 +933,12 @@ export function handlePrismaError(error: any): Error {
     if (error.code === "P2002") {
       return new Error("A unique constraint would be violated")
     }
-    
+
     // Record not found
     if (error.code === "P2025") {
       return new Error("Record not found")
     }
-    
+
     // Foreign key constraint violation
     if (error.code === "P2003") {
       return new Error("Foreign key constraint failed")
@@ -623,7 +961,7 @@ export function handlePrismaError(error: any): Error {
 }
 ```
 
-### Mongoose Error Handling
+**Mongoose Error Handling:**
 ```typescript
 // errors/mongoose.error.ts
 import mongoose from "mongoose"
@@ -646,9 +984,9 @@ export function handleMongooseError(error: any): Error {
 }
 ```
 
-## 9. External API Errors
+### 7.9 External API Errors
 
-### External API Error Handler
+**External API Error Handler:**
 ```typescript
 // errors/external-api.error.ts
 import { AppError } from "./app.error"
@@ -697,7 +1035,7 @@ export class ExternalAPITimeoutError extends AppError {
 }
 ```
 
-### External API Wrapper
+**External API Wrapper:**
 ```typescript
 // utils/external-api.util.ts
 import { ExternalAPIError, ExternalAPITimeoutError } from "../errors/external-api.error"
@@ -744,9 +1082,9 @@ export async function fetchFromExternalAPI<T>(
 }
 ```
 
-## 10. Operational vs Programmer Errors
+### 7.10 Operational vs Programmer Errors
 
-### Error Handler with Classification
+**Error Handler with Classification:**
 ```typescript
 // middleware/classified-error.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -778,7 +1116,7 @@ export function classifiedErrorHandler(
   // Programmer errors - unexpected, report to monitoring
   if (isProgrammerError(error)) {
     Sentry.captureException(error)
-    
+
     return res.status(500).json({
       success: false,
       message: process.env.NODE_ENV === "production"
@@ -796,7 +1134,7 @@ export function classifiedErrorHandler(
 }
 ```
 
-### Error Factory
+**Error Factory:**
 ```typescript
 // utils/error-factory.util.ts
 import { AppError } from "../errors/app.error"
@@ -804,19 +1142,19 @@ import { ValidationError, DatabaseError, AuthenticationError } from "../errors"
 
 export const ErrorFactory = {
   badRequest: (message: string) => new AppError(400, message),
-  
+
   unauthorized: (message?: string) => new AuthenticationError(message),
-  
+
   forbidden: (message?: string) => new AppError(403, message || "Forbidden"),
-  
+
   notFound: (resource: string = "Resource") => new AppError(404, `${resource} not found`),
-  
+
   conflict: (message: string) => new AppError(409, message),
-  
+
   validation: (details: any[]) => new ValidationError("Validation failed", details),
-  
+
   database: (message: string) => new DatabaseError(message),
-  
+
   internal: (message?: string) => new AppError(500, message || "Internal server error"),
 }
 
@@ -826,9 +1164,9 @@ throw ErrorFactory.unauthorized("Invalid credentials")
 throw ErrorFactory.notFound("User")
 ```
 
-## 11. Error Recovery Strategies
+### 7.11 Error Recovery Strategies
 
-### Retry Strategy
+**Retry Strategy:**
 ```typescript
 // utils/retry.util.ts
 export async function retry<T>(
@@ -852,7 +1190,7 @@ export async function retry<T>(
       return await fn()
     } catch (error) {
       lastError = error as Error
-      
+
       if (attempt === maxAttempts) {
         throw lastError
       }
@@ -872,7 +1210,7 @@ const result = await retry(
 )
 ```
 
-### Fallback Strategy
+**Fallback Strategy:**
 ```typescript
 // utils/fallback.util.ts
 export async function withFallback<T>(
@@ -898,19 +1236,19 @@ const data = await withFallback(
 )
 ```
 
-### Circuit Breaker Pattern
+**Circuit Breaker Pattern:**
 ```typescript
 // utils/circuit-breaker.util.ts
 export class CircuitBreaker {
   private failures = 0
   private lastFailureTime: number | null = null
   private state: "closed" | "open" | "half-open" = "closed"
-  
+
   constructor(
     private threshold: number = 5,
     private timeout: number = 60000 // 1 minute
   ) {}
-  
+
   async execute<T>(fn: () => Promise<T>): Promise<T> {
     if (this.state === "open") {
       if (this.shouldAttemptReset()) {
@@ -919,7 +1257,7 @@ export class CircuitBreaker {
         throw new Error("Circuit breaker is open")
       }
     }
-    
+
     try {
       const result = await fn()
       this.onSuccess()
@@ -929,21 +1267,21 @@ export class CircuitBreaker {
       throw error
     }
   }
-  
+
   private onSuccess(): void {
     this.failures = 0
     this.state = "closed"
   }
-  
+
   private onFailure(): void {
     this.failures++
     this.lastFailureTime = Date.now()
-    
+
     if (this.failures >= this.threshold) {
       this.state = "open"
     }
   }
-  
+
   private shouldAttemptReset(): boolean {
     return (
       this.lastFailureTime !== null &&
@@ -962,9 +1300,9 @@ try {
 }
 ```
 
-## 12. Testing Error Scenarios
+### 7.12 Testing Error Scenarios
 
-### Error Handler Tests
+**Error Handler Tests:**
 ```typescript
 // tests/middleware/error.middleware.test.ts
 import request from "supertest"
@@ -1048,7 +1386,7 @@ describe("Error Handler", () => {
 })
 ```
 
-### Service Error Tests
+**Service Error Tests:**
 ```typescript
 // tests/services/user.service.test.ts
 import { UserService } from "../../src/services/user.service"
@@ -1114,7 +1452,7 @@ describe("UserService Error Handling", () => {
 })
 ```
 
-### Python Error Handler Tests
+**Python Error Handler Tests:**
 ```python
 # tests/test_error_handlers.py
 import pytest
@@ -1127,7 +1465,7 @@ client = TestClient(app)
 
 def test_not_found_error():
     response = client.get("/api/v1/users/999")
-    
+
     assert response.status_code == 404
     assert response.json()["success"] == False
     assert "not found" in response.json()["message"].lower()
@@ -1135,7 +1473,7 @@ def test_not_found_error():
 
 def test_bad_request_error():
     response = client.post("/api/v1/users", json={"name": "J"})  # Too short
-    
+
     assert response.status_code == 400
     assert response.json()["success"] == False
     assert "validation" in response.json()["message"].lower()
@@ -1146,10 +1484,20 @@ def test_validation_error_details():
         "email": "invalid-email",
         "password": "short"
     })
-    
+
     assert response.status_code == 422
     data = response.json()
     assert data["success"] == False
     assert "errors" in data
     assert isinstance(data["errors"], list)
 ```
+
+---
+
+## 8. Related Skills
+
+- `03-backend-api/api-design`
+- `03-backend-api/validation`
+- `03-backend-api/middleware`
+- `04-database/database-transactions`
+- `14-monitoring-observability`

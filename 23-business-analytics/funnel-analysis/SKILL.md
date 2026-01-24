@@ -1,8 +1,20 @@
+---
+name: Funnel Analysis
+description: Tracking user journeys through sequential steps to identify where users drop off and optimize conversion at each stage using funnel visualization and drop-off analysis.
+---
+
 # Funnel Analysis
 
-## What is Funnel Analysis
+> **Current Level:** Intermediate  
+> **Domain:** Business Analytics / User Experience
 
-Funnel analysis is the process of tracking user journeys through sequential steps to identify where users drop off and optimize conversion at each stage.
+---
+
+## Overview
+
+Funnel analysis is the process of tracking user journeys through sequential steps to identify where users drop off and optimize conversion at each stage. Effective funnel analysis helps identify bottlenecks, optimize user flows, and improve overall conversion rates.
+
+## What is Funnel Analysis
 
 ### Core Concept
 
@@ -735,6 +747,113 @@ First Use     5,000     50%           50%
 - [ ] Formulate hypotheses
 - [ ] Run A/B tests
 - [ ] Measure impact
+```
+
+---
+
+## Quick Start
+
+### Funnel Query
+
+```sql
+-- Calculate funnel conversion rates
+WITH funnel_steps AS (
+  SELECT 
+    COUNT(DISTINCT CASE WHEN event = 'page_view' THEN user_id END) as step1,
+    COUNT(DISTINCT CASE WHEN event = 'add_to_cart' THEN user_id END) as step2,
+    COUNT(DISTINCT CASE WHEN event = 'checkout_start' THEN user_id END) as step3,
+    COUNT(DISTINCT CASE WHEN event = 'purchase' THEN user_id END) as step4
+  FROM events
+  WHERE date >= CURRENT_DATE - INTERVAL '30 days'
+)
+SELECT 
+  step1 as visitors,
+  step2 as add_to_cart,
+  step3 as checkout_start,
+  step4 as purchases,
+  (step2::float / step1 * 100) as step1_to_step2,
+  (step3::float / step2 * 100) as step2_to_step3,
+  (step4::float / step3 * 100) as step3_to_step4,
+  (step4::float / step1 * 100) as overall_conversion
+FROM funnel_steps
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Funnel Definition**: Define funnel steps clearly
+- [ ] **Event Tracking**: Track all funnel events
+- [ ] **Data Collection**: Collect user journey data
+- [ ] **Visualization**: Create funnel visualization
+- [ ] **Drop-off Analysis**: Identify drop-off points
+- [ ] **Hypothesis**: Formulate optimization hypotheses
+- [ ] **A/B Testing**: Test improvements
+- [ ] **Monitoring**: Monitor funnel metrics
+- [ ] **Documentation**: Document funnel definitions
+- [ ] **Segmentation**: Segment funnels by user type
+- [ ] **Reporting**: Regular funnel reports
+- [ ] **Action Items**: Act on insights
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Too Many Steps
+
+```markdown
+# ❌ Bad - Too many steps
+Step 1: Visit
+Step 2: View product
+Step 3: Add to cart
+Step 4: View cart
+Step 5: Start checkout
+Step 6: Enter email
+Step 7: Enter address
+Step 8: Enter payment
+Step 9: Complete
+# Too granular!
+```
+
+```markdown
+# ✅ Good - Key steps only
+Step 1: Visit
+Step 2: Add to cart
+Step 3: Start checkout
+Step 4: Complete purchase
+# Focus on major actions
+```
+
+### ❌ Don't: No Context
+
+```markdown
+# ❌ Bad - No context
+Step 2: 50% drop-off
+# Why?
+```
+
+```markdown
+# ✅ Good - With context
+Step 2: 50% drop-off
+- Users see shipping cost
+- Many abandon here
+- Hypothesis: Free shipping would help
+```
+
+---
+
+## Integration Points
+
+- **Conversion Optimization** (`23-business-analytics/conversion-optimization/`) - CRO
+- **A/B Testing** (`23-business-analytics/ab-testing-analysis/`) - Testing improvements
+- **Dashboard Design** (`23-business-analytics/dashboard-design/`) - Funnel visualization
+
+---
+
+## Further Reading
+
+- [Funnel Analysis Guide](https://www.optimizely.com/optimization-glossary/funnel-analysis/)
+- [Conversion Funnel Optimization](https://www.shopify.com/blog/conversion-funnel)
 - [ ] Iterate
 
 ### Monitoring Phase

@@ -1,26 +1,308 @@
 # Backend Middleware Patterns
 
-## 1. Middleware Concept
+---
 
-### What is Middleware?
-Middleware functions have access to the request object (req), the response object (res), and the next middleware function in the application's request-response cycle.
+## 1. Executive Summary & Strategic Necessity
 
-### Middleware Flow
+### 1.1 Context (ภาษาไทย)
+
+Middleware functions คือ functions ที่มี access ถึง request object (req), response object (res), และ next middleware function ใน application's request-response cycle โดย middleware ช่วยจัดการ cross-cutting concerns อย่าง authentication, logging, error handling และ validation
+
+Middleware ประกอบด้วย:
+- **Request Processing** - Process incoming requests before route handlers
+- **Response Processing** - Modify responses before sending to clients
+- **Error Handling** - Centralized error handling across all routes
+- **Cross-Cutting Concerns** - Authentication, logging, validation, compression
+- **Modular Design** - Composable middleware chain for flexible configuration
+
+### 1.2 Business Impact (ภาษาไทย)
+
+**ผลกระทบทางธุรกิจ:**
+
+1. **เพิ่ม Maintainability** - Centralized logic ช่วยลด code duplication
+2. **เพิ่ม Security** - Consistent security policies across all endpoints
+3. **เพิ่ม Observability** - Centralized logging และ monitoring
+4. **ลด Development Time** - Reusable middleware ช่วยลด boilerplate
+5. **ปรับปรุง Consistency** - Consistent error handling และ validation
+
+### 1.3 Product Thinking (ภาษาไทย)
+
+**มุมมองด้านผลิตภัณฑ์:**
+
+1. **Composable** - Middleware ต้อง composable และ chainable
+2. **Reusable** - Middleware ต้อง reusable across routes
+3. **Testable** - Middleware ต้อง testable ใน isolation
+4. **Configurable** - Middleware ต้อง configurable ด้วย options
+5. **Type-Safe** - Middleware ต้อง type-safe ด้วย TypeScript
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+### 2.1 Core Logic
+
+Middleware ประกอบด้วย:
+
+1. **Request Processing** - Access and modify request object
+2. **Response Processing** - Access and modify response object
+3. **Next Function** - Pass control to next middleware or route handler
+4. **Error Handling** - Catch and handle errors in middleware chain
+5. **Async Support** - Support async middleware functions
+6. **Termination** - Terminate request-response cycle early if needed
+
+### 2.2 Architecture Diagram Requirements
+
 ```
-Request → Middleware 1 → Middleware 2 → ... → Route Handler → Response
-              ↓ (next)         ↓ (next)                ↓
-            Middleware 2 → ... → Response
+┌─────────────────────────────────────────────────────────┐
+│              Middleware Architecture                 │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │              Client Request                     │  │
+│  └───────────────────────────────────────────────────┘  │
+│                           │                              │
+│                           ▼                              │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │         Middleware Chain (Execution Order)     │  │
+│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  │  │
+│  │  │Security  │  │   CORS   │  │  Logging │  │  │
+│  │  │Headers   │  │          │  │          │  │  │
+│  │  └─────────┘  └─────────┘  └─────────┘  │  │
+│  │       │              │              │          │  │
+│  │       ▼              ▼              ▼          │  │
+│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  │  │
+│  │  │ Body     │  │ Request  │  │ Rate     │  │  │
+│  │  │ Parser   │  │   ID     │  │ Limit    │  │  │
+│  │  └─────────┘  └─────────┘  └─────────┘  │  │
+│  │       │              │              │          │  │
+│  │       ▼              ▼              ▼          │  │
+│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  │  │
+│  │  │ Auth     │  │ Validate │  │  Error    │  │  │
+│  │  │          │  │          │  │ Handler  │  │  │
+│  │  └─────────┘  └─────────┘  └─────────┘  │  │
+│  └───────────────────────────────────────────────────┘  │
+│                           │                              │
+│                           ▼                              │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │              Route Handler                    │  │
+│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  │  │
+│  │  │  GET     │  │  POST    │  │  PUT     │  │  │
+│  │  │ /users   │  │ /users   │  │ /users   │  │  │
+│  │  └─────────┘  └─────────┘  └─────────┘  │  │
+│  └───────────────────────────────────────────────────┘  │
+│                           │                              │
+│                           ▼                              │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │              Response Processing               │  │
+│  │  ┌─────────┐  ┌─────────┐  ┌─────────┐  │  │
+│  │  │ Format   │  │ Compress │  │  Cache    │  │  │
+│  │  │          │  │          │  │ Control  │  │  │
+│  │  └─────────┘  └─────────┘  └─────────┘  │  │
+│  └───────────────────────────────────────────────────┘  │
+│                           │                              │
+│                           ▼                              │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │              Client Response                    │  │
+│  └───────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### Middleware Types
-1. **Application-level middleware**: Applied to all routes
-2. **Router-level middleware**: Applied to specific router
-3. **Route-level middleware**: Applied to specific routes
-4. **Error-handling middleware**: Handles errors
+### 2.3 Implementation Workflow
 
-## 2. Express Middleware
+1. **Middleware Definition** - Define middleware function with req, res, next
+2. **Logic Implementation** - Implement middleware logic (auth, logging, etc.)
+3. **Error Handling** - Handle errors appropriately
+4. **Next Function Call** - Call next() or send response
+5. **Middleware Registration** - Register middleware with app or router
+6. **Order Configuration** - Configure correct execution order
+7. **Testing** - Write unit tests for middleware
 
-### Request Logging
+---
+
+## 3. Tooling & Tech Stack
+
+### 3.1 Enterprise Tools
+
+| Tool | Purpose | Enterprise Features |
+|------|---------|---------------------|
+| Express Middleware | Express.js middleware ecosystem | Built-in middleware, community packages |
+| FastAPI Middleware | FastAPI middleware support | Starlette-based, async support |
+| Helmet | Security headers | Comprehensive security defaults |
+| CORS | Cross-Origin Resource Sharing | Configurable CORS policies |
+| Morgan | HTTP request logger | Custom formats, stream support |
+| Multer | Multipart form data | File upload handling |
+
+### 3.2 Configuration Essentials
+
+```typescript
+// middleware.config.ts
+import express, { Application } from "express"
+import helmet from "helmet"
+import cors from "cors"
+import morgan from "morgan"
+import { securityMiddleware } from "./middleware/security.middleware"
+import { loggingMiddleware } from "./middleware/logging.middleware"
+import { authMiddleware } from "./middleware/auth.middleware"
+import { errorHandler } from "./middleware/error.middleware"
+
+export function createApp(): Application {
+  const app = express()
+
+  // Security headers (first)
+  app.use(helmet())
+
+  // CORS
+  app.use(cors())
+
+  // Logging
+  app.use(morgan("combined"))
+  app.use(loggingMiddleware)
+
+  // Body parsing
+  app.use(express.json())
+  app.use(express.urlencoded({ extended: true }))
+
+  // Request ID
+  app.use(requestIdMiddleware)
+
+  // Rate limiting (before auth)
+  app.use(rateLimiter)
+
+  // Authentication (before routes)
+  app.use(authMiddleware)
+
+  // Routes
+  app.use("/api", routes)
+
+  // 404 handler
+  app.use(notFoundHandler)
+
+  // Error handler (must be last)
+  app.use(errorHandler)
+
+  return app
+}
+```
+
+---
+
+## 4. Standards, Compliance & Security
+
+### 4.1 International Standards
+
+- **OWASP Security** - Follow OWASP security guidelines
+- **HTTP Security Headers** - Implement security headers per RFC
+- **CORS Specification** - Follow CORS specification
+- **Rate Limiting** - Implement rate limiting per API best practices
+- **GDPR Compliance** - Handle personal data in middleware
+
+### 4.2 Security Protocol
+
+1. **Security Headers** - Implement security headers (Helmet)
+2. **CORS Configuration** - Configure CORS properly for production
+3. **Authentication** - Implement JWT-based authentication
+4. **Authorization** - Implement role-based access control
+5. **Input Validation** - Validate all inputs
+6. **Rate Limiting** - Implement rate limiting to prevent abuse
+7. **Error Handling** - Don't expose internal errors
+
+### 4.3 Explainability
+
+- **Request Logging** - Log all incoming requests with metadata
+- **Response Logging** - Log all responses with status codes
+- **Error Logging** - Log all errors with context
+- **Request ID** - Add request ID for tracing
+- **Performance Metrics** - Track response times
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+### 5.1 Cost Calculation
+
+```
+Total Cost = (Server Cost) + (Middleware Overhead Cost)
+
+Server Cost = (Instance Hours × Hourly Rate)
+Middleware Overhead Cost = (Processing Time × CPU Cost)
+
+Middleware Optimization Savings:
+- Centralized logic: 20-30% code reduction
+- Reusable middleware: 40-50% development time reduction
+- Consistent error handling: 15-20% support cost reduction
+```
+
+### 5.2 Key Performance Indicators
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Middleware Latency | < 5ms | Average middleware processing time |
+| Request ID Coverage | 100% | Requests with request IDs |
+| Error Logging Coverage | 100% | Errors logged with context |
+| Rate Limit Effectiveness | > 95% | Blocked requests / Total abuse attempts |
+| Validation Accuracy | 100% | Valid requests / Total requests |
+| Cache Hit Rate | > 80% | Cache hits / Total requests |
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+### 6.1 Phase Rollout
+
+**Phase 1: Foundation (Weeks 1-2)**
+- Set up basic middleware (logging, error handling)
+- Implement request ID generation
+- Add security headers
+
+**Phase 2: Security (Weeks 3-4)**
+- Implement authentication middleware
+- Add authorization middleware
+- Configure CORS properly
+
+**Phase 3: Performance (Weeks 5-6)**
+- Implement rate limiting
+- Add compression middleware
+- Implement caching middleware
+
+**Phase 4: Production (Weeks 7-8)**
+- Deploy with monitoring
+- Set up alerts for middleware failures
+- Documentation and training
+
+### 6.2 Pitfalls to Avoid
+
+1. **Wrong Order** - Middleware order is critical (security first, error handler last)
+2. **Skipping next()** - Always call next() or send response
+3. **Blocking Async** - Don't block async operations
+4. **No Error Handling** - Handle errors in middleware properly
+5. **Exposing Errors** - Don't expose internal errors to clients
+6. **Ignoring Performance** - Monitor middleware performance impact
+7. **No Testing** - Write unit tests for all middleware
+
+### 6.3 Best Practices Checklist
+
+- [ ] Configure middleware in correct order
+- [ ] Use security headers (Helmet)
+- [ ] Implement proper CORS configuration
+- [ ] Add request ID for tracing
+- [ ] Implement authentication middleware
+- [ ] Implement authorization middleware
+- [ ] Add rate limiting
+- [ ] Implement input validation
+- [ ] Add error handling middleware (last)
+- [ ] Log all requests and responses
+- [ ] Monitor middleware performance
+- [ ] Test middleware in isolation
+- [ ] Use TypeScript for type safety
+- [ ] Document middleware options
+- [ ] Implement graceful shutdown
+
+---
+
+## 7. Implementation Examples
+
+### 7.1 Request Logging Middleware
+
 ```typescript
 // middleware/logging.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -77,7 +359,8 @@ export function detailedLoggingMiddleware(
 }
 ```
 
-### Authentication
+### 7.2 Authentication Middleware
+
 ```typescript
 // middleware/auth.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -143,7 +426,8 @@ export function optionalAuthMiddleware(
 }
 ```
 
-### Authorization (Role-based)
+### 7.3 Authorization Middleware
+
 ```typescript
 // middleware/authorization.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -171,7 +455,8 @@ export function requireRole(...roles: Role[]) {
 router.get("/admin/users", authMiddleware, requireRole("admin"), userController.getAll)
 ```
 
-### Error Handling
+### 7.4 Error Handling Middleware
+
 ```typescript
 // middleware/error.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -227,45 +512,8 @@ export function errorHandler(
 }
 ```
 
-### Request Validation
-```typescript
-// middleware/validation.middleware.ts
-import { Request, Response, NextFunction } from "express"
-import { AnyZodObject, ZodError } from "zod"
+### 7.5 Rate Limiting Middleware
 
-export function validate(schema: AnyZodObject) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const result = schema.safeParse(req.body)
-
-    if (!result.success) {
-      const errors = result.error.errors.map((err) => ({
-        field: err.path.join("."),
-        message: err.message,
-      }))
-
-      return res.status(400).json({
-        success: false,
-        message: "Validation failed",
-        errors,
-      })
-    }
-
-    req.body = result.data
-    next()
-  }
-}
-
-// Usage
-import { createUserSchema } from "../validators/user.validator"
-
-router.post(
-  "/users",
-  validate(createUserSchema),
-  userController.create
-)
-```
-
-### Rate Limiting
 ```typescript
 // middleware/rate-limit.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -295,28 +543,10 @@ const apiKeyLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 1000,
 })
-
-// Custom rate limiter with Redis
-import RedisStore from "rate-limit-redis"
-import { createClient } from "redis"
-
-const redisClient = createClient({
-  url: process.env.REDIS_URL,
-})
-
-const redisStore = new RedisStore({
-  client: redisClient,
-  prefix: "rate-limit:",
-})
-
-const redisLimiter = rateLimit({
-  store: redisStore,
-  windowMs: 60 * 60 * 1000,
-  max: 100,
-})
 ```
 
-### CORS Configuration
+### 7.6 CORS Middleware
+
 ```typescript
 // middleware/cors.middleware.ts
 import cors from "cors"
@@ -348,7 +578,8 @@ const corsOptions = {
 export default cors(corsOptions)
 ```
 
-### Security Headers
+### 7.7 Security Headers Middleware
+
 ```typescript
 // middleware/security.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -406,230 +637,80 @@ export function helmetMiddleware() {
 }
 ```
 
-### Body Parser
-```typescript
-// middleware/body-parser.middleware.ts
-import { Request, Response, NextFunction } from "express"
-import { z } from "zod"
+### 7.8 Request Validation Middleware
 
-// JSON body parser with validation
-export const jsonBodyParser = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
-  // Express.json() is usually applied globally
-  // This is for additional processing
-  if (req.is("application/json")) {
-    try {
-      // Validate JSON structure
-      JSON.parse(req.body)
-    } catch (error) {
+```typescript
+// middleware/validation.middleware.ts
+import { Request, Response, NextFunction } from "express"
+import { AnyZodObject, ZodError } from "zod"
+
+export function validate(schema: AnyZodObject) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const result = schema.safeParse(req.body)
+
+    if (!result.success) {
+      const errors = result.error.errors.map((err) => ({
+        field: err.path.join("."),
+        message: err.message,
+      }))
+
       return res.status(400).json({
         success: false,
-        message: "Invalid JSON",
+        message: "Validation failed",
+        errors,
       })
     }
+
+    req.body = result.data
+    next()
   }
-  next()
 }
 
-// URL-encoded body parser
-export const urlEncodedParser = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
-  if (req.is("application/x-www-form-urlencoded")) {
-    // Additional processing for form data
-    console.log("Processing form data")
-  }
-  next()
-}
+// Usage
+import { createUserSchema } from "../validators/user.validator"
 
-// Multipart form data
-import multer from "multer"
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
-    files: 10,
-  },
-})
-
-export const multipartParser = upload.single("file")
-```
-
-## 3. FastAPI Middleware
-
-### CORS
-```python
-# middleware/cors.py
-from fastapi.middleware.cors import CORSMiddleware
-
-origins = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "https://example.com",
-]
-
-cors_middleware = CORSMiddleware(
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+router.post(
+  "/users",
+  validate(createUserSchema),
+  userController.create
 )
 ```
 
-### Trusted Hosts
-```python
-# middleware/trusted_hosts.py
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
+### 7.9 Middleware Composition
 
-trusted_hosts = [
-    "example.com",
-    "*.example.com",
-    "localhost",
-]
+```typescript
+// middleware/compose.middleware.ts
+import { Request, Response, NextFunction } from "express"
 
-trusted_host_middleware = TrustedHostMiddleware(
-    allowed_hosts=trusted_hosts,
+export function compose(...middlewares: Array<(req: Request, res: Response, next: NextFunction) => void>) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const dispatch = (i: number) => {
+      if (i <= middlewares.length) {
+        return middlewares[i - 1](req, res, (err?: Error) => {
+          if (err) {
+            return next(err)
+          }
+          return dispatch(i + 1)
+        })
+      }
+      return next()
+    }
+    return dispatch(1)
+  }
+}
+
+// Usage
+const authChain = compose(
+  loggingMiddleware,
+  requestIdMiddleware,
+  authMiddleware
 )
+
+router.use(authChain)
 ```
 
-### GZip Compression
-```python
-# middleware/compression.py
-from fastapi.middleware.gzip import GZipMiddleware
+### 7.10 Middleware Order Configuration
 
-gzip_middleware = GZipMiddleware(minimum_size=1000)
-```
-
-### Custom Middleware
-```python
-# middleware/logging.py
-from fastapi import Request
-from starlette.middleware.base import BaseHTTPMiddleware
-import time
-import uuid
-import logging
-
-logger = logging.getLogger(__name__)
-
-
-class LoggingMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        request_id = str(uuid.uuid4())
-        start_time = time.time()
-        
-        # Log request
-        logger.info({
-            "request_id": request_id,
-            "method": request.method,
-            "url": str(request.url),
-            "client": request.client.host if request.client else None,
-        })
-        
-        # Process request
-        response = await call_next(request)
-        
-        # Calculate duration
-        process_time = (time.time() - start_time) * 1000
-        
-        # Log response
-        logger.info({
-            "request_id": request_id,
-            "status_code": response.status_code,
-            "process_time_ms": round(process_time, 2),
-        })
-        
-        # Add custom header
-        response.headers["X-Request-ID"] = request_id
-        response.headers["X-Process-Time"] = str(process_time)
-        
-        return response
-```
-
-### Request ID Middleware
-```python
-# middleware/request_id.py
-from fastapi import Request
-from starlette.middleware.base import BaseHTTPMiddleware
-import uuid
-
-
-class RequestIDMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        request.state.request_id = str(uuid.uuid4())
-        response = await call_next(request)
-        response.headers["X-Request-ID"] = request.state.request_id
-        return response
-```
-
-### Timing Middleware
-```python
-# middleware/timing.py
-from fastapi import Request
-from starlette.middleware.base import BaseHTTPMiddleware
-import time
-
-
-class TimingMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        start_time = time.time()
-        
-        response = await call_next(request)
-        
-        process_time = time.time() - start_time
-        response.headers["X-Response-Time"] = str(process_time)
-        
-        return response
-```
-
-### Authentication Middleware
-```python
-# middleware/auth.py
-from fastapi import Request, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import JWTError, jwt
-from app.core.config import settings
-
-security = HTTPBearer()
-
-
-async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-):
-    try:
-        payload = jwt.decode(
-            credentials.credentials,
-            settings.SECRET_KEY,
-            algorithms=[settings.ALGORITHM]
-        )
-        return payload
-    except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-
-async def get_current_active_user(
-    current_user: dict = Depends(get_current_user)
-):
-    if not current_user.get("is_active"):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Inactive user"
-        )
-    return current_user
-```
-
-## 4. Middleware Order
-
-### Correct Order
 ```typescript
 // app.ts
 import express, { Application } from "express"
@@ -680,334 +761,13 @@ export function createApp(): Application {
 }
 ```
 
-### Wrong Order Examples
-```typescript
-// ❌ Wrong: Error handler before routes
-app.use(errorHandler)  // Will catch errors too early
-app.use("/api", routes)
+---
 
-// ❌ Wrong: Body parser after routes
-app.use("/api", routes)
-app.use(express.json())  // Won't parse route bodies
+## 8. Related Skills
 
-// ❌ Wrong: CORS after routes
-app.use("/api", routes)
-app.use(cors())  // CORS headers won't be set
-```
-
-## 5. Testing Middleware
-
-### Express Middleware Tests
-```typescript
-// tests/middleware/auth.middleware.test.ts
-import { Request, Response, NextFunction } from "express"
-import { authMiddleware } from "../../middleware/auth.middleware"
-import jwt from "jsonwebtoken"
-
-describe("Auth Middleware", () => {
-  let mockReq: Partial<Request>
-  let mockRes: Partial<Response>
-  let mockNext: NextFunction
-
-  beforeEach(() => {
-    mockReq = {
-      headers: {},
-    }
-    mockRes = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn().mockReturnThis(),
-    }
-    mockNext = jest.fn()
-  })
-
-  it("should pass with valid token", () => {
-    const token = jwt.sign({ userId: "123" }, "secret")
-    mockReq.headers!.authorization = `Bearer ${token}`
-
-    authMiddleware(mockReq as Request, mockRes as Response, mockNext)
-
-    expect(mockNext).toHaveBeenCalled()
-    expect((mockReq as any).user).toBeDefined()
-    expect((mockReq as any).user.userId).toBe("123")
-  })
-
-  it("should fail without token", () => {
-    authMiddleware(mockReq as Request, mockRes as Response, mockNext)
-
-    expect(mockNext).toHaveBeenCalledWith(expect.any(Error))
-    expect(mockRes.status).toHaveBeenCalledWith(401)
-    expect(mockRes.json).toHaveBeenCalledWith({
-      success: false,
-      message: expect.stringContaining("token"),
-    })
-  })
-
-  it("should fail with invalid token", () => {
-    mockReq.headers!.authorization = "Bearer invalid-token"
-
-    authMiddleware(mockReq as Request, mockRes as Response, mockNext)
-
-    expect(mockNext).toHaveBeenCalledWith(expect.any(Error))
-    expect(mockRes.status).toHaveBeenCalledWith(401)
-  })
-})
-```
-
-### FastAPI Middleware Tests
-```python
-# tests/middleware/test_logging.py
-from fastapi.testclient import TestClient
-from app.main import app
-from unittest.mock import patch, MagicMock
-
-client = TestClient(app)
-
-
-def test_logging_middleware_adds_request_id():
-    response = client.get("/api/v1/users")
-    
-    assert "X-Request-ID" in response.headers
-    assert len(response.headers["X-Request-ID"]) == 36  # UUID length
-
-
-def test_logging_middleware_logs_request(caplog):
-    with patch("app.middleware.logging.logger") as mock_logger:
-        client.get("/api/v1/users")
-        
-        # Check that logger.info was called
-        assert mock_logger.info.called
-        
-        # Check log content
-        call_args = mock_logger.info.call_args
-        assert "request_id" in call_args[0]
-        assert "method" in call_args[0]
-        assert "url" in call_args[0]
-
-
-def test_logging_middleware_adds_process_time():
-    response = client.get("/api/v1/users")
-    
-    assert "X-Process-Time" in response.headers
-    process_time = float(response.headers["X-Process-Time"])
-    assert process_time >= 0
-```
-
-## 6. Common Middleware Patterns
-
-### Conditional Middleware
-```typescript
-// middleware/conditional.middleware.ts
-import { Request, Response, NextFunction } from "express"
-
-export function conditionalMiddleware(
-  condition: boolean,
-  middleware: (req: Request, res: Response, next: NextFunction) => void
-) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (condition) {
-      return middleware(req, res, next)
-    }
-    next()
-  }
-}
-
-// Usage
-router.get(
-  "/admin/users",
-  conditionalMiddleware(process.env.NODE_ENV === "production", authMiddleware),
-  userController.getAll
-)
-```
-
-### Middleware Composition
-```typescript
-// middleware/compose.middleware.ts
-import { Request, Response, NextFunction } from "express"
-
-export function compose(...middlewares: Array<(req: Request, res: Response, next: NextFunction) => void>) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const dispatch = (i: number) => {
-      if (i <= middlewares.length) {
-        return middlewares[i - 1](req, res, (err?: Error) => {
-          if (err) {
-            return next(err)
-          }
-          return dispatch(i + 1)
-        })
-      }
-      return next()
-    }
-    return dispatch(1)
-  }
-}
-
-// Usage
-const authChain = compose(
-  loggingMiddleware,
-  requestIdMiddleware,
-  authMiddleware
-)
-
-router.use(authChain)
-```
-
-### Async Middleware Wrapper
-```typescript
-// middleware/async.middleware.ts
-import { Request, Response, NextFunction } from "express"
-
-export function asyncMiddleware(
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
-) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next)
-  }
-}
-
-// Usage in controllers
-router.get("/users", asyncMiddleware(async (req, res) => {
-  const users = await userService.findAll()
-  res.json(users)
-}))
-```
-
-### Error Boundary Middleware
-```typescript
-// middleware/error-boundary.middleware.ts
-import { Request, Response, NextFunction } from "express"
-
-export function errorBoundaryMiddleware(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
-  const originalJson = res.json.bind(res)
-
-  res.json = function (data: any) {
-    // Check if this is an error response
-    if (data && data.success === false) {
-      // Log error
-      console.error("API Error:", data)
-    }
-
-    return originalJson(data)
-  }
-
-  next()
-}
-```
-
-### Request Context Middleware
-```typescript
-// middleware/context.middleware.ts
-import { Request, Response, NextFunction } from "express"
-
-interface RequestContext {
-  requestId: string
-  startTime: number
-  userId?: string
-}
-
-declare global {
-  namespace Express {
-    interface Request {
-      context: RequestContext
-    }
-  }
-}
-
-export function contextMiddleware(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
-  req.context = {
-    requestId: req.id || "unknown",
-    startTime: Date.now(),
-  }
-
-  next()
-}
-```
-
-### Cache Control Middleware
-```typescript
-// middleware/cache.middleware.ts
-import { Request, Response, NextFunction } from "express"
-
-export function cacheControl(maxAge: number) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    res.setHeader("Cache-Control", `public, max-age=${maxAge}`)
-    next()
-  }
-}
-
-// Usage
-router.get(
-  "/static/data",
-  cacheControl(3600), // 1 hour
-  staticDataController.get
-)
-```
-
-### Request Sanitization Middleware
-```typescript
-// middleware/sanitize.middleware.ts
-import { Request, Response, NextFunction } from "express"
-import xss from "xss"
-
-export function sanitizeBody(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
-  if (req.body) {
-    if (typeof req.body === "object") {
-      for (const key in req.body) {
-        if (typeof req.body[key] === "string") {
-          req.body[key] = xss(req.body[key])
-        }
-      }
-    } else if (typeof req.body === "string") {
-      req.body = xss(req.body)
-    }
-  }
-
-  next()
-}
-
-// Usage
-router.post(
-  "/comments",
-  sanitizeBody,
-  commentController.create
-)
-```
-
-### Request Size Limit Middleware
-```typescript
-// middleware/size-limit.middleware.ts
-import { Request, Response, NextFunction } from "express"
-
-export function sizeLimit(maxSize: number) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const contentLength = parseInt(req.get("content-length") || "0", 10)
-
-    if (contentLength > maxSize) {
-      return res.status(413).json({
-        success: false,
-        message: `Request entity too large. Max size is ${maxSize} bytes`,
-      })
-    }
-
-    next()
-  }
-}
-
-// Usage
-router.post(
-  "/upload",
-  sizeLimit(10 * 1024 * 1024), // 10MB
-  uploadController.upload
-)
-```
+- [`03-backend-api/express-rest`](03-backend-api/express-rest/SKILL.md)
+- [`03-backend-api/nodejs-api`](03-backend-api/nodejs-api/SKILL.md)
+- [`03-backend-api/error-handling`](03-backend-api/error-handling/SKILL.md)
+- [`03-backend-api/validation`](03-backend-api/validation/SKILL.md)
+- [`10-authentication-authorization`](10-authentication-authorization/SKILL.md)
+- [`14-monitoring-observability`](14-monitoring-observability/SKILL.md)

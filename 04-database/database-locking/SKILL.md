@@ -9,9 +9,18 @@ description: Understanding and implementing database locking mechanisms for conc
 
 Database locking is a mechanism used to manage concurrent access to shared data. It ensures data integrity by preventing multiple transactions from modifying the same data simultaneously in ways that could cause inconsistencies.
 
-## Why Locking is Needed (Concurrency Control)
+## Prerequisites
 
-### The Problem
+- Understanding of database transactions and ACID properties
+- Knowledge of SQL and database operations
+- Familiarity with concurrent programming concepts
+- Basic understanding of isolation levels
+
+## Key Concepts
+
+### Why Locking is Needed (Concurrency Control)
+
+#### The Problem
 
 Without locking, concurrent transactions can cause:
 
@@ -20,7 +29,7 @@ Without locking, concurrent transactions can cause:
 3. **Non-Repeatable Reads**: Same query returns different results within same transaction
 4. **Phantom Reads**: New rows appear in subsequent queries
 
-### Example: Lost Update
+#### Example: Lost Update
 
 ```sql
 -- Transaction 1
@@ -39,7 +48,7 @@ COMMIT;
 COMMIT;  -- Final balance is $1100, lost the -$100 update!
 ```
 
-### Solution: Locking
+#### Solution: Locking
 
 ```sql
 -- Transaction 1
@@ -58,9 +67,9 @@ UPDATE accounts SET balance = 1000 WHERE id = 1;
 COMMIT;  -- Final balance is $1000, correct!
 ```
 
-## Lock Types
+### Lock Types
 
-### Shared Locks (Read Locks)
+#### Shared Locks (Read Locks)
 
 Allow multiple transactions to read data but prevent writes.
 
@@ -78,7 +87,7 @@ COMMIT;
 - Writers are blocked
 - Used when reading data that might be updated later
 
-### Exclusive Locks (Write Locks)
+#### Exclusive Locks (Write Locks)
 
 Prevent any other transaction from reading or writing.
 
@@ -95,7 +104,7 @@ COMMIT;
 - Blocks all other transactions
 - Used when updating data
 
-### Intent Locks
+#### Intent Locks
 
 Indicate intention to acquire locks at a finer granularity.
 
@@ -126,7 +135,7 @@ COMMIT;
 | S | ✓ | ✗ | ✓ | ✗ |
 | X | ✗ | ✗ | ✗ | ✗ |
 
-### Update Locks
+#### Update Locks
 
 A special lock that allows other shared locks but converts to exclusive when updating.
 
@@ -142,9 +151,9 @@ UPDATE products SET stock = stock - 1 WHERE id = 1;
 COMMIT;
 ```
 
-## Lock Granularity
+### Lock Granularity
 
-### Row-Level Locks
+#### Row-Level Locks
 
 Lock individual rows, allowing concurrent access to other rows.
 
@@ -167,7 +176,7 @@ COMMIT;
 - Can cause deadlocks
 - May not be efficient for bulk operations
 
-### Page-Level Locks
+#### Page-Level Locks
 
 Lock database pages (typically 8KB-16KB).
 
@@ -185,7 +194,7 @@ Lock database pages (typically 8KB-16KB).
 - Lower concurrency than row-level
 - Can lock unintended rows
 
-### Table-Level Locks
+#### Table-Level Locks
 
 Lock entire table.
 
@@ -216,7 +225,7 @@ COMMIT;
 - `EXCLUSIVE`: REFRESH MATERIALIZED VIEW
 - `ACCESS EXCLUSIVE`: DROP TABLE, TRUNCATE
 
-### Database-Level Locks
+#### Database-Level Locks
 
 Lock entire database.
 
@@ -233,9 +242,11 @@ COMMIT;
 - Schema changes
 - Backup operations
 
-## Pessimistic Locking
+## Implementation Guide
 
-### SELECT FOR UPDATE
+### Pessimistic Locking
+
+#### SELECT FOR UPDATE
 
 Lock rows for update.
 
@@ -245,34 +256,34 @@ async function transferMoney(fromId, toId, amount) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    
+
     // Lock both accounts
     const [fromAccount] = await client.query(
       'SELECT * FROM accounts WHERE id = $1 FOR UPDATE',
       [fromId]
     );
-    
+
     const [toAccount] = await client.query(
       'SELECT * FROM accounts WHERE id = $1 FOR UPDATE',
       [toId]
     );
-    
+
     // Check balance
     if (fromAccount.rows[0].balance < amount) {
       throw new Error('Insufficient balance');
     }
-    
+
     // Perform transfer
     await client.query(
       'UPDATE accounts SET balance = balance - $1 WHERE id = $2',
       [amount, fromId]
     );
-    
+
     await client.query(
       'UPDATE accounts SET balance = balance + $1 WHERE id = $2',
       [amount, toId]
     );
-    
+
     await client.query('COMMIT');
   } catch (error) {
     await client.query('ROLLBACK');
@@ -283,7 +294,7 @@ async function transferMoney(fromId, toId, amount) {
 }
 ```
 
-### SELECT FOR SHARE
+#### SELECT FOR SHARE
 
 Allow multiple readers but block writers.
 
@@ -292,27 +303,27 @@ async function getProductStock(productId) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    
+
     // Lock for share - multiple readers OK
     const result = await client.query(
       'SELECT * FROM products WHERE id = $1 FOR SHARE',
       [productId]
     );
-    
+
     const product = result.rows[0];
-    
+
     // Check stock
     if (product.stock < 1) {
       await client.query('ROLLBACK');
       throw new Error('Out of stock');
     }
-    
+
     // Update stock
     await client.query(
       'UPDATE products SET stock = stock - 1 WHERE id = $1',
       [productId]
     );
-    
+
     await client.query('COMMIT');
     return product;
   } catch (error) {
@@ -324,7 +335,7 @@ async function getProductStock(productId) {
 }
 ```
 
-### Lock Timeout
+#### Lock Timeout
 
 ```javascript
 async function transferWithTimeout(fromId, toId, amount) {
@@ -333,20 +344,20 @@ async function transferWithTimeout(fromId, toId, amount) {
     // Set lock timeout to 5 seconds
     await client.query('SET lock_timeout = 5000');
     await client.query('BEGIN');
-    
+
     try {
       const [fromAccount] = await client.query(
         'SELECT * FROM accounts WHERE id = $1 FOR UPDATE',
         [fromId]
       );
-      
+
       const [toAccount] = await client.query(
         'SELECT * FROM accounts WHERE id = $1 FOR UPDATE',
         [toId]
       );
-      
+
       // ... transfer logic ...
-      
+
       await client.query('COMMIT');
     } catch (error) {
       if (error.code === '55P03') {  // Lock not available
@@ -360,9 +371,9 @@ async function transferWithTimeout(fromId, toId, amount) {
 }
 ```
 
-## Optimistic Locking
+### Optimistic Locking
 
-### Version Columns
+#### Version Columns
 
 Add a version column to track changes.
 
@@ -378,7 +389,7 @@ CREATE TABLE accounts (
 async function updateAccount(accountId, newBalance) {
   let retries = 0;
   const maxRetries = 3;
-  
+
   while (retries < maxRetries) {
     // Read current version
     const [result] = await pool.query(
@@ -386,28 +397,28 @@ async function updateAccount(accountId, newBalance) {
       [accountId]
     );
     const account = result.rows[0];
-    
+
     // Try to update with version check
     const updateResult = await pool.query(
       'UPDATE accounts SET balance = $1, version = version + 1 WHERE id = $2 AND version = $3',
       [newBalance, accountId, account.version]
     );
-    
+
     if (updateResult.rowCount > 0) {
       // Success
       return updateResult.rows[0];
     }
-    
+
     // Version mismatch - retry
     retries++;
     await sleep(100 * retries);  // Exponential backoff
   }
-  
+
   throw new Error('Max retries exceeded');
 }
 ```
 
-### Timestamp Columns
+#### Timestamp Columns
 
 Use timestamp for optimistic locking.
 
@@ -427,22 +438,22 @@ async function updateAccount(accountId, newBalance) {
     [accountId]
   );
   const account = result.rows[0];
-  
+
   // Try to update with timestamp check
   const updateResult = await pool.query(
     'UPDATE accounts SET balance = $1, updated_at = NOW() WHERE id = $2 AND updated_at = $3',
     [newBalance, accountId, account.updated_at]
   );
-  
+
   if (updateResult.rowCount === 0) {
     throw new Error('Account was modified by another transaction');
   }
-  
+
   return updateResult.rows[0];
 }
 ```
 
-### Conditional Updates
+#### Conditional Updates
 
 Use WHERE clause to check current state.
 
@@ -452,11 +463,11 @@ async function decrementStock(productId, quantity) {
     'UPDATE products SET stock = stock - $1 WHERE id = $2 AND stock >= $1',
     [quantity, productId]
   );
-  
+
   if (result.rowCount === 0) {
     throw new Error('Insufficient stock');
   }
-  
+
   return result.rows[0];
 }
 ```
@@ -493,24 +504,24 @@ async function transferMoney(fromId, toId, amount) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    
+
     // Always lock lower ID first
-    const [firstId, secondId] = fromId < toId 
-      ? [fromId, toId] 
+    const [firstId, secondId] = fromId < toId
+      ? [fromId, toId]
       : [toId, fromId];
-    
+
     await client.query(
       'SELECT * FROM accounts WHERE id = $1 FOR UPDATE',
       [firstId]
     );
-    
+
     await client.query(
       'SELECT * FROM accounts WHERE id = $1 FOR UPDATE',
       [secondId]
     );
-    
+
     // ... transfer logic ...
-    
+
     await client.query('COMMIT');
   } catch (error) {
     await client.query('ROLLBACK');
@@ -531,26 +542,26 @@ async function transferMoney(fromId, toId, amount) {
     'SELECT * FROM accounts WHERE id = $1',
     [fromId]
   );
-  
+
   if (fromAccount.rows[0].balance < amount) {
     throw new Error('Insufficient balance');
   }
-  
+
   // Short transaction for actual transfer
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    
+
     await client.query(
       'UPDATE accounts SET balance = balance - $1 WHERE id = $2',
       [amount, fromId]
     );
-    
+
     await client.query(
       'UPDATE accounts SET balance = balance + $1 WHERE id = $2',
       [amount, toId]
     );
-    
+
     await client.query('COMMIT');
   } catch (error) {
     await client.query('ROLLBACK');
@@ -566,7 +577,7 @@ async function transferMoney(fromId, toId, amount) {
 ```javascript
 async function executeWithRetry(fn, maxRetries = 3) {
   let attempt = 0;
-  
+
   while (attempt < maxRetries) {
     try {
       return await fn();
@@ -580,7 +591,7 @@ async function executeWithRetry(fn, maxRetries = 3) {
       }
     }
   }
-  
+
   throw new Error('Max retries exceeded due to deadlock');
 }
 
@@ -588,199 +599,6 @@ async function executeWithRetry(fn, maxRetries = 3) {
 await executeWithRetry(async () => {
   await transferMoney(1, 2, 100);
 });
-```
-
-### Deadlock Graphs
-
-```javascript
-class DeadlockDetector {
-  constructor() {
-    this.locks = new Map();  // transaction -> Set of resources
-    this.waitGraph = new Map();  // resource -> Set of waiting transactions
-  }
-  
-  acquireLock(transactionId, resourceId) {
-    if (!this.locks.has(transactionId)) {
-      this.locks.set(transactionId, new Set());
-    }
-    
-    // Check if resource is locked by another transaction
-    for (const [txId, resources] of this.locks) {
-      if (txId !== transactionId && resources.has(resourceId)) {
-        // Add to wait graph
-        if (!this.waitGraph.has(resourceId)) {
-          this.waitGraph.set(resourceId, new Set());
-        }
-        this.waitGraph.get(resourceId).add(transactionId);
-        
-        // Check for cycle (deadlock)
-        if (this.hasCycle()) {
-          this.reportDeadlock();
-          return false;
-        }
-      }
-    }
-    
-    // Acquire lock
-    this.locks.get(transactionId).add(resourceId);
-    return true;
-  }
-  
-  releaseLock(transactionId, resourceId) {
-    const resources = this.locks.get(transactionId);
-    if (resources) {
-      resources.delete(resourceId);
-      
-      // Remove from wait graph
-      const waiting = this.waitGraph.get(resourceId);
-      if (waiting) {
-        waiting.delete(transactionId);
-      }
-    }
-  }
-  
-  hasCycle() {
-    // Detect cycle in wait graph
-    const visited = new Set();
-    const recursionStack = new Set();
-    
-    for (const resourceId of this.waitGraph.keys()) {
-      if (this.detectCycleDFS(resourceId, visited, recursionStack)) {
-        return true;
-      }
-    }
-    
-    return false;
-  }
-  
-  detectCycleDFS(resourceId, visited, recursionStack) {
-    if (recursionStack.has(resourceId)) {
-      return true;  // Cycle found
-    }
-    
-    if (visited.has(resourceId)) {
-      return false;
-    }
-    
-    visited.add(resourceId);
-    recursionStack.add(resourceId);
-    
-    const waiting = this.waitGraph.get(resourceId);
-    if (waiting) {
-      for (const txId of waiting) {
-        // Find resources held by this transaction
-        const resources = this.locks.get(txId);
-        if (resources) {
-          for (const resId of resources) {
-            if (this.detectCycleDFS(resId, visited, recursionStack)) {
-              return true;
-            }
-          }
-        }
-      }
-    }
-    
-    recursionStack.delete(resourceId);
-    return false;
-  }
-  
-  reportDeadlock() {
-    console.error('Deadlock detected!');
-    console.error('Locks held:', Object.fromEntries(this.locks));
-    console.error('Wait graph:', Object.fromEntries(this.waitGraph));
-  }
-}
-```
-
-## Lock Wait Timeout
-
-```javascript
-async function executeWithLockTimeout(fn, timeout = 5000) {
-  const client = await pool.connect();
-  try {
-    // Set lock timeout
-    await client.query(`SET lock_timeout = ${timeout}`);
-    
-    await client.query('BEGIN');
-    
-    try {
-      const result = await fn(client);
-      await client.query('COMMIT');
-      return result;
-    } catch (error) {
-      if (error.code === '55P03') {  // Lock not available
-        throw new Error(`Lock timeout after ${timeout}ms`);
-      }
-      throw error;
-    }
-  } finally {
-    client.release();
-  }
-}
-
-// Usage
-try {
-  await executeWithLockTimeout(async (client) => {
-    await client.query('SELECT * FROM accounts WHERE id = 1 FOR UPDATE');
-    await client.query('UPDATE accounts SET balance = 900 WHERE id = 1');
-  }, 5000);
-} catch (error) {
-  if (error.message.includes('Lock timeout')) {
-    console.error('Could not acquire lock, please try again');
-  }
-}
-```
-
-## Lock Escalation
-
-### What is Lock Escalation?
-
-Lock escalation occurs when many row-level locks are converted to a single table-level lock to reduce overhead.
-
-```sql
--- Transaction locks many rows
-BEGIN;
-UPDATE accounts SET balance = balance + 1 WHERE id IN (1, 2, 3, ..., 1000);
--- Database may escalate to table-level lock
-COMMIT;
-```
-
-### Detection
-
-```sql
--- PostgreSQL: Check lock escalation
-SELECT 
-  locktype,
-  relation::regclass,
-  mode,
-  pid
-FROM pg_locks
-WHERE pid = pg_backend_pid();
-
--- MySQL: Check lock escalation
-SHOW ENGINE INNODB STATUS;
-```
-
-### Prevention
-
-```javascript
-// Process in smaller batches to avoid escalation
-async function updateManyAccounts(accountIds, amount) {
-  const batchSize = 100;
-  
-  for (let i = 0; i < accountIds.length; i += batchSize) {
-    const batch = accountIds.slice(i, i + batchSize);
-    
-    await pool.query(
-      'UPDATE accounts SET balance = balance + $1 WHERE id = ANY($2)',
-      [amount, batch]
-    );
-    
-    // Commit each batch
-    await pool.query('COMMIT');
-    await pool.query('BEGIN');
-  }
-}
 ```
 
 ## Advisory Locks
@@ -804,17 +622,17 @@ SELECT pg_advisory_unlock(12345);
 // Use advisory locks for distributed tasks
 async function processTask(taskId) {
   const lockId = hashTaskId(taskId);
-  
+
   // Try to acquire lock
   const [result] = await pool.query(
     'SELECT pg_try_advisory_lock($1) AS acquired',
     [lockId]
   );
-  
+
   if (!result.rows[0].acquired) {
     throw new Error('Task is already being processed');
   }
-  
+
   try {
     // Process task
     await processTaskLogic(taskId);
@@ -842,17 +660,17 @@ SELECT RELEASE_LOCK('my_lock');
 // Use named locks for distributed coordination
 async function processJob(jobId) {
   const lockName = `job_${jobId}`;
-  
+
   // Try to acquire lock with 10 second timeout
   const [result] = await pool.query(
     'SELECT GET_LOCK(?, 10) AS acquired',
     [lockName]
   );
-  
+
   if (result[0].acquired === 0) {
     throw new Error('Job is already being processed');
   }
-  
+
   try {
     // Process job
     await processJobLogic(jobId);
@@ -878,7 +696,7 @@ class DistributedLock {
     this.ttl = options.ttl || 30000;  // 30 seconds
     this.value = crypto.randomBytes(16).toString('hex');
   }
-  
+
   async acquire() {
     // Try to acquire lock with SET NX (only if not exists)
     const acquired = await this.redis.set(
@@ -887,10 +705,10 @@ class DistributedLock {
       'PX', this.ttl,  // Expire after TTL
       'NX'  // Only set if not exists
     );
-    
+
     return acquired === 'OK';
   }
-  
+
   async release() {
     // Only release if we own the lock
     const script = `
@@ -900,10 +718,10 @@ class DistributedLock {
         return 0
       end
     `;
-    
+
     await this.redis.eval(script, 1, this.key, this.value);
   }
-  
+
   async extend(newTtl) {
     // Extend lock TTL
     const script = `
@@ -913,15 +731,15 @@ class DistributedLock {
         return 0
       end
     `;
-    
+
     const result = await this.redis.eval(
-      script, 
-      1, 
-      this.key, 
-      this.value, 
+      script,
+      1,
+      this.key,
+      this.value,
       newTtl
     );
-    
+
     return result === 1;
   }
 }
@@ -953,7 +771,7 @@ class ZKLock {
     this.path = `/locks/${path}`;
     this.timeout = options.timeout || 30000;
   }
-  
+
   async acquire() {
     return new Promise((resolve, reject) => {
       // Create ephemeral node
@@ -970,14 +788,14 @@ class ZKLock {
           }
         }
       );
-      
+
       // Timeout
       setTimeout(() => {
         reject(new Error('Lock timeout'));
       }, this.timeout);
     });
   }
-  
+
   async release() {
     return new Promise((resolve, reject) => {
       this.zk.delete(
@@ -993,54 +811,6 @@ class ZKLock {
     });
   }
 }
-```
-
-## Lock-Free Algorithms
-
-### Compare-and-Swap (CAS)
-
-```javascript
-async function incrementCounter(counterId) {
-  let retries = 0;
-  const maxRetries = 10;
-  
-  while (retries < maxRetries) {
-    // Read current value
-    const [result] = await pool.query(
-      'SELECT value FROM counters WHERE id = $1',
-      [counterId]
-    );
-    const currentValue = result.rows[0].value;
-    
-    // Try to increment with CAS
-    const updateResult = await pool.query(
-      'UPDATE counters SET value = value + 1 WHERE id = $1 AND value = $2',
-      [counterId, currentValue]
-    );
-    
-    if (updateResult.rowCount > 0) {
-      // Success
-      return currentValue + 1;
-    }
-    
-    // CAS failed, retry
-    retries++;
-  }
-  
-  throw new Error('Max retries exceeded');
-}
-```
-
-### Atomic Operations
-
-```sql
--- Use database atomic operations instead of application logic
-UPDATE counters SET value = value + 1 WHERE id = 1;
-
--- Instead of:
--- SELECT value FROM counters WHERE id = 1;
--- newValue = value + 1;
--- UPDATE counters SET value = newValue WHERE id = 1;
 ```
 
 ## MVCC (Multi-Version Concurrency Control)
@@ -1111,8 +881,8 @@ COMMIT;
 
 ```sql
 -- SELECT FOR UPDATE SKIP LOCKED - Skip locked rows
-SELECT * FROM jobs 
-WHERE status = 'pending' 
+SELECT * FROM jobs
+WHERE status = 'pending'
 FOR UPDATE SKIP LOCKED
 LIMIT 10;
 
@@ -1139,7 +909,7 @@ UPDATE LOW_PRIORITY accounts SET balance = balance - 100 WHERE id = 1;
 
 ```sql
 -- View current locks
-SELECT 
+SELECT
   pid,
   relation::regclass AS table,
   mode,
@@ -1163,7 +933,7 @@ SELECT * FROM information_schema.INNODB_LOCKS;
 SELECT * FROM information_schema.INNODB_LOCK_WAITS;
 
 -- View lock wait graph
-SELECT 
+SELECT
   r.trx_id AS waiting_trx,
   r.trx_mysql_thread_id AS waiting_thread,
   b.trx_id AS blocking_trx,
@@ -1179,7 +949,7 @@ JOIN information_schema.INNODB_TRX b ON w.blocking_trx_id = b.trx_id;
 
 ```sql
 -- PostgreSQL: Find most locked tables
-SELECT 
+SELECT
   relation::regclass AS table,
   COUNT(*) AS lock_count
 FROM pg_locks
@@ -1189,7 +959,7 @@ ORDER BY lock_count DESC
 LIMIT 10;
 
 -- MySQL: Find most locked tables
-SELECT 
+SELECT
   table_name,
   COUNT(*) AS lock_count
 FROM information_schema.INNODB_LOCKS
@@ -1253,5 +1023,6 @@ LIMIT 10;
 
 ## Related Skills
 
-- `04-database/database-transactions`
-- `04-database/database-optimization`
+- [`04-database/database-transactions`](04-database/database-transactions/SKILL.md)
+- [`04-database/database-optimization`](04-database/database-optimization/SKILL.md)
+- [`04-database/connection-pooling`](04-database/connection-pooling/SKILL.md)

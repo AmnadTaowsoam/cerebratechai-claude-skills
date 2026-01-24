@@ -1,12 +1,24 @@
+---
+name: Accessibility (a11y)
+description: Ensuring websites and applications are usable by everyone, including people with disabilities, following WCAG guidelines and accessibility best practices.
+---
+
 # Accessibility (a11y)
 
-## Overview
-
-Web accessibility ensures that websites and applications are usable by everyone, including people with disabilities.
+> **Current Level:** Intermediate  
+> **Domain:** UX/UI Design / Compliance
 
 ---
 
-## 1. WCAG Guidelines Overview
+## Overview
+
+Web accessibility ensures that websites and applications are usable by everyone, including people with disabilities. Following WCAG (Web Content Accessibility Guidelines) principles makes your applications perceivable, operable, understandable, and robust for all users.
+
+---
+
+## Core Concepts
+
+### 1. WCAG Guidelines Overview
 
 ### WCAG 2.1 Principles
 
@@ -1568,3 +1580,164 @@ button:focus-visible {
 - `aria-live` - Live region
 - `aria-controls` - Controlled element
 ```
+
+---
+
+## Quick Start
+
+### Basic Accessibility Checklist
+
+```html
+<!-- 1. Semantic HTML -->
+<header>
+  <nav aria-label="Main navigation">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <!-- 2. Proper heading hierarchy -->
+  <h1>Page Title</h1>
+  <h2>Section Title</h2>
+  
+  <!-- 3. Alt text for images -->
+  <img src="photo.jpg" alt="Description of image">
+  
+  <!-- 4. Form labels -->
+  <form>
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" required>
+    
+    <button type="submit">Submit</button>
+  </form>
+  
+  <!-- 5. Skip link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+</main>
+```
+
+### Testing with Screen Reader
+
+```bash
+# Install screen reader testing tools
+npm install --save-dev @axe-core/react
+
+# Run accessibility tests
+npm run test:a11y
+```
+
+---
+
+## Production Checklist
+
+- [ ] **WCAG Compliance**: Meet WCAG 2.1 Level AA minimum
+- [ ] **Semantic HTML**: Use proper HTML5 semantic elements
+- [ ] **ARIA Attributes**: Add ARIA when needed, but prefer semantic HTML
+- [ ] **Keyboard Navigation**: All functionality accessible via keyboard
+- [ ] **Focus Management**: Visible focus indicators, logical tab order
+- [ ] **Color Contrast**: Minimum 4.5:1 for normal text, 3:1 for large text
+- [ ] **Alt Text**: All images have descriptive alt text
+- [ ] **Form Labels**: All form inputs have associated labels
+- [ ] **Error Messages**: Clear, accessible error messages
+- [ ] **Skip Links**: Skip navigation links for keyboard users
+- [ ] **Screen Reader Testing**: Test with NVDA, JAWS, or VoiceOver
+- [ ] **Automated Testing**: Run axe-core or similar tools in CI/CD
+- [ ] **Manual Testing**: Keyboard-only navigation testing
+- [ ] **Documentation**: Document accessibility features
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Missing Alt Text
+
+```html
+<!-- ❌ Bad - No alt text -->
+<img src="photo.jpg">
+```
+
+```html
+<!-- ✅ Good - Descriptive alt text -->
+<img src="photo.jpg" alt="A red bicycle parked outside a coffee shop">
+```
+
+### ❌ Don't: Div Buttons
+
+```html
+<!-- ❌ Bad - Not keyboard accessible -->
+<div onclick="handleClick()">Click me</div>
+```
+
+```html
+<!-- ✅ Good - Use button element -->
+<button onclick="handleClick()">Click me</button>
+```
+
+### ❌ Don't: Poor Color Contrast
+
+```css
+/* ❌ Bad - Low contrast */
+.text {
+  color: #ccc;
+  background: #fff;
+}
+```
+
+```css
+/* ✅ Good - WCAG AA compliant */
+.text {
+  color: #333;
+  background: #fff;
+}
+```
+
+### ❌ Don't: Missing Form Labels
+
+```html
+<!-- ❌ Bad - No label -->
+<input type="email" name="email">
+```
+
+```html
+<!-- ✅ Good - Associated label -->
+<label for="email">Email</label>
+<input type="email" id="email" name="email">
+```
+
+### ❌ Don't: No Focus Indicators
+
+```css
+/* ❌ Bad - No visible focus */
+button:focus {
+  outline: none;
+}
+```
+
+```css
+/* ✅ Good - Visible focus */
+button:focus {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+}
+```
+
+---
+
+## Integration Points
+
+- **Form Handling** (`02-frontend/form-handling/`) - Accessible form patterns
+- **React Best Practices** (`02-frontend/react-best-practices/`) - Accessible React components
+- **Design Systems** (`22-ux-ui-design/design-systems/`) - Accessible component libraries
+- **Testing** (`16-testing/`) - Accessibility testing strategies
+
+---
+
+## Further Reading
+
+- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+- [WebAIM](https://webaim.org/)
+- [A11y Project](https://www.a11yproject.com/)
+- [axe DevTools](https://www.deque.com/axe/devtools/)

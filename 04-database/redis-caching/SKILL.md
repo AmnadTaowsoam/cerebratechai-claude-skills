@@ -1,8 +1,52 @@
+---
+name: Redis Caching Patterns
+description: Comprehensive guide to Redis caching including setup, data structures, caching strategies, and best practices.
+---
+
 # Redis Caching Patterns
 
-## 1. Redis Setup
+## Overview
 
-### Basic Connection
+Redis is an in-memory data structure store that can be used as a database, cache, message broker, and queue. This skill covers Redis setup, data structures, caching strategies, key naming conventions, TTL management, cache invalidation, distributed caching, pub/sub patterns, session storage, and rate limiting.
+
+## Prerequisites
+
+- Understanding of caching concepts
+- Knowledge of data structures (strings, hashes, lists, sets, sorted sets)
+- Familiarity with Node.js or Python
+- Understanding of TTL (Time To Live) concepts
+- Knowledge of distributed systems basics
+
+## Key Concepts
+
+### Redis Data Structures
+
+- **Strings**: Binary-safe strings with up to 512MB size
+- **Hashes**: Maps between string fields and string values
+- **Lists**: Collections of string elements sorted by insertion order
+- **Sets**: Unordered collections of unique strings
+- **Sorted Sets**: Collections of unique strings ordered by an associated score
+
+### Caching Strategies
+
+- **Cache-Aside (Lazy Loading)**: Cache is populated on demand
+- **Write-Through**: Cache is updated synchronously with database
+- **Write-Behind**: Cache is updated asynchronously with database
+- **Read-Through**: Cache is populated by the cache provider
+
+### Key Design Patterns
+
+- **Key Naming**: Hierarchical, environment-based, and pattern-based naming
+- **TTL Management**: Absolute TTL, sliding TTL, dynamic TTL
+- **Cache Invalidation**: Simple, pattern-based, tag-based, hash-based
+- **Distributed Caching**: Redis clusters, client-side sharding
+
+## Implementation Guide
+
+### Redis Setup
+
+#### Basic Connection
+
 ```typescript
 // config/redis.ts
 import { createClient } from 'redis'
@@ -34,7 +78,8 @@ redis_client = redis.Redis(
 )
 ```
 
-### Connection Pooling
+#### Connection Pooling
+
 ```typescript
 // config/redis-pool.ts
 import { createClient } from 'redis'
@@ -70,9 +115,10 @@ def get_redis_client():
     return pool.get_connection()
 ```
 
-## 2. Data Structures
+### Data Structures
 
-### Strings
+#### Strings
+
 ```typescript
 // Basic string operations
 import { redisClient } from '../config/redis'
@@ -128,7 +174,8 @@ print(f'Session expires in {ttl} seconds')
 await redis_client.delete('user:123')
 ```
 
-### Hashes
+#### Hashes
+
 ```typescript
 // Hash operations
 import { redisClient } from '../config/redis'
@@ -213,7 +260,8 @@ hash_length = await redis_client.hlen('user:123')
 all_users = await redis_client.keys('user:*')
 ```
 
-### Lists
+#### Lists
+
 ```typescript
 // List operations
 import { redisClient } from '../config/redis'
@@ -274,7 +322,8 @@ await redis_client.lrem('recent:items', 0, 1)
 first_item = await redis_client.lindex('recent:items', 0)
 ```
 
-### Sets
+#### Sets
+
 ```typescript
 // Set operations
 import { redisClient } from '../config/redis'
@@ -333,7 +382,8 @@ follower_count = await redis_client.scard('user:123:followers')
 all_users = await redis_client.sunion('user:123:followers', 'user:456:following')
 ```
 
-### Sorted Sets
+#### Sorted Sets
+
 ```typescript
 // Sorted set operations
 import { redisClient } from '../config/redis'
@@ -394,9 +444,10 @@ score = await redis_client.zscore('leaderboard:scores', json.dumps({"user_id": 1
 await redis_client.zrem('leaderboard:scores', json.dumps({"user_id": 1}))
 ```
 
-## 3. Caching Strategies
+### Caching Strategies
 
-### Cache-Aside (Lazy Loading)
+#### Cache-Aside (Lazy Loading)
+
 ```typescript
 // services/cache.service.ts
 import { redisClient } from '../config/redis'
@@ -494,7 +545,8 @@ async def get_user(user_id: str):
     return user
 ```
 
-### Write-Through
+#### Write-Through
+
 ```typescript
 // services/cache.service.ts
 export async function updateWithCache<T>(
@@ -549,7 +601,8 @@ async def update_user(user_id: str, updates: dict):
     return updated_user
 ```
 
-### Write-Behind (Asynchronous)
+#### Write-Behind (Asynchronous)
+
 ```typescript
 // services/cache.service.ts
 import { redisClient } from '../config/redis'
@@ -602,7 +655,8 @@ async def create_user(user_data: dict):
     await set_cache_async(f"user:{user['id']}", user)
 ```
 
-### Write-Behind (Synchronous)
+#### Write-Behind (Synchronous)
+
 ```typescript
 // services/cache.service.ts
 export async function setCacheSync<T>(
@@ -639,9 +693,10 @@ async def set_cache_sync(key: str, data: dict, ttl: int = None) -> None:
     await redis_client.set(key, value, ex=ttl or 3600)
 ```
 
-## 4. Key Naming Conventions
+### Key Naming Conventions
 
-### Naming Patterns
+#### Naming Patterns
+
 ```typescript
 // Good naming conventions
 const keys = {
@@ -662,7 +717,8 @@ const userKey = keys.user('123')
 const sessionKey = keys.userSession('abc-123', '123')
 ```
 
-### Key Hierarchies
+#### Key Hierarchies
+
 ```typescript
 // Hierarchical key structure
 const keys = {
@@ -689,7 +745,8 @@ const userProfileKey = keys.user.profile('123')
 const productDetailsKey = keys.product.details('abc-456')
 ```
 
-### Environment-based Keys
+#### Environment-based Keys
+
 ```typescript
 const keys = {
   development: {
@@ -733,9 +790,10 @@ user_profile_key = keys['user']['profile']('123')
 product_details_key = keys['product']['details']('abc-456')
 ```
 
-## 5. TTL Management
+### TTL Management
 
-### Absolute TTL
+#### Absolute TTL
+
 ```typescript
 // services/cache.service.ts
 export async function setWithTTL(
@@ -754,7 +812,8 @@ await setWithTTL('session:abc', sessionData, 1800) // 30 minutes
 await setWithTTL('temp:data', tempData, 60) // 1 minute
 ```
 
-### Sliding TTL (Refresh on access)
+#### Sliding TTL (Refresh on Access)
+
 ```typescript
 // services/cache.service.ts
 export async function getWithRefresh(
@@ -817,7 +876,8 @@ async def get_user_with_refresh(user_id: str):
     return db_user
 ```
 
-### Dynamic TTL Based on Data
+#### Dynamic TTL Based on Data
+
 ```typescript
 // services/cache.service.ts
 export async function setDynamicTTL(
@@ -843,9 +903,10 @@ export async function setDynamicTTL(
 }
 ```
 
-## 6. Cache Invalidation
+### Cache Invalidation
 
-### Simple Invalidation
+#### Simple Invalidation
+
 ```typescript
 // services/cache.service.ts
 export async function invalidateUser(userId: string): Promise<void> {
@@ -874,7 +935,8 @@ async function updateUser(userId: string, updates: Partial<User>) {
 }
 ```
 
-### Pattern-based Invalidation
+#### Pattern-based Invalidation
+
 ```typescript
 // services/cache.service.ts
 export async function invalidatePattern(pattern: string): Promise<number> {
@@ -897,7 +959,8 @@ async function invalidateAllProductCaches(productId: string) {
 }
 ```
 
-### Tag-based Invalidation
+#### Tag-based Invalidation
+
 ```typescript
 // services/cache.service.ts
 export async function invalidateTag(tag: string): Promise<number> {
@@ -919,7 +982,8 @@ async function invalidateByTags(tags: string[]) {
 }
 ```
 
-### Hash-based Invalidation
+#### Hash-based Invalidation
+
 ```typescript
 // services/cache.service.ts
 export async function invalidateUserHash(userId: string): Promise<void> {
@@ -946,9 +1010,10 @@ async def invalidate_user_hash(user_id: str) -> None:
         await redis_client.delete(*session_keys)
 ```
 
-## 7. Distributed Caching
+### Distributed Caching
 
-### Redis Cluster
+#### Redis Cluster
+
 ```typescript
 // config/redis-cluster.ts
 import { createCluster } from 'redis'
@@ -965,7 +1030,8 @@ const cluster = createCluster({
 export { cluster }
 ```
 
-### Client-side Sharding
+#### Client-side Sharding
+
 ```typescript
 // services/cache.service.ts
 export function getShardKey(key: string, userId?: string): string {
@@ -984,9 +1050,10 @@ const userKey = getShardKey('user:123', '456')
 const sessionKey = getShardKey('session:abc', '123')
 ```
 
-## 8. Pub/Sub Patterns
+### Pub/Sub Patterns
 
-### Simple Publisher
+#### Simple Publisher
+
 ```typescript
 // services/pubsub.service.ts
 import { redisClient } from '../config/redis'
@@ -999,7 +1066,8 @@ export async function publish(channel: string, message: any): Promise<number> {
 await publish('notifications', { type: 'user.created', userId: '123' })
 ```
 
-### Simple Subscriber
+#### Simple Subscriber
+
 ```typescript
 // services/pubsub.service.ts
 import { redisClient } from '../config/redis'
@@ -1022,7 +1090,8 @@ await subscribe('notifications', (data) => {
 })
 ```
 
-### Pattern-based Subscriptions
+#### Pattern-based Subscriptions
+
 ```typescript
 // services/pubsub.service.ts
 export async function subscribeToUserNotifications(
@@ -1041,7 +1110,8 @@ export async function subscribeToGlobalNotifications(
 }
 ```
 
-### Message Queues (Pub/Sub)
+#### Message Queues (Pub/Sub)
+
 ```typescript
 // services/queue.service.ts
 export async function addToQueue(
@@ -1071,9 +1141,10 @@ export async function processQueue(
 await addToQueue('email:queue', { to: 'user@example.com', subject: 'Hello', body: 'Message' })
 ```
 
-## 9. Session Storage
+### Session Storage
 
-### Session Management
+#### Session Management
+
 ```typescript
 // services/session.service.ts
 import { redisClient } from '../config/redis'
@@ -1182,7 +1253,8 @@ async def delete_session(session_id: str) -> None:
     await redis_client.delete(session_key)
 ```
 
-### Session with Multiple Devices
+#### Session with Multiple Devices
+
 ```typescript
 // services/session.service.ts
 export async function createSessionForDevice(
@@ -1215,9 +1287,10 @@ export async function getUserSessions(userId: string): Promise<string[]> {
 }
 ```
 
-## 10. Rate Limiting with Redis
+### Rate Limiting with Redis
 
-### Fixed Window Rate Limiter
+#### Fixed Window Rate Limiter
+
 ```typescript
 // services/ratelimit.service.ts
 import { redisClient } from '../config/redis'
@@ -1290,7 +1363,8 @@ async def rate_limiter(identifier: str, limit: int = 10, window_ms: int = 60000)
     # Proceed with operation
 ```
 
-### Sliding Window Rate Limiter
+#### Sliding Window Rate Limiter
+
 ```typescript
 // services/ratelimit.service.ts
 export async function slidingWindowRateLimit(
@@ -1372,108 +1446,66 @@ async def sliding_window_rate_limit(
         )
 ```
 
-## 11. Best Practices
+## Best Practices
 
-### 1. Use Appropriate Data Structures
-```typescript
-// Good: Use hash for related fields
-await redisClient.hSet('user:123', {
-  name: 'John Doe',
-  email: 'john@example.com',
-  age: '30',
-})
+1. **Use Appropriate Data Structures**
+   - Use hashes for related fields
+   - Use sets for unique collections
+   - Use sorted sets for ranked data
+   - Use lists for ordered sequences
 
-// Bad: Use separate keys for related data
-await redisClient.set('user:123:name', 'John Doe')
-await redisClient.set('user:123:email', 'john@example.com')
-await redisClient.set('user:123:age', '30')
-```
+2. **Always Set TTL**
+   - Cache data should always have expiration
+   - Use appropriate TTL based on data volatility
+   - Consider sliding TTL for frequently accessed data
 
-### 2. Use Expiration
-```typescript
-// Good: Always set TTL for cached data
-await redisClient.set('user:123', JSON.stringify(user), {
-  EX: 3600 // Always set TTL
-})
+3. **Use Compression**
+   - Compress large data before caching
+   - Use efficient serialization formats
+   - Consider binary formats for performance
 
-// Bad: Cache without expiration
-await redisClient.set('user:123', JSON.stringify(user))
-```
+4. **Handle Connection Errors**
+   - Implement proper error handling
+   - Use connection pooling
+   - Set appropriate retry strategies
+   - Monitor connection health
 
-### 3. Use Compression
-```typescript
-// Good: Compress large data before caching
-import { compress, uncompress } from 'zlib'
+5. **Monitor Redis Performance**
+   - Track memory usage
+   - Monitor hit/miss ratios
+   - Watch for slow operations
+   - Set up alerts for critical metrics
 
-const compressedData = compress(JSON.stringify(largeData))
-await redisClient.set('large:data', compressedData)
+6. **Use Pipeline for Multiple Operations**
+   - Batch multiple operations together
+   - Reduce network round trips
+   - Improve overall performance
 
-// Retrieve and decompress
-const cached = await redisClient.get('large:data')
-if (cached) {
-  const decompressed = uncompress(cached)
-  const data = JSON.parse(decompressed)
-}
-```
+7. **Use Appropriate Serialization**
+   - Use JSON for complex objects
+   - Consider protocol buffers for high performance
+   - Avoid string concatenation for structured data
 
-### 4. Handle Connection Errors
-```typescript
-// config/redis.ts
-import { createClient } from 'redis'
+8. **Key Naming**
+   - Use hierarchical naming conventions
+   - Include environment prefixes
+   - Use consistent patterns
+   - Avoid overly long keys
 
-export const redisClient = createClient({
-  url: process.env.REDIS_URL || 'redis://localhost:6379',
-  socket: {
-    host: process.env.REDIS_HOST || 'localhost',
-    port: parseInt(process.env.REDIS_PORT || '6379'),
-  },
-  retryStrategy: (times) => {
-    delay: (attempt: number) => Math.min(attempt * 100, 3000),
-    maxRetriesPerRequest: 3,
-    maxRetryDelay: 3000,
-  },
-})
+9. **Cache Invalidation**
+   - Implement proper invalidation strategies
+   - Use pattern-based invalidation carefully
+   - Consider tag-based invalidation for complex scenarios
 
-redisClient.on('error', (error) => {
-  console.error('Redis error:', error)
-})
-```
+10. **Security**
+    - Use authentication in production
+    - Encrypt sensitive data
+    - Use TLS for network connections
+    - Follow principle of least privilege
 
-### 5. Monitor Redis Performance
-```typescript
-// services/redis-monitor.service.ts
-import { redisClient } from '../config/redis'
+## Related Skills
 
-export async function getRedisStats(): Promise<any> {
-  const info = await redisClient.info('stats')
-  return info
-}
-
-export async function monitorMemory(): Promise<void> {
-  const info = await redisClient.info('memory')
-  const used = info.used_memory
-  const max = info.max_memory
-  
-  console.log(`Redis memory: ${used} / ${max}`)
-}
-```
-
-### 6. Use Pipeline for Multiple Operations
-```typescript
-// Good: Use pipeline for multiple operations
-const results = await redisClient
-  .pipeline()
-  .set('key1', 'value1')
-  .set('key2', 'value2')
-  .get('key3')
-  .exec()
-```
-
-### 7. Use Appropriate Serialization
-```typescript
-// Good: Use JSON for complex objects
-await redisClient.set('user:123', JSON.stringify(user))
-
-// Bad: String concatenation
-await redisClient.set('user:123', `${user.name},${user.email},${user.age}`)
-```
+- [`04-database/cache-invalidation`](04-database/cache-invalidation/SKILL.md)
+- [`04-database/connection-pooling`](04-database/connection-pooling/SKILL.md)
+- [`04-database/database-optimization`](04-database/database-optimization/SKILL.md)
+- [`04-database/database-transactions`](04-database/database-transactions/SKILL.md)

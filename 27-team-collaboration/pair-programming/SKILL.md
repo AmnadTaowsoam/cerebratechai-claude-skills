@@ -1,8 +1,20 @@
+---
+name: Pair Programming
+description: Software development technique where two developers work together at one workstation, with one writing code (driver) while the other reviews and guides (navigator) for better code quality and knowledge sharing.
+---
+
 # Pair Programming
 
-## What is Pair Programming
+> **Current Level:** Intermediate  
+> **Domain:** Team Collaboration / Development Practices
 
-Pair programming is a software development technique where two developers work together at one workstation. One writes code (driver) while the other reviews and guides (navigator).
+---
+
+## Overview
+
+Pair programming is a software development technique where two developers work together at one workstation. One writes code (driver) while the other reviews and guides (navigator). This practice improves code quality, reduces bugs, facilitates knowledge sharing, and improves team collaboration.
+
+## What is Pair Programming
 
 ### Core Concept
 
@@ -479,6 +491,108 @@ code --install-extension ms-vsliveshare.vsliveshare
 - [ ] Switch roles regularly
 - [ ] Take breaks
 - [ ] Stay focused
+```
+
+---
+
+## Quick Start
+
+### Pair Programming Setup
+
+```markdown
+# Pair Programming Session
+
+## Setup
+- [ ] Choose driver and navigator
+- [ ] Set up screen sharing (VS Code Live Share, Tuple, etc.)
+- [ ] Agree on goal and approach
+- [ ] Set timer for role switching (30-60 min)
+
+## During Session
+- Driver: Types code, focuses on implementation
+- Navigator: Reviews code, thinks about design, catches bugs
+- Both: Discuss approach, ask questions
+
+## After Session
+- [ ] Review what was accomplished
+- [ ] Document decisions
+- [ ] Commit code with pair attribution
+```
+
+### VS Code Live Share
+
+```bash
+# Install Live Share extension
+# Share session
+# Collaborator joins and can edit together
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Partner Selection**: Choose appropriate pairing partner
+- [ ] **Goal Definition**: Clear goal for pairing session
+- [ ] **Tool Setup**: Screen sharing and collaboration tools
+- [ ] **Time Allocation**: Allocate sufficient time
+- [ ] **Role Switching**: Regular role switching (30-60 min)
+- [ ] **Communication**: Clear communication during pairing
+- [ ] **Breaks**: Take regular breaks
+- [ ] **Focus**: Stay focused on goal
+- [ ] **Documentation**: Document decisions and learnings
+- [ ] **Code Review**: Pair programming is continuous review
+- [ ] **Knowledge Sharing**: Share knowledge during pairing
+- [ ] **Feedback**: Provide feedback after session
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Driver Only
+
+```markdown
+# ❌ Bad - Navigator not engaged
+Driver: Types code
+Navigator: Browsing internet
+```
+
+```markdown
+# ✅ Good - Both engaged
+Driver: Types code
+Navigator: Reviews, suggests improvements, catches bugs
+Both: Discuss approach
+```
+
+### ❌ Don't: No Role Switching
+
+```markdown
+# ❌ Bad - Same person always driver
+Session 1: Alice (driver), Bob (navigator)
+Session 2: Alice (driver), Bob (navigator)
+# Bob never gets to code!
+```
+
+```markdown
+# ✅ Good - Regular role switching
+Session 1: Alice (driver), Bob (navigator)
+After 30 min: Bob (driver), Alice (navigator)
+```
+
+---
+
+## Integration Points
+
+- **Code Review Culture** (`27-team-collaboration/code-review-culture/`) - Review practices
+- **Knowledge Sharing** (`27-team-collaboration/knowledge-sharing/`) - Knowledge transfer
+- **Onboarding** (`27-team-collaboration/onboarding/`) - Pair with new team members
+
+---
+
+## Further Reading
+
+- [Pair Programming Guide](https://martinfowler.com/articles/on-pair-programming.html)
+- [VS Code Live Share](https://code.visualstudio.com/learn/collaboration/live-share)
+- [Tuple](https://tuple.app/)
 
 ### After Pairing
 

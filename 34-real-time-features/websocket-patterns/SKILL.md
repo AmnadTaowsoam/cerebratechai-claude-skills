@@ -1,10 +1,24 @@
+---
+name: WebSocket Patterns
+description: Implementing full-duplex communication between client and server using WebSockets, Socket.IO, scaling strategies, and production patterns for real-time applications.
+---
+
 # WebSocket Patterns
+
+> **Current Level:** Intermediate  
+> **Domain:** Real-time / Backend
+
+---
 
 ## Overview
 
-WebSockets enable full-duplex communication between client and server. This guide covers Socket.IO implementation, scaling, and production patterns.
+WebSockets enable full-duplex communication between client and server. This guide covers Socket.IO implementation, scaling, and production patterns for building real-time applications like chat, notifications, live updates, and collaborative features.
 
-## WebSocket Protocol
+---
+
+## Core Concepts
+
+### WebSocket Protocol
 
 ```
 Client                    Server
@@ -620,7 +634,153 @@ ws.on('message', (data) => {
 9. **Rooms** - Use rooms for efficient broadcasting
 10. **Cleanup** - Clean up event listeners
 
-## Resources
+---
+
+## Quick Start
+
+### Basic Socket.IO Server
+
+```javascript
+const express = require('express')
+const { createServer } = require('http')
+const { Server } = require('socket.io')
+
+const app = express()
+const httpServer = createServer(app)
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*'
+  }
+})
+
+io.on('connection', (socket) => {
+  console.log('Client connected:', socket.id)
+  
+  socket.on('message', (data) => {
+    io.emit('message', data)
+  })
+  
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id)
+  })
+})
+
+httpServer.listen(3000)
+```
+
+### Basic Socket.IO Client
+
+```javascript
+import { io } from 'socket.io-client'
+
+const socket = io('http://localhost:3000')
+
+socket.on('connect', () => {
+  console.log('Connected:', socket.id)
+})
+
+socket.on('message', (data) => {
+  console.log('Received:', data)
+})
+
+socket.emit('message', { text: 'Hello!' })
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Connection Management**: Handle reconnections and disconnections
+- [ ] **Authentication**: Authenticate WebSocket connections
+- [ ] **Rate Limiting**: Implement rate limiting per connection
+- [ ] **Scaling**: Use Redis adapter for multi-server scaling
+- [ ] **Rooms**: Use rooms for efficient message broadcasting
+- [ ] **Error Handling**: Handle connection errors gracefully
+- [ ] **Heartbeat**: Implement ping/pong for connection health
+- [ ] **Message Validation**: Validate all incoming messages
+- [ ] **Monitoring**: Monitor connection counts and message rates
+- [ ] **Security**: Use WSS (WebSocket Secure) in production
+- [ ] **CORS**: Configure CORS properly
+- [ ] **Resource Limits**: Set connection and message size limits
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Authentication
+
+```javascript
+// ❌ Bad - Anyone can connect
+io.on('connection', (socket) => {
+  socket.on('message', (data) => {
+    // No auth check!
+  })
+})
+```
+
+```javascript
+// ✅ Good - Authenticate connections
+io.use((socket, next) => {
+  const token = socket.handshake.auth.token
+  if (verifyToken(token)) {
+    next()
+  } else {
+    next(new Error('Authentication failed'))
+  }
+})
+```
+
+### ❌ Don't: No Rate Limiting
+
+```javascript
+// ❌ Bad - No rate limiting
+socket.on('message', (data) => {
+  // Can spam messages!
+  broadcast(data)
+})
+```
+
+```javascript
+// ✅ Good - Rate limit messages
+const rateLimiter = require('socket.io-rate-limiter')
+
+io.use(rateLimiter({
+  windowMs: 1000,
+  max: 10  // Max 10 messages per second
+}))
+```
+
+### ❌ Don't: Broadcast to All
+
+```javascript
+// ❌ Bad - Broadcasts to everyone
+socket.on('message', (data) => {
+  io.emit('message', data)  // All clients!
+})
+```
+
+```javascript
+// ✅ Good - Use rooms
+socket.on('join-room', (roomId) => {
+  socket.join(roomId)
+})
+
+socket.on('message', (data) => {
+  io.to(data.roomId).emit('message', data)  // Only room members
+})
+```
+
+---
+
+## Integration Points
+
+- **WebSocket Patterns** (`03-backend-api/websocket-patterns/`) - WebSocket API patterns
+- **Error Handling** (`03-backend-api/error-handling/`) - Connection error handling
+- **Authentication** (`10-authentication-authorization/`) - WebSocket auth
+
+---
+
+## Further Reading
 
 - [Socket.IO Documentation](https://socket.io/docs/)
 - [WebSocket Protocol](https://datatracker.ietf.org/doc/html/rfc6455)

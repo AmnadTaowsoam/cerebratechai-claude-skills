@@ -1,8 +1,18 @@
+---
+name: Live Notifications
+description: Delivering real-time updates to users via WebSocket, SSE, or Push API for live notification systems with proper architecture, queuing, and delivery mechanisms.
+---
+
 # Live Notifications
+
+> **Current Level:** Intermediate  
+> **Domain:** Real-time / Communication
+
+---
 
 ## Overview
 
-Live notification systems deliver real-time updates to users via WebSocket, SSE, or Push API. This guide covers architecture, implementation, and best practices.
+Live notification systems deliver real-time updates to users via WebSocket, SSE, or Push API. This guide covers architecture, implementation, and best practices for building notification systems that deliver timely updates to users across devices.
 
 ## Notification System Architecture
 
@@ -702,6 +712,119 @@ interface NotificationMetrics {
   clickRate: number;
 }
 ```
+
+---
+
+## Quick Start
+
+### WebSocket Notifications
+
+```typescript
+// Server
+io.on('connection', (socket) => {
+  const userId = socket.handshake.auth.userId
+  
+  // Join user room
+  socket.join(`user:${userId}`)
+  
+  // Send notification
+  socket.emit('notification', {
+    id: '123',
+    type: 'message',
+    title: 'New message',
+    body: 'You have a new message',
+    timestamp: Date.now()
+  })
+})
+
+// Send to specific user
+io.to('user:123').emit('notification', notificationData)
+```
+
+### Notification Queue
+
+```typescript
+class NotificationQueue {
+  async enqueue(notification: Notification) {
+    await redis.lpush('notifications', JSON.stringify(notification))
+  }
+  
+  async process() {
+    while (true) {
+      const notification = await redis.brpop('notifications', 10)
+      if (notification) {
+        await this.deliver(JSON.parse(notification[1]))
+      }
+    }
+  }
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Real-time Delivery**: WebSocket or SSE for instant delivery
+- [ ] **Persistence**: Store notifications in database
+- [ ] **Preferences**: Respect user notification preferences
+- [ ] **Grouping**: Group similar notifications
+- [ ] **Queue**: Queue system for reliable delivery
+- [ ] **Retry**: Retry failed deliveries
+- [ ] **Analytics**: Track notification metrics
+- [ ] **Performance**: Optimize for scale
+- [ ] **Testing**: Test notification delivery
+- [ ] **Documentation**: Document notification system
+- [ ] **Monitoring**: Monitor delivery rates
+- [ ] **Error Handling**: Handle delivery failures
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Persistence
+
+```typescript
+// ❌ Bad - No persistence
+socket.emit('notification', notification)
+// Lost if user offline!
+```
+
+```typescript
+// ✅ Good - Persist notifications
+await db.notifications.create({ data: notification })
+socket.emit('notification', notification)
+// User can fetch when back online
+```
+
+### ❌ Don't: Spam Users
+
+```typescript
+// ❌ Bad - Too many notifications
+user.actions.forEach(action => {
+  sendNotification(`You ${action}`)  // Spam!
+})
+```
+
+```typescript
+// ✅ Good - Group notifications
+const actions = user.actions
+sendNotification(`You have ${actions.length} updates`)
+```
+
+---
+
+## Integration Points
+
+- **WebSocket Patterns** (`34-real-time-features/websocket-patterns/`) - WebSocket implementation
+- **Server-Sent Events** (`34-real-time-features/server-sent-events/`) - SSE alternative
+- **Push Notifications** (`31-mobile-development/push-notifications/`) - Mobile push
+
+---
+
+## Further Reading
+
+- [WebSocket API](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
+- [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
 
 ## Best Practices
 

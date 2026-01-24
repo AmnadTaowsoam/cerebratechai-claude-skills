@@ -252,6 +252,149 @@ async function getUserById(userId: string): Promise<User> {
 
 ---
 
+## 🏢 Enterprise Skill Guidelines (Skills 73-164)
+
+Skills 73-164 เป็นส่วนของ Enterprise Architecture Capability Roadmap และต้องมีโครงสร้างเพิ่มเติมจาก Standard Skill
+
+### Enhanced Structure for Enterprise Skills
+
+````markdown
+---
+name: <Human-readable skill name>
+description: <1 sentence: what it covers + when to use it>
+skill-id: <73-164>
+domain: <IoT / AI / Business Strategy / Security>
+level: Expert (Enterprise Scale)
+---
+
+# [Skill Name]
+
+## Overview
+[2-3 sentences]
+
+## Why This Matters / Strategic Necessity
+- **Context:** เหตุผลความจำเป็นในโลกปี 2025-2026
+- **Business Impact:** ผลกระทบต่อธุรกิจ
+- **Product Thinking:** ทักษะนี้ช่วยแก้ปัญหาอะไร
+
+## Core Concepts / Technical Deep Dive
+[In-depth technical content]
+
+## Tooling & Tech Stack
+- **Enterprise Tools:** เครื่องมือระดับ Production
+- **Configuration Essentials:** Best practices
+
+## Standards, Compliance & Security
+- **Standards:** ISO, NIST, etc.
+- **Security:** Security considerations
+
+## Unit Economics & KPIs (for Business skills 126+)
+- **Cost Calculation:** สูตรการคำนวณต้นทุน
+- **KPIs:** ตัวชี้วัดความสำเร็จ
+
+## Quick Start
+[Minimal steps]
+
+## Production Checklist
+- [ ] Checklist items
+
+## Anti-patterns
+[Things to avoid]
+
+## Integration Points
+[Related skills]
+
+## Further Reading
+[Resources]
+````
+
+### Domain-Specific Requirements
+
+#### IoT Skills (73-90)
+- Include hardware considerations (memory, power, connectivity)
+- Reference platforms: AWS IoT Core, Azure IoT Hub, Mender.io
+- Show OTA update patterns with rollback strategies
+- Include security best practices (Zero Trust)
+
+#### AI/ML Production Skills (91-125)
+- Include cost considerations (GPU, inference costs)
+- Show monitoring patterns (drift detection, model health)
+- Include model versioning and lineage tracking
+- Address bias and fairness where applicable
+
+#### Business Skills (126-157)
+- Connect technical concepts to business outcomes
+- Include financial calculations with formulas
+- Reference standards: ASC 606, GDPR, ESG
+- Show metrics dashboards and KPIs
+
+#### Future-Ready Skills (158-164)
+- Explain why preparation is important NOW
+- Include emerging standards and specifications
+- Show concrete preparation steps
+- Include timeline and adoption curve
+
+### Code Example Requirements for Enterprise Skills
+
+Enterprise skill code examples MUST include:
+
+1. **Error Handling & Resilience**
+   - Retry logic with exponential backoff
+   - Circuit breaker patterns
+   - Graceful degradation
+
+2. **Observability**
+   - Structured logging
+   - Metrics emission
+   - Tracing context
+
+3. **Security**
+   - Input validation
+   - Authentication checks
+   - Secure credential handling
+
+4. **Cost Awareness** (comments about resource usage)
+
+Example:
+````python
+# ❌ Bad - No error handling, no observability
+def process_data(data):
+    result = external_api.call(data)
+    return result
+
+# ✅ Good - Production-ready with all considerations
+@retry(max_attempts=3, backoff=exponential(base=2))
+@trace("process_data")
+def process_data(data: DataInput) -> ProcessedResult:
+    """
+    Process data with external API.
+    
+    Cost: ~$0.001 per call (external API charges)
+    Latency: p50=100ms, p99=500ms
+    """
+    # Validate input
+    validated = validate_input(data)
+    
+    # Track metrics
+    metrics.increment("process_data.calls")
+    
+    try:
+        with Timer() as t:
+            result = external_api.call(validated)
+        
+        metrics.histogram("process_data.latency", t.elapsed)
+        logger.info("Processed data", extra={"duration": t.elapsed})
+        
+        return ProcessedResult(result)
+        
+    except APIError as e:
+        metrics.increment("process_data.errors", tags={"error": e.code})
+        logger.error("API call failed", exc_info=True)
+        raise
+````
+
+---
+
 ## 🎨 Style Guide
 
 ### Markdown Formatting
@@ -468,7 +611,7 @@ We use these labels to organize issues:
 
 Need help contributing?
 
-- 💬 [GitHub Discussions](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills/discussions)
+- 💬 [GitHub Discussions](https://github.com/AmnadTaowsoam/cerebraSkills/discussions)
 - 📧 Email: contribute@cerebratechai.com
 - 🐦 Twitter: [@cerebratechai](https://twitter.com/cerebratechai)
 
@@ -588,7 +731,7 @@ We're particularly looking for contributions in these areas:
 - [x] Thai UX Patterns - `22-ux-ui-design/thai-ux-patterns`
 - [x] Thai Payment Integration - `71-infrastructure-patterns/thai-payment-integration`
 
-### Still Needed
+### Still Needed (Core Skills)
 - [ ] CI/CD with GitLab
 - [ ] Monitoring with Datadog
 - [ ] Log aggregation with Loki
@@ -603,6 +746,76 @@ We're particularly looking for contributions in these areas:
 - [ ] Rust for performance
 - [ ] Kotlin for Android
 - [ ] Swift for iOS
+
+---
+
+### 🚀 NEW: Enterprise Architecture Skills (73-164)
+
+> **Note:** กำลังรับ contributions สำหรับ Enterprise Skills ใหม่ตาม Enterprise Architecture Capability Roadmap 2025-2026
+
+#### Critical Priority (Enterprise IoT & Cloud)
+- [ ] `73-iot-fleet-management/differential-ota-updates` - OTA Delta Updates
+- [ ] `74-iot-zero-trust-security/hardware-rooted-identity` - Hardware Root of Trust
+- [ ] `74-iot-zero-trust-security/mtls-pki-management` - mTLS & PKI
+- [ ] `75-edge-computing/lightweight-kubernetes` - K3s/MicroK8s for Edge
+
+#### Critical Priority (AI & Data Architecture)
+- [ ] `77-mlops-data-engineering/feature-store-implementation` - Feature Store (Feast/Tecton)
+- [ ] `77-mlops-data-engineering/drift-detection-retraining` - Drift Detection & Auto-retraining
+- [ ] `78-inference-model-serving/high-performance-inference` - Triton/TorchServe
+- [ ] `80-agentic-ai-advanced-learning/agentic-ai-frameworks` - LangChain/LangGraph Agents
+
+#### High Priority (Business & Product)
+- [ ] `81-saas-finops-pricing/cloud-unit-economics` - FinOps & Unit Economics
+- [ ] `81-saas-finops-pricing/usage-based-pricing` - Consumption-based Pricing
+- [ ] `82-technical-product-management/business-to-technical-spec` - Business to Tech Spec
+- [ ] `84-compliance-ai-governance/ai-explainability-ethics` - AI Explainability (SHAP/LIME)
+
+#### Future-Ready Skills (High Priority)
+- [ ] `86-sustainable-ai/green-computing-finops` - Sustainable AI & Carbon-aware Computing
+- [ ] `87-multi-agent-governance/multi-agent-orchestration` - Multi-Agent Orchestration & HITL
+- [ ] `88-ai-supply-chain-security/model-bom-security` - AI SBOM & Supply Chain Security
+- [ ] `89-post-quantum-cryptography/pqc-for-iot` - Post-Quantum Cryptography
+
+#### Extended Enterprise Skills (Medium Priority)
+- [ ] `77-mlops-data-engineering/data-pipeline-orchestration` - Airflow/Dagster
+- [ ] `77-mlops-data-engineering/experiment-tracking` - MLflow/W&B
+- [ ] `78-inference-model-serving/model-caching-warmpool` - Model Caching
+- [ ] `79-edge-ai-tinyml/on-device-model-training` - On-device Training
+- [ ] `80-agentic-ai-advanced-learning/rag-advanced` - Advanced RAG
+- [ ] `81-saas-finops-pricing/customer-lifetime-value` - CLV Modeling
+- [ ] `82-technical-product-management/product-discovery-validation` - Product Discovery
+- [ ] `83-go-to-market-tech/technical-content-marketing` - Technical Content
+
+---
+
+### 🚀 NEW: Enterprise Architecture Skills (73-164)
+
+> **Note:** กำลังรับ contributions สำหรับ Enterprise Skills ใหม่ตาม Enterprise Architecture Capability Roadmap 2025-2026
+
+#### Critical Priority (Enterprise IoT & Cloud)
+- [ ] `73-iot-fleet-management/differential-ota-updates` - OTA Delta Updates
+- [ ] `74-iot-zero-trust-security/hardware-rooted-identity` - Hardware Root of Trust
+- [ ] `74-iot-zero-trust-security/mtls-pki-management` - mTLS & PKI
+- [ ] `75-edge-computing/lightweight-kubernetes` - K3s/MicroK8s for Edge
+
+#### Critical Priority (AI & Data Architecture)
+- [ ] `77-mlops-data-engineering/feature-store-implementation` - Feature Store (Feast/Tecton)
+- [ ] `77-mlops-data-engineering/drift-detection-retraining` - Drift Detection & Auto-retraining
+- [ ] `78-inference-model-serving/high-performance-inference` - Triton/TorchServe
+- [ ] `80-agentic-ai-advanced-learning/agentic-ai-frameworks` - LangChain/LangGraph Agents
+
+#### High Priority (Business & Product)
+- [ ] `81-saas-finops-pricing/cloud-unit-economics` - FinOps & Unit Economics
+- [ ] `81-saas-finops-pricing/usage-based-pricing` - Consumption-based Pricing
+- [ ] `82-technical-product-management/business-to-technical-spec` - Business to Tech Spec
+- [ ] `84-compliance-ai-governance/ai-explainability-ethics` - AI Explainability (SHAP/LIME)
+
+#### Future-Ready Skills (High Priority)
+- [ ] `86-sustainable-ai/green-computing-finops` - Sustainable AI & Carbon-aware Computing
+- [ ] `87-multi-agent-governance/multi-agent-orchestration` - Multi-Agent Orchestration & HITL
+- [ ] `88-ai-supply-chain-security/model-bom-security` - AI SBOM & Supply Chain Security
+- [ ] `89-post-quantum-cryptography/pqc-for-iot` - Post-Quantum Cryptography
 
 ---
 

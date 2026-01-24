@@ -1,13 +1,63 @@
+---
+name: Embedding Models
+description: Comprehensive guide for text embedding models and usage, including popular models, selection criteria, generation, evaluation, and production optimization.
+---
+
 # Embedding Models
 
 ## Overview
-Comprehensive guide for text embedding models and usage.
 
----
+Comprehensive guide for text embedding models and usage. This skill covers embedding concepts (dense vectors, semantic similarity, distance metrics), popular models (OpenAI, Sentence Transformers, Cohere, BGE), model selection criteria, embedding generation (batch processing, caching), dimensionality reduction (PCA, t-SNE), fine-tuning, evaluation metrics (precision, recall, F1), storage strategies (numpy, pickle, HDF5), production optimization, and use cases (semantic search, clustering, classification).
 
-## 1. Embedding Concepts
+## Prerequisites
 
-### 1.1 What are Embeddings?
+- Understanding of vector spaces and linear algebra
+- Knowledge of machine learning fundamentals
+- Familiarity with Python and NumPy
+- Understanding of cosine similarity and distance metrics
+- Basic knowledge of transformers and deep learning
+- Familiarity with scikit-learn for evaluation
+
+## Key Concepts
+
+### Embedding Fundamentals
+
+- **Dense Vectors**: Fixed-size numerical representations of text
+- **Semantic Similarity**: Similar meanings have similar vectors
+- **Dimensionality**: Number of dimensions in the vector space
+- **Distance Metrics**: Cosine similarity, Euclidean distance, Manhattan distance
+
+### Popular Embedding Models
+
+- **OpenAI Embeddings**: text-embedding-3-small (1536 dims), text-embedding-3-large (3072 dims)
+- **Sentence Transformers**: all-MiniLM-L6-v2 (384 dims), all-mpnet-base-v2 (768 dims)
+- **Cohere Embeddings**: embed-english-v3.0 (1024 dims)
+- **BGE Models**: BAAI/bge-small-en-v1.5 (384 dims), BAAI/bge-large-en-v1.5 (1024 dims)
+
+### Model Selection Criteria
+
+- **Use Case**: Semantic search, classification, clustering
+- **Budget**: Free (open-source) vs paid (API)
+- **Performance**: Speed vs accuracy tradeoff
+- **Dimensionality**: Lower dimensions = faster, higher = more accurate
+
+### Evaluation Metrics
+
+- **Retrieval**: Precision@K, Recall@K, MRR (Mean Reciprocal Rank)
+- **Classification**: Accuracy, F1, precision, recall
+- **Clustering**: Silhouette score, Davies-Bouldin index
+
+### Storage Formats
+
+- **NumPy**: Fast loading, simple format
+- **Pickle**: Python native, supports metadata
+- **HDF5**: Efficient for large datasets, supports compression
+
+## Implementation Guide
+
+### Embedding Concepts
+
+#### Understanding Embeddings
 
 ```python
 """
@@ -74,11 +124,9 @@ metrics = concepts.compare_distance_metrics()
 print(f"Cosine similarity: {metrics['cosine_similarity']:.3f}")
 ```
 
----
+### Popular Models
 
-## 2. Popular Models
-
-### 2.1 OpenAI Embeddings
+#### OpenAI Embeddings
 
 ```python
 from openai import OpenAI
@@ -129,7 +177,7 @@ dim = embeddings.get_embedding_dimension()
 print(f"Embedding dimension: {dim}")
 ```
 
-### 2.2 Sentence Transformers
+#### Sentence Transformers
 
 ```python
 from sentence_transformers import SentenceTransformer
@@ -185,7 +233,7 @@ similarity = embeddings.compute_similarity("cat", "dog")
 print(f"Similarity between 'cat' and 'dog': {similarity:.3f}")
 ```
 
-### 2.3 Cohere Embeddings
+#### Cohere Embeddings
 
 ```python
 import cohere
@@ -236,7 +284,7 @@ batch_embeddings = embeddings.embed_texts(texts)
 print(f"Batch embeddings shape: {batch_embeddings.shape}")
 ```
 
-### 2.4 BGE Models
+#### BGE Models
 
 ```python
 from sentence_transformers import SentenceTransformer
@@ -279,14 +327,14 @@ class BGEEmbeddings:
 embeddings = BGEEmbeddings(model_name="BAAI/bge-small-en-v1.5")
 
 # Query embedding
-query = "What is the capital of France?"
+query = "What is capital of France?"
 query_emb = embeddings.embed_query(query)
 
 # Document embeddings
 documents = [
-    "Paris is the capital of France.",
-    "London is the capital of UK.",
-    "Berlin is the capital of Germany."
+    "Paris is capital of France.",
+    "London is capital of UK.",
+    "Berlin is capital of Germany."
 ]
 doc_embeddings = embeddings.embed_documents(documents)
 
@@ -295,11 +343,9 @@ scores = embeddings.compute_scores(query, documents)
 print(f"Scores: {scores}")
 ```
 
----
+### Model Selection Criteria
 
-## 3. Model Selection Criteria
-
-### 3.1 Model Comparison
+#### Model Comparison
 
 ```python
 import pandas as pd
@@ -430,7 +476,7 @@ comparison = comparator.compare_models([
 print(comparison)
 ```
 
-### 3.2 Selection Decision Tree
+#### Selection Decision Tree
 
 ```python
 class EmbeddingModelSelector:
@@ -522,11 +568,9 @@ print(f"Selected model: {model_name}")
 print(f"Configuration: {config}")
 ```
 
----
+### Embedding Generation
 
-## 4. Embedding Generation
-
-### 4.1 Batch Processing
+#### Batch Processing
 
 ```python
 import numpy as np
@@ -608,7 +652,7 @@ embeddings = generator.generate_embeddings(texts)
 print(f"Generated {len(embeddings)} embeddings of shape {embeddings.shape}")
 ```
 
-### 4.2 Caching
+#### Caching
 
 ```python
 import numpy as np
@@ -685,9 +729,7 @@ embedding2 = cache.get_or_generate("Hello, world!", embedding_model)
 print(f"Embeddings are equal: {np.allclose(embedding1, embedding2)}")
 ```
 
----
-
-## 5. Dimensionality Reduction
+### Dimensionality Reduction
 
 ```python
 import numpy as np
@@ -753,9 +795,7 @@ tsne_reducer = DimensionalityReducer(method="tsne")
 tsne_reducer.visualize(embeddings, labels)
 ```
 
----
-
-## 6. Fine-Tuning Embeddings
+### Fine-Tuning Embeddings
 
 ```python
 from sentence_transformers import SentenceTransformer, InputExample, losses
@@ -799,7 +839,7 @@ class EmbeddingFineTuner:
         val_texts: List[str] = None,
         val_labels: List[int] = None
     ):
-        """Fine-tune the model."""
+        """Fine-tune model."""
         # Prepare data
         train_examples = self.prepare_data(train_texts, train_labels)
 
@@ -868,9 +908,7 @@ metrics = finetuner.evaluate(test_texts, test_labels)
 print(f"Evaluation metrics: {metrics}")
 ```
 
----
-
-## 7. Evaluation Metrics
+### Evaluation Metrics
 
 ```python
 import numpy as np
@@ -895,7 +933,6 @@ class EmbeddingEvaluator:
 
     @staticmethod
     def evaluate_retrieval(
-        self,
         query_embeddings: np.ndarray,
         document_embeddings: np.ndarray,
         relevant_docs: List[List[int]],
@@ -912,7 +949,7 @@ class EmbeddingEvaluator:
             # Compute similarities
             similarities = []
             for doc_idx in range(len(document_embeddings)):
-                sim = self.cosine_similarity(
+                sim = EmbeddingEvaluator.cosine_similarity(
                     query_embeddings[query_idx],
                     document_embeddings[doc_idx]
                 )
@@ -942,7 +979,6 @@ class EmbeddingEvaluator:
 
     @staticmethod
     def evaluate_clustering(
-        self,
         embeddings: np.ndarray,
         true_labels: np.ndarray,
         predicted_labels: np.ndarray
@@ -979,9 +1015,7 @@ retrieval_metrics = evaluator.evaluate_retrieval(
 print(f"Retrieval metrics: {retrieval_metrics}")
 ```
 
----
-
-## 8. Storage Strategies
+### Storage Strategies
 
 ```python
 import numpy as np
@@ -1066,9 +1100,7 @@ loaded_with_meta, meta = storage.load_pickle("embeddings_with_meta")
 loaded_embeddings, loaded_texts = storage.load_hdf5("embeddings_hdf5")
 ```
 
----
-
-## 9. Production Optimization
+### Production Optimization
 
 ```python
 import numpy as np
@@ -1155,11 +1187,9 @@ print(f"Average latency: {benchmark_results['avg_latency_ms']:.2f}ms")
 print(f"Average throughput: {benchmark_results['avg_throughput_per_sec']:.2f} texts/sec")
 ```
 
----
+### Use Cases
 
-## 10. Use Cases
-
-### 10.1 Semantic Search
+#### Semantic Search
 
 ```python
 import numpy as np
@@ -1213,7 +1243,7 @@ search = SemanticSearch(model)
 # Index documents
 documents = [
     "Paris is the capital of France.",
-    "London is the capital of UK.",
+    "London is the capital of the UK.",
     "Berlin is the capital of Germany.",
     "Madrid is the capital of Spain."
 ]
@@ -1225,7 +1255,7 @@ for doc, score in results:
     print(f"Score: {score:.3f} | {doc}")
 ```
 
-### 10.2 Clustering
+#### Clustering
 
 ```python
 import numpy as np
@@ -1295,7 +1325,7 @@ print(f"K-means silhouette score: {silhouette:.3f}")
 clusterer.visualize_clusters(embeddings, kmeans_labels)
 ```
 
-### 10.3 Classification
+#### Classification
 
 ```python
 import numpy as np
@@ -1356,103 +1386,46 @@ print(f"Accuracy: {results['accuracy']:.3f}")
 print(f"Classification report:\n{results['report']}")
 ```
 
----
+## Best Practices
 
-## 11. Best Practices
+### Embedding Generation
 
-### 11.1 Embedding Best Practices
+- **Use batch processing** for efficiency
+- **Implement caching** to avoid recomputation
+- **Normalize embeddings** for consistent similarity calculations
+- **Choose appropriate batch size** based on memory constraints
 
-```python
-class EmbeddingBestPractices:
-    """Best practices for using embeddings."""
+### Model Selection
 
-    @staticmethod
-    def normalize_embeddings(embeddings: np.ndarray) -> np.ndarray:
-        """Normalize embeddings to unit length."""
-        norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
-        return embeddings / norms
+- **Consider use case**: Semantic search, classification, clustering
+- **Evaluate tradeoffs**: Speed vs accuracy vs cost
+- **Test multiple models** on your specific data
+- **Monitor performance** in production
 
-    @staticmethod
-    def handle_out_of_vocabulary(
-        self,
-        text: str,
-        embedding_model
-    ) -> np.ndarray:
-        """Handle out-of-vocabulary tokens."""
-        try:
-            return embedding_model.encode(text)
-        except Exception as e:
-            # Return zero embedding for unknown text
-            embedding_dim = embedding_model.get_sentence_embedding_dimension()
-            return np.zeros(embedding_dim)
+### Storage
 
-    @staticmethod
-    def batch_efficiently(
-        self,
-        texts: List[str],
-        embedding_model,
-        batch_size: int = 32
-    ) -> np.ndarray:
-        """Batch process efficiently."""
-        from tqdm import tqdm
+- **Use efficient formats**: HDF5 for large datasets
+- **Include metadata**: Model name, dimensions, timestamp
+- **Implement versioning**: Track model changes
+- **Consider compression** for storage efficiency
 
-        all_embeddings = []
+### Production
 
-        for i in tqdm(range(0, len(texts), batch_size)):
-            batch = texts[i:i + batch_size]
-            batch_embeddings = embedding_model.encode(batch)
-            all_embeddings.append(batch_embeddings)
+- **Implement retry logic** for API calls
+- **Use connection pooling** for performance
+- **Monitor costs** for paid APIs
+- **Set appropriate timeouts** for reliability
 
-        return np.vstack(all_embeddings)
+### Evaluation
 
-    @staticmethod
-    def choose_right_model(
-        self,
-        use_case: str,
-        data_size: str,
-        latency_requirement: str
-    ) -> str:
-        """Choose the right embedding model."""
-        recommendations = {
-            "semantic_search": {
-                "small_data": "all-MiniLM-L6-v2",
-                "large_data": "BAAI/bge-large-en-v1.5",
-                "low_latency": "all-MiniLM-L6-v2",
-                "high_latency": "BAAI/bge-large-en-v1.5"
-            },
-            "classification": {
-                "small_data": "all-MiniLM-L6-v2",
-                "large_data": "BAAI/bge-large-en-v1.5"
-            },
-            "clustering": {
-                "any": "all-MiniLM-L6-v2"
-            }
-        }
+- **Use appropriate metrics**: Precision, recall, F1 for retrieval
+- **Establish baselines** before optimization
+- **Monitor drift** over time
+- **A/B test** different models
 
-        return recommendations.get(use_case, {}).get(data_size, "all-MiniLM-L6-v2")
+## Related Skills
 
-# Usage
-practices = EmbeddingBestPractices()
-
-# Normalize embeddings
-embeddings = np.random.randn(100, 384)
-normalized_embeddings = practices.normalize_embeddings(embeddings)
-print(f"Normalized shape: {normalized_embeddings.shape}")
-
-# Choose model
-model_name = practices.choose_right_model(
-    use_case="semantic_search",
-    data_size="large",
-    latency_requirement="low"
-)
-print(f"Recommended model: {model_name}")
-```
-
----
-
-## Additional Resources
-
-- [Sentence Transformers Documentation](https://www.sbert.net/)
-- [OpenAI Embeddings Documentation](https://platform.openai.com/docs/guides/embeddings)
-- [Cohere Embeddings Documentation](https://docs.cohere.com/reference/embed)
-- [BGE Models](https://github.com/FlagOpen/FlagEmbedding)
+- [`06-ai-ml-production/rag-implementation`](06-ai-ml-production/rag-implementation/SKILL.md)
+- [`06-ai-ml-production/vector-search`](06-ai-ml-production/vector-search/SKILL.md)
+- [`04-database/vector-database`](04-database/vector-database/SKILL.md)
+- [`07-document-processing/rag-chunking-metadata-strategy`](07-document-processing/rag-chunking-metadata-strategy/SKILL.md)

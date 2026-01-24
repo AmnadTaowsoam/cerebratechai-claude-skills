@@ -1,8 +1,18 @@
+---
+name: Achievements System
+description: Rewarding players for completing specific goals through progress tracking, unlocking logic, rarity calculation, and achievement display for gamification and player engagement.
+---
+
 # Achievements System
+
+> **Current Level:** Intermediate  
+> **Domain:** Gaming / Backend
+
+---
 
 ## Overview
 
-Achievements reward players for completing specific goals. This guide covers progress tracking, unlocking logic, and rarity calculation.
+Achievements reward players for completing specific goals. This guide covers progress tracking, unlocking logic, and rarity calculation for building engaging achievement systems that motivate players and increase retention.
 
 ## Achievement Types
 
@@ -555,18 +565,109 @@ interface AchievementCardProps {
 }
 ```
 
-## Best Practices
+---
 
-1. **Progress Tracking** - Track all relevant player actions
-2. **Notifications** - Celebrate achievement unlocks
-3. **Hidden Achievements** - Add mystery and discovery
-4. **Rarity** - Make rare achievements valuable
-5. **Points** - Reward with points/badges
-6. **Social** - Enable sharing achievements
-7. **Categories** - Organize by category
-8. **Analytics** - Track unlock rates
-9. **Balance** - Mix easy and hard achievements
-10. **Testing** - Test unlock conditions thoroughly
+## Quick Start
+
+### Achievement System
+
+```typescript
+interface Achievement {
+  id: string
+  name: string
+  description: string
+  type: 'progress' | 'milestone' | 'hidden'
+  condition: AchievementCondition
+  rarity: 'common' | 'rare' | 'epic' | 'legendary'
+  points: number
+}
+
+interface AchievementCondition {
+  type: 'kill_count' | 'level_complete' | 'time_played'
+  target: number
+}
+
+async function checkAchievements(playerId: string, action: PlayerAction) {
+  const achievements = await getUnlockedAchievements(playerId)
+  const allAchievements = await getAllAchievements()
+  
+  for (const achievement of allAchievements) {
+    if (achievements.includes(achievement.id)) continue
+    
+    if (checkCondition(achievement.condition, action)) {
+      await unlockAchievement(playerId, achievement.id)
+      await notifyPlayer(playerId, achievement)
+    }
+  }
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Achievement Design**: Design achievement system
+- [ ] **Progress Tracking**: Track all relevant actions
+- [ ] **Unlock Logic**: Implement unlock conditions
+- [ ] **Notifications**: Celebrate unlocks
+- [ ] **Rarity System**: Calculate and display rarity
+- [ ] **Points System**: Reward with points/badges
+- [ ] **Social Features**: Enable sharing
+- [ ] **Categories**: Organize achievements
+- [ ] **Analytics**: Track unlock rates
+- [ ] **Balance**: Mix easy and hard achievements
+- [ ] **Testing**: Test unlock conditions
+- [ ] **Documentation**: Document achievement system
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Too Easy or Too Hard
+
+```markdown
+# ❌ Bad - Unbalanced
+Achievement 1: "Play 1 game" (too easy)
+Achievement 2: "Play 1,000,000 games" (too hard)
+```
+
+```markdown
+# ✅ Good - Balanced progression
+Achievement 1: "Play 10 games"
+Achievement 2: "Play 100 games"
+Achievement 3: "Play 1,000 games"
+```
+
+### ❌ Don't: No Progress Indication
+
+```typescript
+// ❌ Bad - No progress shown
+if (kills >= 100) {
+  unlockAchievement('kill_100')
+}
+// Player doesn't know progress!
+```
+
+```typescript
+// ✅ Good - Show progress
+const progress = kills / 100
+showProgress('kill_100', progress)  // "Kill 100 enemies: 45/100"
+```
+
+---
+
+## Integration Points
+
+- **Leaderboards** (`38-gaming-features/leaderboards/`) - Achievement rankings
+- **Game Analytics** (`38-gaming-features/game-analytics/`) - Achievement metrics
+- **Matchmaking** (`38-gaming-features/matchmaking/`) - Game sessions
+
+---
+
+## Further Reading
+
+- [Achievement System Design](https://www.gamedeveloper.com/design/achievement-systems)
+- [Gamification Best Practices](https://www.gamify.com/gamification-blog/gamification-best-practices)
 
 ## Resources
 

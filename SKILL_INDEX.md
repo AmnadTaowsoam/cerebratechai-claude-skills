@@ -30,6 +30,19 @@
 | Add CI quality gates | `definition-of-done`, `lint-test-typecheck-policy`, `security-scan-policy` |
 | Improve LLM security | `llm-security-redteaming` |
 | Apply data governance basics | `data-contracts`, `pii-policy-enforcement`, `retention-archival`, `lineage-and-provenance` |
+| Implement IoT OTA updates | `differential-ota-updates`, `atomic-ab-partitioning`, `fleet-campaign-management` |
+| Secure IoT devices (Zero Trust) | `hardware-rooted-identity`, `mtls-pki-management`, `micro-segmentation-policy` |
+| Deploy AI at edge | `tinyml-microcontroller-ai`, `hybrid-inference-architecture`, `edge-model-compression` |
+| Build & govern AI agents | `agentic-ai-frameworks`, `multi-agent-orchestration`, `multi-agent-systems` |
+| Implement MLOps pipelines | `feature-store-implementation`, `drift-detection-retraining`, `model-registry-versioning` |
+| Serve ML models at scale | `high-performance-inference`, `serverless-inference`, `gpu-cluster-management` |
+| Price SaaS products | `usage-based-pricing`, `hybrid-pricing-strategy`, `billing-system-architecture` |
+| Calculate unit economics | `cloud-unit-economics` |
+| Manage tech products | `business-to-technical-spec`, `feature-prioritization`, `product-roadmap-communication` |
+| Go-to-market for tech | `product-led-growth`, `developer-relations-community`, `sales-engineering` |
+| AI compliance & ethics | `data-sovereignty-architecture`, `ai-explainability-ethics`, `ai-audit-trail` |
+| Sustainable AI (ESG) | `green-computing-finops` |
+| Post-Quantum security | `pqc-for-iot` |
 
 ### 00. Meta Skills
 | Skill | Description |
@@ -827,6 +840,178 @@
 
 ---
 
+## Enterprise Architecture Skills (73-89) - Coming Soon
+
+> **Note:** Skills 73-89 เป็นส่วนหนึ่งของ Enterprise Architecture Capability Roadmap 2025-2026 กำลังอยู่ในระหว่างการพัฒนา
+
+### 73. IoT Fleet Management
+| Skill | Description |
+|---|---|
+| [differential-ota-updates](73-iot-fleet-management/differential-ota-updates/SKILL.md) | Differential OTA & Delta Updates for bandwidth-constrained IoT devices |
+| [atomic-ab-partitioning](73-iot-fleet-management/atomic-ab-partitioning/SKILL.md) | A/B Partitioning & Atomic Updates for fault-tolerant firmware updates |
+| [fleet-campaign-management](73-iot-fleet-management/fleet-campaign-management/SKILL.md) | Fleet Campaign Management with phased rollouts and canary deployments |
+
+### 74. IoT Zero Trust Security
+| Skill | Description |
+|---|---|
+| [hardware-rooted-identity](74-iot-zero-trust-security/hardware-rooted-identity/SKILL.md) | Hardware-Rooted Identity & Attestation using HSM/TPM/SE |
+| [mtls-pki-management](74-iot-zero-trust-security/mtls-pki-management/SKILL.md) | Mutual TLS (mTLS) & PKI Management for device authentication |
+| [micro-segmentation-policy](74-iot-zero-trust-security/micro-segmentation-policy/SKILL.md) | Micro-Segmentation & Dynamic Policy for IoT network security |
+| [secure-device-provisioning](74-iot-zero-trust-security/secure-device-provisioning/SKILL.md) | Secure Device Provisioning with zero-touch enrollment |
+| [runtime-threat-detection](74-iot-zero-trust-security/runtime-threat-detection/SKILL.md) | Runtime Threat Detection & Response for edge devices |
+
+### 75. Edge Computing
+| Skill | Description |
+|---|---|
+| [lightweight-kubernetes](75-edge-computing/lightweight-kubernetes/SKILL.md) | Lightweight Kubernetes (K3s/MicroK8s) for edge deployments |
+| [edge-cloud-sync](75-edge-computing/edge-cloud-sync/SKILL.md) | Edge-Cloud Synchronization & Offline Operation patterns |
+| [edge-ai-acceleration](75-edge-computing/edge-ai-acceleration/SKILL.md) | Edge AI Hardware Acceleration with GPU/NPU optimization |
+| [edge-observability](75-edge-computing/edge-observability/SKILL.md) | Edge Observability & Telemetry for distributed systems |
+| [edge-security-compliance](75-edge-computing/edge-security-compliance/SKILL.md) | Edge Security & Compliance for containerized workloads |
+
+### 76. IoT Infrastructure
+| Skill | Description |
+|---|---|
+| [advanced-iac-iot](76-iot-infrastructure/advanced-iac-iot/SKILL.md) | Advanced IaC with CDK/Terraform for IoT infrastructure |
+| [chaos-engineering-iot](76-iot-infrastructure/chaos-engineering-iot/SKILL.md) | Chaos Engineering for IoT systems and thundering herd testing |
+| [gitops-iot-infrastructure](76-iot-infrastructure/gitops-iot-infrastructure/SKILL.md) | GitOps for IoT Infrastructure with ArgoCD/Flux |
+| [multi-cloud-iot](76-iot-infrastructure/multi-cloud-iot/SKILL.md) | Multi-Cloud IoT Architecture for vendor independence |
+| [disaster-recovery-iot](76-iot-infrastructure/disaster-recovery-iot/SKILL.md) | Disaster Recovery for IoT Systems with RTO/RPO planning |
+
+### 77. MLOps & Data Engineering
+| Skill | Description |
+|---|---|
+| [feature-store-implementation](77-mlops-data-engineering/feature-store-implementation/SKILL.md) | Feature Store Implementation with Feast/Tecton |
+| [drift-detection-retraining](77-mlops-data-engineering/drift-detection-retraining/SKILL.md) | Automated Drift Detection & Retraining pipelines |
+| [model-registry-versioning](77-mlops-data-engineering/model-registry-versioning/SKILL.md) | Model Registry & Version Control with MLflow |
+| [data-pipeline-orchestration](77-mlops-data-engineering/data-pipeline-orchestration/SKILL.md) | Data Pipeline Orchestration with Airflow/Dagster |
+| [experiment-tracking](77-mlops-data-engineering/experiment-tracking/SKILL.md) | Experiment Tracking & Reproducibility |
+| [continuous-training-pipelines](77-mlops-data-engineering/continuous-training-pipelines/SKILL.md) | Continuous Training (CT) Pipelines |
+| [data-labeling-pipeline](77-mlops-data-engineering/data-labeling-pipeline/SKILL.md) | Data Labeling Pipeline with active learning |
+| [ml-data-versioning](77-mlops-data-engineering/ml-data-versioning/SKILL.md) | ML Data Versioning with DVC/LakeFS |
+| [model-testing-validation](77-mlops-data-engineering/model-testing-validation/SKILL.md) | Model Testing & Validation strategies |
+| [ml-metadata-management](77-mlops-data-engineering/ml-metadata-management/SKILL.md) | ML Metadata Management for governance |
+
+### 78. Inference & Model Serving
+| Skill | Description |
+|---|---|
+| [high-performance-inference](78-inference-model-serving/high-performance-inference/SKILL.md) | High-Performance Inference Servers (Triton/TorchServe) |
+| [model-optimization-quantization](78-inference-model-serving/model-optimization-quantization/SKILL.md) | Model Optimization & Quantization with TensorRT |
+| [serverless-inference](78-inference-model-serving/serverless-inference/SKILL.md) | Serverless Inference & Scale-to-Zero patterns |
+| [model-caching-warmpool](78-inference-model-serving/model-caching-warmpool/SKILL.md) | Model Caching & Warm Pool management |
+| [inference-pipeline-orchestration](78-inference-model-serving/inference-pipeline-orchestration/SKILL.md) | Inference Pipeline Orchestration with Seldon/KServe |
+| [ab-testing-ml-models](78-inference-model-serving/ab-testing-ml-models/SKILL.md) | A/B Testing for ML Models |
+| [model-versioning-production](78-inference-model-serving/model-versioning-production/SKILL.md) | Model Versioning in Production |
+| [gpu-cluster-management](78-inference-model-serving/gpu-cluster-management/SKILL.md) | GPU Cluster Management and scheduling |
+| [realtime-feature-engineering](78-inference-model-serving/realtime-feature-engineering/SKILL.md) | Real-time Feature Engineering |
+| [inference-monitoring](78-inference-model-serving/inference-monitoring/SKILL.md) | Inference Monitoring & Alerting |
+
+### 79. Edge AI & TinyML
+| Skill | Description |
+|---|---|
+| [tinyml-microcontroller-ai](79-edge-ai-tinyml/tinyml-microcontroller-ai/SKILL.md) | TinyML & Microcontroller AI for constrained devices |
+| [hybrid-inference-architecture](79-edge-ai-tinyml/hybrid-inference-architecture/SKILL.md) | Hybrid Inference Architecture (Edge + Cloud) |
+| [on-device-model-training](79-edge-ai-tinyml/on-device-model-training/SKILL.md) | On-device Model Training for personalization |
+| [edge-model-compression](79-edge-ai-tinyml/edge-model-compression/SKILL.md) | Edge Model Compression techniques |
+| [edge-ai-development-workflow](79-edge-ai-tinyml/edge-ai-development-workflow/SKILL.md) | Edge AI Development Workflow and CI/CD |
+
+### 80. Agentic AI & Advanced Learning
+| Skill | Description |
+|---|---|
+| [agentic-ai-frameworks](80-agentic-ai-advanced-learning/agentic-ai-frameworks/SKILL.md) | Agentic AI Frameworks (ReAct, LangChain, LangGraph) |
+| [federated-learning-privacy](80-agentic-ai-advanced-learning/federated-learning-privacy/SKILL.md) | Federated Learning & Privacy-preserving ML |
+| [multi-agent-systems](80-agentic-ai-advanced-learning/multi-agent-systems/SKILL.md) | Multi-Agent Systems and coordination |
+| [rag-advanced](80-agentic-ai-advanced-learning/rag-advanced/SKILL.md) | Advanced RAG patterns (Hybrid, Multi-modal) |
+| [llm-finetuning-alignment](80-agentic-ai-advanced-learning/llm-finetuning-alignment/SKILL.md) | LLM Fine-tuning & Alignment (LoRA, RLHF) |
+| [prompt-engineering-advanced](80-agentic-ai-advanced-learning/prompt-engineering-advanced/SKILL.md) | Advanced Prompt Engineering techniques |
+| [llm-evaluation-benchmarking](80-agentic-ai-advanced-learning/llm-evaluation-benchmarking/SKILL.md) | LLM Evaluation & Benchmarking |
+| [llm-security-redteaming](80-agentic-ai-advanced-learning/llm-security-redteaming/SKILL.md) | LLM Security & Red Teaming |
+| [ai-workflow-orchestration](80-agentic-ai-advanced-learning/ai-workflow-orchestration/SKILL.md) | AI Workflow Orchestration |
+| [knowledge-graph-integration](80-agentic-ai-advanced-learning/knowledge-graph-integration/SKILL.md) | Knowledge Graph Integration with LLMs |
+
+### 81. SaaS FinOps & Pricing
+| Skill | Description |
+|---|---|
+| [cloud-unit-economics](81-saas-finops-pricing/cloud-unit-economics/SKILL.md) | Cloud Unit Economics (FinOps) for cost management |
+| [usage-based-pricing](81-saas-finops-pricing/usage-based-pricing/SKILL.md) | Usage-Based Pricing Architecture |
+| [hybrid-pricing-strategy](81-saas-finops-pricing/hybrid-pricing-strategy/SKILL.md) | Hybrid Pricing Strategy (Subscription + Usage) |
+| [revenue-recognition-compliance](81-saas-finops-pricing/revenue-recognition-compliance/SKILL.md) | Revenue Recognition & Compliance (ASC 606) |
+| [customer-lifetime-value](81-saas-finops-pricing/customer-lifetime-value/SKILL.md) | Customer Lifetime Value (CLV) Modeling |
+| [cost-optimization-automation](81-saas-finops-pricing/cost-optimization-automation/SKILL.md) | Cost Optimization Automation |
+| [billing-system-architecture](81-saas-finops-pricing/billing-system-architecture/SKILL.md) | Billing System Architecture |
+| [financial-forecasting-tech](81-saas-finops-pricing/financial-forecasting-tech/SKILL.md) | Financial Forecasting for Tech companies |
+| [saas-metrics-dashboard](81-saas-finops-pricing/saas-metrics-dashboard/SKILL.md) | SaaS Metrics Dashboard (MRR/ARR/NRR) |
+| [pricing-experimentation](81-saas-finops-pricing/pricing-experimentation/SKILL.md) | Pricing Experimentation and A/B testing |
+
+### 82. Technical Product Management
+| Skill | Description |
+|---|---|
+| [business-to-technical-spec](82-technical-product-management/business-to-technical-spec/SKILL.md) | Business Model Canvas to Technical Spec |
+| [api-first-product-strategy](82-technical-product-management/api-first-product-strategy/SKILL.md) | API-First Product Strategy |
+| [platform-product-design](82-technical-product-management/platform-product-design/SKILL.md) | Platform Product Design |
+| [product-discovery-validation](82-technical-product-management/product-discovery-validation/SKILL.md) | Product Discovery & Validation |
+| [product-analytics-implementation](82-technical-product-management/product-analytics-implementation/SKILL.md) | Product Analytics Implementation |
+| [feature-prioritization](82-technical-product-management/feature-prioritization/SKILL.md) | Feature Prioritization Frameworks (RICE, ICE) |
+| [technical-debt-prioritization](82-technical-product-management/technical-debt-prioritization/SKILL.md) | Technical Debt Prioritization |
+| [competitive-intelligence](82-technical-product-management/competitive-intelligence/SKILL.md) | Competitive Intelligence |
+| [product-roadmap-communication](82-technical-product-management/product-roadmap-communication/SKILL.md) | Product Roadmap Communication |
+| [cross-functional-leadership](82-technical-product-management/cross-functional-leadership/SKILL.md) | Cross-functional Leadership |
+
+### 83. Go-To-Market for Tech
+| Skill | Description |
+|---|---|
+| [product-led-growth](83-go-to-market-tech/product-led-growth/SKILL.md) | Product-Led Growth (PLG) Mechanics |
+| [developer-relations-community](83-go-to-market-tech/developer-relations-community/SKILL.md) | Developer Relations & Community Building |
+| [technical-content-marketing](83-go-to-market-tech/technical-content-marketing/SKILL.md) | Technical Content Marketing |
+| [sales-engineering](83-go-to-market-tech/sales-engineering/SKILL.md) | Sales Engineering and POC management |
+| [enterprise-sales-alignment](83-go-to-market-tech/enterprise-sales-alignment/SKILL.md) | Enterprise Sales Alignment |
+| [customer-success-engineering](83-go-to-market-tech/customer-success-engineering/SKILL.md) | Customer Success Engineering |
+| [partner-program-design](83-go-to-market-tech/partner-program-design/SKILL.md) | Partner Program Design |
+| [analyst-relations](83-go-to-market-tech/analyst-relations/SKILL.md) | Analyst Relations (Gartner/Forrester) |
+| [launch-strategy-execution](83-go-to-market-tech/launch-strategy-execution/SKILL.md) | Launch Strategy & Execution |
+| [international-expansion](83-go-to-market-tech/international-expansion/SKILL.md) | International Expansion |
+
+### 84. Compliance & AI Governance
+| Skill | Description |
+|---|---|
+| [data-sovereignty-architecture](84-compliance-ai-governance/data-sovereignty-architecture/SKILL.md) | Data Sovereignty Architecture |
+| [ai-explainability-ethics](84-compliance-ai-governance/ai-explainability-ethics/SKILL.md) | AI Explainability & Ethics |
+
+---
+
+## Future-Ready Enterprise Skills (85-89) - Coming Soon
+
+> **Note:** Skills 85-89 เตรียมความพร้อมสำหรับ 2026-2027 รวมถึง Sustainable AI, Multi-Agent Governance, และ Post-Quantum Cryptography
+
+### 85. Future Compliance
+| Skill | Description |
+|---|---|
+| [ai-audit-trail](85-future-compliance/ai-audit-trail/SKILL.md) | AI Audit Trail & Accountability for regulatory compliance |
+| [cross-border-data-transfer](85-future-compliance/cross-border-data-transfer/SKILL.md) | Cross-border Data Transfer Compliance (SCCs, BCRs) |
+| [algorithmic-accountability](85-future-compliance/algorithmic-accountability/SKILL.md) | Algorithmic Accountability and Impact Assessments |
+
+### 86. Sustainable AI
+| Skill | Description |
+|---|---|
+| [green-computing-finops](86-sustainable-ai/green-computing-finops/SKILL.md) | Sustainable AI & Green Computing (FinOps 2.0) - Carbon-aware computing and ESG compliance |
+
+### 87. Multi-Agent Governance
+| Skill | Description |
+|---|---|
+| [multi-agent-orchestration](87-multi-agent-governance/multi-agent-orchestration/SKILL.md) | Multi-Agent Orchestration & Governance with Human-in-the-Loop |
+
+### 88. AI Supply Chain Security
+| Skill | Description |
+|---|---|
+| [model-bom-security](88-ai-supply-chain-security/model-bom-security/SKILL.md) | AI Supply Chain Security - Software/Model Bill of Materials (SBOM/MBOM) |
+
+### 89. Post-Quantum Cryptography
+| Skill | Description |
+|---|---|
+| [pqc-for-iot](89-post-quantum-cryptography/pqc-for-iot/SKILL.md) | Post-Quantum Cryptography (PQC) for IoT - Quantum-resistant algorithms and Crypto-agility |
+
+---
+
 ## By Technology
 
 ### Languages
@@ -867,9 +1052,13 @@
 |------------|--------|
 | **OpenAI** | `llm-integration`, `prompt-engineering` |
 | **Claude** | `llm-integration`, `llm-guardrails` |
-| **LangChain** | `ai-agents`, `rag-implementation` |
+| **LangChain/LangGraph** | `agentic-ai-frameworks`, `ai-workflow-orchestration`, `rag-advanced` |
 | **PyTorch** | `pytorch-deployment`, `model-training` |
 | **YOLO** | `yolo-integration` |
+| **NVIDIA Triton** | `high-performance-inference`, `model-optimization-quantization` |
+| **TensorFlow Lite** | `tinyml-microcontroller-ai`, `edge-model-compression` |
+| **Feast/Tecton** | `feature-store-implementation` |
+| **MLflow** | `model-registry-versioning`, `experiment-tracking` |
 
 ### DevOps
 | Technology | Skills |
@@ -883,7 +1072,38 @@
 | Technology | Skills |
 |------------|--------|
 | **AWS** | `s3-integration`, `secrets-management` |
+| **AWS IoT** | `hardware-rooted-identity`, `differential-ota-updates`, `fleet-campaign-management` |
+| **Azure IoT** | `secure-device-provisioning`, `runtime-threat-detection` |
 | **Vercel** | `nextjs-patterns`, `nextjs-seo` |
+| **K3s/KubeEdge** | `lightweight-kubernetes`, `edge-cloud-sync` |
+| **Terraform/CDK** | `advanced-iac-iot`, `terraform-infrastructure` |
+
+### IoT & Edge
+| Technology | Related Skills |
+|------------|----------------|
+| **AWS IoT Core** | `hardware-rooted-identity`, `differential-ota-updates`, `fleet-campaign-management` |
+| **Azure IoT Hub** | `secure-device-provisioning`, `fleet-campaign-management`, `runtime-threat-detection` |
+| **K3s/KubeEdge** | `lightweight-kubernetes`, `edge-cloud-sync`, `edge-observability` |
+| **MQTT** | `mqtt-integration`, `iot-protocols` |
+| **Mender.io** | `atomic-ab-partitioning`, `fleet-campaign-management` |
+
+### AI/ML Production
+| Technology | Related Skills |
+|------------|----------------|
+| **NVIDIA Triton** | `high-performance-inference`, `model-optimization-quantization` |
+| **TensorFlow Lite** | `tinyml-microcontroller-ai`, `edge-model-compression` |
+| **LangChain/LangGraph** | `agentic-ai-frameworks`, `ai-workflow-orchestration`, `multi-agent-orchestration` |
+| **Feast/Tecton** | `feature-store-implementation` |
+| **MLflow** | `model-registry-versioning`, `experiment-tracking` |
+| **Evidently AI/Arize** | `drift-detection-retraining`, `inference-monitoring` |
+
+### Business & Finance
+| Technology | Related Skills |
+|------------|----------------|
+| **Stripe** | `usage-based-pricing`, `billing-system-architecture`, `stripe-integration` |
+| **Amplitude/Mixpanel** | `product-analytics-implementation` |
+| **ChartMogul** | `saas-metrics-dashboard` |
+| **Cloud Carbon Footprint** | `green-computing-finops` |
 
 ---
 
@@ -1439,6 +1659,22 @@
 
 ## Statistics
 
-- **Total Skills**: 477+
-- **Categories**: 73
-- **Last Updated**: January 19, 2026
+- **Total Skills**: 567+ (including 92 new Enterprise Skills 73-164)
+- **Categories**: 89
+- **Last Updated**: January 24, 2026
+
+### Skill Breakdown by Domain
+| Domain | Skill Range | Count |
+|--------|-------------|-------|
+| Core Skills | 00-72 | 477 |
+| Enterprise IoT & Cloud | 73-90 | 18 |
+| AI & Data Architecture | 91-125 | 35 |
+| Business & Product Strategy | 126-157 | 32 |
+| Future-Ready Enterprise | 158-164 | 7 |
+
+### Implementation Status
+| Status | Count | Notes |
+|--------|-------|-------|
+| ✅ Complete (SKILL.md created) | 7 | Skills 158-164 |
+| ⬜ Pending (Directories only) | 85 | Skills 73-157 - Ready for content |
+| 📝 In Progress | 0 | Currently being written |

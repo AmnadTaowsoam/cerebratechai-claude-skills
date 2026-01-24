@@ -1,12 +1,24 @@
+---
+name: Responsive Design
+description: Creating websites and applications that work well on all devices and screen sizes using flexible layouts, media queries, and mobile-first approaches.
+---
+
 # Responsive Design
 
-## Overview
-
-Responsive design ensures websites work well on all devices and screen sizes.
+> **Current Level:** Intermediate  
+> **Domain:** UX/UI Design / Frontend
 
 ---
 
-## 1. Responsive Design Principles
+## Overview
+
+Responsive design ensures websites work well on all devices and screen sizes. Effective responsive design uses flexible layouts, CSS media queries, fluid typography, and mobile-first approaches to create seamless experiences across desktop, tablet, and mobile devices.
+
+---
+
+## Core Concepts
+
+### 1. Responsive Design Principles
 
 ### Core Principles
 
@@ -980,3 +992,194 @@ Header stays visible while scrolling.
   /* Retina displays */
 }
 ```
+
+---
+
+## Quick Start
+
+### Mobile-First Responsive Layout
+
+```css
+/* Base styles (mobile) */
+.container {
+  width: 100%;
+  padding: 16px;
+}
+
+.column {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+  .container {
+    max-width: 750px;
+    margin: 0 auto;
+  }
+  
+  .columns {
+    display: flex;
+    gap: 16px;
+  }
+  
+  .column {
+    flex: 1;
+  }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1200px;
+  }
+}
+```
+
+### Flexible Images
+
+```html
+<!-- Responsive image -->
+<img 
+  src="image.jpg" 
+  srcset="image-small.jpg 480w, image-medium.jpg 768w, image-large.jpg 1200w"
+  sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, 33vw"
+  alt="Description"
+>
+
+<!-- Or use CSS -->
+<style>
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+</style>
+```
+
+### Viewport Meta Tag
+
+```html
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Viewport Meta**: Include viewport meta tag
+- [ ] **Mobile-First**: Design mobile-first, enhance for larger screens
+- [ ] **Flexible Layouts**: Use flexible units (%, em, rem, vw, vh)
+- [ ] **Media Queries**: Use appropriate breakpoints
+- [ ] **Responsive Images**: Use srcset and sizes attributes
+- [ ] **Touch Targets**: Ensure touch targets are at least 44x44px
+- [ ] **Typography**: Use relative units (rem, em) for text
+- [ ] **Testing**: Test on real devices, not just browser resize
+- [ ] **Performance**: Optimize images for different screen sizes
+- [ ] **Navigation**: Adapt navigation for mobile (hamburger menu)
+- [ ] **Forms**: Make forms mobile-friendly
+- [ ] **Tables**: Make tables scrollable or responsive on mobile
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Fixed Widths
+
+```css
+/* ❌ Bad - Fixed width breaks on mobile */
+.container {
+  width: 1200px;  /* Too wide for mobile! */
+}
+```
+
+```css
+/* ✅ Good - Flexible width */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+```
+
+### ❌ Don't: Missing Viewport Meta
+
+```html
+<!-- ❌ Bad - No viewport meta -->
+<head>
+  <title>My Site</title>
+</head>
+```
+
+```html
+<!-- ✅ Good - Viewport meta included -->
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Site</title>
+</head>
+```
+
+### ❌ Don't: Desktop-First Approach
+
+```css
+/* ❌ Bad - Desktop styles override mobile */
+.desktop-layout {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 768px) {
+  .desktop-layout {
+    display: block;  /* Override needed */
+  }
+}
+```
+
+```css
+/* ✅ Good - Mobile-first */
+.mobile-layout {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .mobile-layout {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+```
+
+### ❌ Don't: Non-Responsive Images
+
+```html
+<!-- ❌ Bad - Fixed size image -->
+<img src="large-image.jpg" width="1200" height="800">
+```
+
+```html
+<!-- ✅ Good - Responsive image -->
+<img 
+  src="image.jpg" 
+  srcset="image-small.jpg 480w, image-large.jpg 1200w"
+  sizes="100vw"
+  alt="Description"
+  style="max-width: 100%; height: auto;"
+>
+```
+
+---
+
+## Integration Points
+
+- **CSS/Tailwind** (`02-frontend/tailwind-patterns/`) - Responsive utilities
+- **Accessibility** (`22-ux-ui-design/accessibility/`) - Mobile accessibility
+- **Design Systems** (`22-ux-ui-design/design-systems/`) - Responsive components
+
+---
+
+## Further Reading
+
+- [Responsive Web Design Basics](https://web.dev/responsive-web-design-basics/)
+- [MDN Responsive Design](https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Responsive_Design)
+- [A List Apart: Responsive Web Design](https://alistapart.com/article/responsive-web-design/)

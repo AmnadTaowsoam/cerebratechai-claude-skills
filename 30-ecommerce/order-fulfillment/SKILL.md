@@ -1,10 +1,24 @@
+---
+name: Order Fulfillment Workflow
+description: Managing the complete order fulfillment process from picking and packing to shipping and returns processing, including warehouse management, 3PL integration, and fulfillment tracking.
+---
+
 # Order Fulfillment Workflow
+
+> **Current Level:** Intermediate  
+> **Domain:** E-commerce / Operations
+
+---
 
 ## Overview
 
-Order fulfillment manages the complete process from picking and packing to shipping and returns processing.
+Order fulfillment manages the complete process from picking and packing to shipping and returns processing. Effective fulfillment systems include warehouse management, batch processing, quality control, shipping label generation, and integration with 3PL providers.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Fulfillment Workflow](#fulfillment-workflow)
 2. [Warehouse Management](#warehouse-management)
@@ -1683,9 +1697,106 @@ async function handleFulfillmentError(
 
 ---
 
-## Resources
+---
+
+## Quick Start
+
+### Fulfillment Workflow
+
+```typescript
+interface Fulfillment {
+  id: string
+  orderId: string
+  status: 'pending' | 'picking' | 'packing' | 'shipped' | 'delivered'
+  warehouseId: string
+  trackingNumber?: string
+  shippedAt?: Date
+}
+
+async function processFulfillment(orderId: string) {
+  const order = await getOrder(orderId)
+  
+  // 1. Create fulfillment
+  const fulfillment = await db.fulfillments.create({
+    data: {
+      orderId,
+      status: 'pending',
+      warehouseId: selectWarehouse(order)
+    }
+  })
+  
+  // 2. Generate pick list
+  await generatePickList(fulfillment.id)
+  
+  // 3. Update status
+  await updateFulfillmentStatus(fulfillment.id, 'picking')
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Workflow**: Complete fulfillment workflow
+- [ ] **Warehouse Management**: Multi-warehouse support
+- [ ] **Pick List**: Generate pick lists
+- [ ] **Packing**: Packing slip generation
+- [ ] **Shipping Labels**: Shipping label generation
+- [ ] **Quality Control**: QC checkpoints
+- [ ] **Tracking**: Order tracking integration
+- [ ] **3PL Integration**: Third-party logistics integration
+- [ ] **SLA Management**: Fulfillment SLA tracking
+- [ ] **Returns**: Returns processing
+- [ ] **Analytics**: Fulfillment analytics
+- [ ] **Documentation**: Document fulfillment process
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Status Tracking
+
+```typescript
+// ❌ Bad - No status tracking
+await shipOrder(orderId)
+// Status unknown!
+```
+
+```typescript
+// ✅ Good - Status tracking
+await updateFulfillmentStatus(fulfillmentId, 'shipped')
+await updateOrderStatus(orderId, 'shipped')
+await sendTrackingEmail(orderId)
+```
+
+### ❌ Don't: No Quality Control
+
+```markdown
+# ❌ Bad - Ship without QC
+Pick → Pack → Ship
+# No quality check!
+```
+
+```markdown
+# ✅ Good - QC checkpoints
+Pick → QC Check → Pack → QC Check → Ship
+```
+
+---
+
+## Integration Points
+
+- **Order Management** (`30-ecommerce/order-management/`) - Order processing
+- **Inventory Management** (`30-ecommerce/inventory-management/`) - Stock management
+- **Shipping Integration** (`30-ecommerce/shipping-integration/`) - Shipping providers
+
+---
+
+## Further Reading
 
 - [Shopify Fulfillment](https://shopify.dev/api/admin-graphql/latest/objects/Fulfillment)
 - [WooCommerce Orders](https://woocommerce.github.io/woocommerce-rest-api-docs/#orders)
 - [Magento 2 Order Management](https://devdocs.magento.com/guides/v2.4/rest/bk-rest-api.html)
+
+## Resources
 - [BigCommerce Orders](https://developer.bigcommerce.com/api-reference/orders/orders-api)

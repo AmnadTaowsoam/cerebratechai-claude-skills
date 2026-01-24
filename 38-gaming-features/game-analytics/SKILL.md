@@ -1,8 +1,18 @@
+---
+name: Game Analytics
+description: Tracking player behavior and game performance through metrics, event tracking, funnel analysis, retention metrics, and integration with analytics platforms for data-driven game development.
+---
+
 # Game Analytics
+
+> **Current Level:** Intermediate  
+> **Domain:** Gaming / Analytics
+
+---
 
 ## Overview
 
-Game analytics tracks player behavior and game performance. This guide covers metrics, event tracking, funnel analysis, and analytics platforms.
+Game analytics tracks player behavior and game performance. This guide covers metrics, event tracking, funnel analysis, and analytics platforms for understanding player engagement, optimizing gameplay, and improving retention.
 
 ## Game Metrics
 
@@ -553,6 +563,125 @@ export function AnalyticsDashboard() {
 8. **Cohorts** - Analyze by install date
 9. **Dashboards** - Create actionable dashboards
 10. **Alerts** - Set up alerts for anomalies
+
+---
+
+## Quick Start
+
+### Event Tracking
+
+```typescript
+// Track game events
+function trackEvent(event: GameEvent) {
+  analytics.track(event.name, {
+    userId: event.userId,
+    sessionId: event.sessionId,
+    timestamp: Date.now(),
+    ...event.properties
+  })
+}
+
+// Track player actions
+trackEvent({
+  name: 'level_complete',
+  userId: 'player-123',
+  sessionId: 'session-456',
+  properties: {
+    level: 5,
+    score: 10000,
+    time: 120  // seconds
+  }
+})
+```
+
+### Key Metrics
+
+```typescript
+interface GameMetrics {
+  dau: number  // Daily Active Users
+  mau: number  // Monthly Active Users
+  retention: {
+    day1: number
+    day7: number
+    day30: number
+  }
+  arpu: number  // Average Revenue Per User
+  ltv: number   // Lifetime Value
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Event Tracking**: Track all game events
+- [ ] **Key Metrics**: Define key metrics (DAU, retention, etc.)
+- [ ] **Funnel Analysis**: Player funnel analysis
+- [ ] **Cohort Analysis**: Cohort retention
+- [ ] **Segmentation**: Segment players
+- [ ] **A/B Testing**: Test features
+- [ ] **Dashboards**: Analytics dashboards
+- [ ] **Alerts**: Alerts for anomalies
+- [ ] **Privacy**: Respect user privacy
+- [ ] **Sampling**: Use sampling for high volume
+- [ ] **Documentation**: Document metrics
+- [ ] **Action**: Act on insights
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Track Everything
+
+```typescript
+// ❌ Bad - Track every action
+trackEvent('mouse_move')
+trackEvent('key_press')
+trackEvent('button_hover')
+// Too much data!
+```
+
+```typescript
+// ✅ Good - Track key events
+trackEvent('level_start')
+trackEvent('level_complete')
+trackEvent('purchase')
+// Focused tracking
+```
+
+### ❌ Don't: No Privacy
+
+```typescript
+// ❌ Bad - Track personal data
+trackEvent('player_action', {
+  userId: user.id,
+  email: user.email,  // Privacy issue!
+  location: user.location
+})
+```
+
+```typescript
+// ✅ Good - Anonymize
+trackEvent('player_action', {
+  userId: hashUserId(user.id),  // Anonymized
+  // No personal data
+})
+```
+
+---
+
+## Integration Points
+
+- **Achievements** (`38-gaming-features/achievements/`) - Achievement metrics
+- **Leaderboards** (`38-gaming-features/leaderboards/`) - Ranking metrics
+- **Analytics** (`23-business-analytics/`) - General analytics
+
+---
+
+## Further Reading
+
+- [Game Analytics Best Practices](https://www.gamedeveloper.com/business/game-analytics-best-practices)
+- [Player Retention](https://www.appsflyer.com/resources/guides/retention/)
 
 ## Resources
 

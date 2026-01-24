@@ -1,8 +1,20 @@
+---
+name: Business Intelligence
+description: Transforming raw data into actionable insights through reporting, analytics, and visualization using BI tools like Tableau, Looker, Power BI, and Metabase to support data-driven decision making.
+---
+
 # Business Intelligence
 
-## What is Business Intelligence
+> **Current Level:** Intermediate  
+> **Domain:** Business Analytics / Data Engineering
 
-Business Intelligence (BI) is the process of transforming raw data into actionable insights through reporting, analytics, and visualization to support data-driven decision making.
+---
+
+## Overview
+
+Business Intelligence (BI) is the process of transforming raw data into actionable insights through reporting, analytics, and visualization to support data-driven decision making. Effective BI systems integrate data from multiple sources, transform it into a usable format, and present it through dashboards and reports.
+
+## What is Business Intelligence
 
 ### Core Components
 
@@ -1053,4 +1065,106 @@ def add_card(dashboard_id, card_id):
 - [ ] Update dashboards regularly
 - [ ] Gather user feedback
 - [ ] Optimize performance
+```
+
+---
+
+## Quick Start
+
+### Metabase Setup
+
+```bash
+# Docker setup
+docker run -d -p 3000:3000 \
+  -e MB_DB_TYPE=postgres \
+  -e MB_DB_DBNAME=metabase \
+  -e MB_DB_USER=metabase \
+  -e MB_DB_PASS=password \
+  metabase/metabase
+```
+
+### Create Dashboard
+
+```sql
+-- Sales dashboard query
+SELECT 
+  DATE_TRUNC('month', created_at) as month,
+  SUM(total) as revenue,
+  COUNT(*) as orders
+FROM orders
+WHERE created_at >= CURRENT_DATE - INTERVAL '12 months'
+GROUP BY DATE_TRUNC('month', created_at)
+ORDER BY month DESC
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Data Sources**: Identify and connect all data sources
+- [ ] **ETL/ELT**: Set up data transformation pipeline
+- [ ] **Data Warehouse**: Configure data warehouse
+- [ ] **BI Tool**: Select and configure BI tool
+- [ ] **Dashboards**: Create key business dashboards
+- [ ] **Access Control**: Set up user permissions
+- [ ] **Performance**: Optimize query performance
+- [ ] **Documentation**: Document data models and dashboards
+- [ ] **Training**: Train users on BI tools
+- [ ] **Monitoring**: Monitor BI system health
+- [ ] **Backup**: Backup dashboards and configurations
+- [ ] **Governance**: Establish data governance policies
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Data Model
+
+```sql
+-- ❌ Bad - Direct query on production
+SELECT * FROM orders o
+JOIN users u ON o.user_id = u.id
+JOIN products p ON o.product_id = p.id
+-- Complex joins, slow queries!
+```
+
+```sql
+-- ✅ Good - Pre-aggregated in data warehouse
+SELECT * FROM sales_summary_monthly
+-- Fast, optimized for analytics
+```
+
+### ❌ Don't: Too Many Dashboards
+
+```markdown
+# ❌ Bad - Dashboard overload
+- Dashboard 1
+- Dashboard 2
+- Dashboard 3
+# ... 50 more dashboards
+```
+
+```markdown
+# ✅ Good - Focused dashboards
+- Executive Dashboard (KPIs)
+- Sales Dashboard
+- Marketing Dashboard
+# 5-10 key dashboards
+```
+
+---
+
+## Integration Points
+
+- **Dashboard Design** (`23-business-analytics/dashboard-design/`) - Dashboard layouts
+- **KPI Metrics** (`23-business-analytics/kpi-metrics/`) - Key metrics
+- **SQL for Analytics** (`23-business-analytics/sql-for-analytics/`) - Query patterns
+
+---
+
+## Further Reading
+
+- [Tableau Documentation](https://help.tableau.com/)
+- [Looker Documentation](https://cloud.google.com/looker/docs)
+- [Metabase Documentation](https://www.metabase.com/docs/)
 - [ ] Document changes

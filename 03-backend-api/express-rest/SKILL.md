@@ -1,8 +1,347 @@
 # Express.js REST API Patterns
 
-## 1. App Initialization
+---
 
-### Basic Express Setup
+## 1. Executive Summary & Strategic Necessity
+
+### 1.1 Context (ภาษาไทย)
+
+Express.js เป็น minimal และ flexible Node.js web application framework ที่ใช้สำหรับ building REST APIs โดยมี middleware system ที่ powerful, routing ที่ flexible, และ ecosystem ที่ large
+
+Express.js ประกอบด้วย:
+- **Minimal Core** - Minimal core ด้วย middleware system ที่ powerful
+- **Flexible Routing** - Flexible routing ด้วย route parameters
+- **Middleware Stack** - Middleware stack สำหรับ request/response processing
+- **Error Handling** - Built-in error handling
+- **Security** - Security middleware และ best practices
+- **Production-Ready** - Production-ready ด้วย clustering และ graceful shutdown
+
+### 1.2 Business Impact (ภาษาไทย)
+
+**ผลกระทบทางธุรกิจ:**
+
+1. **เพิ่ม Development Velocity** - Express.js ช่วยเพิ่ม development velocity ได้ถึง 30-50%
+2. **ลด Time to Market** - Flexible framework ช่วยลด time to market
+3. **เพิ่ม Scalability** - Clustering และ middleware ช่วยเพิ่ม scalability
+4. **ลด Maintenance Cost** - Well-structured code ช่วยลด maintenance cost
+5. **ปรับปรุง Performance** - Optimized middleware ช่วยเพิ่ม performance
+
+### 1.3 Product Thinking (ภาษาไทย)
+
+**มุมมองด้านผลิตภัณฑ์:**
+
+1. **RESTful** - APIs ต้อง RESTful และ follow best practices
+2. **Secure** - APIs ต้อง secure ด้วย proper authentication และ authorization
+3. **Scalable** - APIs ต้อง scalable ด้วย clustering แล caching
+4. **Observable** - APIs ต้อง observable ด้วย logging แล monitoring
+5. **Testable** - APIs ต้อง testable ง่าย
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+### 2.1 Core Logic
+
+Express.js ประกอบด้วย:
+
+1. **Application** - Express application instance
+2. **Router** - Routing system สำหรับ mapping URLs ไปยัง handlers
+3. **Middleware** - Functions ที่ process requests แล responses
+4. **Request/Response** - Request แล response objects
+5. **Error Handling** - Error handling middleware
+6. **Static Files** - Static file serving
+7. **Template Engines** - Template engine integration
+
+### 2.2 Architecture Diagram Requirements
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              Express.js Architecture                  │
+├─────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Client Layer                         │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Browser    │  │  Mobile     │  │  API Client │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Middleware Stack                      │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Security   │  │  Logging    │  │  Body Parse │  │   │
+│  │  │  Middleware│  │  Middleware │  │  Middleware │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Auth       │  │  Validation │  │  Rate Limit│  │   │
+│  │  │  Middleware│  │  Middleware │  │  Middleware │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Routing Layer                        │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Routes     │  │  Controllers│  │  Services  │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Error Handling Layer                │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Error      │  │  404        │  │  Logging   │  │   │
+│  │  │  Handler    │  │  Handler    │  │  Services  │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 2.3 Implementation Workflow
+
+**Step 1: Initialize Express App**
+
+```typescript
+// src/app.ts
+import express, { Application } from "express"
+
+export function createApp(): Application {
+  const app = express()
+
+  // Middleware
+  app.use(express.json())
+
+  // Routes
+  app.use("/api", routes)
+
+  return app
+}
+```
+
+**Step 2: Create Server**
+
+```typescript
+// src/server.ts
+import { createApp } from "./app"
+
+const app = createApp()
+const PORT = process.env.PORT || 3000
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})
+```
+
+**Step 3: Add Routes**
+
+```typescript
+// src/routes/user.routes.ts
+import { Router } from "express"
+
+const router = Router()
+
+router.get("/users", userController.getAll)
+router.post("/users", userController.create)
+
+export default router
+```
+
+---
+
+## 3. Tooling & Tech Stack
+
+### 3.1 Enterprise Tools
+
+| Tool | Purpose | Version | License |
+|------|---------|---------|---------|
+| Express | Web Framework | ^4.18.0 | MIT |
+| TypeScript | Type Safety | ^5.3.0 | Apache-2.0 |
+| Helmet | Security Headers | ^7.1.0 | MIT |
+| CORS | CORS Middleware | ^2.8.0 | MIT |
+| Morgan | HTTP Logger | ^1.10.0 | MIT |
+| Winston | Logging Library | ^3.11.0 | MIT |
+| Express Validator | Validation Middleware | ^7.0.0 | MIT |
+| Zod | Schema Validation | ^3.22.0 | MIT |
+| JWT | Authentication | ^9.0.0 | MIT |
+| Rate Limit | Rate Limiting | ^7.1.0 | MIT |
+
+### 3.2 Configuration Essentials
+
+**Environment Configuration:**
+```typescript
+// src/config/env.ts
+import dotenv from "dotenv"
+import { z } from "zod"
+
+dotenv.config()
+
+const envSchema = z.object({
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  PORT: z.string().transform(Number).default(3000),
+  DATABASE_URL: z.string(),
+  JWT_SECRET: z.string(),
+  JWT_EXPIRES_IN: z.string().default("1d"),
+  REDIS_URL: z.string().optional(),
+  LOG_LEVEL: z.string().default("info"),
+})
+
+export const config = envSchema.parse(process.env)
+```
+
+**Winston Configuration:**
+```typescript
+// src/utils/logger.ts
+import winston from "winston"
+
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || "info",
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    }),
+    new winston.transports.File({
+      filename: "logs/error.log",
+      level: "error",
+    }),
+    new winston.transports.File({
+      filename: "logs/combined.log",
+    }),
+  ],
+})
+
+export default logger
+```
+
+---
+
+## 4. Standards, Compliance & Security
+
+### 4.1 International Standards
+
+- **REST API Standards** - RESTful API Design Standards
+- **OWASP** - Security Best Practices
+- **RFC 7807** - Problem Details for HTTP APIs
+- **GDPR** - Data Protection สำหรับ API Data
+- **HIPAA** - Healthcare Data Protection
+
+### 4.2 Security Protocol
+
+Express.js ต้องปฏิบัติตามหลักความปลอดภัย:
+
+1. **Security Headers** - ใช้ Helmet สำหรับ security headers
+2. **CORS** - Configure CORS อย่างเหมาะสม
+3. **Rate Limiting** - จำกัดจำนวน requests
+4. **Input Validation** - Validate ข้อมูลทั้ง client แล server
+5. **Authentication** - ใช้ JWT หรือ OAuth2
+6. **HTTPS** - ใช้ HTTPS สำหรับ production
+
+### 4.3 Explainability
+
+Express.js ต้องสามารถอธิบายได้ว่า:
+
+1. **Request Flow** - ทำไม request ถูก process อย่างไร
+2. **Middleware Order** - ทำไม middleware ถูก execute อย่างไร
+3. **Error Handling** - ทำไม errors ถูก handle อย่างไร
+4. **Response Format** - ทำไม responses ถูก format อย่างไร
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+### 5.1 Cost Calculation
+
+| Metric | Calculation | Target |
+|--------|-------------|--------|
+| Response Time | Average response time | < 100ms |
+| Throughput | Requests per second | > 1000 req/s |
+| Error Rate | Errors / Total Requests | < 1% |
+| Memory Usage | Memory per request | < 10 MB |
+| CPU Usage | CPU utilization | < 70% |
+
+### 5.2 Key Performance Indicators
+
+**Technical Metrics:**
+
+1. **Response Time** - Average response time
+2. **Throughput** - Requests per second
+3. **Error Rate** - Error rate
+4. **Memory Usage** - Memory usage
+
+**Business Metrics:**
+
+1. **API Availability** - API uptime
+2. **User Satisfaction** - CSAT score
+3. **Support Tickets** - Support tickets จาก API issues
+4. **Time to Resolution** - Average time to resolve issues
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+### 6.1 Phase Rollout
+
+**Phase 1: Foundation (Week 1-2)**
+- Initialize Express app
+- Setup basic routes
+- Add middleware stack
+- Implement error handling
+
+**Phase 2: Security (Week 3-4)**
+- Add security headers
+- Configure CORS
+- Implement authentication
+- Add rate limiting
+
+**Phase 3: Advanced Features (Week 5-6)**
+- Add validation middleware
+- Implement logging
+- Add health checks
+- Setup monitoring
+
+**Phase 4: Production (Week 7-8)**
+- Optimize performance
+- Implement clustering
+- Setup graceful shutdown
+- Documentation and training
+
+### 6.2 Pitfalls to Avoid
+
+1. **Poor Middleware Order** - ไม่ order middleware อย่างถูกต้อง
+2. **Missing Error Handling** - ไม่ handle errors อย่างเหมาะสม
+3. **No Input Validation** - ไม่ validate input
+4. **Poor Security** - ไม่ implement security measures
+5. **No Logging** - ไม่ log requests แล errors
+6. **Poor Performance** - ไม่ optimize performance
+
+### 6.3 Best Practices Checklist
+
+- [ ] ใช้ TypeScript สำหรับ type safety
+- [ ] Implement proper middleware order
+- [ ] Add security headers ด้วย Helmet
+- [ ] Configure CORS อย่างเหมาะสม
+- [ ] Implement authentication แล authorization
+- [ ] Add rate limiting สำหรับ abuse prevention
+- [ ] Validate input ด้วย express-validator หรือ Zod
+- [ ] Implement proper error handling
+- [ ] Add logging ด้วย Winston
+- [ ] Use async/await สำหรับ async operations
+- [ ] Test routes ด้วย Supertest
+- [ ] Add health check endpoint
+- [ ] Implement graceful shutdown
+- [ ] Use clustering สำหรับ production
+- [ ] Monitor performance แล errors
+
+---
+
+## 7. Implementation Examples
+
+### 7.1 App Initialization
+
+**Basic Express Setup:**
 ```typescript
 // src/app.ts
 import express, { Application, Request, Response, NextFunction } from "express"
@@ -48,7 +387,7 @@ export function createApp(): Application {
 }
 ```
 
-### Server Entry Point
+**Server Entry Point:**
 ```typescript
 // src/server.ts
 import { createApp } from "./app"
@@ -76,9 +415,9 @@ process.on("SIGINT", () => {
 })
 ```
 
-## 2. Routing Patterns
+### 7.2 Routing Patterns
 
-### Basic Routes
+**Basic Routes:**
 ```typescript
 // src/routes/user.routes.ts
 import { Router, Request, Response, NextFunction } from "express"
@@ -97,7 +436,7 @@ router.delete("/users/:id", userController.delete)
 export default router
 ```
 
-### Route Modules
+**Route Modules:**
 ```typescript
 // src/routes/index.ts
 import { Router } from "express"
@@ -114,7 +453,7 @@ router.use("/posts", postRoutes)
 export default router
 ```
 
-### Nested Routes
+**Nested Routes:**
 ```typescript
 // src/routes/comment.routes.ts
 import { Router } from "express"
@@ -152,7 +491,7 @@ router.use("/posts/:postId", commentRoutes)
 export default router
 ```
 
-### Route Parameters
+**Route Parameters:**
 ```typescript
 // src/routes/product.routes.ts
 import { Router, Request, Response } from "express"
@@ -184,9 +523,9 @@ router.get("/files/*", (req: Request, res: Response) => {
 })
 ```
 
-## 3. Middleware Stack
+### 7.3 Middleware Stack
 
-### Middleware Order
+**Middleware Order:**
 ```typescript
 // src/app.ts
 import express, { Application } from "express"
@@ -224,7 +563,7 @@ export function createApp(): Application {
 }
 ```
 
-### Conditional Middleware
+**Conditional Middleware:**
 ```typescript
 // src/middleware/conditional.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -247,7 +586,7 @@ router.get(
 )
 ```
 
-### Middleware for Specific Routes
+**Middleware for Specific Routes:**
 ```typescript
 // Apply middleware to single route
 router.get("/protected", authMiddleware, userController.getProtected)
@@ -266,9 +605,9 @@ router.get("/admin/users", userController.getAll)
 router.get("/admin/settings", settingsController.get)
 ```
 
-## 4. Error Handling Middleware
+### 7.4 Error Handling Middleware
 
-### Error Handler
+**Error Handler:**
 ```typescript
 // src/middleware/error.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -323,7 +662,7 @@ export function errorHandler(
 }
 ```
 
-### 404 Handler
+**404 Handler:**
 ```typescript
 // src/middleware/not-found.middleware.ts
 import { Request, Response } from "express"
@@ -336,7 +675,7 @@ export function notFoundHandler(req: Request, res: Response): void {
 }
 ```
 
-### Async Error Wrapper
+**Async Error Wrapper:**
 ```typescript
 // src/utils/async-handler.util.ts
 import { Request, Response, NextFunction } from "express"
@@ -354,9 +693,9 @@ router.get("/users", asyncHandler(userController.getAll))
 router.post("/users", asyncHandler(userController.create))
 ```
 
-## 5. Request Validation
+### 7.5 Request Validation
 
-### Express Validator
+**Express Validator:**
 ```typescript
 // src/middleware/validation.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -440,7 +779,7 @@ router.get(
 )
 ```
 
-### Zod Validation
+**Zod Validation:**
 ```typescript
 // src/middleware/zod-validation.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -479,9 +818,9 @@ router.post(
 )
 ```
 
-## 6. Authentication Middleware
+### 7.6 Authentication Middleware
 
-### JWT Authentication
+**JWT Authentication:**
 ```typescript
 // src/middleware/auth.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -538,7 +877,7 @@ export function optionalAuth(req: Request, res: Response, next: NextFunction): v
 }
 ```
 
-### Role-based Authorization
+**Role-based Authorization:**
 ```typescript
 // src/middleware/role.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -578,16 +917,16 @@ router.get(
 )
 ```
 
-## 7. CORS Configuration
+### 7.7 CORS Configuration
 
-### Basic CORS
+**Basic CORS:**
 ```typescript
 import cors from "cors"
 
 app.use(cors())
 ```
 
-### Custom CORS
+**Custom CORS:**
 ```typescript
 import cors from "cors"
 
@@ -618,7 +957,7 @@ const corsOptions = {
 app.use(cors(corsOptions))
 ```
 
-### Per-route CORS
+**Per-route CORS:**
 ```typescript
 import cors from "cors"
 
@@ -637,9 +976,9 @@ app.get("/private/data", restrictedCors, (req, res) => {
 })
 ```
 
-## 8. Rate Limiting
+### 7.8 Rate Limiting
 
-### Basic Rate Limiting
+**Basic Rate Limiting:**
 ```typescript
 import rateLimit from "express-rate-limit"
 
@@ -654,7 +993,7 @@ const limiter = rateLimit({
 app.use("/api", limiter)
 ```
 
-### Multiple Rate Limiters
+**Multiple Rate Limiters:**
 ```typescript
 import rateLimit from "express-rate-limit"
 
@@ -677,7 +1016,7 @@ app.use("/api", apiLimiter)
 app.use("/api/auth", authLimiter)
 ```
 
-### Rate Limiting with Redis
+**Rate Limiting with Redis:**
 ```typescript
 import RedisStore from "rate-limit-redis"
 import rateLimit from "express-rate-limit"
@@ -700,9 +1039,9 @@ const limiter = rateLimit({
 app.use(limiter)
 ```
 
-## 9. Security Headers
+### 7.9 Security Headers
 
-### Helmet Configuration
+**Helmet Configuration:**
 ```typescript
 import helmet from "helmet"
 
@@ -731,7 +1070,7 @@ app.use(helmet({
 }))
 ```
 
-### Custom Security Headers
+**Custom Security Headers:**
 ```typescript
 app.use((req, res, next) => {
   // X-Content-Type-Options
@@ -761,9 +1100,9 @@ app.use((req, res, next) => {
 })
 ```
 
-## 10. Logging
+### 7.10 Logging
 
-### Morgan Configuration
+**Morgan Configuration:**
 ```typescript
 import morgan from "morgan"
 import { createStream } from "rotating-file-stream"
@@ -790,7 +1129,7 @@ if (process.env.NODE_ENV === "production") {
 }
 ```
 
-### Custom Logger
+**Custom Logger:**
 ```typescript
 // src/utils/logger.ts
 import winston from "winston"
@@ -819,7 +1158,7 @@ const logger = winston.createLogger({
 export default logger
 ```
 
-### Request Logging Middleware
+**Request Logging Middleware:**
 ```typescript
 // src/middleware/logging.middleware.ts
 import { Request, Response, NextFunction } from "express"
@@ -857,9 +1196,9 @@ export function loggingMiddleware(
 }
 ```
 
-## 11. Testing
+### 7.11 Testing
 
-### Controller Tests
+**Controller Tests:**
 ```typescript
 // tests/controllers/user.controller.test.ts
 import request from "supertest"
@@ -930,7 +1269,7 @@ describe("UserController", () => {
 })
 ```
 
-### Integration Tests
+**Integration Tests:**
 ```typescript
 // tests/integration/api.test.ts
 import request from "supertest"
@@ -974,9 +1313,9 @@ describe("API Integration Tests", () => {
 })
 ```
 
-## 12. Production Setup
+### 7.12 Production Setup
 
-### Environment Configuration
+**Environment Configuration:**
 ```typescript
 // src/config/env.ts
 import dotenv from "dotenv"
@@ -997,7 +1336,7 @@ const envSchema = z.object({
 export const config = envSchema.parse(process.env)
 ```
 
-### Cluster Mode
+**Cluster Mode:**
 ```typescript
 // src/cluster.ts
 import cluster from "cluster"
@@ -1024,7 +1363,7 @@ if (cluster.isPrimary) {
 }
 ```
 
-### Graceful Shutdown
+**Graceful Shutdown:**
 ```typescript
 // src/server.ts
 import http from "http"
@@ -1060,7 +1399,7 @@ process.on("unhandledRejection", (reason, promise) => {
 })
 ```
 
-### Health Check Endpoint
+**Health Check Endpoint:**
 ```typescript
 // src/routes/health.routes.ts
 import { Router, Request, Response } from "express"
@@ -1090,3 +1429,13 @@ router.get("/health", async (req: Request, res: Response) => {
 
 export default router
 ```
+
+---
+
+## 8. Related Skills
+
+- `03-backend-api/error-handling`
+- `03-backend-api/validation`
+- `03-backend-api/middleware`
+- `01-foundations/api-design`
+- `14-monitoring-observability`

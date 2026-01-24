@@ -4,11 +4,11 @@
 
 ระบบนี้ใช้ 2 directory แยกกัน:
 
-- **Development (พัฒนา)**: `D:\Cerebra\cerebratechai-claude-skills`
+- **Development (พัฒนา)**: `D:\Cerebra\cerebraSkills`
   - ที่นี่คุณแก้ไขและพัฒนา skills
   - เชื่อมต่อกับ GitHub
   
-- **Production (ใช้งานจริง)**: `D:\AgentSkill\cerebratechai-claude-skills`
+- **Production (ใช้งานจริง)**: `D:\AgentSkill\cerebraSkills`
   - ที่นี่ multi-agent ดึงข้อมูล skills ไปใช้
   - ดึงข้อมูลจาก GitHub เท่านั้น (อ่านอย่างเดียว)
 
@@ -31,22 +31,20 @@ setup-project-links.bat
 
 ```batch
 mkdir .agentskills
-mklink /J .agentskills\skills D:\AgentSkill\cerebratechai-claude-skills
-mklink /J .codex .agentskills
+mklink /J .agentskills\skills D:\AgentSkill\CerebraSkills
 ```
 
 **ผลลัพธ์:**
 ```
 your-project/
 ├── .agentskills/
-│   └── skills/  → D:\AgentSkill\cerebratechai-claude-skills
-└── .codex/      → .agentskills/
+    └── skills/  → D:\AgentSkill\cerebraSkills
+
 ```
 
 **เพิ่มใน .gitignore:**
 ```gitignore
 .agentskills/
-.codex/
 ```
 
 ---
@@ -56,7 +54,7 @@ your-project/
 1. **Always commit meaningful changes**: Use descriptive commit messages
 2. **Test before pushing**: Ensure your skills work correctly before syncing to production
 3. **Pull before editing**: Run `update-skills.bat` before starting new edits to avoid conflicts
-4. **Keep production clean**: Never edit files directly in `D:\AgentSkill\cerebratechai-claude-skills`
+4. **Keep production clean**: Never edit files directly in `D:\AgentSkill\cerebraSkills`
 5. **Use junction links**: Set up junction links for each project to avoid config repetition
 
 ## Autonomous Gap Detector (ใหม่!) 🔥
@@ -76,7 +74,7 @@ your-project/
 
 แก้ไขไฟล์ใน directory พัฒนา:
 ```
-D:\Cerebra\cerebratechai-claude-skills
+D:\Cerebra\cerebraSkills
 ```
 
 ### 2. Push ขึ้น GitHub
@@ -84,7 +82,7 @@ D:\Cerebra\cerebratechai-claude-skills
 เมื่อพร้อมแล้ว ให้รัน:
 
 ```batch
-cd D:\Cerebra\cerebratechai-claude-skills
+cd D:\Cerebra\cerebraSkills
 sync-to-production.bat
 ```
 
@@ -97,7 +95,7 @@ Script นี้จะ:
 
 **หรือทำด้วยตัวเอง:**
 ```batch
-cd D:\Cerebra\cerebratechai-claude-skills
+cd D:\Cerebra\cerebraSkills
 git add .
 git commit -m "ข้อความอธิบายการเปลี่ยนแปลง"
 git push origin main
@@ -107,7 +105,7 @@ git push origin main
 
 เข้าไปดูที่ GitHub ว่า push สำเร็จหรือไม่:
 ```
-https://github.com/AmnadTaowsoam/cerebratechai-claude-skills
+https://github.com/AmnadTaowsoam/cerebraSkills
 ```
 
 ### 4. Pull มาที่ Production
@@ -126,7 +124,7 @@ Script นี้จะ:
 
 **หรือทำด้วยตัวเอง:**
 ```batch
-cd D:\AgentSkill\cerebratechai-claude-skills
+cd D:\AgentSkill\cerebraSkills
 git fetch origin
 git checkout main
 git pull --ff-only origin main
@@ -136,7 +134,7 @@ git pull --ff-only origin main
 
 ตอนนี้ multi-agent สามารถเข้าถึง skills ล่าสุดได้จาก:
 ```
-D:\AgentSkill\cerebratechai-claude-skills
+D:\AgentSkill\cerebraSkills
 ```
 
 ## สรุปขั้นตอน
@@ -157,8 +155,8 @@ Pull (update-skills.bat)
 
 | ไฟล์ | ที่อยู่ | ไว้ทำอะไร |
 |------|---------|-----------|
-| `sync-to-production.bat` | `D:\Cerebra\cerebratechai-claude-skills\` | Push ขึ้น GitHub |
-| `update-skills.bat` | `D:\Cerebra\cerebratechai-claude-skills\` | Pull จาก GitHub มา Production |
+| `sync-to-production.bat` | `D:\Cerebra\cerebraSkills\` | Push ขึ้น GitHub |
+| `update-skills.bat` | `D:\Cerebra\cerebraSkills\` | Pull จาก GitHub มา Production |
 
 ## ข้อควรระวัง
 
@@ -171,7 +169,7 @@ Pull (update-skills.bat)
 
 ### ถ้ามี Merge Conflict
 ```batch
-cd D:\Cerebra\cerebratechai-claude-skills
+cd D:\Cerebra\cerebraSkills
 git status
 # แก้ไข conflict ด้วยตัวเอง
 git add .
@@ -181,14 +179,14 @@ git push origin main
 
 ### ถ้า Production มีการเปลี่ยนแปลงที่ไม่ต้องการ
 ```batch
-cd D:\AgentSkill\cerebratechai-claude-skills
+cd D:\AgentSkill\cerebraSkills
 git reset --hard origin/main
 git pull origin main
 ```
 
 ### ถ้า Push ไม่ผ่าน
 ```batch
-cd D:\Cerebra\cerebratechai-claude-skills
+cd D:\Cerebra\cerebraSkills
 git pull --rebase origin main
 git push origin main
 ```
@@ -198,7 +196,7 @@ git push origin main
 ### เช้าวันจันทร์ - เริ่มทำงาน
 ```batch
 # Pull ข้อมูลล่าสุดมาก่อน
-cd D:\Cerebra\cerebratechai-claude-skills
+cd D:\Cerebra\cerebraSkills
 git pull origin main
 
 # เริ่มแก้ไข skills...
@@ -207,7 +205,7 @@ git pull origin main
 ### เย็นวันจันทร์ - เสร็จงานแล้ว
 ```batch
 # Push งานที่ทำเสร็จขึ้น GitHub
-cd D:\Cerebra\cerebratechai-claude-skills
+cd D:\Cerebra\cerebraSkills
 sync-to-production.bat
 # (ใส่ commit message: "เพิ่ม skill ใหม่สำหรับ multi-agent")
 

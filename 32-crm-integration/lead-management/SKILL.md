@@ -1,8 +1,20 @@
+---
+name: Lead Management
+description: Tracking potential customers from initial contact through conversion, including lead capture, scoring, qualification, assignment, nurturing, and conversion processes.
+---
+
 # Lead Management
+
+> **Current Level:** Intermediate  
+> **Domain:** CRM / Sales
+
+---
 
 ## Overview
 
-Lead management tracks potential customers from initial contact through conversion. This guide covers lead capture, scoring, qualification, and conversion processes.
+Lead management tracks potential customers from initial contact through conversion. This guide covers lead capture, scoring, qualification, and conversion processes for managing sales pipelines and converting leads into customers effectively.
+
+---
 
 ## Lead Lifecycle
 
@@ -549,7 +561,122 @@ interface ConversionResult {
 9. **Analytics** - Track lead metrics
 10. **Integration** - Integrate with marketing tools
 
-## Resources
+---
+
+## Quick Start
+
+### Lead Capture
+
+```typescript
+async function captureLead(data: LeadData) {
+  const lead = await db.leads.create({
+    data: {
+      email: data.email,
+      name: data.name,
+      source: data.source,
+      status: 'new',
+      score: calculateInitialScore(data)
+    }
+  })
+  
+  // Trigger automation
+  await triggerWorkflow('new-lead', lead.id)
+  
+  return lead
+}
+```
+
+### Lead Scoring
+
+```typescript
+function calculateLeadScore(lead: Lead): number {
+  let score = 0
+  
+  // Company size
+  if (lead.companySize === 'enterprise') score += 30
+  else if (lead.companySize === 'mid-market') score += 20
+  
+  // Engagement
+  if (lead.emailOpens > 5) score += 20
+  if (lead.websiteVisits > 10) score += 15
+  
+  // Fit
+  if (lead.industry === 'target-industry') score += 25
+  
+  return Math.min(score, 100)
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Lead Capture**: Multiple lead capture points
+- [ ] **Lead Scoring**: Automated lead scoring
+- [ ] **Qualification**: Lead qualification process
+- [ ] **Assignment**: Automatic lead assignment
+- [ ] **Nurturing**: Lead nurturing workflows
+- [ ] **Conversion Tracking**: Track conversions
+- [ ] **CRM Integration**: Integrate with CRM
+- [ ] **Analytics**: Track lead metrics
+- [ ] **Follow-up**: Automated follow-up sequences
+- [ ] **Documentation**: Document lead process
+- [ ] **Testing**: Test lead workflows
+- [ ] **Optimization**: Optimize conversion rates
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Lead Scoring
+
+```typescript
+// ❌ Bad - All leads treated equally
+const leads = await getLeads()
+leads.forEach(lead => {
+  assignToSales(lead)  // Even unqualified leads!
+})
+```
+
+```typescript
+// ✅ Good - Score and qualify
+const leads = await getLeads()
+leads.forEach(lead => {
+  lead.score = calculateLeadScore(lead)
+  if (lead.score >= 70) {
+    assignToSales(lead)
+  } else {
+    addToNurture(lead)
+  }
+})
+```
+
+### ❌ Don't: No Follow-up
+
+```typescript
+// ❌ Bad - No follow-up
+await captureLead(data)
+// Lead forgotten!
+```
+
+```typescript
+// ✅ Good - Automated follow-up
+await captureLead(data)
+await scheduleFollowUp(leadId, '1 day')
+await scheduleFollowUp(leadId, '1 week')
+```
+
+---
+
+## Integration Points
+
+- **Marketing Automation** (`28-marketing-integration/marketing-automation/`) - Lead nurturing
+- **Salesforce Integration** (`32-crm-integration/salesforce-integration/`) - CRM sync
+- **Email Marketing** (`28-marketing-integration/email-marketing/`) - Email campaigns
+
+---
+
+## Further Reading
 
 - [Lead Management Best Practices](https://www.salesforce.com/resources/articles/lead-management/)
 - [Lead Scoring](https://www.hubspot.com/lead-scoring)

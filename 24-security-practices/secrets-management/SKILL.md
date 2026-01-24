@@ -1986,6 +1986,155 @@ logger.info({ userId }); // No sensitive data
 ```javascript
 // ❌ BAD: Storing secrets in plain text
 fs.writeFileSync('secrets.txt', apiKey);
+```
+
+---
+
+## Quick Start
+
+### Using Environment Variables
+
+```bash
+# .env file (never commit!)
+DATABASE_URL=postgresql://user:pass@localhost/db
+API_KEY=sk-1234567890
+SECRET_KEY=your-secret-key
+```
+
+```javascript
+// Load from environment
+require('dotenv').config()
+
+const dbUrl = process.env.DATABASE_URL
+const apiKey = process.env.API_KEY
+```
+
+### Using AWS Secrets Manager
+
+```javascript
+const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager')
+
+const client = new SecretsManagerClient({ region: 'us-east-1' })
+
+async function getSecret(secretName) {
+  const command = new GetSecretValueCommand({ SecretId: secretName })
+  const response = await client.send(command)
+  return JSON.parse(response.SecretString)
+}
+
+// Usage
+const secrets = await getSecret('my-app/secrets')
+const dbPassword = secrets.DATABASE_PASSWORD
+```
+
+### Using HashiCorp Vault
+
+```bash
+# Install Vault CLI
+vault auth -method=aws
+vault read secret/my-app/database
+```
+
+```javascript
+const vault = require('node-vault')({ apiVersion: 'v1' })
+
+const secrets = await vault.read('secret/my-app/database')
+const dbPassword = secrets.data.password
+```
+
+---
+
+## Production Checklist
+
+- [ ] **No Hardcoded Secrets**: Never commit secrets to version control
+- [ ] **Environment Variables**: Use .env files (gitignored) for local development
+- [ ] **Secrets Manager**: Use cloud secrets manager (AWS, Azure, GCP) in production
+- [ ] **Rotation**: Implement secret rotation policies
+- [ ] **Access Control**: Limit access to secrets (principle of least privilege)
+- [ ] **Encryption**: Encrypt secrets at rest and in transit
+- [ ] **Audit Logging**: Log all secret access
+- [ ] **Backup**: Backup secrets securely
+- [ ] **Testing**: Use separate test secrets, never production secrets in tests
+- [ ] **Documentation**: Document where secrets are stored and how to access
+- [ ] **Monitoring**: Monitor for secret leaks or unauthorized access
+- [ ] **Incident Response**: Have plan for secret compromise
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Commit Secrets to Git
+
+```javascript
+// ❌ Bad - Committed to repo
+const config = {
+  apiKey: 'sk-1234567890',  // Exposed!
+  dbPassword: 'mypassword'
+}
+```
+
+```javascript
+// ✅ Good - Use environment variables
+const config = {
+  apiKey: process.env.API_KEY,
+  dbPassword: process.env.DB_PASSWORD
+}
+```
+
+### ❌ Don't: Log Secrets
+
+```javascript
+// ❌ Bad - Secrets in logs
+console.log('API Key:', apiKey)  // Exposed in logs!
+logger.info({ apiKey })  // Exposed!
+```
+
+```javascript
+// ✅ Good - Never log secrets
+console.log('API Key configured')  // Generic message
+logger.info({ hasApiKey: !!apiKey })  // Boolean only
+```
+
+### ❌ Don't: Share Secrets via Email/Chat
+
+```javascript
+// ❌ Bad - Sent via insecure channel
+// Email: "Here's the API key: sk-1234567890"
+```
+
+```javascript
+// ✅ Good - Use secure secrets manager
+// Share access to secrets manager, not the secret itself
+```
+
+### ❌ Don't: No Secret Rotation
+
+```javascript
+// ❌ Bad - Same secret forever
+const API_KEY = 'sk-1234567890'  // Never rotated
+```
+
+```javascript
+// ✅ Good - Rotate regularly
+// Implement rotation policy (e.g., every 90 days)
+// Use secrets manager with automatic rotation
+```
+
+---
+
+## Integration Points
+
+- **Error Handling** (`03-backend-api/error-handling/`) - Don't expose secrets in errors
+- **Logging** (`14-monitoring-observability/logging/`) - Secure logging practices
+- **CI/CD** (`15-devops-infrastructure/ci-cd-github-actions/`) - Secure secret injection
+
+---
+
+## Further Reading
+
+- [OWASP Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)
+- [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/)
+- [HashiCorp Vault](https://www.vaultproject.io/)
 
 // ✅ GOOD: Encrypt before storing
 const encrypted = await encrypt(apiKey, encryptionKey);

@@ -1,10 +1,26 @@
+---
+name: Web3 Integration
+description: Enabling decentralized applications to interact with blockchain networks using Web3.js, Ethers.js, provider setup, wallet connections, and smart contract interactions.
+---
+
 # Web3 Integration
+
+> **Current Level:** Advanced  
+> **Domain:** Blockchain / Web3
+
+---
 
 ## Overview
 
-Web3 enables decentralized applications to interact with blockchain networks. This guide covers Web3.js, Ethers.js, provider setup, and blockchain interactions.
+Web3 enables decentralized applications to interact with blockchain networks. This guide covers Web3.js, Ethers.js, provider setup, and blockchain interactions for building decentralized applications that interact with Ethereum and other blockchain networks.
 
-## Web3 Concepts
+---
+
+---
+
+## Core Concepts
+
+### Web3 Concepts
 
 ```
 Traditional Web (Web2):
@@ -560,6 +576,139 @@ export class Web3ErrorHandler {
 8. **Testing** - Test with local blockchain
 9. **Caching** - Cache blockchain data when possible
 10. **Documentation** - Document all Web3 interactions
+```
+
+---
+
+## Quick Start
+
+### Ethers.js Setup
+
+```javascript
+import { ethers } from 'ethers'
+
+// Connect to provider
+const provider = new ethers.providers.JsonRpcProvider(
+  'https://mainnet.infura.io/v3/YOUR_PROJECT_ID'
+)
+
+// Connect wallet
+const wallet = new ethers.Wallet(PRIVATE_KEY, provider)
+
+// Interact with contract
+const contract = new ethers.Contract(
+  CONTRACT_ADDRESS,
+  ABI,
+  wallet
+)
+
+// Call contract function
+const result = await contract.getBalance()
+```
+
+### Web3.js Setup
+
+```javascript
+import Web3 from 'web3'
+
+const web3 = new Web3('https://mainnet.infura.io/v3/YOUR_PROJECT_ID')
+
+// Get balance
+const balance = await web3.eth.getBalance(ADDRESS)
+
+// Send transaction
+const tx = await web3.eth.sendTransaction({
+  from: FROM_ADDRESS,
+  to: TO_ADDRESS,
+  value: web3.utils.toWei('1', 'ether')
+})
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Provider**: Use reliable blockchain provider (Infura, Alchemy)
+- [ ] **Wallet Security**: Secure private key storage
+- [ ] **Gas Estimation**: Always estimate gas before transactions
+- [ ] **Error Handling**: Handle all Web3 errors gracefully
+- [ ] **Transaction Confirmation**: Wait for transaction confirmations
+- [ ] **Nonce Management**: Proper nonce handling
+- [ ] **Rate Limiting**: Limit RPC calls to prevent throttling
+- [ ] **Monitoring**: Monitor transaction status and failures
+- [ ] **Testing**: Test with testnets before mainnet
+- [ ] **Security**: Never expose private keys
+- [ ] **Fallback**: Multiple provider fallbacks
+- [ ] **Documentation**: Document all blockchain interactions
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Expose Private Keys
+
+```javascript
+// ❌ Bad - Private key in code
+const wallet = new ethers.Wallet('0x1234...', provider)  // Exposed!
+```
+
+```javascript
+// ✅ Good - Environment variable
+const wallet = new ethers.Wallet(
+  process.env.PRIVATE_KEY,  // From secrets manager
+  provider
+)
+```
+
+### ❌ Don't: No Gas Estimation
+
+```javascript
+// ❌ Bad - Fixed gas
+await contract.function({ gasLimit: 100000 })  // Might fail!
+```
+
+```javascript
+// ✅ Good - Estimate gas
+const gasEstimate = await contract.estimateGas.function()
+await contract.function({ gasLimit: gasEstimate.mul(120).div(100) })
+```
+
+### ❌ Don't: No Error Handling
+
+```javascript
+// ❌ Bad - No error handling
+const tx = await contract.function()
+```
+
+```javascript
+// ✅ Good - Handle errors
+try {
+  const tx = await contract.function()
+  await tx.wait()  // Wait for confirmation
+} catch (error) {
+  if (error.code === 'INSUFFICIENT_FUNDS') {
+    // Handle insufficient funds
+  } else {
+    // Handle other errors
+  }
+}
+```
+
+---
+
+## Integration Points
+
+- **Wallet Connection** (`35-blockchain-web3/wallet-connection/`) - Wallet integration
+- **Smart Contracts** (`35-blockchain-web3/smart-contracts/`) - Contract interaction
+- **Secrets Management** (`24-security-practices/secrets-management/`) - Secure keys
+
+---
+
+## Further Reading
+
+- [Ethers.js Documentation](https://docs.ethers.io/)
+- [Web3.js Documentation](https://web3js.readthedocs.io/)
+- [Ethereum Developer Resources](https://ethereum.org/en/developers/)
 
 ## Resources
 

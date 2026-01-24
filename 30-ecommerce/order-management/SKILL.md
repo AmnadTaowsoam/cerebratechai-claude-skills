@@ -1,10 +1,26 @@
+---
+name: Order Management System (OMS)
+description: Handling the complete order lifecycle from creation to fulfillment, including order validation, status tracking, inventory reservation, payment processing, and returns.
+---
+
 # Order Management System (OMS)
+
+> **Current Level:** Intermediate  
+> **Domain:** E-commerce / Backend
+
+---
 
 ## Overview
 
-Order Management System handles the complete order lifecycle from creation to fulfillment, including order validation, status tracking, inventory reservation, and returns processing.
+Order Management System handles the complete order lifecycle from creation to fulfillment, including order validation, status tracking, inventory reservation, and returns processing. Effective OMS systems ensure data consistency, handle edge cases, and provide real-time order status updates.
 
-## Table of Contents
+---
+
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Order Lifecycle](#order-lifecycle)
 2. [Database Schema](#database-schema)
@@ -1741,7 +1757,183 @@ async function logOrderStateChange(orderId: string, newStatus: OrderStatus): Pro
 
 ---
 
-## Resources
+---
+
+## Quick Start
+
+### Basic Order Creation
+
+```typescript
+interface OrderItem {
+  productId: string
+  quantity: number
+  price: number
+}
+
+async function createOrder(
+  userId: string,
+  items: OrderItem[],
+  shippingAddress: Address
+) {
+  // 1. Validate items
+  for (const item of items) {
+    const product = await getProduct(item.productId)
+    if (!product.inStock || product.stock < item.quantity) {
+      throw new Error(`Product ${item.productId} out of stock`)
+    }
+  }
+  
+  // 2. Calculate totals
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const tax = calculateTax(subtotal)
+  const shipping = calculateShipping(shippingAddress)
+  const total = subtotal + tax + shipping
+  
+  // 3. Create order
+  const order = await db.orders.create({
+    data: {
+      userId,
+      status: 'pending',
+      subtotal,
+      tax,
+      shipping,
+      total,
+      items: {
+        create: items.map(item => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          price: item.price
+        }))
+      }
+    }
+  })
+  
+  // 4. Reserve inventory
+  await reserveInventory(items)
+  
+  return order
+}
+```
+
+### Order Status Workflow
+
+```typescript
+const ORDER_STATUS_FLOW = {
+  pending: ['processing', 'cancelled'],
+  processing: ['shipped', 'cancelled'],
+  shipped: ['delivered', 'returned'],
+  delivered: ['returned'],
+  cancelled: [],
+  returned: ['refunded']
+}
+
+async function updateOrderStatus(orderId: string, newStatus: OrderStatus) {
+  const order = await db.orders.findUnique({ where: { id: orderId } })
+  
+  if (!ORDER_STATUS_FLOW[order.status].includes(newStatus)) {
+    throw new Error(`Invalid status transition: ${order.status} -> ${newStatus}`)
+  }
+  
+  await db.orders.update({
+    where: { id: orderId },
+    data: { status: newStatus }
+  })
+  
+  // Log status change
+  await logOrderStateChange(orderId, newStatus)
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Order Validation**: Validate all order data
+- [ ] **Inventory Check**: Check inventory before order creation
+- [ ] **Price Validation**: Validate prices server-side
+- [ ] **Status Workflow**: Enforce valid status transitions
+- [ ] **Idempotency**: Use idempotency keys for order creation
+- [ ] **Inventory Reservation**: Reserve inventory on order creation
+- [ ] **Payment Processing**: Integrate with payment gateway
+- [ ] **Order Tracking**: Provide order tracking for customers
+- [ ] **Notifications**: Send order status notifications
+- [ ] **Cancellation**: Handle order cancellations
+- [ ] **Returns**: Process returns and refunds
+- [ ] **Audit Trail**: Log all order state changes
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Trust Client Prices
+
+```typescript
+// ❌ Bad - Use client price
+const order = await createOrder({
+  items: [{ productId: '123', quantity: 1, price: clientPrice }]  // Can be manipulated!
+})
+```
+
+```typescript
+// ✅ Good - Get price from server
+const items = await Promise.all(
+  clientItems.map(async item => {
+    const product = await getProduct(item.productId)
+    return {
+      productId: item.productId,
+      quantity: item.quantity,
+      price: product.price  // Server price
+    }
+  })
+)
+const order = await createOrder({ items })
+```
+
+### ❌ Don't: No Inventory Reservation
+
+```typescript
+// ❌ Bad - No reservation
+const order = await createOrder(items)
+// Inventory might be sold to another order!
+```
+
+```typescript
+// ✅ Good - Reserve inventory
+await reserveInventory(items)  // Lock inventory
+const order = await createOrder(items)
+// Inventory reserved, safe to proceed
+```
+
+### ❌ Don't: Invalid Status Transitions
+
+```typescript
+// ❌ Bad - Allow any status change
+await updateOrderStatus(orderId, 'delivered')  // From 'pending'? Invalid!
+```
+
+```typescript
+// ✅ Good - Validate transitions
+const validTransitions = ORDER_STATUS_FLOW[currentStatus]
+if (!validTransitions.includes(newStatus)) {
+  throw new Error('Invalid status transition')
+}
+await updateOrderStatus(orderId, newStatus)
+```
+
+---
+
+## Integration Points
+
+- **Shopping Cart** (`30-ecommerce/shopping-cart/`) - Cart to order conversion
+- **Payment Gateways** (`30-ecommerce/payment-gateways/`) - Payment processing
+- **Inventory Management** (`30-ecommerce/inventory-management/`) - Stock management
+
+---
+
+## Further Reading
+
+- [Order Management Best Practices](https://www.shopify.com/blog/order-management-system)
+- [E-commerce Order Processing](https://www.bigcommerce.com/blog/order-management/)
 
 - [Shopify Order API](https://shopify.dev/api/admin-graphql/latest/objects/Order)
 - [WooCommerce Orders](https://woocommerce.github.io/woocommerce-rest-api-docs/#orders)

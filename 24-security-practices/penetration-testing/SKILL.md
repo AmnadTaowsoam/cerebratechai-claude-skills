@@ -1,8 +1,20 @@
+---
+name: Penetration Testing
+description: Simulated cyberattacks on systems to identify vulnerabilities before malicious attackers do, including ethical hacking, vulnerability assessment, and security testing with explicit permission.
+---
+
 # Penetration Testing
 
-## What is Penetration Testing
+> **Current Level:** Advanced  
+> **Domain:** Security / Testing
 
-Penetration testing (pen testing) is a simulated cyberattack on your systems to identify vulnerabilities before malicious attackers do. It's ethical hacking with explicit permission.
+---
+
+## Overview
+
+Penetration testing (pen testing) is a simulated cyberattack on your systems to identify vulnerabilities before malicious attackers do. It's ethical hacking with explicit permission. Effective penetration testing includes planning, reconnaissance, exploitation, reporting, and remediation verification.
+
+## What is Penetration Testing
 
 ### Pen Testing Goals
 
@@ -649,6 +661,121 @@ await db.query(query, [username]);
 - [ ] Preserve evidence
 - [ ] Report issues immediately
 - [ ] Stop if asked
+```
+
+---
+
+## Quick Start
+
+### Penetration Testing Tools
+
+```bash
+# OWASP ZAP
+docker run -t owasp/zap2docker-stable zap-baseline.py -t http://target-app.com
+
+# Nmap scan
+nmap -sV -sC target.com
+
+# Burp Suite
+# Use Burp Suite for manual testing
+```
+
+### Vulnerability Reporting
+
+```markdown
+# Vulnerability Report
+
+## Summary
+[Brief description]
+
+## Severity
+[Critical/High/Medium/Low]
+
+## Description
+[Detailed description]
+
+## Impact
+[Potential impact]
+
+## Steps to Reproduce
+1. Step 1
+2. Step 2
+
+## Remediation
+[How to fix]
+
+## References
+[CVEs, OWASP, etc.]
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Scope Definition**: Define testing scope
+- [ ] **Authorization**: Written authorization obtained
+- [ ] **Tools**: Penetration testing tools prepared
+- [ ] **Team**: Penetration testing team assembled
+- [ ] **Documentation**: Document all findings
+- [ ] **Reporting**: Comprehensive vulnerability report
+- [ ] **Remediation**: Remediation recommendations
+- [ ] **Verification**: Verify fixes after remediation
+- [ ] **Compliance**: Meet compliance requirements
+- [ ] **Regular Testing**: Schedule regular pen tests
+- [ ] **Documentation**: Document pen test process
+- [ ] **Training**: Team security training
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Authorization
+
+```markdown
+# ❌ Bad - No authorization
+"Let me test this system"
+# Unauthorized access!
+```
+
+```markdown
+# ✅ Good - Written authorization
+Authorization letter signed by:
+- CTO
+- Security team
+- Legal team
+Scope clearly defined
+```
+
+### ❌ Don't: Out of Scope
+
+```markdown
+# ❌ Bad - Out of scope
+Scope: Web application
+Action: Tested production database
+# Beyond scope!
+```
+
+```markdown
+# ✅ Good - Stay in scope
+Scope: Web application
+Action: Tested only web application
+# Within scope
+```
+
+---
+
+## Integration Points
+
+- **Vulnerability Management** (`24-security-practices/vulnerability-management/`) - Vulnerability handling
+- **Security Audit** (`24-security-practices/security-audit/`) - Security reviews
+- **OWASP Top 10** (`24-security-practices/owasp-top-10/`) - Common vulnerabilities
+
+---
+
+## Further Reading
+
+- [OWASP Testing Guide](https://owasp.org/www-project-web-security-testing-guide/)
+- [PTES Methodology](http://www.pentest-standard.org/)
 
 ### After Pen Test
 

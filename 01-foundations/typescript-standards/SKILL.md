@@ -1,19 +1,159 @@
-# TypeScript Coding Standards
+### **06: TypeScript Coding Standards**
+
+> 
+> **Current Level:** Expert (Enterprise Scale) 
+> 
+> 
+> **Domain:** Foundations / TypeScript Development 
+> 
+
+---
+
+### **1. Executive Summary & Strategic Necessity**
+
+* **Context:** ในโลกปี 2025-2026 การพัฒนาซอฟต์แวร์ด้วย TypeScript มีความซับซ้อนเพิ่มขึ้นอย่างมาก การใช้ TypeScript Standards ที่เป็นมาตรฐานช่วยให้ทีมพัฒนาสามารถเขียนโค้ดที่มี Type Safety สูง ลด Bug และเพิ่มประสิทธิภาพในการพัฒนา
+* **Business Impact:** การใช้ TypeScript Standards ที่มีประสิทธิภาพช่วย:
+  - เพิ่มความโค้ดที่สะอดความและเป็นมาตรฐาน
+  - ลดความ Bug ที่เกิดขึ้นใน Production
+  - เพิ่มประสิทธิภาพในการพัฒนา
+  - ลดเวลาในการ Code Review
+  - เพิ่มความสามารถในการทำงานร่วมกัน
+  - ลด Technical Debt ที่สะสมในระยะว
+  - เพิ่มความโปร่งใสในการพัฒนา
+* **Product Thinking:** ทักษะนี้ช่วยแก้ปัญหา (Pain Point) ให้กับ:
+  - ทีมพัฒนาที่ต้องการ TypeScript Standards ที่เป็นระบบ
+  - ผู้ทำงานผิดพลาดที่ต้องการ Standards ที่เข้าใจ
+  - ทีมพัฒนาที่ต้องการ Type Safety ที่สูง
+  - ลูกค้าที่ต้องการความเสถียรของระบบ
+  - ทีม Support ที่ต้องการ Debug ของ Code
+
+### **2. Technical Deep Dive (The "How-to")**
+
+* **Core Logic:** TypeScript Standards ประกอบด้วย:
+  - **TypeScript Configuration:** การตั้งค่า TypeScript (tsconfig.json, Strict Mode, Key Options Explained)
+  - **Naming Conventions:** การตั้งชื่อที่เป็นมาตรฐาน (Variables & Functions, Types & Interfaces & Classes, Constants, Boolean Variables, Event Handlers, File Naming)
+  - **Type Definitions:** การกำหนด Types (Basic Types, Interface vs Type, Generics Best Practices, Discriminated Unions, Type Guards)
+  - **Error Handling Patterns:** การจัดการ Error ที่เป็นระบบ (Custom Error Classes Hierarchy, Try-Catch Patterns, Result Type Pattern, Error Boundary Pattern)
+  - **API Response Patterns:** รูปแบบการตอบกลับ API (Standard Response Types, Response Helper Functions, Express Integration)
+  - **Async/Await Best Practices:** การใช้ Async/Await อย่างถูกต้อง (Proper Promise Handling, Promise.allSettled for Partial Failures, Controlled Concurrency, Timeout Handling, Retry Pattern)
+  - **Utility Types:** Types สำหรับการใช้งาน (Deep Partial, Required Fields, Nullable and NonNullable, Extract and Filter Types, Function Types, Builder Pattern Types, Path Types)
+  - **Dependency Injection Patterns:** รูปแบบ Dependency Injection (Constructor Injection, Factory Pattern with DI, Functional Dependency Injection, Testing with DI)
+  - **Environment Variables Validation:** การตรวจสอบ Environment Variables (Zod Schema Validation, Environment-Specific Configs)
+  - **Import Organization:** การจัดระเบบ Imports (Import Order Convention, Type-Only Imports, Barrel Files)
+
+* **Architecture Diagram Requirements:** แผนผังสถาปัตยกรรมที่ต้องมี:
+  - **Type System Architecture Diagram:** แผนผังแสดง Type System ของ TypeScript
+  - **Error Handling Flow Diagram:** แผนผังแสดงกระบวนการ Error Handling
+  - **API Response Flow Diagram:** แผนผังแสดงกระบวนการ API Response
+  - **Async Execution Flow Diagram:** แผนผังแสดงกระบวนการ Async Execution
+  - **Dependency Injection Diagram:** แผนผังแสดง Dependency Injection Pattern
+
+* **Implementation Workflow:**
+  1. **Setup TypeScript Configuration:** ตั้งค่า TypeScript Configuration สำหรับโปรเจกต์
+  2. **Define Naming Conventions:** กำหนด Naming Conventions สำหรับโปรเจกต์
+  3. **Create Type Definitions:** สร้าง Type Definitions สำหรับโปรเจกต์
+  4. **Implement Error Handling:** จัดการ Error Handling ที่เป็นระบบ
+  5. **Setup API Response Patterns:** ตั้งค่า API Response Patterns
+  6. **Implement Async/Await Patterns:** จัดการ Async/Await Patterns
+  7. **Configure Environment Variables:** ตั้งค่า Environment Variables Validation
+
+### **3. Tooling & Tech Stack**
+
+* **Enterprise Tools:** เครื่องมือระดับอุตสาหกรรมที่เลือกใช้:
+  - **TypeScript Compiler:** TypeScript Compiler, tsc
+  - **Linting:** ESLint, TypeScript ESLint
+  - **Formatting:** Prettier
+  - **Type Checking:** TypeScript Compiler, tsc
+  - **Testing:** Jest, Vit, Mocha, Chai
+  - **Build Tools:** Vite, Webpack, esbuild
+  - **CI/CD Platforms:** GitHub Actions, GitLab CI, Azure Pipelines, Jenkins
+  - **Package Managers:** npm, pnpm, yarn
+
+* **Configuration Essentials:** ส่วนประกอบสำคัญในการตั้งค่า:
+  - **tsconfig.json:** การตั้งค่า TypeScript Compiler Options
+  - **ESLint Configuration:** การตั้งค่า ESLint สำหรับ TypeScript
+  - **Prettier Configuration:** การตั้งค่า Prettier สำหรับ Formatting
+  - **Package.json Scripts:** การตั้งค่า Scripts สำหรับ Build, Test, Lint
+  - **GitHub Actions Workflow:** การตั้งค่า CI/CD Pipeline
+
+### **4. Standards, Compliance & Security**
+
+* **International Standards:** มาตรฐานที่เกี่ยวข้อง:
+  - **TypeScript Specification:** TypeScript Language Specification
+  - **ECMAScript Standards:** ECMAScript Standards
+  - **Type System Standards:** Type System Standards
+  - **Code Quality Standards:** Code Quality Standards
+
+* **Security Protocol:** กลไกการป้องกัน:
+  - **Input Validation:** การตรวจสอบ Input ด้วย TypeScript Types
+  - **Environment Variables Validation:** การตรวจสอบ Environment Variables ด้วย Zod
+  - **Type Safety:** การใช้ Type Safety สำหรับการป้องกัน
+  - **Error Handling:** การจัดการ Error ที่ปลอดภัย
+  - **API Security:** การใช้ API Security ที่เป็นมาตรฐาน
+
+* **Explainability:** ความสามารถในการอธิบาย:
+  - **Type Annotations Documentation:** การบันทึก Type Annotations ที่ชัดเจน
+  - **Error Messages Documentation:** การบันทึก Error Messages ที่ชัดเจน
+  - **API Documentation:** การบันทึก API Documentation ที่ชัดเจน
+  - **Code Comments:** การบันทึก Code Comments ที่ชัดเจน
+
+### **5. Unit Economics & Performance Metrics (KPIs)**
+
+* **Cost Calculation:** สูตรการคำนวณต้นทุนต่อหน่วย (COGS):
+  ```
+  Total Cost = (Development Time × Hourly Rate) + 
+               (Code Review Time × Hourly Rate) + 
+               (Bug Fix Time × Hourly Rate) + 
+               (Tooling Cost)
+  
+  ROI = (Productivity Gain - Total Cost) / Total Cost × 100%
+  
+  Productivity Gain = (Time Saved on Bug Fixes) + 
+                      (Time Saved on Code Reviews) + 
+                      (Time Saved on Onboarding)
+  ```
+
+* **Key Performance Indicators:** ตัวชี้วัดความสำเร็จทางเทคนิค:
+  - **Type Coverage:** % ของ Code ที่มี Type Annotations (Target: > 95%)
+  - **Code Quality Score:** คะแนนคุณภาพของโค้ด (Target: > A)
+  - **Bug Detection Rate:** % ของ Bugs ที่ค้นพบก่อน Production (Target: > 85%)
+  - **Code Review Time:** เวลาเฉลี่ยในการ Code Review (Target: < 30 min)
+  - **Team Productivity:** จำนวน Commits ต่อวัน (Target: > 10/day)
+
+### **6. Strategic Recommendations (CTO Insights)**
+
+* **Phase Rollout:** คำแนะนำในการทยอยเริ่มใช้งาน:
+  1. **Phase 1 (Months 1-2):** สร้าง TypeScript Standards และ Guidelines, ฝึกอบรมทีม
+  2. **Phase 2 (Months 3-4):** ตั้งค่า TypeScript Configuration และ ESLint
+  3. **Phase 3 (Months 5-6):** ฝึกอบรมทีมเกี่ยวกับ TypeScript Standards และ Best Practices
+  4. **Phase 4 (Year 2+):** ขยายไปยังทุกทีม, สร้าง Culture ของ TypeScript Best Practices
+
+* **Pitfalls to Avoid:** ข้อควรระวังที่มักจะผิดพลาด:
+  - **Using `any` Type:** หลีกเลี่ยงการใช้ `any` Type
+  - **Implicit Any:** หลีกเลี่ยงการใช้ Implicit Any
+  - **Skipping Type Annotations:** หลีกเลี่ยงการไม่ใช้ Type Annotations
+  - **Not Using Strict Mode:** หลีกเลี่ยงการไม่ใช้ Strict Mode
+  - **Poor Error Handling:** หลีกเลี่ยงการจัดการ Error ที่ไม่ดี
+  - **Inconsistent Naming:** หลีกเลี่ยงการใช้ Naming ที่ไม่สม่ำเสมอ
+  - **Not Testing Types:** หลีกเลี่ยงการไม่ทดสอบ Types
+
+---
 
 ## Overview
-มาตรฐานการเขียน TypeScript สำหรับทุกโปรเจค รองรับ Node.js และ Next.js
+
+TypeScript coding standards for Backend and Frontend projects supporting Node.js and Next.js.
 
 ## Core Principles
+
 - **Type Safety First**: หลีกเลี่ยง `any` ทุกกรณี
 - **Explicit over Implicit**: ระบุ type ชัดเจน
 - **Functional Programming**: ใช้ immutable patterns
 - **Error Handling**: ใช้ Result type หรือ throw Error ที่มีโครงสร้าง
 
----
-
-## 1. TypeScript Configuration
+## TypeScript Configuration
 
 ### tsconfig.json (Strict Mode - Recommended)
+
 ```json
 {
   "compilerOptions": {
@@ -48,6 +188,7 @@
 ```
 
 ### tsconfig.json for Next.js
+
 ```json
 {
   "compilerOptions": {
@@ -78,6 +219,7 @@
 ```
 
 ### Key Strict Options Explained
+
 ```typescript
 // noUncheckedIndexedAccess - Arrays return T | undefined
 const items = ["a", "b", "c"];
@@ -104,11 +246,10 @@ const config1: Config = {}; // OK - property is absent
 const config2: Config = { timeout: 5000 }; // OK - property has value
 ```
 
----
-
-## 2. Naming Conventions
+## Naming Conventions
 
 ### Variables & Functions (camelCase)
+
 ```typescript
 // ❌ Bad
 const UserData = { name: "John" };
@@ -124,6 +265,7 @@ function fetchUserData() {}
 ```
 
 ### Types, Interfaces, Classes & Enums (PascalCase)
+
 ```typescript
 // ❌ Bad
 interface user {}
@@ -148,6 +290,7 @@ interface UserService {}
 ```
 
 ### Constants (SCREAMING_SNAKE_CASE for true constants)
+
 ```typescript
 // ❌ Bad
 const apikey = "sk-xxx";
@@ -165,6 +308,7 @@ const startTime = Date.now();
 ```
 
 ### Boolean Variables (use is/has/can/should prefix)
+
 ```typescript
 // ❌ Bad
 const loading = true;
@@ -181,6 +325,7 @@ const shouldRefresh = true;
 ```
 
 ### Event Handlers (use handle/on prefix)
+
 ```typescript
 // ❌ Bad
 const clickButton = () => {};
@@ -193,6 +338,7 @@ const onUserSelect = () => {};
 ```
 
 ### File Naming Conventions
+
 ```typescript
 // Classes and Components - PascalCase
 UserController.ts
@@ -217,11 +363,10 @@ constants.ts
 config.ts
 ```
 
----
-
-## 3. Type Definitions
+## Type Definitions
 
 ### Basic Types - Avoid `any`
+
 ```typescript
 // ❌ Bad - any defeats TypeScript's purpose
 function processData(data: any): any {
@@ -320,6 +465,7 @@ type Route = `${HttpMethod} ${Endpoint}`;
 ```
 
 ### Generics Best Practices
+
 ```typescript
 // ❌ Bad - single letter without constraint is unclear
 function process<T>(data: T): T {
@@ -357,7 +503,7 @@ function getProperty<TObj, TKey extends keyof TObj>(
 }
 
 // ✅ Good - generic factory pattern
-function createRepository<T extends { id: string }>(): Repository<T> {
+function createRepository<T extends { id: string }>( ): Repository<T> {
   return {
     async findById(id: string): Promise<T | null> {
       // Implementation
@@ -368,6 +514,7 @@ function createRepository<T extends { id: string }>(): Repository<T> {
 ```
 
 ### Discriminated Unions (Tagged Unions)
+
 ```typescript
 // ✅ Excellent for state management and event handling
 type LoadingState = { status: "loading" };
@@ -412,6 +559,7 @@ function handleUserAction(action: UserAction): void {
 ```
 
 ### Type Guards
+
 ```typescript
 // Custom type guard functions
 function isUser(value: unknown): value is User {
@@ -456,11 +604,10 @@ function processUnknown(value: unknown): void {
 }
 ```
 
----
-
-## 4. Error Handling Patterns
+## Error Handling Patterns
 
 ### Custom Error Classes Hierarchy
+
 ```typescript
 // Base application error
 export abstract class AppError extends Error {
@@ -544,7 +691,10 @@ export class ConflictError extends AppError {
   readonly statusCode = 409;
   readonly code = "CONFLICT";
 
-  constructor(message: string, resource?: string) {
+  constructor(
+    message: string,
+    resource?: string
+  ) {
     super(message, { resource });
   }
 }
@@ -571,6 +721,7 @@ export class ServiceUnavailableError extends AppError {
 ```
 
 ### Try-Catch Patterns
+
 ```typescript
 // ❌ Bad - swallowing errors
 async function getUser(id: string): Promise<User | null> {
@@ -641,6 +792,7 @@ async function processFile(filePath: string): Promise<void> {
 ```
 
 ### Result Type Pattern (Functional Error Handling)
+
 ```typescript
 // Result type definition
 type Result<T, E = Error> =
@@ -708,6 +860,7 @@ const emailResult = map(userResult, (user) => user.email);
 ```
 
 ### Error Boundary Pattern (for Services)
+
 ```typescript
 type ErrorHandler = (error: unknown) => AppError;
 
@@ -741,11 +894,10 @@ const safeCreateUser = withErrorBoundary(
 );
 ```
 
----
-
-## 5. API Response Patterns
+## API Response Patterns
 
 ### Standard Response Types
+
 ```typescript
 // Base response interface
 interface BaseResponse {
@@ -794,6 +946,7 @@ type ApiResponse<T> = SuccessResponse<T> | ErrorResponse;
 ```
 
 ### Response Helper Functions
+
 ```typescript
 import { randomUUID } from "crypto";
 
@@ -863,6 +1016,7 @@ export function paginatedResponse<T>(
 ```
 
 ### Express Integration
+
 ```typescript
 import { Request, Response, NextFunction } from "express";
 
@@ -922,11 +1076,10 @@ export function errorHandler(
 }
 ```
 
----
-
-## 6. Async/Await Best Practices
+## Async/Await Best Practices
 
 ### Proper Promise Handling
+
 ```typescript
 // ❌ Bad - fire and forget (unhandled promise)
 async function processUsers(users: User[]): Promise<void> {
@@ -970,6 +1123,7 @@ async function processUsersSequentially(users: User[]): Promise<void> {
 ```
 
 ### Promise.allSettled for Partial Failures
+
 ```typescript
 interface BatchResult<T> {
   succeeded: T[];
@@ -1011,6 +1165,7 @@ console.log(`Sent ${succeeded.length} emails, ${failed.length} failed`);
 ```
 
 ### Controlled Concurrency
+
 ```typescript
 async function processWithConcurrency<T, R>(
   items: T[],
@@ -1062,6 +1217,7 @@ const results = await processWithLimit(
 ```
 
 ### Timeout Handling
+
 ```typescript
 function withTimeout<T>(
   promise: Promise<T>,
@@ -1107,6 +1263,7 @@ async function fetchWithAbort(
 ```
 
 ### Retry Pattern
+
 ```typescript
 interface RetryOptions {
   maxAttempts: number;
@@ -1170,11 +1327,10 @@ const data = await withRetry(() => fetchExternalApi(), {
 });
 ```
 
----
-
-## 7. Utility Types
+## Utility Types
 
 ### Deep Partial
+
 ```typescript
 type DeepPartial<T> = T extends object
   ? { [P in keyof T]?: DeepPartial<T[P]> }
@@ -1209,6 +1365,7 @@ const update: ConfigUpdate = {
 ```
 
 ### Required Fields
+
 ```typescript
 // Make specific fields required
 type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>;
@@ -1233,6 +1390,7 @@ type UserComplete = RequiredExcept<User, "avatar">;
 ```
 
 ### Nullable and NonNullable Utilities
+
 ```typescript
 // Make all fields nullable
 type Nullable<T> = { [K in keyof T]: T[K] | null };
@@ -1249,6 +1407,7 @@ type OptionalToNullable<T> = {
 ```
 
 ### Extract and Filter Types
+
 ```typescript
 // Extract keys by value type
 type KeysOfType<T, V> = {
@@ -1276,6 +1435,7 @@ type UserStrings = PickByType<User, string>;
 ```
 
 ### Function Types
+
 ```typescript
 // Extract async function return type
 type AsyncReturnType<T extends (...args: any[]) => Promise<any>> =
@@ -1300,6 +1460,7 @@ type FetchedUser = AsyncReturnType<typeof fetchUser>; // User
 ```
 
 ### Builder Pattern Types
+
 ```typescript
 type Builder<T> = {
   [K in keyof T as `set${Capitalize<string & K>}`]: (
@@ -1321,6 +1482,7 @@ type Immutable<T> = {
 ```
 
 ### Path Types (for nested object access)
+
 ```typescript
 type PathImpl<T, K extends keyof T> = K extends string
   ? T[K] extends Record<string, any>
@@ -1366,11 +1528,10 @@ function getSetting<P extends Path<Settings>>(
 }
 ```
 
----
-
-## 8. Dependency Injection Patterns
+## Dependency Injection Patterns
 
 ### Constructor Injection
+
 ```typescript
 // ❌ Bad - tight coupling, hard to test
 class UserService {
@@ -1420,6 +1581,7 @@ class UserService {
 ```
 
 ### Factory Pattern with DI
+
 ```typescript
 // Service factory
 interface ServiceContainer {
@@ -1454,6 +1616,7 @@ const userService = createUserService(container);
 ```
 
 ### Functional Dependency Injection
+
 ```typescript
 // Dependencies as function parameters
 type CreateUserFn = (
@@ -1490,6 +1653,7 @@ const user = await boundCreateUser({ name: "John", email: "john@example.com" });
 ```
 
 ### Testing with DI
+
 ```typescript
 // Mock implementations
 class MockUserRepository implements IUserRepository {
@@ -1554,11 +1718,10 @@ describe("UserService", () => {
 });
 ```
 
----
-
-## 9. Environment Variables Validation
+## Environment Variables Validation
 
 ### Zod Schema Validation
+
 ```typescript
 import { z } from "zod";
 
@@ -1640,6 +1803,7 @@ console.log(env.ENABLE_CACHE); // boolean
 ```
 
 ### Environment-Specific Configs
+
 ```typescript
 import { z } from "zod";
 
@@ -1706,11 +1870,10 @@ function loadConfig(): Config {
 export const config = loadConfig();
 ```
 
----
-
-## 10. Import Organization
+## Import Organization
 
 ### Import Order Convention
+
 ```typescript
 // 1. Node.js built-in modules
 import { readFile } from "fs/promises";
@@ -1737,6 +1900,7 @@ import { USER_ROLES } from "./constants";
 ```
 
 ### Type-Only Imports
+
 ```typescript
 // ❌ Bad - importing type as value (increases bundle size)
 import { User } from "./types";
@@ -1758,6 +1922,7 @@ export type { ApiResponse, PaginatedResponse } from "./api.types";
 ```
 
 ### Barrel Files (Index Exports)
+
 ```typescript
 // services/index.ts
 export { UserService } from "./user.service";
@@ -1773,11 +1938,10 @@ import { UserService, AuthService } from "@/services";
 import type { User, ApiResponse } from "@/types";
 ```
 
----
-
-## 11. ESLint Configuration
+## ESLint Configuration
 
 ### Recommended ESLint Config
+
 ```javascript
 // eslint.config.js (ESLint 9+ flat config)
 import eslint from "@eslint/js";
@@ -1884,180 +2048,7 @@ export default tseslint.config(
 );
 ```
 
-### Legacy ESLint Config (ESLint 8)
-```json
-{
-  "root": true,
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "project": "./tsconfig.json"
-  },
-  "plugins": ["@typescript-eslint"],
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "plugin:@typescript-eslint/strict",
-    "prettier"
-  ],
-  "rules": {
-    "@typescript-eslint/no-explicit-any": "error",
-    "@typescript-eslint/explicit-function-return-type": "warn",
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-    "@typescript-eslint/consistent-type-imports": "error",
-    "@typescript-eslint/no-floating-promises": "error"
-  }
-}
-```
-
----
-
-## 12. Testing Types
-
-### Type-Safe Test Utilities
-```typescript
-// test/utils/factory.ts
-import { randomUUID } from "crypto";
-
-// Generic factory function
-type Factory<T> = (overrides?: Partial<T>) => T;
-
-function createFactory<T>(defaults: T): Factory<T> {
-  return (overrides?: Partial<T>): T => ({
-    ...defaults,
-    ...overrides,
-  });
-}
-
-// User factory
-export const createTestUser = createFactory<User>({
-  id: randomUUID(),
-  name: "Test User",
-  email: "test@example.com",
-  createdAt: new Date(),
-  updatedAt: new Date(),
-});
-
-// Usage
-const user = createTestUser({ name: "Custom Name" });
-```
-
-### Mock Types for Jest
-```typescript
-// test/utils/mocks.ts
-import type { Mock } from "jest-mock";
-
-// Type-safe mock function
-type MockFn<T extends (...args: any[]) => any> = Mock<
-  ReturnType<T>,
-  Parameters<T>
->;
-
-// Type-safe mock implementation
-type MockImpl<T> = {
-  [K in keyof T]: T[K] extends (...args: any[]) => any
-    ? MockFn<T[K]>
-    : T[K];
-};
-
-// Create mock service
-function createMockService<T extends object>(
-  implementations: Partial<MockImpl<T>> = {}
-): MockImpl<T> {
-  return new Proxy({} as MockImpl<T>, {
-    get(target, prop) {
-      if (prop in implementations) {
-        return implementations[prop as keyof T];
-      }
-      if (!(prop in target)) {
-        (target as any)[prop] = jest.fn();
-      }
-      return (target as any)[prop];
-    },
-  });
-}
-
-// Usage
-const mockUserRepo = createMockService<IUserRepository>({
-  findById: jest.fn().mockResolvedValue(createTestUser()),
-});
-```
-
-### Testing Async Code
-```typescript
-// Type-safe async test helpers
-async function expectAsync<T>(
-  promise: Promise<T>
-): Promise<{ resolved: T } | { rejected: Error }> {
-  try {
-    const resolved = await promise;
-    return { resolved };
-  } catch (error) {
-    return { rejected: error as Error };
-  }
-}
-
-// Test that function throws specific error
-async function expectToThrow<E extends Error>(
-  promise: Promise<unknown>,
-  ErrorClass: new (...args: any[]) => E
-): Promise<E> {
-  const result = await expectAsync(promise);
-
-  if ("resolved" in result) {
-    throw new Error(`Expected promise to reject but it resolved`);
-  }
-
-  if (!(result.rejected instanceof ErrorClass)) {
-    throw new Error(
-      `Expected ${ErrorClass.name} but got ${result.rejected.constructor.name}`
-    );
-  }
-
-  return result.rejected;
-}
-
-// Usage
-describe("UserService", () => {
-  it("should throw NotFoundError for missing user", async () => {
-    const error = await expectToThrow(
-      userService.getById("nonexistent"),
-      NotFoundError
-    );
-
-    expect(error.message).toContain("not found");
-  });
-});
-```
-
-### Type Testing with expect-type
-```typescript
-// type-tests/user.test-d.ts
-import { expectTypeOf } from "expect-type";
-import type { User, CreateUserDto, ApiResponse } from "@/types";
-
-// Test type structure
-expectTypeOf<User>().toHaveProperty("id");
-expectTypeOf<User>().toHaveProperty("email");
-
-// Test function return types
-declare function getUser(id: string): Promise<User>;
-expectTypeOf(getUser).returns.resolves.toMatchTypeOf<User>();
-
-// Test generic types
-expectTypeOf<ApiResponse<User>>().toMatchTypeOf<{
-  success: boolean;
-  data?: User;
-}>();
-
-// Test that specific types are NOT assignable
-expectTypeOf<User>().not.toBeAny();
-expectTypeOf<string>().not.toEqualTypeOf<number>();
-```
-
----
-
-## 13. Common Patterns Checklist
+## Common Patterns Checklist
 
 When writing TypeScript code, ensure:
 

@@ -1,8 +1,18 @@
+---
+name: Real-time Multiplayer
+description: Enabling simultaneous gameplay across networks using WebSocket or WebRTC, including state synchronization, lag compensation, client-side prediction, and server authority for fair gameplay.
+---
+
 # Real-time Multiplayer
+
+> **Current Level:** Advanced  
+> **Domain:** Gaming / Networking
+
+---
 
 ## Overview
 
-Real-time multiplayer enables simultaneous gameplay across networks. This guide covers networking, state synchronization, and lag compensation.
+Real-time multiplayer enables simultaneous gameplay across networks. This guide covers networking, state synchronization, and lag compensation for building responsive multiplayer games that handle network latency and maintain game state consistency.
 
 ## Real-time Networking
 
@@ -442,6 +452,123 @@ export class GameRoom extends Room {
   }
 }
 ```
+
+---
+
+## Quick Start
+
+### Client-Side Prediction
+
+```typescript
+// Client predicts movement
+function predictMovement(playerId: string, input: Input) {
+  const player = getPlayer(playerId)
+  player.position.x += input.deltaX
+  player.position.y += input.deltaY
+  
+  // Send to server
+  socket.emit('player-move', { playerId, input })
+}
+
+// Server corrects if needed
+socket.on('server-update', (update) => {
+  const player = getPlayer(update.playerId)
+  
+  // Reconcile if different
+  if (player.position.x !== update.position.x) {
+    player.position = update.position  // Server is authoritative
+  }
+})
+```
+
+### Lag Compensation
+
+```typescript
+// Server rewinds time for hit detection
+function checkHit(shooterId: string, targetId: string, shotTime: number) {
+  const lag = getPlayerLatency(shooterId)
+  const rewindTime = shotTime - lag
+  
+  // Check hit at rewind time
+  const targetPos = getPlayerPositionAtTime(targetId, rewindTime)
+  return isHit(shotPosition, targetPos)
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Networking**: Choose WebSocket or WebRTC
+- [ ] **Client Prediction**: Implement client-side prediction
+- [ ] **Server Authority**: Server is authoritative
+- [ ] **Reconciliation**: Correct client predictions
+- [ ] **Lag Compensation**: Compensate for network latency
+- [ ] **State Synchronization**: Efficient state sync
+- [ ] **Anti-cheat**: Validate all actions server-side
+- [ ] **Bandwidth**: Optimize network usage
+- [ ] **Testing**: Test with various latencies
+- [ ] **Documentation**: Document networking architecture
+- [ ] **Monitoring**: Monitor network performance
+- [ ] **Error Handling**: Handle network errors
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Trust Client
+
+```typescript
+// ❌ Bad - Trust client position
+function movePlayer(playerId: string, newPosition: Position) {
+  players[playerId].position = newPosition  // Client can cheat!
+}
+```
+
+```typescript
+// ✅ Good - Server calculates
+function movePlayer(playerId: string, input: Input) {
+  const player = players[playerId]
+  // Server calculates movement
+  player.position.x += input.deltaX * player.speed
+  player.position.y += input.deltaY * player.speed
+}
+```
+
+### ❌ Don't: No Lag Compensation
+
+```typescript
+// ❌ Bad - No lag compensation
+function checkHit(shooterPos: Position, targetPos: Position) {
+  return distance(shooterPos, targetPos) < HIT_RADIUS
+  // Unfair for high latency players!
+}
+```
+
+```typescript
+// ✅ Good - Lag compensation
+function checkHit(shooterId: string, targetId: string, shotTime: number) {
+  const lag = getPlayerLatency(shooterId)
+  const rewindTime = shotTime - lag
+  const targetPos = getPlayerPositionAtTime(targetId, rewindTime)
+  return distance(shotPosition, targetPos) < HIT_RADIUS
+}
+```
+
+---
+
+## Integration Points
+
+- **Matchmaking** (`38-gaming-features/matchmaking/`) - Player matching
+- **WebSocket Patterns** (`34-real-time-features/websocket-patterns/`) - WebSocket implementation
+- **Game Analytics** (`38-gaming-features/game-analytics/`) - Game metrics
+
+---
+
+## Further Reading
+
+- [Real-time Multiplayer Networking](https://www.gabrielgambetta.com/client-server-game-architecture.html)
+- [Client-Side Prediction](https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking)
 
 ## Best Practices
 

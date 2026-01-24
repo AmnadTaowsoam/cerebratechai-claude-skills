@@ -1,8 +1,18 @@
+---
+name: Content Versioning
+description: Tracking changes to content over time enabling rollback, comparison, and audit trails with version history, diff viewing, and content lifecycle management.
+---
+
 # Content Versioning
+
+> **Current Level:** Intermediate  
+> **Domain:** Content Management / Version Control
+
+---
 
 ## Overview
 
-Content versioning tracks changes to content over time, enabling rollback, comparison, and audit trails. This guide covers implementation patterns and best practices.
+Content versioning tracks changes to content over time, enabling rollback, comparison, and audit trails. This guide covers implementation patterns and best practices for managing content versions effectively.
 
 ## Versioning Concepts
 
@@ -659,8 +669,120 @@ export default router;
 9. **Permissions** - Control who can publish
 10. **Testing** - Test version workflows
 
-## Resources
+---
+
+## Quick Start
+
+### Content Versioning
+
+```typescript
+interface ContentVersion {
+  id: string
+  contentId: string
+  version: number
+  content: string
+  author: string
+  createdAt: Date
+  status: 'draft' | 'published' | 'archived'
+}
+
+async function createVersion(
+  contentId: string,
+  content: string,
+  author: string
+): Promise<ContentVersion> {
+  // Get latest version
+  const latest = await getLatestVersion(contentId)
+  const newVersion = latest ? latest.version + 1 : 1
+  
+  return await db.contentVersions.create({
+    data: {
+      contentId,
+      version: newVersion,
+      content,
+      author,
+      status: 'draft'
+    }
+  })
+}
+
+async function rollbackToVersion(contentId: string, version: number) {
+  const version = await db.contentVersions.findUnique({
+    where: { contentId_version: { contentId, version } }
+  })
+  
+  await publishVersion(version.id)
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Versioning System**: Content versioning implemented
+- [ ] **Version History**: Complete version history
+- [ ] **Diff Viewing**: Visual diff tools
+- [ ] **Rollback**: Easy rollback to previous versions
+- [ ] **Audit Trail**: Track all changes
+- [ ] **Status Management**: Draft/published/archived
+- [ ] **Comparison**: Compare versions
+- [ ] **Metadata**: Version metadata
+- [ ] **Testing**: Test version workflows
+- [ ] **Documentation**: Document versioning
+- [ ] **Performance**: Optimize version storage
+- [ ] **Cleanup**: Archive old versions
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Version History
+
+```typescript
+// ❌ Bad - Overwrite content
+await db.content.update({
+  where: { id: contentId },
+  data: { content: newContent }
+})
+// Lost previous version!
+```
+
+```typescript
+// ✅ Good - Version history
+await createVersion(contentId, newContent, author)
+// Previous versions preserved
+```
+
+### ❌ Don't: Unlimited Versions
+
+```markdown
+# ❌ Bad - Keep all versions forever
+Version 1, Version 2, ... Version 10000
+# Storage bloat!
+```
+
+```markdown
+# ✅ Good - Archive old versions
+Keep last 50 versions
+Archive versions older than 1 year
+# Manageable storage
+```
+
+---
+
+## Integration Points
+
+- **Headless CMS** (`33-content-management/headless-cms/`) - CMS patterns
+- **Contentful Integration** (`33-content-management/contentful-integration/`) - CMS integration
+- **Versioning** (`01-foundations/versioning/`) - Version control
+
+---
+
+## Further Reading
 
 - [Git Versioning](https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control)
+- [Content Versioning Best Practices](https://www.contentful.com/developers/docs/concepts/versioning/)
+
+## Resources
 - [Diff Algorithms](https://github.com/kpdecker/jsdiff)
 - [Content Versioning Best Practices](https://www.contentful.com/blog/2021/04/14/content-versioning/)

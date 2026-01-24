@@ -1,8 +1,18 @@
+---
+name: ML Model Serving
+description: Deploying ML models for predictions through REST APIs, batch prediction, model optimization, deployment strategies, and serving infrastructure for production ML systems.
+---
+
 # ML Model Serving
+
+> **Current Level:** Advanced  
+> **Domain:** Data Science / ML / DevOps
+
+---
 
 ## Overview
 
-Model serving deploys ML models for predictions. This guide covers REST APIs, batch prediction, optimization, and deployment strategies.
+Model serving deploys ML models for predictions. This guide covers REST APIs, batch prediction, optimization, and deployment strategies for building production ML systems that serve predictions reliably and efficiently.
 
 ## Model Serving Patterns
 
@@ -501,10 +511,126 @@ spec:
 9. **Scaling** - Auto-scale based on load
 10. **Security** - Secure API endpoints
 
-## Resources
+---
+
+## Quick Start
+
+### FastAPI Model Serving
+
+```python
+from fastapi import FastAPI
+import torch
+
+app = FastAPI()
+model = torch.load('model.pth')
+model.eval()
+
+@app.post('/predict')
+async def predict(data: PredictionRequest):
+    # Preprocess
+    input_tensor = preprocess(data.features)
+    
+    # Predict
+    with torch.no_grad():
+        prediction = model(input_tensor)
+    
+    # Postprocess
+    result = postprocess(prediction)
+    
+    return {'prediction': result}
+```
+
+### Batch Prediction
+
+```python
+async def batch_predict(data: List[PredictionRequest]):
+    # Batch processing
+    inputs = [preprocess(d.features) for d in data]
+    batch = torch.stack(inputs)
+    
+    with torch.no_grad():
+        predictions = model(batch)
+    
+    return [postprocess(p) for p in predictions]
+```
+
+---
+
+## Production Checklist
+
+- [ ] **API**: REST API for predictions
+- [ ] **Batch Processing**: Batch prediction support
+- [ ] **Model Loading**: Efficient model loading
+- [ ] **Caching**: Cache predictions if appropriate
+- [ ] **Monitoring**: Monitor prediction performance
+- [ ] **Health Checks**: Health endpoints
+- [ ] **Logging**: Log predictions for debugging
+- [ ] **A/B Testing**: Test new models safely
+- [ ] **Scaling**: Auto-scale based on load
+- [ ] **Security**: Secure API endpoints
+- [ ] **Documentation**: Document API
+- [ ] **Testing**: Test model serving
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Load Model Every Request
+
+```python
+# ❌ Bad - Load on every request
+@app.post('/predict')
+async def predict(data):
+    model = torch.load('model.pth')  # Slow!
+    return model(data)
+```
+
+```python
+# ✅ Good - Load once
+model = torch.load('model.pth')  # Load at startup
+
+@app.post('/predict')
+async def predict(data):
+    return model(data)  # Fast!
+```
+
+### ❌ Don't: No Error Handling
+
+```python
+# ❌ Bad - No error handling
+@app.post('/predict')
+async def predict(data):
+    return model(data)  # What if model fails?
+```
+
+```python
+# ✅ Good - Error handling
+@app.post('/predict')
+async def predict(data):
+    try:
+        return model(data)
+    except Exception as e:
+        logger.error(f"Prediction error: {e}")
+        raise HTTPException(status_code=500, detail="Prediction failed")
+```
+
+---
+
+## Integration Points
+
+- **Model Training** (`05-ai-ml-core/model-training/`) - Model development
+- **Model Optimization** (`05-ai-ml-core/model-optimization/`) - Model optimization
+- **API Design** (`01-foundations/api-design/`) - API patterns
+
+---
+
+## Further Reading
 
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [TorchServe](https://pytorch.org/serve/)
+- [ML Model Serving Best Practices](https://www.tensorflow.org/tfx/guide/serving)
+
+## Resources
 - [TensorFlow Serving](https://www.tensorflow.org/tfx/guide/serving)
 - [BentoML](https://www.bentoml.com/)
 - [Seldon Core](https://www.seldon.io/)

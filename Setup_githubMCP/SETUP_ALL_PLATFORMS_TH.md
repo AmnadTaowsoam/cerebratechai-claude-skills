@@ -38,7 +38,7 @@
 1. ไปที่: https://github.com/settings/tokens
 2. สร้าง **Fine-grained token**:
    - ชื่อ: `Claude MCP - Skills`
-   - Repository: `cerebratechai-claude-skills`
+   - Repository: `cerebraSkills`
    - สิทธิ์: `Contents: Read-only`
 3. คัดลอก token (ขึ้นต้นด้วย `github_pat_`)
 
@@ -69,7 +69,7 @@ nano ~/.config/Claude/claude_desktop_config.json
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
         "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }
@@ -161,8 +161,8 @@ Create a Prisma schema for a blog
 #### ขั้นที่ 1: Clone Repository
 ```bash
 cd ~/projects
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
-cd cerebratechai-claude-skills
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
+cd cerebraSkills
 ```
 
 #### ขั้นที่ 2: เปิดใน VS Code
@@ -277,7 +277,7 @@ Cursor IDE (Roo Code) ตอนนี้รองรับ **MCP (Model Context 
          "env": {
            "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
            "GITHUB_OWNER": "AmnadTaowsoam",
-           "GITHUB_REPO": "cerebratechai-claude-skills",
+           "GITHUB_REPO": "cerebraSkills",
            "GITHUB_BRANCH": "main"
          }
        }
@@ -325,15 +325,15 @@ Create a Next.js API endpoint
 #### ขั้นที่ 1: Clone Repository
 ```bash
 cd ~/projects
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
 ```
 
 #### ขั้นที่ 2: เปิดใน Cursor
 ```bash
-cursor cerebratechai-claude-skills
+cursor cerebraSkills
 ```
 
-หรือ: File → Open Folder → เลือก `cerebratechai-claude-skills`
+หรือ: File → Open Folder → เลือก `cerebraSkills`
 
 #### ขั้นที่ 3: ตั้งค่า Cursor Rules
 
@@ -418,7 +418,7 @@ Repository นี้มี 473+ production-ready coding skills ใน 73 หม�
 
 **วิธีที่ 3: @ Mentions**
 ```
-@cerebratechai-claude-skills/01-foundations/typescript-standards/SKILL.md
+@cerebraSkills/01-foundations/typescript-standards/SKILL.md
 
 ใช้มาตรฐานเหล่านี้กับไฟล์ปัจจุบัน
 ```
@@ -468,7 +468,7 @@ Antigravity รองรับ **MCP (Model Context Protocol)** สำหรั�
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
         "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }
@@ -523,11 +523,11 @@ Create a Next.js API endpoint
 ```bash
 # Windows (PowerShell)
 cd $HOME\Documents
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
 
 # macOS/Linux
 cd ~/Documents
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
 ```
 
 #### ขั้นที่ 2: เพิ่มเป็น Skill ใน Antigravity
@@ -537,8 +537,8 @@ git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
 3. **ไปที่ส่วน "Skills"**
 4. **คลิก "Add Skill"** หรือ "Add Folder"
 5. **เลือกโฟลเดอร์** ที่ clone มา:
-   - Windows: `C:\Users\YOUR_USERNAME\Documents\cerebratechai-claude-skills`
-   - macOS/Linux: `/Users/YOUR_USERNAME/Documents/cerebratechai-claude-skills`
+   - Windows: `C:\Users\YOUR_USERNAME\Documents\cerebraSkills`
+   - macOS/Linux: `/Users/YOUR_USERNAME/Documents/cerebraSkills`
 6. **ตั้งชื่อ**: `cerebratechai-skills`
 7. **เปิดใช้งาน** skill
 8. **บันทึก** การตั้งค่า
@@ -586,7 +586,7 @@ Load context from cerebratechai-skills:
 **วิธี Local:**
 ```bash
 # ไปที่ repository
-cd ~/Documents/cerebratechai-claude-skills
+cd ~/Documents/cerebraSkills
 
 # Pull การเปลี่ยนแปลงล่าสุด
 git pull origin main
@@ -679,8 +679,8 @@ Antigravity จะใช้ไฟล์ที่อัปเดตแล้ว�
 - 📑 [SKILL_INDEX.md](./SKILL_INDEX.md) - ดัชนี skill ทั้งหมด
 
 ### ชุมชน
-- 🐛 [Issues](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills/issues)
-- 💬 [Discussions](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills/discussions)
+- 🐛 [Issues](https://github.com/AmnadTaowsoam/cerebraSkills/issues)
+- 💬 [Discussions](https://github.com/AmnadTaowsoam/cerebraSkills/discussions)
 - 🤝 [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ---
@@ -708,5 +708,5 @@ Antigravity จะใช้ไฟล์ที่อัปเดตแล้ว�
 ---
 
 **อัปเดตล่าสุด**: 16 มกราคม 2026  
-**Repository**: https://github.com/AmnadTaowsoam/cerebratechai-claude-skills  
+**Repository**: https://github.com/AmnadTaowsoam/cerebraSkills  
 **License**: MIT

@@ -1,8 +1,18 @@
+---
+name: Media Library
+description: Managing digital assets including images, videos, and documents with upload, processing, optimization, organization, metadata, and CDN integration for efficient media delivery.
+---
+
 # Media Library
+
+> **Current Level:** Intermediate  
+> **Domain:** Content Management / Media
+
+---
 
 ## Overview
 
-A media library manages digital assets including images, videos, and documents. This guide covers upload, processing, organization, and CDN integration.
+A media library manages digital assets including images, videos, and documents. This guide covers upload, processing, organization, and CDN integration for building scalable media management systems.
 
 ## Media Library Architecture
 
@@ -707,6 +717,241 @@ export class MediaBulkService {
 8. **Permissions** - Control access to media
 9. **Bulk Operations** - Support bulk actions
 10. **Performance** - Lazy load thumbnails
+```
+
+---
+
+## Quick Start
+
+### Media Upload
+
+```typescript
+interface Media {
+  id: string
+  filename: string
+  mimeType: string
+  size: number
+  url: string
+  thumbnailUrl?: string
+  metadata: Record<string, any>
+}
+
+async function uploadMedia(file: File): Promise<Media> {
+  // Validate
+  validateFile(file)
+  
+  // Upload to S3
+  const s3Key = `media/${Date.now()}-${file.name}`
+  await s3.upload({
+    Bucket: process.env.S3_BUCKET,
+    Key: s3Key,
+    Body: file.buffer,
+    ContentType: file.mimetype
+  })
+  
+  // Generate thumbnail
+  const thumbnail = await generateThumbnail(file)
+  
+  // Save metadata
+  return await db.media.create({
+    data: {
+      filename: file.name,
+      mimeType: file.mimetype,
+      size: file.size,
+      url: `https://cdn.example.com/${s3Key}`,
+      thumbnailUrl: thumbnail ? `https://cdn.example.com/thumbnails/${s3Key}` : undefined,
+      metadata: await extractMetadata(file)
+    }
+  })
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Upload**: File upload functionality
+- [ ] **Validation**: File type and size validation
+- [ ] **Processing**: Image/video processing
+- [ ] **Optimization**: Automatic optimization
+- [ ] **Thumbnails**: Thumbnail generation
+- [ ] **Storage**: Cloud storage (S3, etc.)
+- [ ] **CDN**: CDN for delivery
+- [ ] **Metadata**: Extract and store metadata
+- [ ] **Organization**: Folders and tags
+- [ ] **Search**: Full-text search
+- [ ] **Permissions**: Access control
+- [ ] **Performance**: Optimize for large files
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Validation
+
+```typescript
+// ❌ Bad - No validation
+await uploadFile(file)
+// Could be malicious file!
+```
+
+```typescript
+// ✅ Good - Validate
+if (!isValidFileType(file.mimetype)) {
+  throw new Error('Invalid file type')
+}
+if (file.size > MAX_FILE_SIZE) {
+  throw new Error('File too large')
+}
+await uploadFile(file)
+```
+
+### ❌ Don't: No Optimization
+
+```typescript
+// ❌ Bad - Upload as-is
+await uploadFile(file)
+// Large file, slow loading!
+```
+
+```typescript
+// ✅ Good - Optimize
+const optimized = await optimizeImage(file)
+await uploadFile(optimized)
+// Smaller file, faster loading
+```
+
+---
+
+## Integration Points
+
+- **Contentful Integration** (`33-content-management/contentful-integration/`) - CMS media
+- **CDN Delivery** (`37-video-streaming/cdn-delivery/`) - Media CDN
+- **File Storage** (`13-file-storage/`) - Storage patterns
+
+---
+
+## Further Reading
+
+- [Media Library Best Practices](https://www.contentful.com/developers/docs/concepts/media/)
+- [Image Optimization](https://web.dev/fast/#optimize-your-images)
+
+---
+
+## Quick Start
+
+### Media Upload
+
+```typescript
+interface Media {
+  id: string
+  filename: string
+  mimeType: string
+  size: number
+  url: string
+  thumbnailUrl?: string
+  metadata: Record<string, any>
+}
+
+async function uploadMedia(file: File): Promise<Media> {
+  // Validate
+  validateFile(file)
+  
+  // Upload to S3
+  const s3Key = `media/${Date.now()}-${file.name}`
+  await s3.upload({
+    Bucket: process.env.S3_BUCKET,
+    Key: s3Key,
+    Body: file.buffer,
+    ContentType: file.mimetype
+  })
+  
+  // Generate thumbnail
+  const thumbnail = await generateThumbnail(file)
+  
+  // Save metadata
+  return await db.media.create({
+    data: {
+      filename: file.name,
+      mimeType: file.mimetype,
+      size: file.size,
+      url: `https://cdn.example.com/${s3Key}`,
+      thumbnailUrl: thumbnail ? `https://cdn.example.com/thumbnails/${s3Key}` : undefined,
+      metadata: await extractMetadata(file)
+    }
+  })
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Upload**: File upload functionality
+- [ ] **Validation**: File type and size validation
+- [ ] **Processing**: Image/video processing
+- [ ] **Optimization**: Automatic optimization
+- [ ] **Thumbnails**: Thumbnail generation
+- [ ] **Storage**: Cloud storage (S3, etc.)
+- [ ] **CDN**: CDN for delivery
+- [ ] **Metadata**: Extract and store metadata
+- [ ] **Organization**: Folders and tags
+- [ ] **Search**: Full-text search
+- [ ] **Permissions**: Access control
+- [ ] **Performance**: Optimize for large files
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Validation
+
+```typescript
+// ❌ Bad - No validation
+await uploadFile(file)
+// Could be malicious file!
+```
+
+```typescript
+// ✅ Good - Validate
+if (!isValidFileType(file.mimetype)) {
+  throw new Error('Invalid file type')
+}
+if (file.size > MAX_FILE_SIZE) {
+  throw new Error('File too large')
+}
+await uploadFile(file)
+```
+
+### ❌ Don't: No Optimization
+
+```typescript
+// ❌ Bad - Upload as-is
+await uploadFile(file)
+// Large file, slow loading!
+```
+
+```typescript
+// ✅ Good - Optimize
+const optimized = await optimizeImage(file)
+await uploadFile(optimized)
+// Smaller file, faster loading
+```
+
+---
+
+## Integration Points
+
+- **Contentful Integration** (`33-content-management/contentful-integration/`) - CMS media
+- **CDN Delivery** (`37-video-streaming/cdn-delivery/`) - Media CDN
+- **File Storage** (`13-file-storage/`) - Storage patterns
+
+---
+
+## Further Reading
+
+- [Media Library Best Practices](https://www.contentful.com/developers/docs/concepts/media/)
+- [Image Optimization](https://web.dev/fast/#optimize-your-images)
 
 ## Resources
 

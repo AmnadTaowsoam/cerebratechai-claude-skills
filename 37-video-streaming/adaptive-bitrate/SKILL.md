@@ -1,8 +1,20 @@
+---
+name: Adaptive Bitrate Streaming
+description: Automatically adjusting video quality based on network conditions using HLS, DASH protocols and player implementation for smooth playback and optimal user experience.
+---
+
 # Adaptive Bitrate Streaming
+
+> **Current Level:** Advanced  
+> **Domain:** Video Streaming / Media
+
+---
 
 ## Overview
 
-Adaptive Bitrate (ABR) streaming automatically adjusts video quality based on network conditions. This guide covers HLS, DASH, and player implementation.
+Adaptive Bitrate (ABR) streaming automatically adjusts video quality based on network conditions. This guide covers HLS, DASH, and player implementation for building video streaming solutions that provide smooth playback across varying network conditions.
+
+---
 
 ## ABR Concepts
 
@@ -414,12 +426,105 @@ if (shaka.Player.isBrowserSupported() &&
 }
 ```
 
-## Best Practices
+---
 
-1. **Multiple Qualities** - Provide 3-5 quality levels
-2. **Segment Duration** - Use 6-10 second segments
-3. **Buffer Management** - Configure appropriate buffers
-4. **Error Handling** - Handle network errors gracefully
+## Quick Start
+
+### HLS Manifest Generation
+
+```bash
+# Generate HLS with multiple bitrates
+ffmpeg -i input.mp4 \
+  -c:v libx264 -preset veryfast -b:v:0 3000k -s:v:0 1920x1080 \
+  -c:v libx264 -preset veryfast -b:v:1 1500k -s:v:1 1280x720 \
+  -c:v libx264 -preset veryfast -b:v:2 800k -s:v:2 854x480 \
+  -c:a aac -b:a 128k \
+  -var_stream_map "v:0,a:0 v:1,a:0 v:2,a:0" \
+  -master_pl_name master.m3u8 \
+  -f hls -hls_time 6 -hls_list_size 0 \
+  stream_%v/playlist.m3u8
+```
+
+### HLS.js Player
+
+```javascript
+import Hls from 'hls.js'
+
+const video = document.getElementById('video')
+const hls = new Hls()
+
+hls.loadSource('https://server/master.m3u8')
+hls.attachMedia(video)
+
+// Monitor quality changes
+hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
+  console.log('Switched to quality:', data.level)
+})
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Multiple Qualities**: Provide 3-5 quality levels
+- [ ] **Segment Duration**: Use 6-10 second segments
+- [ ] **Buffer Management**: Configure appropriate buffers
+- [ ] **Error Handling**: Handle network errors gracefully
+- [ ] **CDN**: Use CDN for global distribution
+- [ ] **Monitoring**: Monitor playback quality and buffering
+- [ ] **Testing**: Test on various network conditions
+- [ ] **Fallback**: Fallback to lower quality on errors
+- [ ] **Analytics**: Track quality switches and buffering
+- [ ] **Documentation**: Document quality levels
+- [ ] **Optimization**: Optimize encoding settings
+- [ ] **Compatibility**: Test across browsers and devices
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Single Quality
+
+```bash
+# ❌ Bad - One quality only
+ffmpeg -i input.mp4 -b:v 3000k output.m3u8
+```
+
+```bash
+# ✅ Good - Multiple qualities
+ffmpeg -i input.mp4 \
+  -b:v:0 3000k -b:v:1 1500k -b:v:2 800k \
+  -var_stream_map "v:0 v:1 v:2" \
+  master.m3u8
+```
+
+### ❌ Don't: Long Segments
+
+```bash
+# ❌ Bad - Long segments
+-hls_time 30  # 30 seconds - slow adaptation
+```
+
+```bash
+# ✅ Good - Shorter segments
+-hls_time 6  # 6 seconds - faster adaptation
+```
+
+---
+
+## Integration Points
+
+- **Live Streaming** (`37-video-streaming/live-streaming/`) - Live ABR
+- **CDN Delivery** (`37-video-streaming/cdn-delivery/`) - CDN setup
+- **Video Analytics** (`37-video-streaming/video-analytics/`) - Quality metrics
+
+---
+
+## Further Reading
+
+- [HLS Specification](https://developer.apple.com/streaming/)
+- [DASH Specification](https://dashif.org/)
+- [HLS.js Documentation](https://github.com/video-dev/hls.js/)
 5. **Quality Selection** - Allow manual quality override
 6. **Analytics** - Track quality switches
 7. **CDN** - Use CDN for delivery

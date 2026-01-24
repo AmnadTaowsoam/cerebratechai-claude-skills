@@ -1,10 +1,24 @@
+---
+name: UTM Tracking and Campaign Tracking
+description: Adding UTM parameters to URLs to track marketing campaign effectiveness across channels, including UTM builder, attribution models, analytics integration, and campaign reporting.
+---
+
 # UTM Tracking and Campaign Tracking
+
+> **Current Level:** Intermediate  
+> **Domain:** Marketing / Analytics
+
+---
 
 ## Overview
 
 UTM (Urchin Tracking Module) parameters are tags added to URLs to track the effectiveness of marketing campaigns across various channels. They help identify where traffic is coming from and how users interact with your content.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [UTM Parameters Explained](#utm-parameters-explained)
 2. [UTM Builder Implementation](#utm-builder-implementation)
@@ -1826,6 +1840,135 @@ const campaignName = CampaignNamer.generateName({
 ```
 
 ---
+
+---
+
+## Quick Start
+
+### UTM Builder
+
+```typescript
+interface UTMParams {
+  source: string      // utm_source
+  medium: string      // utm_medium
+  campaign: string    // utm_campaign
+  term?: string       // utm_term
+  content?: string    // utm_content
+}
+
+function buildUTMUrl(baseUrl: string, params: UTMParams): string {
+  const url = new URL(baseUrl)
+  url.searchParams.set('utm_source', params.source)
+  url.searchParams.set('utm_medium', params.medium)
+  url.searchParams.set('utm_campaign', params.campaign)
+  if (params.term) url.searchParams.set('utm_term', params.term)
+  if (params.content) url.searchParams.set('utm_content', params.content)
+  return url.toString()
+}
+
+// Usage
+const url = buildUTMUrl('https://example.com', {
+  source: 'facebook',
+  medium: 'social',
+  campaign: 'summer-sale'
+})
+```
+
+### Track UTM Parameters
+
+```typescript
+// Extract UTM from URL
+function extractUTM(url: string): UTMParams | null {
+  const urlObj = new URL(url)
+  const source = urlObj.searchParams.get('utm_source')
+  const medium = urlObj.searchParams.get('utm_medium')
+  const campaign = urlObj.searchParams.get('utm_campaign')
+  
+  if (!source || !medium || !campaign) {
+    return null
+  }
+  
+  return {
+    source,
+    medium,
+    campaign,
+    term: urlObj.searchParams.get('utm_term') || undefined,
+    content: urlObj.searchParams.get('utm_content') || undefined
+  }
+}
+
+// Store in session
+sessionStorage.setItem('utm_params', JSON.stringify(extractUTM(window.location.href)))
+```
+
+---
+
+## Production Checklist
+
+- [ ] **UTM Builder**: UTM URL builder implemented
+- [ ] **Parameter Tracking**: Track UTM parameters
+- [ ] **Storage**: Store UTM data
+- [ ] **Attribution**: Attribution model defined
+- [ ] **Analytics Integration**: Integrate with analytics
+- [ ] **Link Shortening**: Link shortening if needed
+- [ ] **QR Codes**: QR code generation
+- [ ] **Reporting**: Campaign reporting
+- [ ] **Naming Convention**: Consistent naming convention
+- [ ] **Documentation**: Document UTM structure
+- [ ] **Testing**: Test UTM tracking
+- [ ] **Monitoring**: Monitor campaign performance
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Inconsistent Naming
+
+```typescript
+// ❌ Bad - Inconsistent
+utm_source=facebook
+utm_source=Facebook
+utm_source=FB
+// Same source, different names!
+```
+
+```typescript
+// ✅ Good - Consistent
+utm_source=facebook  // Always lowercase
+utm_medium=social   // Always lowercase
+utm_campaign=summer-sale  // Always kebab-case
+```
+
+### ❌ Don't: No Attribution
+
+```markdown
+# ❌ Bad - No attribution model
+All conversions attributed to last click
+# Ignores other touchpoints!
+```
+
+```markdown
+# ✅ Good - Multi-touch attribution
+First touch: 20%
+Middle touch: 30%
+Last touch: 50%
+# Recognizes all touchpoints
+```
+
+---
+
+## Integration Points
+
+- **Campaign Management** (`28-marketing-integration/campaign-management/`) - Campaign tracking
+- **Analytics** (`23-business-analytics/`) - Campaign analytics
+- **Marketing Automation** (`28-marketing-integration/marketing-automation/`) - Automated campaigns
+
+---
+
+## Further Reading
+
+- [UTM Parameters Guide](https://support.google.com/analytics/answer/1033863)
+- [Campaign Attribution](https://www.optimizely.com/optimization-glossary/attribution-modeling/)
 
 ## Resources
 

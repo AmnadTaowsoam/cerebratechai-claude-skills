@@ -38,7 +38,7 @@ Use Model Context Protocol (MCP) to connect Claude Desktop directly to this GitH
 1. Go to: https://github.com/settings/tokens
 2. Create **Fine-grained token**:
    - Name: `Claude MCP - Skills`
-   - Repository: `cerebratechai-claude-skills`
+   - Repository: `cerebraSkills`
    - Permissions: `Contents: Read-only`
 3. Copy token (starts with `github_pat_`)
 
@@ -69,7 +69,7 @@ nano ~/.config/Claude/claude_desktop_config.json
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
         "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }
@@ -162,8 +162,8 @@ Use this repository as context for GitHub Copilot through workspace indexing.
 #### Step 1: Clone Repository
 ```bash
 cd ~/projects
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
-cd cerebratechai-claude-skills
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
+cd cerebraSkills
 ```
 
 #### Step 2: Open in VS Code
@@ -278,7 +278,7 @@ Same as Claude Desktop (Section 1, Step 1)
          "env": {
            "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
            "GITHUB_OWNER": "AmnadTaowsoam",
-           "GITHUB_REPO": "cerebratechai-claude-skills",
+           "GITHUB_REPO": "cerebraSkills",
            "GITHUB_BRANCH": "main"
          }
        }
@@ -326,15 +326,15 @@ If you prefer local files or want offline access:
 #### Step 1: Clone Repository
 ```bash
 cd ~/projects
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
 ```
 
 #### Step 2: Open in Cursor
 ```bash
-cursor cerebratechai-claude-skills
+cursor cerebraSkills
 ```
 
-Or: File → Open Folder → Select `cerebratechai-claude-skills`
+Or: File → Open Folder → Select `cerebraSkills`
 
 #### Step 3: Configure Cursor Rules
 
@@ -419,7 +419,7 @@ Create a complete auth system for Next.js
 
 **Method 3: @ Mentions**
 ```
-@cerebratechai-claude-skills/01-foundations/typescript-standards/SKILL.md
+@cerebraSkills/01-foundations/typescript-standards/SKILL.md
 
 Apply these standards to my current file
 ```
@@ -469,7 +469,7 @@ Same as Claude Desktop (Section 1, Step 1)
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN_HERE",
         "GITHUB_OWNER": "AmnadTaowsoam",
-        "GITHUB_REPO": "cerebratechai-claude-skills",
+        "GITHUB_REPO": "cerebraSkills",
         "GITHUB_BRANCH": "main"
       }
     }
@@ -524,11 +524,11 @@ If you prefer local files or need offline access:
 ```bash
 # Windows (PowerShell)
 cd $HOME\Documents
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
 
 # macOS/Linux
 cd ~/Documents
-git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
+git clone https://github.com/AmnadTaowsoam/cerebraSkills.git
 ```
 
 #### Step 2: Add as Skill in Antigravity
@@ -538,8 +538,8 @@ git clone https://github.com/AmnadTaowsoam/cerebratechai-claude-skills.git
 3. **Navigate to "Skills"** section
 4. **Click "Add Skill"** or "Add Folder"
 5. **Browse and select** the cloned folder:
-   - Windows: `C:\Users\YOUR_USERNAME\Documents\cerebratechai-claude-skills`
-   - macOS/Linux: `/Users/YOUR_USERNAME/Documents/cerebratechai-claude-skills`
+   - Windows: `C:\Users\YOUR_USERNAME\Documents\cerebraSkills`
+   - macOS/Linux: `/Users/YOUR_USERNAME/Documents/cerebraSkills`
 6. **Name it**: `cerebratechai-skills`
 7. **Enable** the skill
 8. **Save** settings
@@ -587,7 +587,7 @@ Now help me build a full-stack app
 **Local Method:**
 ```bash
 # Navigate to repository
-cd ~/Documents/cerebratechai-claude-skills
+cd ~/Documents/cerebraSkills
 
 # Pull latest changes
 git pull origin main
@@ -680,8 +680,8 @@ All three can share the same GitHub repository and stay in sync!
 - 📑 [SKILL_INDEX.md](./SKILL_INDEX.md) - Detailed skill index
 
 ### Community
-- 🐛 [Issues](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills/issues)
-- 💬 [Discussions](https://github.com/AmnadTaowsoam/cerebratechai-claude-skills/discussions)
+- 🐛 [Issues](https://github.com/AmnadTaowsoam/cerebraSkills/issues)
+- 💬 [Discussions](https://github.com/AmnadTaowsoam/cerebraSkills/discussions)
 - 🤝 [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ---
@@ -709,5 +709,5 @@ All three can share the same GitHub repository and stay in sync!
 ---
 
 **Last Updated**: January 16, 2026  
-**Repository**: https://github.com/AmnadTaowsoam/cerebratechai-claude-skills  
+**Repository**: https://github.com/AmnadTaowsoam/cerebraSkills  
 **License**: MIT

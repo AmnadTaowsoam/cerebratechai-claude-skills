@@ -1,46 +1,107 @@
 # Multi-Step Form Patterns
 
-## Overview
+---
 
-Patterns for building complex multi-step forms with state management, validation, progress tracking, and user experience optimization. This skill covers wizard patterns, form persistence, conditional steps, and best practices for long-form data collection.
+## 1. Executive Summary & Strategic Necessity
+
+### 1.1 Context (ภาษาไทย)
+
+Multi-Step Form คือ pattern สำหรับการสร้าง forms ที่มีหลายขั้นตอน (wizard pattern) ซึ่งช่วยให้ผู้ใช้กรอกข้อมูลที่ซับซ้อนได้ง่ายขึ้น โดยแบ่งข้อมูลออกเป็น steps ที่เล็กลง และมีการตรวจสอบ (validation) และบันทึกข้อมูล (persistence) ตลอดเวลา
+
+Multi-Step Form ใช้ React Hook Form สำหรับ state management และ Zod สำหรับ validation พร้อมกับ auto-save และ progress indicators ที่ช่วยให้ผู้ใช้เข้าใจสถานะของ form และสามารถกลับมาทำต่อได้
+
+### 1.2 Business Impact (ภาษาไทย)
+
+**ผลกระทบทางธุรกิจ:**
+
+1. **เพิ่ม Completion Rate** - Multi-step forms ช่วยเพิ่ม completion rate ได้ถึง 20-30%
+2. **ลด Form Abandonment** - การแบ่งขั้นตอนช่วยลด form abandonment rate
+3. **เพิ่ม Data Quality** - Per-step validation ช่วยเพิ่มคุณภาพข้อมูล
+4. **เพิ่ม User Experience** - Progress indicators และ auto-save ช่วยเพิ่ม UX
+5. **ปรับปรุง Conversion** - การกรอกข้อมูลที่ง่ายขึ้นช่วยเพิ่ม conversion rate
+
+### 1.3 Product Thinking (ภาษาไทย)
+
+**มุมมองด้านผลิตภัณฑ์:**
+
+1. **User-Centric** - Form ต้องเป็นประโยชน์และเข้าใจง่ายสำหรับผู้ใช้
+2. **Progressive Disclosure** - แสดงข้อมูลทีละ step เพื่อลด cognitive load
+3. **Data Persistence** - บันทึกข้อมูลอัตโนมัติเพื่อป้องกัน data loss
+4. **Validation First** - Validate ข้อมูลทุก step เพื่อป้องกัน errors
+5. **Accessibility** - Form ต้องเข้าถึงได้และใช้งานได้สำหรับผู้ใช้ทุกคน
 
 ---
 
-## 1. Multi-Step Form Architecture
+## 2. Technical Deep Dive (The "How-to")
 
-### Form Structure
+### 2.1 Core Logic
 
-```markdown
-# Multi-Step Form Architecture
+Multi-Step Form ประกอบด้วย 6 components หลัก:
 
-## Components
-1. **Form Container**: Manages overall state
-2. **Step Navigator**: Controls step transitions
-3. **Progress Indicator**: Shows completion status
-4. **Step Components**: Individual form steps
-5. **Validation Engine**: Per-step and global validation
-6. **State Persistence**: Save/restore form data
+1. **Form Container** - จัดการ overall state ของ form
+2. **Step Navigator** - ควบคุมการเปลี่ยน step
+3. **Progress Indicator** - แสดงสถานะ completion
+4. **Step Components** - Components สำหรับแต่ละ step
+5. **Validation Engine** - Per-step และ global validation
+6. **State Persistence** - Save/restore form data
 
-## Form Flow
+### 2.2 Architecture Diagram Requirements
+
 ```
-Step 1 → Validate → Step 2 → Validate → ... → Review → Submit
-   ↓                  ↓                           ↓
- Save Draft       Save Draft                  Final Submit
+┌─────────────────────────────────────────────────────────┐
+│              Multi-Step Form Architecture               │
+├─────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              User Interface Layer                   │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Progress    │  │  Step       │  │  Form      │  │   │
+│  │  │  Indicator  │  │  Navigator  │  │  Content  │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              State Management Layer                 │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Form       │  │  Step       │  │  Error     │  │   │
+│  │  │  State      │  │  State      │  │  State     │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Completed   │  │  Submitting │  │  Draft     │  │   │
+│  │  │  Steps      │  │  State      │  │  State     │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Validation Layer                        │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Per-Step   │  │  Global     │  │  Async     │  │   │
+│  │  │  Validation │  │  Validation │  │  Validation│  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Persistence Layer                      │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Local      │  │  Session    │  │  Server    │  │   │
+│  │  │  Storage    │  │  Storage    │  │  Storage   │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Auto-Save Layer                        │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Debounced  │  │  Throttled  │  │  Manual    │  │   │
+│  │  │  Save       │  │  Save       │  │  Save      │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+└─────────────────────────────────────────────────────────┘
 ```
 
-## Use Cases
-- Event creation wizards
-- User onboarding
-- Booking processes
-- Survey forms
-- Registration flows
-```
+### 2.3 Implementation Workflow
 
----
-
-## 2. Form State Management
-
-### React Hook for Multi-Step Forms
+**Step 1: Create Multi-Step Form Hook**
 
 ```typescript
 // useMultiStepForm Hook
@@ -157,8 +218,300 @@ export function useMultiStepForm<T extends Record<string, any>>(
 }
 ```
 
-### Form Container Component
+---
 
+## 3. Tooling & Tech Stack
+
+### 3.1 Enterprise Tools
+
+| Tool | Purpose | Version | License |
+|------|---------|---------|---------|
+| React Hook Form | Form State Management | ^7.0.0 | MIT |
+| Zod | Schema Validation | ^3.0.0 | MIT |
+| React | UI Library | ^18.0.0 | MIT |
+| TypeScript | Type Safety | ^5.0.0 | Apache 2.0 |
+| Lodash | Utility Functions | ^4.0.0 | MIT |
+
+### 3.2 Configuration Essentials
+
+**TypeScript Configuration:**
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2020"
+  }
+}
+```
+
+---
+
+## 4. Standards, Compliance & Security
+
+### 4.1 International Standards
+
+- **WCAG 2.1 Level AA** - Forms ต้องเข้าถึงได้และใช้งานได้สำหรับผู้ใช้ทุกคน
+- **ISO 9241-11** - Usability Standards สำหรับ Form Design
+- **GDPR** - Data Protection สำหรับ User Data
+- **PCI DSS** - Security Standards สำหรับ Payment Forms
+
+### 4.2 Security Protocol
+
+Multi-Step Form ต้องปฏิบัติตามหลักความปลอดภัย:
+
+1. **Input Sanitization** - Sanitize data ก่อนบันทึก
+2. **CSRF Protection** - ใช้ CSRF tokens สำหรับ forms
+3. **Secure Storage** - ไม่เก็บ sensitive data ใน localStorage
+4. **Rate Limiting** - จำกัดจำนวน submissions ต่อผู้ใช้
+
+```typescript
+// Secure form handling
+import { z } from 'zod'
+
+// Sanitize input before validation
+const sanitizeInput = (input: string): string => {
+  return input
+    .replace(/[<>]/g, '') // Remove potential XSS
+    .trim()
+}
+
+// Secure schema validation
+const secureSchema = z.object({
+  email: z.string().email().transform(sanitizeInput),
+  password: z.string().min(8),
+})
+```
+
+### 4.3 Explainability
+
+Multi-Step Form ต้องสามารถอธิบายได้ว่า:
+
+1. **Validation Logic** - ทำไม field ถูก validate อย่างไร
+2. **Step Transition** - ทำไม step ถูก skip หรือ show
+3. **Auto-Save** - ทำไมข้อมูลถูกบันทึกเมื่อไร
+4. **Error Messages** - ทำไมเกิด error และวิธีแก้ไข
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+### 5.1 Cost Calculation
+
+| Metric | Calculation | Target |
+|--------|-------------|--------|
+| Form Completion Rate | Completed forms / Started forms | > 70% |
+| Time to Complete | Average time to complete form | < 5 min |
+| Error Rate | Failed validations / Total attempts | < 10% |
+| Abandonment Rate | Abandoned forms / Started forms | < 30% |
+| Auto-Save Success | Successful saves / Total saves | > 95% |
+
+### 5.2 Key Performance Indicators
+
+**Technical Metrics:**
+
+1. **Form Completion Rate** - อัตราการเสร็จสิ้น form
+2. **Time to Complete** - เวลาในการกรอก form
+3. **Error Rate** - อัตราการเกิด errors
+4. **Abandonment Rate** - อัตราการละทิ้ง form
+
+**Business Metrics:**
+
+1. **Conversion Rate** - อัตราการแปลงผู้ใช้
+2. **Data Quality** - คุณภาพข้อมูลที่ได้
+3. **User Satisfaction** - ความพึงพอใจของผู้ใช้
+4. **Return Rate** - อัตราการกลับมากรอกซ้ำ
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+### 6.1 Phase Rollout
+
+**Phase 1: Foundation (Week 1-2)**
+- Create multi-step form hook
+- Implement basic step navigation
+- Add progress indicators
+- Setup form validation
+
+**Phase 2: Advanced Features (Week 3-4)**
+- Implement auto-save
+- Add form persistence
+- Create conditional steps
+- Implement async validation
+
+**Phase 3: Optimization (Week 5-6)**
+- Performance audit
+- Accessibility testing
+- Error handling improvement
+- Mobile optimization
+
+**Phase 4: Production (Week 7-8)**
+- Analytics integration
+- A/B testing
+- Documentation and training
+- Component library
+
+### 6.2 Pitfalls to Avoid
+
+1. **Lost Data** - ไม่ implement persistence
+2. **Confusing Navigation** - Progress indicators ที่ไม่ชัดเจน
+3. **Validation Timing** - Validate ไม่ถูกจังหวะ
+4. **Performance** - ไม่ optimize re-renders
+5. **Accessibility** - ลืม keyboard navigation
+6. **Poor UX** - Steps ที่ยาวเกินไป
+
+### 6.3 Best Practices Checklist
+
+- [ ] ใช้ progress indicators ที่ชัดเจน
+- [ ] Implement per-step validation
+- [ ] ใช้ form persistence สำหรับ auto-save
+- [ ] อนุญาตให้ navigate กลับไป steps ก่อนหน้า
+- [ ] ใช้ appropriate validation timing
+- [ ] Lazy load step components
+- [ ] Debounce auto-save
+- [ ] Optimize validation
+- [ ] Cache validation results
+- [ ] Implement keyboard navigation
+- [ ] Add screen reader support
+- [ ] Manage focus properly
+- [ ] Announce errors to screen readers
+- [ ] Test บน mobile devices
+- [ ] Implement conditional steps
+
+---
+
+## 7. Implementation Examples
+
+### 7.1 Form State Management
+
+**React Hook for Multi-Step Forms:**
+```typescript
+// useMultiStepForm Hook
+'use client'
+
+import { useState, useCallback } from 'react'
+
+interface UseMultiStepFormOptions<T> {
+  initialData: T
+  steps: string[]
+  onSubmit: (data: T) => Promise<void>
+  validate?: (step: number, data: T) => Promise<ValidationErrors>
+  onStepChange?: (step: number) => void
+}
+
+interface ValidationErrors {
+  [key: string]: string
+}
+
+export function useMultiStepForm<T extends Record<string, any>>(
+  options: UseMultiStepFormOptions<T>
+) {
+  const [currentStep, setCurrentStep] = useState(0)
+  const [formData, setFormData] = useState<T>(options.initialData)
+  const [errors, setErrors] = useState<ValidationErrors>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set())
+
+  const totalSteps = options.steps.length
+
+  const updateFormData = useCallback((updates: Partial<T>) => {
+    setFormData((prev) => ({ ...prev, ...updates }))
+  }, [])
+
+  const validateCurrentStep = useCallback(async (): Promise<boolean> => {
+    if (!options.validate) return true
+
+    const stepErrors = await options.validate(currentStep, formData)
+    setErrors(stepErrors)
+
+    return Object.keys(stepErrors).length === 0
+  }, [currentStep, formData, options])
+
+  const goToStep = useCallback(
+    async (step: number) => {
+      if (step < 0 || step >= totalSteps) return
+
+      // Validate current step before moving forward
+      if (step > currentStep) {
+        const isValid = await validateCurrentStep()
+        if (!isValid) return
+      }
+
+      setCurrentStep(step)
+      options.onStepChange?.(step)
+
+      // Mark previous step as completed
+      if (step > currentStep) {
+        setCompletedSteps((prev) => new Set([...prev, currentStep]))
+      }
+    },
+    [currentStep, totalSteps, validateCurrentStep, options]
+  )
+
+  const nextStep = useCallback(async () => {
+    await goToStep(currentStep + 1)
+  }, [currentStep, goToStep])
+
+  const previousStep = useCallback(() => {
+    goToStep(currentStep - 1)
+  }, [currentStep, goToStep])
+
+  const handleSubmit = useCallback(async () => {
+    // Validate all steps
+    const isValid = await validateCurrentStep()
+    if (!isValid) return
+
+    setIsSubmitting(true)
+
+    try {
+      await options.onSubmit(formData)
+    } catch (error) {
+      console.error('Form submission failed:', error)
+      throw error
+    } finally {
+      setIsSubmitting(false)
+    }
+  }, [formData, validateCurrentStep, options])
+
+  const resetForm = useCallback(() => {
+    setCurrentStep(0)
+    setFormData(options.initialData)
+    setErrors({})
+    setCompletedSteps(new Set())
+  }, [options.initialData])
+
+  return {
+    currentStep,
+    totalSteps,
+    formData,
+    errors,
+    isSubmitting,
+    completedSteps,
+    updateFormData,
+    nextStep,
+    previousStep,
+    goToStep,
+    handleSubmit,
+    resetForm,
+    isFirstStep: currentStep === 0,
+    isLastStep: currentStep === totalSteps - 1,
+    progress: ((currentStep + 1) / totalSteps) * 100,
+  }
+}
+```
+
+**Form Container Component:**
 ```typescript
 // MultiStepFormContainer Component
 'use client'
@@ -240,12 +593,9 @@ export default function MultiStepFormContainer({
 }
 ```
 
----
+### 7.2 Progress Indicators
 
-## 3. Progress Indicators
-
-### Step Progress Component
-
+**Step Progress Component:**
 ```typescript
 // StepProgress Component
 'use client'
@@ -315,8 +665,7 @@ export default function StepProgress({
 }
 ```
 
-### Circular Progress
-
+**Circular Progress:**
 ```typescript
 // CircularProgress Component
 interface CircularProgressProps {
@@ -371,12 +720,9 @@ export default function CircularProgress({
 }
 ```
 
----
+### 7.3 Form Validation
 
-## 4. Form Validation
-
-### Per-Step Validation
-
+**Per-Step Validation:**
 ```typescript
 // Form Validation
 import { z } from 'zod'
@@ -431,8 +777,7 @@ async function validateStep(
 }
 ```
 
-### Async Validation
-
+**Async Validation:**
 ```typescript
 // Async Validation (e.g., checking availability)
 async function validateVenueAvailability(
@@ -476,12 +821,9 @@ async function validateStep2WithAvailability(
 }
 ```
 
----
+### 7.4 Form Persistence
 
-## 5. Form Persistence
-
-### Local Storage Persistence
-
+**Local Storage Persistence:**
 ```typescript
 // Form Persistence Hook
 'use client'
@@ -536,8 +878,7 @@ export function useFormPersistence<T>({
 }
 ```
 
-### Auto-Save Feature
-
+**Auto-Save Feature:**
 ```typescript
 // Auto-Save Component
 'use client'
@@ -590,12 +931,9 @@ export function AutoSave<T>({ data, onSave, delay = 2000 }: AutoSaveProps<T>) {
 }
 ```
 
----
+### 7.5 Conditional Steps
 
-## 6. Conditional Steps
-
-### Dynamic Step Flow
-
+**Dynamic Step Flow:**
 ```typescript
 // Conditional Steps Logic
 interface ConditionalStepConfig {
@@ -648,12 +986,9 @@ const eventFormSteps: ConditionalStepConfig[] = [
 const activeSteps = getActiveSteps(eventFormSteps, formData)
 ```
 
----
+### 7.6 Complete Example: Event Creation Form
 
-## 7. Complete Example: Event Creation Form
-
-### Event Creation Wizard
-
+**Event Creation Wizard:**
 ```typescript
 // EventCreationWizard Component
 'use client'
@@ -824,85 +1159,46 @@ function Step1BasicInfo({ data, errors, onChange }: any) {
     </div>
   )
 }
-
-// ... Other step components
 ```
 
----
+### 7.7 Best Practices
 
-## Best Practices
+**User Experience:**
+- Show clear progress indicators
+- Allow navigation to previous steps
+- Provide save/draft functionality
+- Use appropriate validation timing
 
-1. **User Experience**
-   - Show clear progress indicators
-   - Allow navigation to previous steps
-   - Provide save/draft functionality
-   - Use appropriate validation timing
+**Performance:**
+- Lazy load step components
+- Debounce auto-save
+- Optimize validation
+- Cache validation results
 
-2. **Performance**
-   - Lazy load step components
-   - Debounce auto-save
-   - Optimize validation
-   - Cache validation results
+**Accessibility:**
+- Keyboard navigation
+- Screen reader support
+- Focus management
+- Error announcements
 
-3. **Accessibility**
-   - Keyboard navigation
-   - Screen reader support
-   - Focus management
-   - Error announcements
+**Data Management:**
+- Persist form state
+- Handle browser refresh
+- Implement auto-save
+- Validate before transitions
 
-4. **Data Management**
-   - Persist form state
-   - Handle browser refresh
-   - Implement auto-save
-   - Validate before transitions
-
-5. **Error Handling**
-   - Clear error messages
-   - Field-level validation
-   - Step-level validation
-   - Global validation
+**Error Handling:**
+- Clear error messages
+- Field-level validation
+- Step-level validation
+- Global validation
 
 ---
 
-## Common Pitfalls
+## 8. Related Skills
 
-1. **Lost Data**: Not implementing persistence
-2. **Confusing Navigation**: Unclear progress indicators
-3. **Validation Timing**: Validating too early or too late
-4. **Performance**: Not optimizing re-renders
-5. **Accessibility**: Forgetting keyboard navigation
-
----
-
-## Production Checklist
-
-- [ ] Progress indicator implemented
-- [ ] Validation per step working
-- [ ] Form persistence enabled
-- [ ] Auto-save configured
-- [ ] Navigation tested
-- [ ] Error handling comprehensive
-- [ ] Accessibility verified
-- [ ] Mobile responsive
-- [ ] Performance optimized
-- [ ] Analytics tracking
-
----
-
-## Tools & Libraries
-
-| Tool | Purpose |
-|------|---------|
-| React Hook Form | Form state management |
-| Zod | Schema validation |
-| Formik | Alternative form library |
-| Yup | Alternative validation |
-
----
-
-## Further Reading
-
-- [Form Design Best Practices](https://www.nngroup.com/articles/web-form-design/)
-- [Multi-Step Form UX](https://baymard.com/blog/checkout-flow-average-form-fields)
-- [React Hook Form Documentation](https://react-hook-form.com/)
-- [Zod Documentation](https://zod.dev/)
+- `02-frontend/form-handling`
+- `02-frontend/react-best-practices`
+- `02-frontend/state-management`
+- `22-ux-ui-design/user-research`
+- `16-testing`

@@ -1,8 +1,20 @@
+---
+name: Contentful Integration
+description: Integrating with Contentful headless CMS platform for content management, including setup, content modeling, API integration, and Next.js patterns.
+---
+
 # Contentful Integration
+
+> **Current Level:** Intermediate  
+> **Domain:** Content Management / Frontend
+
+---
 
 ## Overview
 
-Contentful is a headless CMS platform that provides content via APIs. This guide covers setup, content modeling, API integration, and Next.js patterns.
+Contentful is a headless CMS platform that provides content via APIs. This guide covers setup, content modeling, API integration, and Next.js patterns for building content-driven applications with flexibility and developer-friendly APIs.
+
+---
 
 ## Contentful Setup
 
@@ -664,12 +676,136 @@ export default async function handler(req: any, res: any) {
 }
 ```
 
-## Best Practices
+---
 
-1. **Content Modeling** - Design flexible content models
-2. **GraphQL** - Use GraphQL for efficient queries
-3. **Preview** - Enable content preview for editors
-4. **Images** - Use Contentful's Image API
+## Quick Start
+
+### Contentful Client Setup
+
+```javascript
+const contentful = require('contentful')
+
+const client = contentful.createClient({
+  space: process.env.CONTENTFUL_SPACE_ID,
+  accessToken: process.env.CONTENTFUL_ACCESS_TOKEN
+})
+
+// Fetch entries
+const entries = await client.getEntries({
+  content_type: 'blogPost',
+  order: '-sys.createdAt'
+})
+```
+
+### Next.js Integration
+
+```javascript
+// pages/blog/[slug].js
+import { createClient } from 'contentful'
+
+export async function getStaticProps({ params }) {
+  const client = createClient({
+    space: process.env.CONTENTFUL_SPACE_ID,
+    accessToken: process.env.CONTENTFUL_ACCESS_TOKEN
+  })
+  
+  const entries = await client.getEntries({
+    content_type: 'blogPost',
+    'fields.slug': params.slug
+  })
+  
+  return {
+    props: {
+      post: entries.items[0]
+    },
+    revalidate: 60  // ISR: revalidate every 60 seconds
+  }
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Content Model**: Design flexible content models
+- [ ] **API Keys**: Secure API keys (environment variables)
+- [ ] **GraphQL**: Use GraphQL for efficient queries
+- [ ] **Caching**: Cache content appropriately
+- [ ] **Preview Mode**: Enable preview mode for draft content
+- [ ] **Webhooks**: Set up webhooks for content updates
+- [ ] **Images**: Use Contentful's Image API for optimization
+- [ ] **Localization**: Support multi-language content
+- [ ] **Error Handling**: Handle API errors gracefully
+- [ ] **Rate Limiting**: Respect API rate limits
+- [ ] **Testing**: Test content fetching
+- [ ] **Documentation**: Document content structure
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Fetch on Every Request
+
+```javascript
+// ❌ Bad - No caching
+export async function getServerSideProps() {
+  const entries = await client.getEntries()  // Every request!
+  return { props: { entries } }
+}
+```
+
+```javascript
+// ✅ Good - Cache with ISR
+export async function getStaticProps() {
+  const entries = await client.getEntries()
+  return {
+    props: { entries },
+    revalidate: 60  // Revalidate every 60 seconds
+  }
+}
+```
+
+### ❌ Don't: Expose API Keys
+
+```javascript
+// ❌ Bad - API key in client code
+const client = createClient({
+  space: 'public-space',
+  accessToken: 'secret-token'  // Exposed!
+})
+```
+
+```javascript
+// ✅ Good - Use backend proxy
+// Frontend
+fetch('/api/contentful/posts')
+
+// Backend
+app.get('/api/contentful/posts', async (req, res) => {
+  const client = createClient({
+    space: process.env.CONTENTFUL_SPACE_ID,
+    accessToken: process.env.CONTENTFUL_ACCESS_TOKEN
+  })
+  const posts = await client.getEntries()
+  res.json(posts)
+})
+```
+
+---
+
+## Integration Points
+
+- **Headless CMS** (`33-content-management/headless-cms/`) - CMS patterns
+- **Next.js Patterns** (`02-frontend/nextjs-patterns/`) - ISR and SSG
+- **API Design** (`01-foundations/api-design/`) - API patterns
+
+---
+
+## Further Reading
+
+- [Contentful Documentation](https://www.contentful.com/developers/docs/)
+- [Contentful GraphQL API](https://www.contentful.com/developers/docs/references/graphql/)
+- [Next.js Contentful Example](https://github.com/vercel/next.js/tree/canary/examples/cms-contentful)
 5. **Webhooks** - Use webhooks for real-time updates
 6. **ISR** - Use Incremental Static Regeneration
 7. **Localization** - Support multi-language content

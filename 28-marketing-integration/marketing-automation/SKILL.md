@@ -1,10 +1,24 @@
+---
+name: Marketing Automation
+description: Streamlining, automating, and measuring marketing tasks and workflows to enable personalized customer engagement at scale through segmentation, behavioral triggers, and automated campaigns.
+---
+
 # Marketing Automation
+
+> **Current Level:** Intermediate  
+> **Domain:** Marketing / Automation
+
+---
 
 ## Overview
 
-Marketing automation enables businesses to streamline, automate, and measure marketing tasks and workflows, allowing for personalized customer engagement at scale.
+Marketing automation enables businesses to streamline, automate, and measure marketing tasks and workflows, allowing for personalized customer engagement at scale. Effective marketing automation uses segmentation, behavioral triggers, lead scoring, and automated workflows to engage customers at the right time with the right message.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Marketing Automation Concepts](#marketing-automation-concepts)
 2. [User Segmentation](#user-segmentation)
@@ -2101,3 +2115,98 @@ async function getWorkflowAnalytics(workflowId: string): Promise<CampaignAnalyti
 - [ ] Configure error handling
 - [ ] Document runbooks
 - [ ] Train team on procedures
+```
+
+---
+
+## Quick Start
+
+### Basic Automation Workflow
+
+```javascript
+// User segmentation
+const segment = await segmentUser(userId)
+if (segment === 'high-value') {
+  await triggerWorkflow('welcome-premium', userId)
+} else {
+  await triggerWorkflow('welcome-standard', userId)
+}
+
+// Behavioral trigger
+eventEmitter.on('user:abandoned-cart', async (userId) => {
+  await delay(24 * 60 * 60 * 1000)  // 24 hours
+  const cart = await getCart(userId)
+  if (cart.items.length > 0) {
+    await sendEmail('cart-reminder', userId, { cart })
+  }
+})
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Segmentation**: User segmentation configured
+- [ ] **Triggers**: Behavioral triggers set up
+- [ ] **Workflows**: Automation workflows created
+- [ ] **Email Templates**: Email templates designed
+- [ ] **Lead Scoring**: Lead scoring rules configured
+- [ ] **CRM Integration**: CRM integration working
+- [ ] **Testing**: Test automation flows
+- [ ] **Monitoring**: Monitor automation performance
+- [ ] **Analytics**: Track automation metrics
+- [ ] **Compliance**: GDPR and consent tracking
+- [ ] **Documentation**: Document automation rules
+- [ ] **Optimization**: A/B test automation flows
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Spam Users
+
+```javascript
+// ❌ Bad - Too many emails
+user.actions.forEach(action => {
+  sendEmail(`action-${action}`, userId)  // Spam!
+})
+```
+
+```javascript
+// ✅ Good - Rate limiting
+const lastEmail = await getLastEmailSent(userId)
+if (Date.now() - lastEmail > 24 * 60 * 60 * 1000) {
+  sendEmail('summary', userId, { actions })
+}
+```
+
+### ❌ Don't: No Personalization
+
+```javascript
+// ❌ Bad - Generic emails
+sendEmail('welcome', userId, {})  // No personalization
+```
+
+```javascript
+// ✅ Good - Personalized
+const user = await getUser(userId)
+sendEmail('welcome', userId, {
+  name: user.name,
+  preferences: user.preferences
+})
+```
+
+---
+
+## Integration Points
+
+- **Email Marketing** (`28-marketing-integration/email-marketing/`) - Email campaigns
+- **CRM Integration** (`32-crm-integration/`) - Lead management
+- **Analytics** (`23-business-analytics/`) - Campaign analytics
+
+---
+
+## Further Reading
+
+- [Marketing Automation Best Practices](https://www.hubspot.com/marketing-automation)
+- [Customer Journey Mapping](https://www.salesforce.com/resources/articles/customer-journey-mapping/)

@@ -1,8 +1,35 @@
+---
+name: PDF Processing
+description: Comprehensive guide to PDF processing, manipulation, and extraction using Python libraries
+---
+
 # PDF Processing
 
 ## Overview
 
 Comprehensive guide to PDF processing, manipulation, and extraction using Python libraries.
+
+## Prerequisites
+
+- **Python 3.7+**: Required for most PDF processing libraries
+- **PyPDF2**: For basic PDF reading, merging, and manipulation
+- **pdfplumber**: For better text extraction and table extraction
+- **PyMuPDF (fitz)**: For fast PDF processing and image extraction
+- **ReportLab**: For creating PDFs programmatically
+- **WeasyPrint**: For HTML to PDF conversion
+- **pdf2image**: For PDF to image conversion
+- **Camelot**: For advanced table extraction
+
+## Key Concepts
+
+- **PDF Structure**: Understanding of PDF objects, pages, and streams
+- **Text Extraction**: Methods for extracting text with layout preservation
+- **Image Extraction**: Extracting embedded images from PDFs
+- **Table Extraction**: Identifying and extracting tabular data
+- **PDF Manipulation**: Merging, splitting, rotating, and watermarking
+- **Form Filling**: Populating PDF form fields programmatically
+- **PDF to Image**: Converting PDF pages to raster images
+- **Batch Processing**: Efficient processing of multiple PDF files
 
 ## Table of Contents
 
@@ -1005,6 +1032,15 @@ def recover_pdf(pdf_path: str, output_path: str):
 ```
 
 ---
+
+## Related Skills
+
+- [Document Ingestion Pipeline](../07-document-processing/document-ingestion-pipeline/SKILL.md) - Document loading and processing workflows
+- [Document Parsing](../07-document-processing/document-parsing/SKILL.md) - Structured data extraction from documents
+- [Image Preprocessing](../07-document-processing/image-preprocessing/SKILL.md) - Image enhancement for better OCR accuracy
+- [OCR with Tesseract](../07-document-processing/ocr-tesseract/SKILL.md) - Text extraction using Tesseract OCR
+- [OCR with PaddleOCR](../07-document-processing/ocr-paddleocr/SKILL.md) - Text extraction using PaddleOCR
+- [RAG Implementation](../06-ai-ml-production/rag-implementation/SKILL.md) - Retrieval-Augmented Generation patterns
 
 ## Additional Resources
 

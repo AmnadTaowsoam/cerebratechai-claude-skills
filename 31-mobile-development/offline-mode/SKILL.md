@@ -1,10 +1,24 @@
+---
+name: Offline-First Mobile App Patterns
+description: Building apps that work without network connectivity by storing data locally and synchronizing when connectivity is restored, including local storage, data sync, conflict resolution, and cache strategies.
+---
+
 # Offline-First Mobile App Patterns
+
+> **Current Level:** Advanced  
+> **Domain:** Mobile Development / Architecture
+
+---
 
 ## Overview
 
-Offline-first apps work without network connectivity by storing data locally and synchronizing when connectivity is restored. This guide covers local storage, data sync, conflict resolution, and cache strategies.
+Offline-first apps work without network connectivity by storing data locally and synchronizing when connectivity is restored. This guide covers local storage, data sync, conflict resolution, and cache strategies for building resilient mobile applications that work in poor network conditions.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Offline-First Concepts](#offline-first-concepts)
 2. [Local Storage](#local-storage)
@@ -1288,10 +1302,155 @@ async function detectAndResolveConflict(
 
 ---
 
-## Resources
+---
+
+## Quick Start
+
+### AsyncStorage Setup
+
+```javascript
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+// Save data
+async function saveData(key, value) {
+  try {
+    await AsyncStorage.setItem(key, JSON.stringify(value))
+  } catch (error) {
+    console.error('Error saving data:', error)
+  }
+}
+
+// Load data
+async function loadData(key) {
+  try {
+    const value = await AsyncStorage.getItem(key)
+    return value ? JSON.parse(value) : null
+  } catch (error) {
+    console.error('Error loading data:', error)
+    return null
+  }
+}
+```
+
+### Sync Queue
+
+```javascript
+class SyncQueue {
+  constructor() {
+    this.queue = []
+    this.syncing = false
+  }
+  
+  async add(operation) {
+    this.queue.push(operation)
+    await this.saveQueue()
+    this.sync()
+  }
+  
+  async sync() {
+    if (this.syncing || this.queue.length === 0) return
+    
+    this.syncing = true
+    const operation = this.queue.shift()
+    
+    try {
+      await this.executeOperation(operation)
+      await this.saveQueue()
+    } catch (error) {
+      this.queue.unshift(operation)  // Retry
+      await this.saveQueue()
+    } finally {
+      this.syncing = false
+      if (this.queue.length > 0) {
+        this.sync()
+      }
+    }
+  }
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Local Storage**: Choose appropriate storage (AsyncStorage, SQLite, MMKV)
+- [ ] **Data Sync**: Implement data synchronization
+- [ ] **Conflict Resolution**: Handle data conflicts
+- [ ] **Queue Management**: Queue operations when offline
+- [ ] **Network Detection**: Detect network connectivity
+- [ ] **Optimistic Updates**: Update UI optimistically
+- [ ] **Background Sync**: Sync in background
+- [ ] **Error Handling**: Handle sync errors gracefully
+- [ ] **Testing**: Test offline scenarios
+- [ ] **Performance**: Optimize storage operations
+- [ ] **Data Size**: Manage storage size
+- [ ] **User Feedback**: Show sync status to users
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Conflict Resolution
+
+```javascript
+// ❌ Bad - Overwrite without checking
+async function syncData(localData, serverData) {
+  await saveData('key', serverData)  // Lost local changes!
+}
+```
+
+```javascript
+// ✅ Good - Conflict resolution
+async function syncData(localData, serverData) {
+  if (serverData.updatedAt > localData.updatedAt) {
+    // Server is newer
+    await saveData('key', serverData)
+  } else if (localData.updatedAt > serverData.updatedAt) {
+    // Local is newer, send to server
+    await sendToServer('key', localData)
+  } else {
+    // Conflict - merge or ask user
+    const merged = mergeData(localData, serverData)
+    await saveData('key', merged)
+  }
+}
+```
+
+### ❌ Don't: No Queue
+
+```javascript
+// ❌ Bad - Operations lost when offline
+async function createOrder(order) {
+  await api.createOrder(order)  // Fails when offline!
+}
+```
+
+```javascript
+// ✅ Good - Queue operations
+async function createOrder(order) {
+  if (isOnline()) {
+    await api.createOrder(order)
+  } else {
+    await syncQueue.add({ type: 'createOrder', data: order })
+  }
+}
+```
+
+---
+
+## Integration Points
+
+- **React Native Patterns** (`31-mobile-development/react-native-patterns/`) - App patterns
+- **Push Notifications** (`31-mobile-development/push-notifications/`) - Sync notifications
+- **Database** (`04-database/`) - Local database patterns
+
+---
+
+## Further Reading
 
 - [React Native Offline Storage](https://react-native-async-storage/)
 - [MMKV Storage](https://github.com/ammar-jamil/react-native-mmkv-storage)
 - [React Native SQLite](https://github.com/andporobi/react-native-quick-sqlite)
+- [Offline-First Architecture](https://offlinefirst.org/)
 - [React Native Background Task](https://github.com/transistorsoft/react-native-background-task)
 - [NetInfo](https://github.com/react-native-netinfo/)

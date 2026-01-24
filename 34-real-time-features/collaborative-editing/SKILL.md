@@ -1,8 +1,18 @@
+---
+name: Collaborative Editing
+description: Enabling multiple users to edit the same document simultaneously using Operational Transformation, CRDTs, and implementation with Yjs for conflict-free collaborative editing.
+---
+
 # Collaborative Editing
+
+> **Current Level:** Advanced  
+> **Domain:** Real-time / Collaboration
+
+---
 
 ## Overview
 
-Collaborative editing enables multiple users to edit the same document simultaneously. This guide covers Operational Transformation, CRDTs, and implementation with Yjs.
+Collaborative editing enables multiple users to edit the same document simultaneously. This guide covers Operational Transformation, CRDTs, and implementation with Yjs for building real-time collaborative editors that handle concurrent edits without conflicts.
 
 ## Collaborative Editing Concepts
 
@@ -583,10 +593,104 @@ interface Props {
 9. **Version History** - Track document versions
 10. **Testing** - Test with multiple users
 
-## Resources
+---
+
+## Quick Start
+
+### Yjs Integration
+
+```javascript
+import * as Y from 'yjs'
+import { WebsocketProvider } from 'y-websocket'
+
+// Create Yjs document
+const ydoc = new Y.Doc()
+
+// Connect via WebSocket
+const provider = new WebsocketProvider(
+  'ws://localhost:1234',
+  'room-name',
+  ydoc
+)
+
+// Create text type
+const ytext = ydoc.getText('content')
+
+// Observe changes
+ytext.observe(event => {
+  console.log('Content changed:', ytext.toString())
+})
+
+// Update content
+ytext.insert(0, 'Hello')
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Conflict Resolution**: CRDT or OT implementation
+- [ ] **WebSocket**: WebSocket connection for real-time sync
+- [ ] **User Presence**: Show user cursors and selections
+- [ ] **Authentication**: Authenticate WebSocket connections
+- [ ] **Error Handling**: Handle connection errors
+- [ ] **Offline Support**: Support offline editing
+- [ ] **Version History**: Track document versions
+- [ ] **Performance**: Optimize for large documents
+- [ ] **Testing**: Test with multiple concurrent users
+- [ ] **Documentation**: Document collaboration features
+- [ ] **Monitoring**: Monitor collaboration performance
+- [ ] **Security**: Secure collaborative editing
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Conflict Resolution
+
+```javascript
+// ❌ Bad - Last write wins
+function updateDocument(userId, content) {
+  document.content = content  // Overwrites other users' changes!
+}
+```
+
+```javascript
+// ✅ Good - CRDT for conflict-free
+const ytext = ydoc.getText('content')
+ytext.insert(0, 'Hello')  // CRDT handles conflicts automatically
+```
+
+### ❌ Don't: No User Presence
+
+```markdown
+# ❌ Bad - No indication of other users
+User A: Editing document
+User B: Also editing (but doesn't know!)
+```
+
+```markdown
+# ✅ Good - Show user presence
+User A: Editing document
+User B: Sees "User A is editing" and cursor position
+```
+
+---
+
+## Integration Points
+
+- **WebSocket Patterns** (`34-real-time-features/websocket-patterns/`) - WebSocket implementation
+- **Presence Detection** (`34-real-time-features/presence-detection/`) - User presence
+- **Real-time Dashboard** (`34-real-time-features/real-time-dashboard/`) - Real-time updates
+
+---
+
+## Further Reading
 
 - [Yjs](https://docs.yjs.dev/)
 - [TipTap](https://tiptap.dev/)
+- [Operational Transformation](https://en.wikipedia.org/wiki/Operational_transformation)
+- [CRDTs](https://crdt.tech/)
 - [ProseMirror](https://prosemirror.net/)
 - [Quill](https://quilljs.com/)
 - [Operational Transformation](https://en.wikipedia.org/wiki/Operational_transformation)

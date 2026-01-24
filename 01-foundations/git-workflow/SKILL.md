@@ -1,10 +1,143 @@
-# Git Workflow and Best Practices
+### **03: Git Workflow and Best Practices**
+
+> 
+> **Current Level:** Expert (Enterprise Scale) 
+> 
+> 
+> **Domain:** Foundations / Version Control 
+> 
+
+---
+
+### **1. Executive Summary & Strategic Necessity**
+
+* **Context:** ในโลกปี 2025-2026 การพัฒนาซอฟต์แวร์ทีมงานต้องมีระบบควบคุมเวอร์ชันที่มีประสิทธิภาพ Git Workflow คือกระบวนการที่ช่วยให้ทีมพัฒนาสามารถจัดการการเปลี่ยนแปลงโค้ดอย่างเป็นระบบ ลดความขัดแย้ง และเพิ่มประสิทธิภาพในการทำงานร่วมกัน
+* **Business Impact:** การใช้ Git Workflow ที่มีประสิทธิภาพช่วย:
+  - ลดความขัดแย้งในการพัฒนาโค้ด (Merge Conflicts)
+  - เพิ่มความเสถียรของระบบ
+  - เพิ่มประสิทธิภาพในการทำงานร่วมกัน
+  - ลดเวลาในการแก้ไขปัญหา
+  - เพิ่มความสามารถในการติดตามการเปลี่ยนแปลง
+  - ลดความเสี่ยงในการ Deploy
+  - เพิ่มความโปร่งใสในการพัฒนา
+* **Product Thinking:** ทักษะนี้ช่วยแก้ปัญหา (Pain Point) ให้กับ:
+  - ทีมพัฒนาที่ต้องการ Workflow ที่เป็นระบบ
+  - ผู้ทำงานที่ต้องการความโปร่งใสในการพัฒนา
+  - ทีมพัฒนาที่ต้องการลด Merge Conflicts
+  - ผู้จัดการที่ต้องการติดตามความคืบหน้า
+  - ทีม DevOps ที่ต้องการ CI/CD ที่เป็นระบบ
+
+### **2. Technical Deep Dive (The "How-to")**
+
+* **Core Logic:** Git Workflow ประกอบด้วย:
+  - **Branching Strategies:** กลยุทธ์การแยก Branch (Git Flow, GitHub Flow, Trunk-Based Development)
+  - **Commit Conventions:** การตั้งชื่อ Commit ที่เป็นมาตรฐาน (Conventional Commits)
+  - **Pull Request Process:** กระบวนการทบทวนและรวมโค้ด (Code Review, Approval, Merge)
+  - **Merge Strategies:** กลยุทธ์การรวม Branch (Merge, Squash, Rebase)
+  - **Release Management:** การจัดการการเผยแพร่ (Semantic Versioning, Tagging, Release Notes)
+  - **Hotfix Process:** กระบวนการแก้ไขปัญหาเร่งด่วน (Hotfix Workflow, Rollback)
+
+* **Architecture Diagram Requirements:** แผนผังสถาปัตยกรรมที่ต้องมี:
+  - **Git Flow Diagram:** แผนผังแสดง Branch Structure ของ Git Flow
+  - **GitHub Flow Diagram:** แผนผังแสดง Branch Structure ของ GitHub Flow
+  - **Pull Request Workflow Diagram:** แผนผังแสดงกระบวนการ Pull Request
+  - **Release Process Diagram:** แผนผังแสดงกระบวนการ Release
+  - **Hotfix Workflow Diagram:** แผนผังแสดงกระบวนการ Hotfix
+
+* **Implementation Workflow:**
+  1. **Choose Branching Strategy:** เลือกกลยุทธ์ Branching ที่เหมาะสม
+  2. **Setup Git Hooks:** ตั้งค่า Git Hooks สำหรับ Validation
+  3. **Configure CI/CD:** ตั้งค่า CI/CD Pipeline
+  4. **Define Commit Conventions:** กำหนด Commit Message Standards
+  5. **Train Team on Workflow:** ฝึกอบรมทีมเกี่ยวกับ Workflow
+  6. **Implement Pull Request Process:** ดำเนินการ Pull Request Process
+  7. **Monitor and Improve:** ติดตามและปรับปรุง Workflow
+
+### **3. Tooling & Tech Stack**
+
+* **Enterprise Tools:** เครื่องมือระดับอุตสาหกรรมที่เลือกใช้:
+  - **Git Platforms:** GitHub, GitLab, Bitbucket, Azure DevOps
+  - **Git Clients:** GitKraken, SourceTree, VS Code Git Integration
+  - **Git Hooks:** Husky, pre-commit, commitlint
+  - **Linting Tools:** ESLint, Prettier, Black, isort
+  - **CI/CD Platforms:** GitHub Actions, GitLab CI, Azure Pipelines, Jenkins
+  - **Release Tools:** semantic-release, standard-version, conventional-changelog
+
+* **Configuration Essentials:** ส่วนประกอบสำคัญในการตั้งค่า:
+  - **Git Configuration:** การตั้งค่า Git User, Email, Aliases
+  - **Branch Protection Rules:** กฎการป้องกัน Branch (Require Review, Require Status Checks)
+  - **Commitlint Configuration:** การตั้งค่า Commitlint สำหรับ Validation
+  - **Husky Configuration:** การตั้งค่า Husky สำหรับ Git Hooks
+  - **lint-staged Configuration:** การตั้งค่า lint-staged สำหรับ Linting ก่อน Commit
+  - **Release Configuration:** การตั้งค่า Release Automation
+
+### **4. Standards, Compliance & Security**
+
+* **International Standards:** มาตรฐานที่เกี่ยวข้อง:
+  - **Conventional Commits:** มาตรฐานสำหรับ Commit Messages
+  - **Semantic Versioning:** มาตรฐานสำหรับ Versioning (MAJOR.MINOR.PATCH)
+  - **Git Best Practices:** แนวทางปฏิบัติที่ดีในการใช้ Git
+  - **Git Security:** แนวทางปฏิบัติด้านความปลอดใจในการใช้ Git
+
+* **Security Protocol:** กลไกการป้องกัน:
+  - **Branch Protection Rules:** กฎการป้องกัน Branch (Require Review, Require Status Checks)
+  - **Pre-commit Hooks:** การตรวจสอบก่อน Commit (Linting, Security Scanning)
+  - **Pre-push Hooks:** การตรวจสอบก่อน Push (Test Suite, Security Scanning)
+  - **Signed Commits:** การลงนาม Commits สำหรับความเปลอดใจ
+  - **Access Control:** การควบคุมการเข้าถึง Repository
+  - **Audit Trail:** การบันทึกการเข้าถึงและการเปลี่ยนแปลง
+
+* **Explainability:** ความสามารถในการอธิบาย:
+  - **Commit Message Documentation:** การบันทึก Commit Messages ที่ชัดเจน
+  - **Branch Naming Documentation:** การบันทึก Branch Naming Conventions
+  - **Workflow Documentation:** การบันทึก Workflow และ Processes
+  - **Release Notes:** การบันทึก Release Notes ที่ชัดเจน
+
+### **5. Unit Economics & Performance Metrics (KPIs)**
+
+* **Cost Calculation:** สูตรการคำนวณต้นทุนต่อหน่วย (COGS):
+  ```
+  Total Cost = (Merge Conflict Resolution Time × Hourly Rate) + 
+               (Hotfix Time × Hourly Rate) + 
+               (Tooling Cost)
+  
+  ROI = (Productivity Gain - Total Cost) / Total Cost × 100%
+  
+  Productivity Gain = (Time Saved on Conflicts) + 
+                      (Time Saved on Reviews) + 
+                      (Time Saved on Deployments)
+  ```
+
+* **Key Performance Indicators:** ตัวชี้วัดความสำเร็จทางเทคนิค:
+  - **Merge Conflict Rate:** % ของ Pull Requests ที่มี Merge Conflicts (Target: < 10%)
+  - **Review Turnaround Time:** เวลาเฉลี่ยในการ Review (Target: < 24 hours)
+  - **Deployment Frequency:** จำนวน Deployments ต่อสัปดาห์ (Target: > 5/week)
+  - **Lead Time:** เวลาเฉลี่ยจาก Commit ไป Deploy (Target: < 24 hours)
+  - **Change Failure Rate:** % ของ Deployments ที่ล้มเหลว (Target: < 5%)
+  - **Team Productivity:** จำนวน Commits ต่อวัน (Target: > 10/day)
+
+### **6. Strategic Recommendations (CTO Insights)**
+
+* **Phase Rollout:** คำแนะนำในการทยอยเริ่มใช้งาน:
+  1. **Phase 1 (Months 1-2):** สร้าง Git Workflow Standards และ Guidelines, ฝึกอบรมทีม
+  2. **Phase 2 (Months 3-4):** ตั้งค่า Git Hooks และ CI/CD Pipeline
+  3. **Phase 3 (Months 5-6):** ฝึกอบรมทีมเกี่ยวกับ Workflow และ Processes
+  4. **Phase 4 (Year 2+):** ขยายไปยังทุกทีม, สร้าง Culture ของ Git Best Practices
+
+* **Pitfalls to Avoid:** ข้อควรระวังที่มักจะผิดพลาด:
+  - **Over-Engineering:** หลีกเลี่ยงการสร้าง Workflow ที่ซับซ้อนเกินไป
+  - **Not Following Standards:** ต้องทบทวนตามหลักการ Git Standards
+  - **Skipping Reviews:** หลีกเลี่ยงการข้าม Review สำหรับ PR ที่สำคัญ
+  - **Not Protecting Branches:** ต้องป้องกัน Branch ที่สำคัญ (main, develop)
+  - **Not Using Hooks:** หลีกเลี่ยงการไม่ใช้ Git Hooks สำหรับ Validation
+  - **Not Documenting:** ต้องบันทึก Workflow และ Processes อย่างชัดเจน
+  - **Not Training Team:** ต้องฝึกอบรมทีมเกี่ยวกับ Workflow และ Best Practices
+
+---
 
 ## Overview
 
-This guide covers Git workflow patterns, branching strategies, and best practices for maintaining clean, collaborative repositories. Consistent Git practices improve code quality, simplify debugging, and streamline team collaboration.
-
----
+Git workflow patterns, branching strategies, and best practices for maintaining clean, collaborative repositories. Consistent Git practices improve code quality, simplify debugging, and streamline team collaboration.
 
 ## Branch Naming Conventions
 
@@ -58,8 +191,6 @@ feature/JIRA-100-add-payment-gateway
 bugfix/GH-42-fix-memory-leak
 hotfix/PROD-001-database-connection
 ```
-
----
 
 ## Commit Message Format
 
@@ -153,8 +284,6 @@ changed the code to fix the thing
 3. **No period at end**: "Add feature" not "Add feature."
 4. **Max 50 characters**: Keep it concise
 5. **Reference issues**: Include ticket numbers when applicable
-
----
 
 ## Git Flow vs GitHub Flow
 
@@ -274,8 +403,6 @@ git branch -d feature/new-feature
 | Learning curve | Steep | Gentle |
 | Hotfixes | Dedicated process | Same as features |
 
----
-
 ## Pull Request Process
 
 ### PR Checklist (Author)
@@ -347,8 +474,6 @@ Related to #456
 | 200-400 | Medium | 30-60 min |
 | 400-800 | Large | 1-2 hours |
 | > 800 | Too Large | Split it! |
-
----
 
 ## Merge Strategies
 
@@ -464,8 +589,6 @@ git commit -m "feat: add complete feature"
 git checkout main
 git merge --no-ff feature/long-running
 ```
-
----
 
 ## Common Git Commands and Scenarios
 
@@ -680,8 +803,6 @@ git fetch --prune
 git remote prune origin
 ```
 
----
-
 ## .gitignore Best Practices
 
 ### Basic Patterns
@@ -843,8 +964,6 @@ Thumbs.db
 *~
 ```
 
----
-
 ## Handling Merge Conflicts
 
 ### Understanding Conflict Markers
@@ -946,8 +1065,6 @@ git rebase --skip
 3. **Communicate with team** - Know who's working on what
 4. **Small, focused commits** - Easier to resolve conflicts
 5. **Use feature flags** - Multiple features can coexist
-
----
 
 ## Git Hooks
 
@@ -1113,8 +1230,6 @@ npm install lint-staged --save-dev
 npx lint-staged
 ```
 
----
-
 ## Tagging and Releases
 
 ### Semantic Versioning
@@ -1226,8 +1341,6 @@ conventional-changelog -p angular -i CHANGELOG.md -s
 conventional-changelog -p angular -i CHANGELOG.md -s -r 0
 ```
 
----
-
 ## Emergency Hotfix Process
 
 ### When to Use Hotfix
@@ -1316,8 +1429,6 @@ git checkout v1.2.0
 # Deploy this version
 ```
 
----
-
 ## Quick Reference
 
 ### Daily Commands
@@ -1375,3 +1486,40 @@ perf:     Performance
 ci:       CI/CD
 build:    Build system
 ```
+
+## Best Practices
+
+1. **Choose the right workflow** - Git Flow for scheduled releases, GitHub Flow for continuous deployment
+2. **Keep branches short-lived** - Less time for merge conflicts
+3. **Follow commit conventions** - Use Conventional Commits for consistency
+4. **Write meaningful commit messages** - Clear, imperative mood, specific
+5. **Use descriptive branch names** - Include type and description
+6. **Keep PRs small** - Ideal size: 200-400 lines
+7. **Review thoroughly** - Check logic, security, performance, tests
+8. **Use appropriate merge strategy** - Merge, squash, or rebase based on context
+9. **Tag releases** - Use semantic versioning and annotated tags
+10. **Automate with hooks** - Use Husky and lint-staged for automation
+
+## Common Pitfalls
+
+1. **Over-engineering workflows** - Keep it simple for your team's needs
+2. **Not syncing branches** - Regularly merge or rebase with main
+3. **Skipping reviews** - Always review code before merging
+4. **Large PRs** - Split large PRs into smaller, focused ones
+5. **Poor commit messages** - Follow Conventional Commits specification
+6. **Not using hooks** - Automate validation with Git hooks
+7. **Force pushing shared branches** - Never force push to main/develop
+8. **Ignoring conflicts** - Resolve conflicts promptly and communicate
+9. **Not protecting branches** - Use branch protection rules
+10. **Hotfixing without testing** - Always test hotfixes thoroughly
+
+## Resources
+
+- [Pro Git Book](https://git-scm.com/book/en/v2) - Comprehensive Git documentation
+- [GitHub Flow](https://guides.github.com/introduction/flow/) - GitHub's workflow guide
+- [Git Flow](https://nvie.com/posts/a-successful-git-branching-model/) - Git Flow branching model
+- [Conventional Commits](https://www.conventionalcommits.org/) - Commit message specification
+- [Semantic Versioning](https://semver.org/) - Versioning specification
+- [Husky](https://typicode.github.io/husky/) - Git hooks made easy
+- [lint-staged](https://github.com/okonet/lint-staged) - Run linters on staged files
+- [commitlint](https://commitlint.js.org/) - Lint commit messages

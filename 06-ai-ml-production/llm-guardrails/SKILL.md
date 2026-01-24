@@ -1,8 +1,27 @@
+---
+name: LLM Guardrails
+description: Comprehensive guide to LLM safety and guardrails implementation for AI systems.
+---
+
 # LLM Guardrails
 
 ## Overview
-Comprehensive guide for LLM safety and guardrails implementation.
 
+Comprehensive guide to LLM safety and guardrails implementation for AI systems.
+
+## Prerequisites
+
+- Understanding of LLM safety and security concerns
+- Knowledge of content moderation techniques
+- Familiarity with regex patterns for input/output filtering
+- Understanding of PII (Personally Identifiable Information) detection
+- Knowledge of prompt injection techniques
+- Familiarity with Python and security libraries
+- Understanding of ML-based content classification
+
+## Key Concepts
+
+### What Are Guardrails?
 ---
 
 ## 1. Guardrails Concepts
@@ -2215,6 +2234,13 @@ class MultiLayerGuardrail:
 ```
 
 ---
+
+## Related Skills
+
+- [`06-ai-ml-production/llm-integration`](06-ai-ml-production/llm-integration/SKILL.md)
+- [`06-ai-ml-production/prompt-engineering`](06-ai-ml-production/prompt-engineering/SKILL.md)
+- [`06-ai-ml-production/llm-function-calling`](06-ai-ml-production/llm-function-calling/SKILL.md)
+- [`06-ai-ml-production/agent-patterns`](06-ai-ml-production/agent-patterns/SKILL.md)
 
 ## Additional Resources
 

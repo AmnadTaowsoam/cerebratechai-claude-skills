@@ -1,8 +1,20 @@
+---
+name: RTL (Right-to-Left) Support
+description: Supporting right-to-left writing and layout direction for languages like Arabic, Hebrew, Persian, and Urdu using CSS direction, logical properties, and RTL-aware components.
+---
+
 # RTL (Right-to-Left) Support
 
-## What is RTL
+> **Current Level:** Intermediate  
+> **Domain:** Internationalization / Frontend
 
-RTL (Right-to-Left) is the writing and layout direction used by languages such as Arabic, Hebrew, Persian, Urdu, and others.
+---
+
+## Overview
+
+RTL (Right-to-Left) is the writing and layout direction used by languages such as Arabic, Hebrew, Persian, Urdu, and others. Effective RTL support includes CSS direction properties, logical properties, mirrored layouts, and RTL-aware components.
+
+## What is RTL
 
 ### RTL Languages
 
@@ -985,6 +997,115 @@ describe('RTL Support', () => {
 
 - [ ] HTML dir attribute used
 - [ ] Logical CSS properties
+- [ ] Icons and images mirrored
+- [ ] Text alignment handled
+```
+
+---
+
+## Quick Start
+
+### HTML Direction
+
+```html
+<!-- Set direction -->
+<html dir="rtl" lang="ar">
+  <head>
+    <title>My App</title>
+  </head>
+  <body>
+    <!-- Content automatically flows RTL -->
+  </body>
+</html>
+```
+
+### CSS Logical Properties
+
+```css
+/* ❌ Bad - Physical properties */
+.element {
+  margin-left: 10px;
+  padding-right: 20px;
+  border-left: 1px solid black;
+}
+
+/* ✅ Good - Logical properties */
+.element {
+  margin-inline-start: 10px;  /* Left in LTR, Right in RTL */
+  padding-inline-end: 20px;
+  border-inline-start: 1px solid black;
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Direction Detection**: Auto-detect RTL languages
+- [ ] **HTML dir**: Set dir attribute correctly
+- [ ] **CSS Logical Properties**: Use logical properties
+- [ ] **Icons**: Mirror icons appropriately
+- [ ] **Images**: Handle image direction
+- [ ] **Text Alignment**: Proper text alignment
+- [ ] **Layout**: RTL-aware layouts
+- [ ] **Testing**: Test with RTL languages
+- [ ] **Documentation**: Document RTL support
+- [ ] **Design System**: RTL-aware design system
+- [ ] **Components**: RTL-aware components
+- [ ] **Accessibility**: Maintain accessibility in RTL
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Physical Properties Only
+
+```css
+/* ❌ Bad - Physical properties */
+.element {
+  margin-left: 10px;  /* Wrong in RTL! */
+  padding-right: 20px;
+}
+```
+
+```css
+/* ✅ Good - Logical properties */
+.element {
+  margin-inline-start: 10px;  /* Adapts to direction */
+  padding-inline-end: 20px;
+}
+```
+
+### ❌ Don't: Hardcoded Directions
+
+```css
+/* ❌ Bad - Hardcoded */
+.text {
+  text-align: left;  /* Wrong in RTL! */
+}
+```
+
+```css
+/* ✅ Good - Direction-aware */
+.text {
+  text-align: start;  /* Adapts to direction */
+}
+```
+
+---
+
+## Integration Points
+
+- **i18n Setup** (`25-internationalization/i18n-setup/`) - Internationalization
+- **Localization** (`25-internationalization/localization/`) - Content translation
+- **Multi-language** (`25-internationalization/multi-language/`) - Multi-language support
+
+---
+
+## Further Reading
+
+- [CSS Logical Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Logical_Properties)
+- [RTL Best Practices](https://rtlstyling.com/)
 - [ ] Icons flip for RTL
 - [ ] URLs remain LTR
 - [ ] Numbers stay LTR

@@ -1,8 +1,18 @@
+---
+name: Real-time Dashboard
+description: Displaying live data updates using WebSocket or SSE for real-time dashboards, including architecture, data streaming, state management, and React implementation patterns.
+---
+
 # Real-time Dashboard
+
+> **Current Level:** Intermediate  
+> **Domain:** Real-time / Frontend / Analytics
+
+---
 
 ## Overview
 
-Real-time dashboards display live data updates using WebSocket or SSE. This guide covers architecture, data streaming, and React implementation patterns.
+Real-time dashboards display live data updates using WebSocket or SSE. This guide covers architecture, data streaming, and React implementation patterns for building dashboards that update in real-time without page refreshes.
 
 ## Architecture
 
@@ -623,9 +633,117 @@ export function MetricsDashboard() {
 9. **Fallback** - Provide polling fallback
 10. **Testing** - Test with simulated data
 
-## Resources
+---
+
+## Quick Start
+
+### WebSocket Dashboard
+
+```typescript
+// Server
+io.on('connection', (socket) => {
+  // Send initial data
+  socket.emit('dashboard:data', getDashboardData())
+  
+  // Send updates every second
+  const interval = setInterval(() => {
+    socket.emit('dashboard:update', getDashboardData())
+  }, 1000)
+  
+  socket.on('disconnect', () => {
+    clearInterval(interval)
+  })
+})
+
+// Client
+const socket = io()
+
+socket.on('dashboard:update', (data) => {
+  setDashboardData(data)  // Update React state
+})
+```
+
+---
+
+## Production Checklist
+
+- [ ] **WebSocket/SSE**: Set up real-time connection
+- [ ] **Data Aggregation**: Aggregate data on backend
+- [ ] **State Management**: Manage dashboard state
+- [ ] **Chart Library**: Choose chart library (Chart.js, Recharts)
+- [ ] **Performance**: Optimize chart rendering
+- [ ] **Error Handling**: Handle connection errors
+- [ ] **Reconnection**: Auto-reconnect on disconnect
+- [ ] **Throttling**: Throttle updates if needed
+- [ ] **Caching**: Cache initial data
+- [ ] **Testing**: Test with real-time data
+- [ ] **Monitoring**: Monitor WebSocket health
+- [ ] **Fallback**: Polling fallback for old browsers
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Too Frequent Updates
+
+```typescript
+// ❌ Bad - Update every millisecond
+setInterval(() => {
+  socket.emit('update', data)  // Too frequent!
+}, 1)
+```
+
+```typescript
+// ✅ Good - Throttled updates
+const throttle = require('lodash/throttle')
+
+const sendUpdate = throttle((data) => {
+  socket.emit('update', data)
+}, 1000)  // Max once per second
+```
+
+### ❌ Don't: No Error Handling
+
+```typescript
+// ❌ Bad - No error handling
+socket.on('update', (data) => {
+  setData(data)  // What if connection fails?
+})
+```
+
+```typescript
+// ✅ Good - Error handling
+socket.on('connect', () => {
+  console.log('Connected')
+})
+
+socket.on('disconnect', () => {
+  console.log('Disconnected, reconnecting...')
+  // Show offline indicator
+})
+
+socket.on('error', (error) => {
+  console.error('Error:', error)
+  // Fallback to polling
+})
+```
+
+---
+
+## Integration Points
+
+- **WebSocket Patterns** (`34-real-time-features/websocket-patterns/`) - WebSocket implementation
+- **Server-Sent Events** (`34-real-time-features/server-sent-events/`) - SSE alternative
+- **Dashboard Design** (`23-business-analytics/dashboard-design/`) - Dashboard layouts
+
+---
+
+## Further Reading
 
 - [Chart.js](https://www.chartjs.org/)
 - [Recharts](https://recharts.org/)
+- [Socket.io](https://socket.io/)
+
+## Resources
 - [Socket.IO](https://socket.io/)
 - [Zustand](https://github.com/pmndrs/zustand)

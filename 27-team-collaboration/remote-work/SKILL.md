@@ -1,4 +1,18 @@
+---
+name: Remote Work Best Practices
+description: Best practices for remote work including async-first communication, collaboration tools, time zone management, work-life balance, and team building for distributed teams.
+---
+
 # Remote Work Best Practices
+
+> **Current Level:** Intermediate  
+> **Domain:** Team Collaboration / Culture
+
+---
+
+## Overview
+
+Remote work requires different practices than in-office work. Effective remote work includes async-first communication, proper collaboration tools, time zone management, clear boundaries, and intentional team building to maintain productivity and team cohesion.
 
 ## Remote Work Challenges
 
@@ -552,6 +566,112 @@ const productivity = {
 - [ ] Breaks taken
 - [ ] Mental health prioritized
 - [ ] Time off taken
+```
+
+---
+
+## Quick Start
+
+### Async Communication Template
+
+```markdown
+# Decision: [Title]
+
+## Context
+[Background information]
+
+## Decision
+[What we're deciding]
+
+## Options Considered
+1. Option A
+2. Option B
+3. Option C
+
+## Recommendation
+[Recommended option with reasoning]
+
+## Impact
+[Who/what is affected]
+
+## Next Steps
+[Action items]
+```
+
+### Time Zone Overlap
+
+```typescript
+// Find team overlap hours
+function findOverlapHours(timezones: string[]): number[] {
+  // Calculate overlapping hours
+  // Return array of hours (0-23) where all timezones overlap
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Async Communication**: Async-first communication culture
+- [ ] **Documentation**: Comprehensive documentation
+- [ ] **Tools**: Collaboration tools (Slack, Notion, etc.)
+- [ ] **Time Zones**: Time zone overlap management
+- [ ] **Meetings**: Efficient meeting practices
+- [ ] **Boundaries**: Clear work-life boundaries
+- [ ] **Check-ins**: Regular team check-ins
+- [ ] **Social**: Virtual team building
+- [ ] **Onboarding**: Remote onboarding process
+- [ ] **Performance**: Performance management
+- [ ] **Documentation**: Document remote work practices
+- [ ] **Feedback**: Regular feedback loops
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Always Sync
+
+```markdown
+# ❌ Bad - Everything requires sync meeting
+"Let's schedule a meeting to discuss"
+# Blocks progress!
+```
+
+```markdown
+# ✅ Good - Async first
+"Documented decision in Notion, review by EOD"
+# Non-blocking
+```
+
+### ❌ Don't: No Boundaries
+
+```markdown
+# ❌ Bad - Always available
+Slack: "Can you help?" at 11 PM
+# Burnout!
+```
+
+```markdown
+# ✅ Good - Clear boundaries
+Working hours: 9 AM - 6 PM
+Do Not Disturb: After hours
+# Healthy boundaries
+```
+
+---
+
+## Integration Points
+
+- **Knowledge Sharing** (`27-team-collaboration/knowledge-sharing/`) - Knowledge transfer
+- **Onboarding** (`27-team-collaboration/onboarding/`) - Remote onboarding
+- **Pair Programming** (`27-team-collaboration/pair-programming/`) - Remote pairing
+
+---
+
+## Further Reading
+
+- [Remote Work Best Practices](https://www.atlassian.com/work-management/remote-work)
+- [Async Communication Guide](https://www.doist.com/blog/asynchronous-communication)
 
 ### Security
 

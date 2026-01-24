@@ -1,13 +1,56 @@
+---
+name: Model Versioning
+description: Comprehensive guide for ML model versioning and management strategies, including model registries, metadata tracking, and deployment workflows.
+---
+
 # Model Versioning
 
 ## Overview
-Comprehensive guide for ML model versioning and management strategies, including model registries, metadata tracking, and deployment workflows.
 
----
+Model versioning is the practice of tracking and managing different versions of machine learning models throughout their lifecycle. This skill covers versioning strategies, model registries, metadata management, lineage tracking, artifact storage, promotion workflows, A/B testing, and model comparison tools.
 
-## 1. Versioning Strategies
+## Prerequisites
 
-### 1.1 Semantic Versioning
+- Understanding of machine learning model development
+- Knowledge of Git and version control systems
+- Familiarity with model deployment concepts
+- Understanding of data pipelines and workflows
+- Basic knowledge of database systems
+
+## Key Concepts
+
+### Versioning Strategies
+
+- **Semantic Versioning**: MAJOR.MINOR.PATCH format for tracking changes
+- **Timestamp-Based Versioning**: Using timestamps for unique version identifiers
+- **Git-Based Versioning**: Leveraging git commits and tags for versioning
+
+### Model Registry
+
+- **Centralized Storage**: Single source of truth for model versions
+- **Stage Management**: Development, Staging, Production, Archived stages
+- **Metadata Tracking**: Comprehensive model information storage
+- **Model Loading**: Retrieving models by version or stage
+
+### Metadata Management
+
+- **Model Metadata Schema**: Structured information about models
+- **Metadata Store**: Database for storing and querying metadata
+- **Lineage Tracking**: Tracking model relationships and data sources
+- **Artifact Storage**: Managing model files and related artifacts
+
+### Deployment Workflows
+
+- **Promotion Pipeline**: Moving models through stages
+- **Rollback Strategy**: Reverting to previous versions
+- **A/B Testing**: Comparing model versions in production
+- **Model Comparison**: Analyzing performance across versions
+
+## Implementation Guide
+
+### Versioning Strategies
+
+#### Semantic Versioning
 
 ```python
 from dataclasses import dataclass
@@ -70,7 +113,7 @@ v3 = ModelVersion.parse("2.1.3-beta+build123")
 print(v3)  # 2.1.3-beta+build123
 ```
 
-### 1.2 Timestamp-Based Versioning
+#### Timestamp-Based Versioning
 
 ```python
 from datetime import datetime
@@ -114,7 +157,7 @@ version_micro = versioner.generate_with_microseconds()
 print(version_micro)  # 20240114-123045-123456
 ```
 
-### 1.3 Git-Based Versioning
+#### Git-Based Versioning
 
 ```python
 import subprocess
@@ -189,11 +232,9 @@ version = GitVersion.generate_version()
 print(version)  # main-abc1234 or v1.0.0
 ```
 
----
+### Model Registry
 
-## 2. Model Registry
-
-### 2.1 MLflow Model Registry
+#### MLflow Model Registry
 
 ```python
 import mlflow
@@ -315,7 +356,7 @@ registry.transition_stage("image_classifier", "1", "Production")
 model = registry.load_model("image_classifier", stage="Production")
 ```
 
-### 2.2 Custom Model Registry
+#### Custom Model Registry
 
 ```python
 import json
@@ -324,6 +365,7 @@ from pathlib import Path
 from datetime import datetime
 import hashlib
 import pickle
+import torch
 
 class ModelRegistry:
     """Custom model registry."""
@@ -485,17 +527,16 @@ registry.transition_stage("image_classifier", "1.0.0", "Production")
 model, metadata = registry.load("image_classifier", stage="Production")
 ```
 
----
+### Metadata Management
 
-## 3. Metadata Management
-
-### 3.1 Model Metadata Schema
+#### Model Metadata Schema
 
 ```python
 from dataclasses import dataclass, asdict
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 from enum import Enum
+import json
 
 class ModelStage(Enum):
     DEVELOPMENT = "Development"
@@ -602,7 +643,7 @@ with open("model_metadata.json", "w") as f:
     f.write(metadata.to_json())
 ```
 
-### 3.2 Metadata Store
+#### Metadata Store
 
 ```python
 import sqlite3
@@ -790,11 +831,9 @@ metadata = store.get_metadata("image_classifier", "1.0.0")
 production_models = store.list_models(stage=ModelStage.PRODUCTION)
 ```
 
----
+### Model Lineage Tracking
 
-## 4. Model Lineage Tracking
-
-### 4.1 Lineage Graph
+#### Lineage Graph
 
 ```python
 from typing import List, Dict, Optional
@@ -935,11 +974,9 @@ descendants = lineage.get_descendants("base_model", "1.0.0")
 lineage.visualize("lineage.png")
 ```
 
----
+### Artifact Storage
 
-## 5. Artifact Storage
-
-### 5.1 Artifact Manager
+#### Artifact Manager
 
 ```python
 import os
@@ -948,6 +985,7 @@ import hashlib
 from pathlib import Path
 from typing import List, Optional
 import json
+from datetime import datetime
 
 class ArtifactManager:
     """Manage model artifacts."""
@@ -1080,11 +1118,9 @@ manager.store(
 artifact_path = manager.retrieve("image_classifier", "1.0.0", destination="./downloaded_model.pth")
 ```
 
----
+### Model Promotion Workflow
 
-## 6. Model Promotion Workflow
-
-### 6.1 Promotion Pipeline
+#### Promotion Pipeline
 
 ```python
 from enum import Enum
@@ -1207,7 +1243,7 @@ pipeline.promote(
 )
 ```
 
-### 6.2 Rollback Strategy
+#### Rollback Strategy
 
 ```python
 class ModelRollback:
@@ -1278,11 +1314,9 @@ pipeline.promote("image_classifier", "1.0.0", PromotionStage.STAGING, PromotionS
 rollback.rollback("image_classifier")
 ```
 
----
+### A/B Testing Setup
 
-## 7. A/B Testing Setup
-
-### 7.1 A/B Test Manager
+#### A/B Test Manager
 
 ```python
 from typing import Dict, List
@@ -1438,11 +1472,9 @@ results = ab_test.get_results(test_id)
 ab_test.conclude_test(test_id, winner="B")
 ```
 
----
+### Model Comparison
 
-## 8. Model Comparison
-
-### 8.1 Model Comparison Tool
+#### Model Comparison Tool
 
 ```python
 from typing import Dict, List
@@ -1538,132 +1570,141 @@ best = comparator.find_best_model("image_classifier", "accuracy", maximize=True)
 print(f"Best model: {best}")
 ```
 
----
+## Best Practices
 
-## 9. Best Practices
+### Versioning Guidelines
 
-### 9.1 Versioning Guidelines
+1. **Use Semantic Versioning**
+   - MAJOR: Breaking changes
+   - MINOR: New features, backward compatible
+   - PATCH: Bug fixes, backward compatible
 
-```python
-# 1. Use semantic versioning
-# MAJOR: Breaking changes
-# MINOR: New features, backward compatible
-# PATCH: Bug fixes, backward compatible
+2. **Tag Releases in Git**
+   ```bash
+   git tag -a v1.0.0 -m "Release version 1.0.0"
+   git push origin v1.0.0
+   ```
 
-# 2. Tag releases in git
-# git tag -a v1.0.0 -m "Release version 1.0.0"
-# git push origin v1.0.0
+3. **Document Changes in CHANGELOG.md**
+   ```markdown
+   # Changelog
 
-# 3. Document changes in CHANGELOG.md
-"""
-# Changelog
+   ## [1.1.0] - 2024-01-15
+   ### Added
+   - New feature X
+   - New feature Y
 
-## [1.1.0] - 2024-01-15
-### Added
-- New feature X
-- New feature Y
+   ### Changed
+   - Improved performance of model
 
-### Changed
-- Improved performance of model
+   ## [1.0.0] - 2024-01-01
+   ### Added
+   - Initial release
+   ```
 
-## [1.0.0] - 2024-01-01
-### Added
-- Initial release
-"""
+4. **Use Git Commit Hash for Reproducibility**
+   ```python
+   metadata = {
+       "git_commit": GitVersion.get_commit_hash(),
+       "git_branch": GitVersion.get_branch()
+   }
+   ```
 
-# 4. Use git commit hash for reproducibility
-metadata = {
-    "git_commit": GitVersion.get_commit_hash(),
-    "git_branch": GitVersion.get_branch()
-}
+5. **Store Hyperparameters with Model**
+   ```python
+   hyperparameters = {
+       "learning_rate": 0.001,
+       "batch_size": 32,
+       "epochs": 100,
+       "optimizer": "Adam"
+   }
+   ```
 
-# 5. Store hyperparameters with model
-hyperparameters = {
-    "learning_rate": 0.001,
-    "batch_size": 32,
-    "epochs": 100,
-    "optimizer": "Adam"
-}
-```
+### Registry Best Practices
 
-### 9.2 Registry Best Practices
+1. **Always Validate Before Production Deployment**
+   ```python
+   def validate_model(model, test_loader, thresholds):
+       """Validate model meets production thresholds."""
+       metrics = evaluate(model, test_loader)
 
-```python
-# 1. Always validate before production deployment
-def validate_model(model, test_loader, thresholds):
-    """Validate model meets production thresholds."""
-    metrics = evaluate(model, test_loader)
+       for metric, threshold in thresholds.items():
+           if metrics[metric] < threshold:
+               raise ValueError(
+                   f"Model {metric} ({metrics[metric]}) below threshold ({threshold})"
+               )
 
-    for metric, threshold in thresholds.items():
-        if metrics[metric] < threshold:
-            raise ValueError(
-                f"Model {metric} ({metrics[metric]}) below threshold ({threshold})"
-            )
+       return metrics
+   ```
 
-    return metrics
+2. **Keep Model Lineage**
+   ```python
+   lineage = ModelLineage()
+   lineage.add_model(
+       model_name="model_v2",
+       version="1.0.0",
+       parent_model="model_v1",
+       parent_version="1.0.0"
+   )
+   ```
 
-# 2. Keep model lineage
-lineage = ModelLineage()
-lineage.add_model(
-    model_name="model_v2",
-    version="1.0.0",
-    parent_model="model_v1",
-    parent_version="1.0.0"
-)
+3. **Use Consistent Metadata**
+   ```python
+   metadata = ModelMetadata(
+       model_name="my_model",
+       version="1.0.0",
+       framework="pytorch",
+       task="classification",
+       # ... all required fields
+   )
+   ```
 
-# 3. Use consistent metadata
-metadata = ModelMetadata(
-    model_name="my_model",
-    version="1.0.0",
-    framework="pytorch",
-    task="classification",
-    # ... all required fields
-)
+4. **Archive Old Models**
+   ```python
+   def archive_old_models(registry, model_name, keep_versions=5):
+       """Archive old model versions."""
+       versions = registry.list_versions(model_name)
 
-# 4. Archive old models
-def archive_old_models(registry, model_name, keep_versions=5):
-    """Archive old model versions."""
-    versions = registry.list_versions(model_name)
+       # Sort by registered date
+       versions.sort(key=lambda x: x["registered_at"])
 
-    # Sort by registered date
-    versions.sort(key=lambda x: x["registered_at"])
+       # Archive all but latest N versions
+       for version_info in versions[:-keep_versions]:
+           registry.transition_stage(
+               model_name,
+               version_info["version"],
+               "Archived"
+           )
+   ```
 
-    # Archive all but the latest N versions
-    for version_info in versions[:-keep_versions]:
-        registry.transition_stage(
-            model_name,
-            version_info["version"],
-            "Archived"
-        )
+5. **Monitor Production Models**
+   ```python
+   def monitor_production_models(registry, alert_thresholds):
+       """Monitor production models for issues."""
+       production_models = registry.list_models(stage="Production")
 
-# 5. Monitor production models
-def monitor_production_models(registry, alert_thresholds):
-    """Monitor production models for issues."""
-    production_models = registry.list_models(stage="Production")
+       for model_info in production_models:
+           model, metadata = registry.load(
+               model_info["model_name"],
+               model_info["version"]
+           )
 
-    for model_info in production_models:
-        model, metadata = registry.load(
-            model_info["model_name"],
-            model_info["version"]
-        )
+           # Check model health
+           health = check_model_health(model)
 
-        # Check model health
-        health = check_model_health(model)
+           if not health["healthy"]:
+               # Send alert
+               send_alert(
+                   model_name=model_info["model_name"],
+                   version=model_info["version"],
+                   issue=health["issue"]
+               )
+   ```
 
-        if not health["healthy"]:
-            # Send alert
-            send_alert(
-                model_name=model_info["model_name"],
-                version=model_info["version"],
-                issue=health["issue"]
-            )
-```
+## Related Skills
 
----
-
-## Additional Resources
-
-- [MLflow Documentation](https://mlflow.org/docs/latest/index.html)
-- [DVC Documentation](https://dvc.org/doc)
-- [Semantic Versioning](https://semver.org/)
-- [Model Versioning Best Practices](https://ml-ops.org/content/model-versioning/)
+- [`05-ai-ml-core/model-training`](05-ai-ml-core/model-training/SKILL.md)
+- [`05-ai-ml-core/model-optimization`](05-ai-ml-core/model-optimization/SKILL.md)
+- [`06-ai-ml-production/llm-integration`](06-ai-ml-production/llm-integration/SKILL.md)
+- [`06-ai-ml-production/llm-local-deployment`](06-ai-ml-production/llm-local-deployment/SKILL.md)
+- [`15-devops-infrastructure/ci-cd-pipelines`](15-devops-infrastructure/ci-cd-pipelines/SKILL.md)

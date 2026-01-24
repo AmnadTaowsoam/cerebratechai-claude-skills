@@ -1,29 +1,65 @@
+---
+name: AI/ML Observability and Monitoring
+description: Comprehensive guide to monitoring AI/ML systems in production, including LLMs, RAG applications, and traditional ML models.
+---
+
 # AI/ML Observability and Monitoring
 
 ## Overview
 
-Comprehensive guide to monitoring AI/ML systems in production, including LLMs, RAG applications, and traditional ML models.
+Comprehensive guide to monitoring AI/ML systems in production, including LLMs, RAG applications, and traditional ML models. This skill covers monitoring stack setup (Prometheus, Grafana, Jaeger, Phoenix), metrics tracking (latency, throughput, token usage, cost, errors), model performance monitoring, data drift detection, LLM interaction logging, tracing with LangSmith/Phoenix, alerting strategies, dashboards, A/B test monitoring, cost optimization, debugging patterns, and production deployment checklists.
 
-## Table of Contents
+## Prerequisites
 
-1. [Monitoring Stack](#monitoring-stack)
-2. [Metrics to Track](#metrics-to-track)
-3. [Model Performance Monitoring](#model-performance-monitoring)
-4. [Data Drift Detection](#data-drift-detection)
-5. [Logging LLM Interactions](#logging-llm-interactions)
-6. [Tracing with LangSmith/Phoenix](#tracing-with-langsmithphoenix)
-7. [Alerting Strategies](#alerting-strategies)
-8. [Dashboards](#dashboards)
-9. [A/B Test Monitoring](#ab-test-monitoring)
-10. [Cost Optimization](#cost-optimization)
-11. [Debugging Patterns](#debugging-patterns)
-12. [Production Checklist](#production-checklist)
+- Understanding of observability concepts (metrics, logs, traces)
+- Familiarity with monitoring tools (Prometheus, Grafana)
+- Knowledge of LLM APIs and their pricing models
+- Understanding of statistical concepts for drift detection
+- Familiarity with Docker and container orchestration
+- Knowledge of FastAPI and middleware patterns
 
----
+## Key Concepts
 
-## Monitoring Stack
+### Monitoring Stack Components
 
-### Recommended Tools
+- **Prometheus**: Metrics collection and storage
+- **Grafana**: Visualization and dashboards
+- **Loki/Promtail**: Log aggregation
+- **Jaeger**: Distributed tracing
+- **Phoenix/Arize**: AI-specific observability
+- **LangSmith**: LangChain tracing and debugging
+
+### Key Metrics
+
+- **Latency**: Request/response time (P50, P95, P99)
+- **Throughput**: Requests per second/minute
+- **Token Usage**: Input/output tokens per model
+- **Cost**: USD cost per model and endpoint
+- **Error Rates**: Rate limit, timeout, validation errors
+
+### Model Performance Metrics
+
+- **Classification**: Accuracy, F1, precision, recall
+- **Generation**: ROUGE scores, BLEU, semantic similarity
+- **RAG**: Precision@K, Recall@K, MRR, NDCG
+
+### Drift Detection
+
+- **Statistical Drift**: KS test, JS divergence, population stability index
+- **Embedding Drift**: Centroid distance, similarity shift
+- **Concept Drift**: Changes in model behavior over time
+
+### Tracing
+
+- **OpenTelemetry**: Standard tracing framework
+- **LangSmith Tracer**: LangChain-specific tracing
+- **Phoenix Instrumentor**: Automatic tracing for LangChain
+
+## Implementation Guide
+
+### Monitoring Stack
+
+#### Docker Compose Setup
 
 ```yaml
 # docker-compose.yml for observability stack
@@ -77,7 +113,7 @@ volumes:
   grafana-storage:
 ```
 
-### LangSmith Setup
+#### LangSmith Setup
 
 ```python
 # langsmith_config.py
@@ -91,11 +127,9 @@ os.environ["LANGCHAIN_PROJECT"] = "my-ai-app"
 client = Client()
 ```
 
----
+### Metrics to Track
 
-## Metrics to Track
-
-### 1. Latency
+#### Latency Tracking
 
 ```python
 # metrics_collector.py
@@ -121,7 +155,7 @@ duration = time.time() - start_time
 request_latency.labels(model='gpt-4', endpoint='/chat').observe(duration)
 ```
 
-### 2. Throughput
+#### Throughput Tracking
 
 ```python
 # Requests per second
@@ -142,7 +176,7 @@ def track_request(model: str, status: str):
     requests_total.labels(model=model, status=status).inc()
 ```
 
-### 3. Token Usage
+#### Token Usage Tracking
 
 ```python
 # Token usage tracking
@@ -161,14 +195,14 @@ token_cost = Counter(
 def track_tokens(model: str, input_tokens: int, output_tokens: int):
     token_usage.labels(model=model, type='input').inc(input_tokens)
     token_usage.labels(model=model, type='output').inc(output_tokens)
-    
+
     # Calculate cost
     input_cost = input_tokens * INPUT_COST_PER_1K[model] / 1000
     output_cost = output_tokens * OUTPUT_COST_PER_1K[model] / 1000
     token_cost.labels(model=model).inc(input_cost + output_cost)
 ```
 
-### 4. Cost Tracking
+#### Cost Tracking
 
 ```python
 # Cost tracking configuration
@@ -190,7 +224,7 @@ daily_cost = Gauge(
 )
 ```
 
-### 5. Error Rates
+#### Error Rate Tracking
 
 ```python
 # Error tracking
@@ -219,11 +253,9 @@ def track_error(model: str, error_type: str):
         error_total.labels(model=model, error_type=error_type).inc()
 ```
 
----
+### Model Performance Monitoring
 
-## Model Performance Monitoring
-
-### Quality Metrics
+#### Quality Metrics
 
 ```python
 # quality_metrics.py
@@ -234,7 +266,7 @@ import numpy as np
 class QualityMonitor:
     def __init__(self):
         self.rouge_scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
-    
+
     def track_classification(self, y_true, y_pred):
         """Track classification metrics"""
         metrics = {
@@ -243,7 +275,7 @@ class QualityMonitor:
             'precision_recall': precision_recall_fscore_support(y_true, y_pred)
         }
         return metrics
-    
+
     def track_generation_quality(self, reference: str, generated: str):
         """Track text generation quality"""
         scores = self.rouge_scorer.score(reference, generated)
@@ -252,26 +284,26 @@ class QualityMonitor:
             'rouge2': scores['rouge2'].fmeasure,
             'rougeL': scores['rougeL'].fmeasure
         }
-    
+
     def track_rag_retrieval(self, relevant_docs: list, retrieved_docs: list, k: int = 10):
         """Track RAG retrieval quality"""
         # Precision@K
         precision = len(set(relevant_docs) & set(retrieved_docs[:k])) / k
-        
+
         # Recall@K
         recall = len(set(relevant_docs) & set(retrieved_docs[:k])) / len(relevant_docs) if relevant_docs else 0
-        
+
         # MRR (Mean Reciprocal Rank)
         mrr = 0
         for i, doc in enumerate(retrieved_docs[:k], 1):
             if doc in relevant_docs:
                 mrr = 1 / i
                 break
-        
+
         return {'precision_at_k': precision, 'recall_at_k': recall, 'mrr': mrr}
 ```
 
-### Feedback Collection
+#### Feedback Collection
 
 ```python
 # feedback_collector.py
@@ -296,13 +328,13 @@ async def collect_feedback(feedback: Feedback):
         **feedback.dict(),
         'timestamp': datetime.utcnow().isoformat()
     }
-    
+
     # Store feedback
     await store_feedback(feedback_data)
-    
+
     # Update metrics
     update_feedback_metrics(feedback.rating, feedback.helpful)
-    
+
     return {"status": "recorded"}
 
 def update_feedback_metrics(rating: int, helpful: bool):
@@ -312,11 +344,9 @@ def update_feedback_metrics(rating: int, helpful: bool):
     pass
 ```
 
----
+### Data Drift Detection
 
-## Data Drift Detection
-
-### Statistical Drift Detection
+#### Statistical Drift Detection
 
 ```python
 # drift_detection.py
@@ -329,7 +359,7 @@ class DriftDetector:
     def __init__(self, reference_data: pd.DataFrame):
         self.reference_data = reference_data
         self.reference_stats = self._calculate_stats(reference_data)
-    
+
     def _calculate_stats(self, data: pd.DataFrame):
         """Calculate reference statistics"""
         stats_dict = {}
@@ -342,11 +372,11 @@ class DriftDetector:
                 'percentiles': data[column].quantile([0.25, 0.5, 0.75]).to_dict()
             }
         return stats_dict
-    
+
     def detect_drift(self, current_data: pd.DataFrame, threshold: float = 0.05):
         """Detect statistical drift"""
         drift_results = {}
-        
+
         for column in current_data.select_dtypes(include=[np.number]).columns:
             if column in self.reference_stats:
                 # Kolmogorov-Smirnov test
@@ -354,36 +384,36 @@ class DriftDetector:
                     self.reference_data[column],
                     current_data[column]
                 )
-                
+
                 drift_results[column] = {
                     'ks_statistic': ks_stat,
                     'p_value': p_value,
                     'drift_detected': p_value < threshold
                 }
-        
+
         return drift_results
-    
+
     def detect_distribution_drift(self, current_data: pd.DataFrame):
         """Detect distribution drift using JS divergence"""
         drift_results = {}
-        
+
         for column in current_data.select_dtypes(include=[np.number]).columns:
             # Create histograms
             ref_hist, ref_bins = np.histogram(self.reference_data[column], bins=20, density=True)
             curr_hist, _ = np.histogram(current_data[column], bins=ref_bins, density=True)
-            
+
             # Calculate Jensen-Shannon divergence
             js_divergence = jensenshannon(ref_hist, curr_hist)
-            
+
             drift_results[column] = {
                 'js_divergence': js_divergence,
                 'drift_detected': js_divergence > 0.1  # Threshold
             }
-        
+
         return drift_results
 ```
 
-### Embedding Drift Detection
+#### Embedding Drift Detection
 
 ```python
 # embedding_drift.py
@@ -394,37 +424,37 @@ class EmbeddingDriftDetector:
     def __init__(self, reference_embeddings: np.ndarray):
         self.reference_embeddings = reference_embeddings
         self.reference_centroid = np.mean(reference_embeddings, axis=0)
-    
+
     def detect_drift(self, current_embeddings: np.ndarray, threshold: float = 0.1):
         """Detect drift in embedding space"""
         current_centroid = np.mean(current_embeddings, axis=0)
-        
+
         # Calculate centroid distance
         centroid_distance = 1 - cosine_similarity(
             [self.reference_centroid],
             [current_centroid]
         )[0][0]
-        
+
         # Calculate average pairwise similarity
         ref_similarities = []
         curr_similarities = []
-        
+
         for i in range(min(100, len(self.reference_embeddings))):
             ref_sim = np.mean(cosine_similarity(
                 [self.reference_embeddings[i]],
                 self.reference_embeddings[:100]
             ))
             ref_similarities.append(ref_sim)
-        
+
         for i in range(min(100, len(current_embeddings))):
             curr_sim = np.mean(cosine_similarity(
                 [current_embeddings[i]],
                 current_embeddings[:100]
             ))
             curr_similarities.append(curr_sim)
-        
+
         similarity_shift = abs(np.mean(ref_similarities) - np.mean(curr_similarities))
-        
+
         return {
             'centroid_distance': centroid_distance,
             'similarity_shift': similarity_shift,
@@ -432,11 +462,9 @@ class EmbeddingDriftDetector:
         }
 ```
 
----
+### Logging LLM Interactions
 
-## Logging LLM Interactions
-
-### Structured Logging
+#### Structured Logging
 
 ```python
 # llm_logger.py
@@ -448,7 +476,7 @@ from typing import Dict, Any, Optional
 class LLMLogger:
     def __init__(self, log_file: str = "llm_interactions.jsonl"):
         self.log_file = log_file
-    
+
     def log_interaction(
         self,
         model: str,
@@ -472,12 +500,12 @@ class LLMLogger:
             "latency_seconds": latency,
             "metadata": metadata or {}
         }
-        
+
         with open(self.log_file, 'a') as f:
             f.write(json.dumps(interaction) + '\n')
-        
+
         return interaction["id"]
-    
+
     def log_rag_interaction(
         self,
         query: str,
@@ -497,14 +525,14 @@ class LLMLogger:
             "response": response,
             "metadata": metadata or {}
         }
-        
+
         with open(self.log_file, 'a') as f:
             f.write(json.dumps(interaction) + '\n')
-        
+
         return interaction["id"]
 ```
 
-### Middleware for FastAPI
+#### Middleware for FastAPI
 
 ```python
 # llm_middleware.py
@@ -517,22 +545,22 @@ class LLMMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, logger: LLMLogger):
         super().__init__(app)
         self.logger = logger
-    
+
     async def dispatch(self, request: Request, call_next):
         # Start timer
         start_time = time.time()
-        
+
         # Process request
         response = await call_next(request)
-        
+
         # Calculate latency
         process_time = time.time() - start_time
-        
+
         # Log if it's an LLM endpoint
         if request.url.path.startswith("/api/llm"):
             # Extract request body (if available)
             body = await request.body()
-            
+
             # Log interaction
             self.logger.log_interaction(
                 model=request.headers.get("X-Model", "unknown"),
@@ -542,18 +570,16 @@ class LLMMiddleware(BaseHTTPMiddleware):
                 output_tokens=0,
                 latency=process_time
             )
-        
+
         # Add latency header
         response.headers["X-Process-Time"] = str(process_time)
-        
+
         return response
 ```
 
----
+### Tracing with LangSmith/Phoenix
 
-## Tracing with LangSmith/Phoenix
-
-### LangSmith Integration
+#### LangSmith Integration
 
 ```python
 # langsmith_tracing.py
@@ -576,7 +602,7 @@ response = llm.invoke([HumanMessage(content="Hello, world!")])
 print(response.content)
 ```
 
-### Phoenix Integration
+#### Phoenix Integration
 
 ```python
 # phoenix_tracing.py
@@ -596,7 +622,7 @@ llm = ChatOpenAI(model="gpt-4")
 response = llm.invoke([HumanMessage(content="Hello, world!")])
 ```
 
-### Custom Tracing
+#### Custom Tracing
 
 ```python
 # custom_tracing.py
@@ -621,21 +647,19 @@ trace.get_tracer_provider().add_span_processor(span_processor)
 def traced_llm_call(prompt: str):
     with tracer.start_as_current_span("llm_call") as span:
         span.set_attribute("prompt", prompt)
-        
+
         # Call LLM
         response = call_llm(prompt)
-        
+
         span.set_attribute("response", response)
         span.set_attribute("tokens", count_tokens(response))
-        
+
         return response
 ```
 
----
+### Alerting Strategies
 
-## Alerting Strategies
-
-### Prometheus Alerting Rules
+#### Prometheus Alerting Rules
 
 ```yaml
 # alert_rules.yml
@@ -652,7 +676,7 @@ groups:
         annotations:
           summary: "High LLM latency detected"
           description: "95th percentile latency is {{ $value }}s for model {{ $labels.model }}"
-      
+
       # High error rate alert
       - alert: HighLLMErrorRate
         expr: rate(llm_errors_total[5m]) / rate(llm_requests_total[5m]) > 0.05
@@ -662,7 +686,7 @@ groups:
         annotations:
           summary: "High LLM error rate detected"
           description: "Error rate is {{ $value | humanizePercentage }}"
-      
+
       # Cost alert
       - alert: HighDailyCost
         expr: llm_daily_cost_usd > 100
@@ -671,7 +695,7 @@ groups:
         annotations:
           summary: "Daily cost exceeds threshold"
           description: "Daily cost is ${{ $value }}"
-      
+
       # Data drift alert
       - alert: DataDriftDetected
         expr: data_drift_detected == 1
@@ -683,7 +707,7 @@ groups:
           description: "Drift detected in {{ $labels.feature }}"
 ```
 
-### Custom Alerting
+#### Custom Alerting
 
 ```python
 # alert_manager.py
@@ -695,11 +719,11 @@ class AlertManager:
     def __init__(self):
         self.alert_handlers: Dict[str, Callable] = {}
         self.alert_history = []
-    
+
     def register_handler(self, alert_type: str, handler: Callable):
         """Register alert handler"""
         self.alert_handlers[alert_type] = handler
-    
+
     def trigger_alert(self, alert_type: str, data: Dict[str, Any]):
         """Trigger an alert"""
         self.alert_history.append({
@@ -707,30 +731,30 @@ class AlertManager:
             'data': data,
             'timestamp': datetime.utcnow().isoformat()
         })
-        
+
         if alert_type in self.alert_handlers:
             self.alert_handlers[alert_type](data)
-    
+
     def email_alert(self, data: Dict[str, Any]):
         """Send email alert"""
         msg = MIMEText(data['message'])
         msg['Subject'] = data['subject']
         msg['From'] = 'alerts@example.com'
         msg['To'] = data['recipient']
-        
+
         with smtplib.SMTP('smtp.example.com') as server:
             server.send_message(msg)
-    
+
     def slack_alert(self, data: Dict[str, Any]):
         """Send Slack alert"""
         import requests
-        
+
         webhook_url = data['webhook_url']
         payload = {
             'text': data['message'],
             'attachments': data.get('attachments', [])
         }
-        
+
         requests.post(webhook_url, json=payload)
 
 # Usage
@@ -739,11 +763,9 @@ alert_manager.register_handler('high_latency', alert_manager.email_alert)
 alert_manager.register_handler('high_error_rate', alert_manager.slack_alert)
 ```
 
----
+### Dashboards
 
-## Dashboards
-
-### Grafana Dashboard Configuration
+#### Grafana Dashboard Configuration
 
 ```json
 {
@@ -805,11 +827,9 @@ alert_manager.register_handler('high_error_rate', alert_manager.slack_alert)
 }
 ```
 
----
+### A/B Test Monitoring
 
-## A/B Test Monitoring
-
-### A/B Test Setup
+#### A/B Test Setup
 
 ```python
 # ab_test_monitor.py
@@ -820,27 +840,27 @@ from scipy import stats
 class ABTestMonitor:
     def __init__(self):
         self.experiments = {}
-    
+
     def create_experiment(self, name: str, variants: list):
         """Create A/B test experiment"""
         self.experiments[name] = {
             'variants': {v: {'metrics': []} for v in variants},
             'created_at': datetime.utcnow()
         }
-    
+
     def record_metric(self, experiment: str, variant: str, metric: float):
         """Record metric for variant"""
         if experiment in self.experiments:
             self.experiments[experiment]['variants'][variant]['metrics'].append(metric)
-    
+
     def analyze_experiment(self, experiment: str, metric_name: str = "metric"):
         """Analyze A/B test results"""
         if experiment not in self.experiments:
             return None
-        
+
         variants = self.experiments[experiment]['variants']
         results = {}
-        
+
         for variant_name, data in variants.items():
             metrics = data['metrics']
             results[variant_name] = {
@@ -848,7 +868,7 @@ class ABTestMonitor:
                 'std': np.std(metrics),
                 'count': len(metrics)
             }
-        
+
         # Statistical significance test
         variant_names = list(results.keys())
         if len(variant_names) == 2:
@@ -861,7 +881,7 @@ class ABTestMonitor:
                 'p_value': p_value,
                 'significant': p_value < 0.05
             }
-        
+
         return results
 
 # Usage
@@ -876,11 +896,9 @@ monitor.record_metric('model_comparison', 'gpt-3.5-turbo', 4.2)
 results = monitor.analyze_experiment('model_comparison')
 ```
 
----
+### Cost Optimization
 
-## Cost Optimization
-
-### Cost Tracking and Optimization
+#### Cost Tracking and Optimization
 
 ```python
 # cost_optimizer.py
@@ -890,7 +908,7 @@ import heapq
 class CostOptimizer:
     def __init__(self):
         self.usage_history = []
-    
+
     def recommend_model(
         self,
         task_type: str,
@@ -910,9 +928,9 @@ class CostOptimizer:
                 'high': 'gpt-4'
             }
         }
-        
+
         return model_recommendations.get(complexity, {}).get(task_type, 'gpt-3.5-turbo')
-    
+
     def optimize_token_usage(self, prompt: str, max_tokens: int = 1000) -> str:
         """Optimize prompt to reduce token usage"""
         # Remove redundant content
@@ -920,24 +938,22 @@ class CostOptimizer:
         # Use system prompts efficiently
         optimized = prompt[:max_tokens * 4]  # Rough approximation
         return optimized
-    
+
     def batch_requests(self, requests: List[Dict], batch_size: int = 10):
         """Batch requests for efficiency"""
         for i in range(0, len(requests), batch_size):
             batch = requests[i:i + batch_size]
             yield batch
-    
+
     def cache_responses(self, cache_key: str, response: str, ttl: int = 3600):
         """Cache responses to avoid duplicate calls"""
         # Implement caching logic
         pass
 ```
 
----
+### Debugging Patterns
 
-## Debugging Patterns
-
-### Common Issues and Solutions
+#### Common Issues and Solutions
 
 ```python
 # debugging_patterns.py
@@ -947,50 +963,48 @@ class LLMDbugger:
     def debug_high_latency(latency: float, model: str):
         """Debug high latency issues"""
         issues = []
-        
+
         if latency > 30:
             issues.append("Consider using a faster model")
             issues.append("Check network connectivity")
             issues.append("Review prompt complexity")
-        
+
         if model == 'gpt-4' and latency > 60:
             issues.append("GPT-4 has higher latency, consider GPT-3.5 for simpler tasks")
-        
+
         return issues
-    
+
     @staticmethod
     def debug_high_error_rate(error_rate: float, error_types: Dict[str, int]):
         """Debug high error rate"""
         issues = []
-        
+
         if 'rate_limit_exceeded' in error_types and error_types['rate_limit_exceeded'] > 10:
             issues.append("Implement rate limiting and retry logic")
             issues.append("Consider upgrading API tier")
-        
+
         if 'timeout' in error_types and error_types['timeout'] > 5:
             issues.append("Increase timeout duration")
             issues.append("Check for network issues")
-        
+
         return issues
-    
+
     @staticmethod
     def debug_quality_degradation(quality_metrics: Dict[str, float]):
         """Debug quality degradation"""
         issues = []
-        
+
         if quality_metrics.get('rougeL', 1.0) < 0.5:
             issues.append("Check for data drift")
             issues.append("Review prompt templates")
             issues.append("Consider fine-tuning model")
-        
+
         return issues
 ```
 
----
+### Production Checklist
 
-## Production Checklist
-
-### Pre-Deployment Checklist
+#### Pre-Deployment Checklist
 
 ```markdown
 ## Monitoring
@@ -1036,7 +1050,7 @@ class LLMDbugger:
 - [ ] Incident response plan is ready
 ```
 
-### Post-Deployment Monitoring
+#### Post-Deployment Monitoring
 
 ```python
 # post_deployment_monitor.py
@@ -1044,44 +1058,118 @@ class LLMDbugger:
 class PostDeploymentMonitor:
     def __init__(self, baseline_metrics: Dict[str, float]):
         self.baseline = baseline_metrics
-    
+
     def check_deployment_health(self, current_metrics: Dict[str, float]) -> Dict[str, bool]:
         """Check if deployment is healthy"""
         health_status = {}
-        
+
         # Check latency
         health_status['latency'] = (
             current_metrics['latency'] <= self.baseline['latency'] * 1.5
         )
-        
+
         # Check error rate
         health_status['error_rate'] = (
             current_metrics['error_rate'] <= self.baseline['error_rate'] * 2
         )
-        
+
         # Check quality
         health_status['quality'] = (
             current_metrics['quality'] >= self.baseline['quality'] * 0.9
         )
-        
+
         return health_status
-    
+
     def should_rollback(self, health_status: Dict[str, bool]) -> bool:
         """Determine if rollback is needed"""
         critical_failures = [
             not health_status.get('error_rate', True),
             not health_status.get('quality', True)
         ]
-        
+
         return any(critical_failures)
 ```
 
----
+## Best Practices
 
-## Additional Resources
+### Monitoring Setup
 
-- [LangSmith Documentation](https://docs.smith.langchain.com/)
-- [Phoenix Documentation](https://docs.arize.com/phoenix)
-- [Prometheus Best Practices](https://prometheus.io/docs/practices/)
-- [OpenTelemetry Python](https://opentelemetry.io/docs/instrumentation/python/)
-- [Grafana Dashboards](https://grafana.com/grafana/dashboards/)
+- **Use a comprehensive monitoring stack**
+  - Prometheus for metrics
+  - Grafana for visualization
+  - Loki for logs
+  - Jaeger for tracing
+  - Phoenix for AI-specific observability
+
+- **Track all key metrics**
+  - Latency (P50, P95, P99)
+  - Throughput (requests per second)
+  - Token usage and cost
+  - Error rates by type
+
+### Alerting
+
+- **Set appropriate thresholds**
+  - Latency: Alert on P95 > 30s
+  - Error rate: Alert on > 5%
+  - Cost: Alert on daily budget exceeded
+
+- **Use multiple alert channels**
+  - Email for critical alerts
+  - Slack for warnings
+  - PagerDuty for emergencies
+
+### Logging
+
+- **Log all LLM interactions**
+  - Include model, prompt, response, tokens, latency
+  - Use structured logging (JSON)
+  - Mask sensitive data
+
+- **Implement middleware for automatic logging**
+  - Use FastAPI middleware
+  - Track request/response cycles
+  - Add correlation IDs
+
+### Drift Detection
+
+- **Monitor for data drift**
+  - Use statistical tests (KS test)
+  - Track embedding drift
+  - Set appropriate thresholds
+
+- **Detect concept drift**
+  - Monitor model performance over time
+  - Track quality metrics
+  - Compare to baseline
+
+### Cost Management
+
+- **Track costs per model**
+  - Monitor token usage
+  - Calculate cost per request
+  - Set daily budgets
+
+- **Optimize for cost**
+  - Use appropriate models for tasks
+  - Cache responses
+  - Batch requests
+
+### Production Deployment
+
+- **Follow the checklist**
+  - Complete all pre-deployment items
+  - Test monitoring and alerting
+  - Document runbooks
+
+- **Monitor post-deployment**
+  - Compare to baseline metrics
+  - Watch for anomalies
+  - Be ready to rollback
+
+## Related Skills
+
+- [`06-ai-ml-production/llm-integration`](06-ai-ml-production/llm-integration/SKILL.md)
+- [`06-ai-ml-production/agent-patterns`](06-ai-ml-production/agent-patterns/SKILL.md)
+- [`14-monitoring-observability`](14-monitoring-observability/SKILL.md)
+- [`42-cost-engineering`](42-cost-engineering/SKILL.md)

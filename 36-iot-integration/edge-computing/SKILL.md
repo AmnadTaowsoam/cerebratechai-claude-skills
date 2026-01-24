@@ -1,8 +1,18 @@
+---
+name: Edge Computing
+description: Processing data closer to IoT devices to reduce latency and bandwidth usage, including edge devices, local processing, filtering, and cloud synchronization.
+---
+
 # Edge Computing
+
+> **Current Level:** Advanced  
+> **Domain:** IoT / Edge Computing / Architecture
+
+---
 
 ## Overview
 
-Edge computing processes data closer to IoT devices, reducing latency and bandwidth. This guide covers edge devices, local processing, and cloud synchronization.
+Edge computing processes data closer to IoT devices, reducing latency and bandwidth. This guide covers edge devices, local processing, and cloud synchronization for building efficient IoT systems that process data at the edge while maintaining cloud connectivity.
 
 ## Edge Computing Concepts
 
@@ -411,7 +421,103 @@ def should_send_to_cloud(data):
 9. **Monitoring** - Monitor edge device health
 10. **Containerization** - Use Docker for deployment
 
-## Resources
+---
+
+## Quick Start
+
+### AWS IoT Greengrass
+
+```python
+import greengrasssdk
+
+client = greengrasssdk.client('iot-data')
+
+def lambda_handler(event, context):
+    # Process data at edge
+    processed_data = process_sensor_data(event['sensor_data'])
+    
+    # Send to cloud
+    client.publish(
+        topic='sensor/processed',
+        payload=json.dumps(processed_data)
+    )
+    
+    return processed_data
+```
+
+### Edge Device Setup
+
+```bash
+# Install Greengrass Core
+sudo ./greengrass-linux-x86-64-1.11.0.tar.gz
+
+# Configure
+sudo /greengrass/ggc/core/greengrassd start
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Edge Devices**: Select appropriate edge devices
+- [ ] **Local Processing**: Implement local data processing
+- [ ] **Cloud Sync**: Set up cloud synchronization
+- [ ] **Offline Support**: Handle offline scenarios
+- [ ] **Security**: Secure edge devices
+- [ ] **Updates**: Support OTA updates
+- [ ] **Monitoring**: Monitor edge device health
+- [ ] **Containerization**: Use Docker for deployment
+- [ ] **Resource Management**: Manage device resources
+- [ ] **Testing**: Test edge processing
+- [ ] **Documentation**: Document edge architecture
+- [ ] **Scalability**: Scale edge deployment
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Process Everything in Cloud
+
+```javascript
+// ❌ Bad - All processing in cloud
+device → send all data → cloud processes → response
+// High latency, high bandwidth!
+```
+
+```javascript
+// ✅ Good - Process at edge
+device → edge processes → send summary → cloud
+// Low latency, low bandwidth
+```
+
+### ❌ Don't: No Offline Support
+
+```javascript
+// ❌ Bad - Requires cloud connection
+if (!isOnline()) {
+  return error('No connection')  // Device stops working!
+}
+```
+
+```javascript
+// ✅ Good - Offline processing
+if (!isOnline()) {
+  processLocally(data)  // Continue processing
+  queueForSync(data)  // Sync when online
+}
+```
+
+---
+
+## Integration Points
+
+- **Device Management** (`36-iot-integration/device-management/`) - Device lifecycle
+- **IoT Protocols** (`36-iot-integration/iot-protocols/`) - Device communication
+- **IoT Security** (`36-iot-integration/iot-security/`) - Edge security
+
+---
+
+## Further Reading
 
 - [AWS IoT Greengrass](https://aws.amazon.com/greengrass/)
 - [Azure IoT Edge](https://azure.microsoft.com/en-us/services/iot-edge/)

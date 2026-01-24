@@ -1,10 +1,26 @@
+---
+name: React Native Development Patterns
+description: Project structure, navigation, state management, styling, and best practices for building cross-platform mobile applications with React Native.
+---
+
 # React Native Development Patterns
+
+> **Current Level:** Intermediate  
+> **Domain:** Mobile Development / Frontend
+
+---
 
 ## Overview
 
-React Native development patterns cover project structure, navigation, state management, styling, and best practices for building cross-platform mobile applications.
+React Native development patterns cover project structure, navigation, state management, styling, and best practices for building cross-platform mobile applications. Effective React Native development uses platform-specific optimizations, proper state management, and native module integration to create performant mobile apps.
 
-## Table of Contents
+---
+
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [React Native Setup](#react-native-setup)
 2. [Project Structure](#project-structure)
@@ -1375,7 +1391,122 @@ function Component() {
 
 ---
 
-## Resources
+---
+
+## Quick Start
+
+### Create React Native App
+
+```bash
+# Using Expo
+npx create-expo-app MyApp
+cd MyApp
+npm start
+
+# Using React Native CLI
+npx react-native init MyApp
+cd MyApp
+npm run android  # or ios
+```
+
+### Basic App Structure
+
+```typescript
+// App.tsx
+import React from 'react'
+import { NavigationContainer } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
+
+const Stack = createStackNavigator()
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Details" component={DetailsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  )
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Project Structure**: Organized folder structure
+- [ ] **Navigation**: Navigation library configured (React Navigation)
+- [ ] **State Management**: State management solution (Redux, Zustand)
+- [ ] **Styling**: Consistent styling approach (StyleSheet, styled-components)
+- [ ] **Platform-Specific**: Platform-specific code handled
+- [ ] **Performance**: Performance optimizations (memoization, FlatList)
+- [ ] **Testing**: Unit and integration tests
+- [ ] **Error Handling**: Error boundaries and error handling
+- [ ] **Offline Support**: Offline functionality if needed
+- [ ] **Push Notifications**: Push notification setup
+- [ ] **App Store**: App store deployment configured
+- [ ] **Analytics**: Analytics integration
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Inline Styles Everywhere
+
+```tsx
+// ❌ Bad - Inline styles
+<View style={{ padding: 10, margin: 5, backgroundColor: '#fff' }}>
+```
+
+```tsx
+// ✅ Good - StyleSheet
+const styles = StyleSheet.create({
+  container: {
+    padding: 10,
+    margin: 5,
+    backgroundColor: '#fff'
+  }
+})
+
+<View style={styles.container}>
+```
+
+### ❌ Don't: No Error Boundaries
+
+```tsx
+// ❌ Bad - No error handling
+function App() {
+  return <ComponentThatMightCrash />
+}
+```
+
+```tsx
+// ✅ Good - Error boundary
+class ErrorBoundary extends React.Component {
+  // Error boundary implementation
+}
+
+function App() {
+  return (
+    <ErrorBoundary>
+      <ComponentThatMightCrash />
+    </ErrorBoundary>
+  )
+}
+```
+
+---
+
+## Integration Points
+
+- **State Management** (`02-frontend/state-management/`) - State patterns
+- **Mobile CI/CD** (`31-mobile-development/mobile-ci-cd/`) - Deployment
+- **Push Notifications** (`31-mobile-development/push-notifications/`) - Notifications
+
+---
+
+## Further Reading
 
 - [React Native Documentation](https://reactnative.dev/)
 - [React Navigation](https://reactnavigation.org/)

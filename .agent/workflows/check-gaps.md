@@ -7,7 +7,7 @@ description: Workflow for autonomously detecting skill gaps in the current proje
 // turbo
 3.  Execute the skill watcher script:
     ```cmd
-    python d:\Cerebra\cerebratechai-claude-skills\scripts\skill_watcher.py --target .
+    python d:\Cerebra\cerebraSkills\scripts\skill_watcher.py --target .
     ```
 4.  Read the generated `GAP_REPORT.md`.
 5.  If any **🔴 Potential Skill Gaps** are found:

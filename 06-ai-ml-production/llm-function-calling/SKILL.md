@@ -9,7 +9,18 @@ description: Implementing function calling (tool use) with LLMs for structured o
 
 LLM function calling (also known as tool use) enables Large Language Models to interact with external systems by calling predefined functions. Instead of just generating text, the LLM can request to execute specific functions with structured parameters, receive results, and continue reasoning based on those results.
 
-## What is Function Calling (Tool Use)
+## Prerequisites
+
+- Understanding of LLM APIs and their capabilities
+- Knowledge of JSON Schema and function definition formats
+- Familiarity with error handling and retry patterns
+- Understanding of security best practices for function execution
+- Basic knowledge of async/await patterns for parallel execution
+- Familiarity with validation libraries (Pydantic, jsonschema)
+
+## Key Concepts
+
+### What is Function Calling (Tool Use)
 
 Function calling allows LLMs to:
 
@@ -1997,6 +2008,6 @@ except Exception as e:
 
 ## Related Skills
 
-- `06-ai-ml-production/llm-integration`
-- `06-ai-ml-production/prompt-engineering`
-- `06-ai-ml-production/agent-patterns`
+- [`06-ai-ml-production/llm-integration`](06-ai-ml-production/llm-integration/SKILL.md)
+- [`06-ai-ml-production/prompt-engineering`](06-ai-ml-production/prompt-engineering/SKILL.md)
+- [`06-ai-ml-production/agent-patterns`](06-ai-ml-production/agent-patterns/SKILL.md)

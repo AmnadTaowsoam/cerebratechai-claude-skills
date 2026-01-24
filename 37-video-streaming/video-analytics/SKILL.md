@@ -1,8 +1,18 @@
+---
+name: Video Analytics
+description: Tracking viewer behavior, engagement, and quality metrics for video content including player events, QoE metrics, watch time, and analytics dashboards.
+---
+
 # Video Analytics
+
+> **Current Level:** Intermediate  
+> **Domain:** Video Streaming / Analytics
+
+---
 
 ## Overview
 
-Video analytics tracks viewer behavior, engagement, and quality metrics. This guide covers player events, QoE metrics, and analytics dashboards.
+Video analytics tracks viewer behavior, engagement, and quality metrics. This guide covers player events, QoE metrics, and analytics dashboards for understanding video performance and viewer engagement.
 
 ## Video Metrics
 
@@ -475,18 +485,115 @@ export function AnalyticsDashboard({ videoId }: { videoId: string }) {
 }
 ```
 
-## Best Practices
+---
 
-1. **Privacy** - Respect user privacy, anonymize data
-2. **Sampling** - Use sampling for high-traffic videos
-3. **Real-time** - Track events in real-time
-4. **Aggregation** - Pre-aggregate metrics
-5. **Retention** - Set data retention policies
-6. **Performance** - Don't impact playback performance
-7. **Accuracy** - Validate data accuracy
-8. **Visualization** - Create clear dashboards
-9. **Actionable** - Focus on actionable insights
-10. **Testing** - A/B test improvements
+## Quick Start
+
+### Video Event Tracking
+
+```typescript
+// Track video events
+function trackVideoEvent(
+  videoId: string,
+  event: 'play' | 'pause' | 'seek' | 'complete',
+  timestamp: number
+) {
+  analytics.track('video_event', {
+    videoId,
+    event,
+    timestamp,
+    watchTime: calculateWatchTime(videoId)
+  })
+}
+
+// Calculate watch time
+function calculateWatchTime(videoId: string): number {
+  const events = getVideoEvents(videoId)
+  let watchTime = 0
+  let lastPlayTime = 0
+  
+  events.forEach(event => {
+    if (event.type === 'play') {
+      lastPlayTime = event.timestamp
+    } else if (event.type === 'pause') {
+      watchTime += event.timestamp - lastPlayTime
+    }
+  })
+  
+  return watchTime
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Event Tracking**: Track all video events
+- [ ] **Watch Time**: Calculate accurate watch time
+- [ ] **Engagement Metrics**: Track engagement (completion rate, etc.)
+- [ ] **Quality Metrics**: Track video quality (buffering, bitrate)
+- [ ] **Privacy**: Anonymize user data
+- [ ] **Sampling**: Use sampling for high traffic
+- [ ] **Real-time**: Real-time analytics
+- [ ] **Aggregation**: Pre-aggregate metrics
+- [ ] **Dashboards**: Analytics dashboards
+- [ ] **Retention**: Data retention policies
+- [ ] **Performance**: Don't impact playback
+- [ ] **Testing**: Test analytics implementation
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Track Too Much
+
+```typescript
+// ❌ Bad - Track every millisecond
+setInterval(() => {
+  trackEvent('heartbeat', { timestamp: Date.now() })
+}, 1)  // Too much data!
+```
+
+```typescript
+// ✅ Good - Track key events
+video.addEventListener('play', () => trackEvent('play'))
+video.addEventListener('pause', () => trackEvent('pause'))
+video.addEventListener('ended', () => trackEvent('complete'))
+```
+
+### ❌ Don't: No Privacy
+
+```typescript
+// ❌ Bad - Track personal data
+trackEvent('video_view', {
+  userId: user.id,
+  email: user.email,  // Privacy issue!
+  videoId: video.id
+})
+```
+
+```typescript
+// ✅ Good - Anonymize
+trackEvent('video_view', {
+  userId: hashUserId(user.id),  // Anonymized
+  videoId: video.id
+})
+```
+
+---
+
+## Integration Points
+
+- **Live Streaming** (`37-video-streaming/live-streaming/`) - Live analytics
+- **Adaptive Bitrate** (`37-video-streaming/adaptive-bitrate/`) - Quality metrics
+- **Analytics** (`23-business-analytics/`) - General analytics
+
+---
+
+## Further Reading
+
+- [Video Analytics Best Practices](https://www.wistia.com/learn/analytics)
+- [Video Metrics Guide](https://www.brightcove.com/en/resources/video-analytics/)
 
 ## Resources
 

@@ -1,8 +1,18 @@
+---
+name: A/B Testing for ML
+description: Comparing ML models in production through experiment design, statistical testing, multi-armed bandits, traffic splitting, and monitoring to determine which model performs better.
+---
+
 # A/B Testing for ML
+
+> **Current Level:** Advanced  
+> **Domain:** Data Science / ML / Experimentation
+
+---
 
 ## Overview
 
-A/B testing compares ML models in production. This guide covers experiment design, statistical testing, multi-armed bandits, and monitoring.
+A/B testing compares ML models in production. This guide covers experiment design, statistical testing, multi-armed bandits, and monitoring for safely deploying and comparing ML models to determine which performs better on business metrics.
 
 ## A/B Testing for ML
 
@@ -557,6 +567,100 @@ class EarlyStopping:
 8. **Early Stopping** - Stop early if clear winner
 9. **Documentation** - Document experiment design
 10. **Rollback** - Have rollback plan ready
+
+---
+
+## Quick Start
+
+### Model A/B Test
+
+```python
+import random
+
+def assign_model(user_id: str) -> str:
+    # Consistent assignment
+    hash_value = hash(user_id)
+    return 'model_a' if hash_value % 2 == 0 else 'model_b'
+
+# Track predictions
+def track_prediction(user_id: str, model: str, prediction: float, actual: float):
+    metrics.track('ml_prediction', {
+        'user_id': user_id,
+        'model': model,
+        'prediction': prediction,
+        'actual': actual,
+        'error': abs(prediction - actual)
+    })
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Experiment Design**: Clear experiment design
+- [ ] **Traffic Splitting**: Proper traffic splitting
+- [ ] **Statistical Testing**: Statistical significance tests
+- [ ] **Metrics**: Business and ML metrics
+- [ ] **Monitoring**: Continuous monitoring
+- [ ] **Early Stopping**: Early stopping rules
+- [ ] **Documentation**: Document experiment
+- [ ] **Rollback**: Rollback plan
+- [ ] **Testing**: Test implementation
+- [ ] **Documentation**: Document results
+- [ ] **Action**: Act on results
+- [ ] **Learning**: Document learnings
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Statistical Testing
+
+```python
+# ❌ Bad - No significance test
+if model_b_accuracy > model_a_accuracy:
+    return 'B wins'  # Could be random!
+```
+
+```python
+# ✅ Good - Statistical test
+from scipy import stats
+
+t_stat, p_value = stats.ttest_ind(model_a_errors, model_b_errors)
+if p_value < 0.05 and model_b_accuracy > model_a_accuracy:
+    return 'B wins (statistically significant)'
+```
+
+### ❌ Don't: Ignore Business Metrics
+
+```python
+# ❌ Bad - Only ML metrics
+if model_b_accuracy > model_a_accuracy:
+    return 'B wins'
+# But what about revenue?
+```
+
+```python
+# ✅ Good - Business metrics too
+if (model_b_accuracy > model_a_accuracy and 
+    model_b_revenue >= model_a_revenue):
+    return 'B wins'
+```
+
+---
+
+## Integration Points
+
+- **ML Serving** (`39-data-science-ml/ml-serving/`) - Model serving
+- **Model Experiments** (`39-data-science-ml/model-experiments/`) - Experiment tracking
+- **A/B Testing Analysis** (`23-business-analytics/ab-testing-analysis/`) - Testing methodology
+
+---
+
+## Further Reading
+
+- [ML A/B Testing Guide](https://www.datacamp.com/tutorial/ab-testing-machine-learning)
+- [Multi-Armed Bandits](https://en.wikipedia.org/wiki/Multi-armed_bandit)
 
 ## Resources
 

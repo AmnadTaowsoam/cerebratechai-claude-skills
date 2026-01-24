@@ -1,10 +1,24 @@
+---
+name: Payment Gateway Integration
+description: Secure processing of online payments through various providers like Stripe, PayPal, 2C2P, and Omise with proper error handling, webhooks, and PCI compliance.
+---
+
 # Payment Gateway Integration
+
+> **Current Level:** Intermediate  
+> **Domain:** E-commerce / Payments
+
+---
 
 ## Overview
 
-Payment gateway integration enables secure processing of online payments through various providers like Stripe, PayPal, 2C2P, and Omise.
+Payment gateway integration enables secure processing of online payments through various providers like Stripe, PayPal, 2C2P, and Omise. Effective payment integration handles 3D Secure, webhooks, refunds, reconciliation, and PCI compliance while providing a smooth user experience.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [Payment Gateway Comparison](#payment-gateway-comparison)
 2. [Stripe Integration](#stripe-integration)
@@ -1711,10 +1725,173 @@ async function processPaymentWithTimeout(
 
 ---
 
-## Resources
+---
+
+## Quick Start
+
+### Stripe Payment
+
+```javascript
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+
+// Create payment intent
+const paymentIntent = await stripe.paymentIntents.create({
+  amount: 2000,  // $20.00
+  currency: 'usd',
+  metadata: { orderId: '123' }
+})
+
+// Client-side confirmation
+// (Use Stripe.js on frontend)
+```
+
+### Webhook Handling
+
+```javascript
+const express = require('express')
+const app = express()
+
+app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const sig = req.headers['stripe-signature']
+  const event = stripe.webhooks.constructEvent(req.body, sig, process.env.WEBHOOK_SECRET)
+  
+  if (event.type === 'payment_intent.succeeded') {
+    const paymentIntent = event.data.object
+    // Update order status
+    updateOrderStatus(paymentIntent.metadata.orderId, 'paid')
+  }
+  
+  res.json({ received: true })
+})
+```
+
+---
+
+## Production Checklist
+
+- [ ] **API Keys**: Store API keys securely (secrets manager)
+- [ ] **Webhooks**: Set up webhook endpoints with signature verification
+- [ ] **3D Secure**: Implement 3D Secure for high-value transactions
+- [ ] **Error Handling**: Handle payment failures gracefully
+- [ ] **Idempotency**: Use idempotency keys for retries
+- [ ] **Testing**: Test with test cards and sandbox environments
+- [ ] **PCI Compliance**: Never store card data, use tokenization
+- [ ] **Reconciliation**: Implement payment reconciliation
+- [ ] **Refunds**: Handle refunds and cancellations
+- [ ] **Monitoring**: Monitor payment success rates and failures
+- [ ] **Logging**: Log all payment attempts (without sensitive data)
+- [ ] **Rate Limiting**: Implement rate limiting on payment endpoints
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Store Card Data
+
+```javascript
+// ❌ Bad - Storing card data (PCI violation!)
+const cardData = {
+  number: '4242424242424242',
+  cvv: '123',
+  expiry: '12/25'
+}
+await db.save(cardData)  // NEVER!
+```
+
+```javascript
+// ✅ Good - Use tokenization
+const paymentMethod = await stripe.paymentMethods.create({
+  type: 'card',
+  card: { token: 'tok_visa' }  // Token from Stripe.js
+})
+// Store only payment method ID
+await db.save({ paymentMethodId: paymentMethod.id })
+```
+
+### ❌ Don't: No Webhook Verification
+
+```javascript
+// ❌ Bad - No signature verification
+app.post('/webhook', (req, res) => {
+  const event = req.body  // Trusted without verification!
+  processEvent(event)
+})
+```
+
+```javascript
+// ✅ Good - Verify webhook signature
+app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const sig = req.headers['stripe-signature']
+  try {
+    const event = stripe.webhooks.constructEvent(
+      req.body, 
+      sig, 
+      process.env.WEBHOOK_SECRET
+    )
+    processEvent(event)
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${err.message}`)
+  }
+})
+```
+
+### ❌ Don't: No Idempotency
+
+```javascript
+// ❌ Bad - Can create duplicate charges
+app.post('/charge', async (req, res) => {
+  await stripe.charges.create({ amount: 1000 })  // Can be called twice!
+})
+```
+
+```javascript
+// ✅ Good - Use idempotency key
+app.post('/charge', async (req, res) => {
+  const idempotencyKey = req.headers['idempotency-key']
+  await stripe.charges.create(
+    { amount: 1000 },
+    { idempotencyKey }  // Prevents duplicates
+  )
+})
+```
+
+### ❌ Don't: Ignore Payment Failures
+
+```javascript
+// ❌ Bad - No error handling
+const charge = await stripe.charges.create({ amount: 1000 })
+// What if it fails?
+```
+
+```javascript
+// ✅ Good - Handle failures
+try {
+  const charge = await stripe.charges.create({ amount: 1000 })
+  await updateOrderStatus(orderId, 'paid')
+} catch (error) {
+  if (error.type === 'StripeCardError') {
+    await updateOrderStatus(orderId, 'payment_failed', error.message)
+  }
+  throw error
+}
+```
+
+---
+
+## Integration Points
+
+- **Secrets Management** (`24-security-practices/secrets-management/`) - Secure API keys
+- **Webhooks** (`03-backend-api/`) - Webhook handling patterns
+- **Error Handling** (`03-backend-api/error-handling/`) - Payment error handling
+- **Idempotency** (`40-system-resilience/idempotency-and-dedup/`) - Prevent duplicate charges
+
+---
+
+## Further Reading
 
 - [Stripe Documentation](https://stripe.com/docs/)
 - [PayPal Developer Docs](https://developer.paypal.com/docs/)
 - [2C2P Documentation](https://developer.2c2p.com/)
 - [Omise Documentation](https://www.omise.co/docs)
+- [PCI Compliance Guide](https://www.pcisecuritystandards.org/)
 - [PCI DSS Requirements](https://www.pcisecuritystandards.org/)

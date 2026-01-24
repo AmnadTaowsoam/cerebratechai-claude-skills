@@ -1,8 +1,18 @@
+---
+name: Sensor Data Processing
+description: Handling ingestion, storage, and analysis of time-series data from IoT devices using TimescaleDB, stream processing, aggregation, and anomaly detection for scalable IoT data pipelines.
+---
+
 # Sensor Data Processing
+
+> **Current Level:** Advanced  
+> **Domain:** IoT / Data Engineering
+
+---
 
 ## Overview
 
-Sensor data processing handles ingestion, storage, and analysis of time-series data from IoT devices. This guide covers TimescaleDB, stream processing, and anomaly detection.
+Sensor data processing handles ingestion, storage, and analysis of time-series data from IoT devices. This guide covers TimescaleDB, stream processing, and anomaly detection for building efficient data pipelines that handle high-volume sensor data.
 
 ## Data Ingestion Patterns
 
@@ -431,9 +441,126 @@ class DataCompression:
 9. **Partitioning** - Partition by time
 10. **Monitoring** - Monitor ingestion rates
 
-## Resources
+---
+
+## Quick Start
+
+### TimescaleDB Setup
+
+```sql
+-- Create hypertable
+CREATE TABLE sensor_data (
+  time TIMESTAMPTZ NOT NULL,
+  device_id TEXT NOT NULL,
+  sensor_type TEXT NOT NULL,
+  value DOUBLE PRECISION,
+  metadata JSONB
+);
+
+-- Convert to hypertable
+SELECT create_hypertable('sensor_data', 'time');
+
+-- Insert data
+INSERT INTO sensor_data (time, device_id, sensor_type, value)
+VALUES (NOW(), 'device-001', 'temperature', 25.5);
+```
+
+### Stream Processing
+
+```python
+import paho.mqtt.client as mqtt
+from timescaledb import TimescaleDB
+
+def on_message(client, userdata, message):
+    data = json.loads(message.payload)
+    
+    # Process and store
+    db.insert_sensor_data(
+        device_id=data['device_id'],
+        sensor_type=data['type'],
+        value=data['value'],
+        timestamp=datetime.utcnow()
+    )
+    
+    # Detect anomalies
+    if is_anomaly(data['value']):
+        send_alert(data)
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Time-Series DB**: TimescaleDB or similar
+- [ ] **Data Ingestion**: Efficient data ingestion
+- [ ] **Stream Processing**: Real-time stream processing
+- [ ] **Aggregation**: Pre-aggregate data
+- [ ] **Retention**: Set retention policies
+- [ ] **Validation**: Validate incoming data
+- [ ] **Anomaly Detection**: Real-time anomaly detection
+- [ ] **Batch Processing**: Batch processing for analysis
+- [ ] **Indexing**: Index by device and time
+- [ ] **Partitioning**: Partition by time
+- [ ] **Monitoring**: Monitor ingestion rates
+- [ ] **Documentation**: Document data pipeline
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Regular Database
+
+```sql
+-- ❌ Bad - Regular table
+CREATE TABLE sensor_data (
+  id SERIAL PRIMARY KEY,
+  device_id TEXT,
+  value DOUBLE PRECISION,
+  timestamp TIMESTAMP
+);
+-- Not optimized for time-series!
+```
+
+```sql
+-- ✅ Good - Hypertable
+CREATE TABLE sensor_data (
+  time TIMESTAMPTZ NOT NULL,
+  device_id TEXT NOT NULL,
+  value DOUBLE PRECISION
+);
+SELECT create_hypertable('sensor_data', 'time');
+-- Optimized for time-series!
+```
+
+### ❌ Don't: No Retention
+
+```sql
+-- ❌ Bad - Keep all data forever
+-- Storage grows indefinitely!
+```
+
+```sql
+-- ✅ Good - Retention policy
+SELECT add_retention_policy('sensor_data', INTERVAL '1 year');
+-- Auto-delete old data
+```
+
+---
+
+## Integration Points
+
+- **Real-time Monitoring** (`36-iot-integration/real-time-monitoring/`) - Monitoring dashboards
+- **Edge Computing** (`36-iot-integration/edge-computing/`) - Edge processing
+- **Database Optimization** (`04-database/database-optimization/`) - Query optimization
+
+---
+
+## Further Reading
 
 - [TimescaleDB](https://www.timescale.com/)
+- [Time-Series Data Best Practices](https://www.timescale.com/learn/time-series-data)
+
+## Resources
 - [InfluxDB](https://www.influxdata.com/)
 - [Apache Kafka](https://kafka.apache.org/)
 - [Scikit-learn](https://scikit-learn.org/)

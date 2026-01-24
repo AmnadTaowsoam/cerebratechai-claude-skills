@@ -1,8 +1,34 @@
+---
+name: OCR with Tesseract
+description: Comprehensive guide to Optical Character Recognition (OCR) using Tesseract OCR engine with Python
+---
+
 # OCR with Tesseract
 
 ## Overview
 
 Comprehensive guide to Optical Character Recognition (OCR) using Tesseract OCR engine with Python.
+
+## Prerequisites
+
+- **Python 3.7+**: Required for pytesseract and related libraries
+- **Tesseract OCR Engine**: Must be installed on the system (separate from Python package)
+- **OpenCV**: For image preprocessing and manipulation
+- **PIL/Pillow**: For image loading and conversion
+- **NumPy**: For array operations
+- **Image Preprocessing**: Understanding of image enhancement techniques
+- **Regular Expressions**: For text extraction and pattern matching
+
+## Key Concepts
+
+- **Tesseract Engine**: Open-source OCR engine developed by Google
+- **Page Segmentation Modes (PSM)**: Different modes for handling various document layouts
+- **OCR Engine Modes (OEM)**: Choice between legacy and LSTM neural network engines
+- **Language Support**: Multi-language OCR with language-specific trained data
+- **Image Preprocessing**: Grayscale conversion, denoising, binarization, deskewing
+- **Confidence Scores**: Reliability metrics for OCR output
+- **Region of Interest (ROI)**: Focused OCR on specific image regions
+- **Post-processing**: Text cleaning, spell correction, and validation
 
 ## Table of Contents
 
@@ -980,6 +1006,15 @@ def calculate_confidence(text: str) -> float:
 ```
 
 ---
+
+## Related Skills
+
+- [Image Preprocessing](../07-document-processing/image-preprocessing/SKILL.md) - Image enhancement for better OCR accuracy
+- [Document Parsing](../07-document-processing/document-parsing/SKILL.md) - Structured data extraction from documents
+- [OCR with PaddleOCR](../07-document-processing/ocr-paddleocr/SKILL.md) - Alternative OCR engine with deep learning
+- [PDF Processing](../07-document-processing/pdf-processing/SKILL.md) - PDF-specific processing techniques
+- [Document Ingestion Pipeline](../07-document-processing/document-ingestion-pipeline/SKILL.md) - Document loading workflows
+- [RAG Implementation](../06-ai-ml-production/rag-implementation/SKILL.md) - Retrieval-Augmented Generation patterns
 
 ## Additional Resources
 

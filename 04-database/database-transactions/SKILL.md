@@ -9,11 +9,26 @@ description: Comprehensive guide to database transactions, ACID properties, isol
 
 Database transactions are fundamental to maintaining data integrity and consistency in applications. They provide a way to group multiple operations into a single unit of work that either succeeds completely or fails completely, following the ACID principles.
 
-## ACID Properties Explained
+## Prerequisites
 
-ACID is an acronym that defines the key properties of a reliable transaction:
+- Understanding of SQL and database operations
+- Knowledge of database systems (PostgreSQL, MySQL, etc.)
+- Familiarity with concurrency concepts
+- Basic understanding of distributed systems
 
-### Atomicity
+## Key Concepts
+
+### What are Database Transactions?
+
+Database transactions are:
+- **Atomic**: All operations succeed or none do
+- **Consistent**: Database moves from valid state to valid state
+- **Isolated**: Transactions don't interfere with each other
+- **Durable**: Committed changes persist
+
+### ACID Properties
+
+#### Atomicity
 
 Atomicity ensures that all operations within a transaction are treated as a single unit. Either all operations succeed, or none do.
 
@@ -27,7 +42,7 @@ COMMIT;  -- Both updates succeed or both fail
 
 If the second UPDATE fails, the first UPDATE is rolled back automatically.
 
-### Consistency
+#### Consistency
 
 Consistency ensures that a transaction brings the database from one valid state to another valid state, maintaining all database rules and constraints.
 
@@ -50,7 +65,7 @@ SELECT COUNT(*) FROM accounts WHERE balance < 0;
 COMMIT;
 ```
 
-### Isolation
+#### Isolation
 
 Isolation ensures that concurrent transactions don't interfere with each other. Each transaction sees a consistent snapshot of the database.
 
@@ -69,7 +84,7 @@ SELECT balance FROM accounts WHERE id = 1;  -- Still reads $1000
 COMMIT;
 ```
 
-### Durability
+#### Durability
 
 Durability ensures that once a transaction is committed, it remains permanent even in the event of a system failure.
 
@@ -80,9 +95,11 @@ COMMIT;  -- This data is permanently stored
 -- Even if server crashes after this, the data is preserved
 ```
 
-## Transaction Lifecycle
+## Implementation Guide
 
-### BEGIN
+### Transaction Lifecycle
+
+#### BEGIN
 
 Starts a new transaction.
 
@@ -94,7 +111,7 @@ BEGIN TRANSACTION;
 START TRANSACTION;
 ```
 
-### COMMIT
+#### COMMIT
 
 Permanently saves all changes made in the transaction.
 
@@ -104,7 +121,7 @@ UPDATE users SET email = 'new@example.com' WHERE id = 1;
 COMMIT;  -- Changes are now permanent
 ```
 
-### ROLLBACK
+#### ROLLBACK
 
 Undoes all changes made in the transaction.
 
@@ -114,7 +131,7 @@ UPDATE users SET email = 'new@example.com' WHERE id = 1;
 ROLLBACK;  -- Changes are discarded
 ```
 
-### Transaction Lifecycle Example
+#### Transaction Lifecycle Example
 
 ```sql
 -- 1. Begin transaction
@@ -132,9 +149,9 @@ ELSE
 END IF;
 ```
 
-## Isolation Levels
+### Isolation Levels
 
-### READ UNCOMMITTED
+#### READ UNCOMMITTED
 
 The lowest isolation level. Transactions can read uncommitted changes from other transactions.
 
@@ -155,7 +172,7 @@ COMMIT;
 - Rarely used in practice
 - Only when performance is critical and dirty reads are acceptable
 
-### READ COMMITTED
+#### READ COMMITTED
 
 Default isolation level in PostgreSQL and SQL Server. Transactions can only read committed changes.
 
@@ -176,7 +193,7 @@ COMMIT;
 - Most applications
 - When you need to see committed changes from other transactions
 
-### REPEATABLE READ
+#### REPEATABLE READ
 
 Default isolation level in MySQL. Transactions see a consistent snapshot from the start of the transaction.
 
@@ -199,7 +216,7 @@ COMMIT;
 - Reporting queries
 - When non-repeatable reads would cause issues
 
-### SERIALIZABLE
+#### SERIALIZABLE
 
 The highest isolation level. Transactions are completely isolated from each other.
 
@@ -222,72 +239,9 @@ COMMIT;
 - When absolute consistency is required
 - When phantom reads would cause issues
 
-## Dirty Reads, Non-Repeatable Reads, Phantom Reads
+### Locking Mechanisms
 
-### Dirty Reads
-
-Reading data that has been modified but not yet committed by another transaction.
-
-```sql
--- Transaction 1
-BEGIN;
-UPDATE accounts SET balance = 0 WHERE id = 1;  -- Not committed yet
-
--- Transaction 2 (READ UNCOMMITTED)
-BEGIN;
-SELECT balance FROM accounts WHERE id = 1;  -- Reads 0 (dirty read)
--- Transaction 1 rolls back
-ROLLBACK;
--- Transaction 2 now has incorrect data
-```
-
-**Prevention:** Use READ COMMITTED or higher isolation level.
-
-### Non-Repeatable Reads
-
-Reading the same row twice and getting different values because another transaction modified and committed it.
-
-```sql
--- Transaction 1 (READ COMMITTED)
-BEGIN;
-SELECT balance FROM accounts WHERE id = 1;  -- Reads $1000
-
--- Transaction 2
-BEGIN;
-UPDATE accounts SET balance = balance + 500 WHERE id = 1;
-COMMIT;  -- Now $1500
-
--- Transaction 1 continues
-SELECT balance FROM accounts WHERE id = 1;  -- Reads $1500 (different!)
-COMMIT;
-```
-
-**Prevention:** Use REPEATABLE READ or SERIALIZABLE isolation level.
-
-### Phantom Reads
-
-Executing the same query twice and getting different result sets because another transaction inserted/deleted rows.
-
-```sql
--- Transaction 1 (REPEATABLE READ)
-BEGIN;
-SELECT * FROM accounts WHERE balance > 1000;  -- Returns 5 rows
-
--- Transaction 2
-BEGIN;
-INSERT INTO accounts (id, balance) VALUES (6, 2000);
-COMMIT;  -- Now 6 rows meet criteria
-
--- Transaction 1 continues
-SELECT * FROM accounts WHERE balance > 1000;  -- Returns 6 rows (phantom!)
-COMMIT;
-```
-
-**Prevention:** Use SERIALIZABLE isolation level.
-
-## Locking Mechanisms
-
-### Pessimistic Locking
+#### Pessimistic Locking
 
 Locks resources before accessing them, assuming conflicts will occur.
 
@@ -324,7 +278,7 @@ COMMIT;
 - Reduces concurrency
 - May cause performance issues
 
-### Optimistic Locking
+#### Optimistic Locking
 
 Assumes conflicts are rare and checks for conflicts before committing.
 
@@ -333,8 +287,8 @@ Assumes conflicts are rare and checks for conflicts before committing.
 ALTER TABLE accounts ADD COLUMN version INT DEFAULT 0;
 
 -- Update with version check
-UPDATE accounts 
-SET balance = balance - 100, version = version + 1 
+UPDATE accounts
+SET balance = balance - 100, version = version + 1
 WHERE id = 1 AND version = 5;
 
 -- Check if update succeeded
@@ -351,8 +305,8 @@ END IF;
 ALTER TABLE accounts ADD COLUMN updated_at TIMESTAMP;
 
 -- Update with timestamp check
-UPDATE accounts 
-SET balance = balance - 100, updated_at = NOW() 
+UPDATE accounts
+SET balance = balance - 100, updated_at = NOW()
 WHERE id = 1 AND updated_at = '2024-01-01 10:00:00';
 
 -- Check if update succeeded
@@ -372,9 +326,9 @@ END IF;
 - Extra column required
 - More complex error handling
 
-## Row-Level vs Table-Level Locks
+### Row-Level vs Table-Level Locks
 
-### Row-Level Locks
+#### Row-Level Locks
 
 Locks individual rows, allowing concurrent access to other rows in the same table.
 
@@ -383,9 +337,8 @@ BEGIN;
 -- Lock specific row
 SELECT * FROM accounts WHERE id = 1 FOR UPDATE;
 
--- Other rows in the table are still accessible
+-- Other rows in table are still accessible
 SELECT * FROM accounts WHERE id = 2;  -- This works fine
-
 COMMIT;
 ```
 
@@ -394,9 +347,9 @@ COMMIT;
 - High concurrency requirements
 - When conflicts are localized to specific rows
 
-### Table-Level Locks
+#### Table-Level Locks
 
-Locks the entire table, preventing any concurrent access.
+Locks entire table, preventing any concurrent access.
 
 ```sql
 BEGIN;
@@ -405,7 +358,6 @@ LOCK TABLE accounts IN EXCLUSIVE MODE;
 
 -- No other transaction can access this table
 SELECT * FROM accounts WHERE id = 1;  -- Only this transaction
-
 COMMIT;
 ```
 
@@ -424,205 +376,7 @@ COMMIT;
 - Schema changes
 - When you need exclusive access to all data
 
-## Deadlock Detection and Prevention
-
-### What is Deadlock?
-
-A deadlock occurs when two or more transactions are waiting for each other's locks.
-
-```
-Transaction 1: Locks row A, waiting for row B
-Transaction 2: Locks row B, waiting for row A
-```
-
-### Deadlock Example
-
-```sql
--- Transaction 1
-BEGIN;
-UPDATE accounts SET balance = balance - 100 WHERE id = 1;  -- Locks row 1
--- Waiting for row 2...
-UPDATE accounts SET balance = balance + 100 WHERE id = 2;
-
--- Transaction 2 (concurrent)
-BEGIN;
-UPDATE accounts SET balance = balance - 100 WHERE id = 2;  -- Locks row 2
--- Waiting for row 1...
-UPDATE accounts SET balance = balance + 100 WHERE id = 1;
-
--- DEADLOCK! Both transactions are waiting for each other
-```
-
-### Deadlock Prevention
-
-**Consistent Lock Ordering:**
-
-```sql
--- Always lock rows in the same order (e.g., by ID)
--- Transaction 1
-BEGIN;
-UPDATE accounts SET balance = balance - 100 WHERE id = 1;  -- Lower ID first
-UPDATE accounts SET balance = balance + 100 WHERE id = 2;
-COMMIT;
-
--- Transaction 2
-BEGIN;
-UPDATE accounts SET balance = balance - 100 WHERE id = 1;  -- Same order
-UPDATE accounts SET balance = balance + 100 WHERE id = 2;
-COMMIT;
-```
-
-**Lock Timeout:**
-
-```sql
--- Set lock timeout
-SET lock_timeout = '5s';  -- PostgreSQL
--- or
-SET innodb_lock_wait_timeout = 5;  -- MySQL
-
-BEGIN;
--- If lock can't be acquired within 5 seconds, error is raised
-SELECT * FROM accounts WHERE id = 1 FOR UPDATE;
-COMMIT;
-```
-
-**Short Transactions:**
-
-```sql
--- Keep transactions as short as possible
-BEGIN;
--- Only necessary operations
-UPDATE accounts SET balance = balance - 100 WHERE id = 1;
-COMMIT;
-
--- Do processing outside transaction
--- ...
-
-BEGIN;
--- Final update
-UPDATE accounts SET balance = balance + 100 WHERE id = 2;
-COMMIT;
-```
-
-### Handling Deadlocks
-
-```javascript
-// Application-level retry logic
-async function transferMoney(fromId, toId, amount) {
-  const maxRetries = 3;
-  let attempt = 0;
-  
-  while (attempt < maxRetries) {
-    try {
-      await db.transaction(async (trx) => {
-        await trx('accounts')
-          .where('id', fromId)
-          .update('balance', db.raw('balance - ?', [amount]));
-        
-        await trx('accounts')
-          .where('id', toId)
-          .update('balance', db.raw('balance + ?', [amount]));
-      });
-      return;  // Success
-    } catch (error) {
-      if (error.code === '40P01') {  // Deadlock error code
-        attempt++;
-        await sleep(100 * attempt);  // Exponential backoff
-      } else {
-        throw error;  // Other errors
-      }
-    }
-  }
-  
-  throw new Error('Max retries exceeded');
-}
-```
-
-## Transaction Timeout and Retry
-
-### Setting Timeouts
-
-**PostgreSQL:**
-
-```sql
--- Statement timeout
-SET statement_timeout = '30s';
-
--- Lock timeout
-SET lock_timeout = '5s';
-
--- Idle in transaction timeout
-SET idle_in_transaction_session_timeout = '10min';
-```
-
-**MySQL:**
-
-```sql
--- Lock wait timeout
-SET innodb_lock_wait_timeout = 5;
-
--- Transaction read-only timeout
-SET tx_read_only = 1;
-```
-
-### Retry Logic
-
-```javascript
-class TransactionRetry {
-  constructor(options = {}) {
-    this.maxRetries = options.maxRetries || 3;
-    this.retryDelay = options.retryDelay || 100;
-    this.backoffMultiplier = options.backoffMultiplier || 2;
-  }
-  
-  async execute(fn) {
-    let attempt = 0;
-    let lastError;
-    
-    while (attempt < this.maxRetries) {
-      try {
-        return await fn();
-      } catch (error) {
-        lastError = error;
-        
-        if (this.isRetryableError(error)) {
-          attempt++;
-          const delay = this.retryDelay * Math.pow(this.backoffMultiplier, attempt - 1);
-          await this.sleep(delay);
-        } else {
-          throw error;
-        }
-      }
-    }
-    
-    throw lastError;
-  }
-  
-  isRetryableError(error) {
-    const retryableCodes = [
-      '40P01',  // Deadlock
-      '40001',  // Serialization failure
-      '08006',  // Connection failure
-    ];
-    return retryableCodes.includes(error.code);
-  }
-  
-  sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-}
-
-// Usage
-const retry = new TransactionRetry({ maxRetries: 3 });
-
-await retry.execute(async () => {
-  await db.transaction(async (trx) => {
-    // Transaction operations
-  });
-});
-```
-
-## Savepoints
+### Savepoints
 
 Savepoints allow you to rollback to a specific point within a transaction without rolling back the entire transaction.
 
@@ -679,170 +433,210 @@ RELEASE SAVEPOINT sp1;  -- Savepoint is released
 
 -- Can't rollback to sp1 anymore
 -- ROLLBACK TO sp1;  -- Error!
-
 COMMIT;
 ```
 
-## Nested Transactions
+### Deadlock Detection and Prevention
 
-Most databases don't support true nested transactions, but you can simulate them using savepoints.
+#### What is Deadlock?
+
+A deadlock occurs when two or more transactions are waiting for each other's locks.
+
+```
+Transaction 1: Locks row A, waiting for row B
+Transaction 2: Locks row B, waiting for row A
+```
+
+#### Deadlock Example
+
+```sql
+-- Transaction 1
+BEGIN;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;  -- Locks row 1
+-- Waiting for row 2...
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+
+-- Transaction 2 (concurrent)
+BEGIN;
+UPDATE accounts SET balance = balance - 100 WHERE id = 2;  -- Locks row 2
+-- Waiting for row 1...
+UPDATE accounts SET balance = balance + 100 WHERE id = 1;
+
+-- DEADLOCK! Both transactions are waiting for each other
+```
+
+#### Deadlock Prevention
+
+**Consistent Lock Ordering:**
+
+```sql
+-- Always lock rows in the same order (e.g., by ID)
+-- Transaction 1
+BEGIN;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;  -- Lower ID first
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;
+
+-- Transaction 2
+BEGIN;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;  -- Same order
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;
+```
+
+**Lock Timeout:**
+
+```sql
+-- Set lock timeout
+SET lock_timeout = '5s';  -- PostgreSQL
+-- or
+SET innodb_lock_wait_timeout = 5;  -- MySQL
+
+BEGIN;
+-- If lock can't be acquired within 5 seconds, error is raised
+SELECT * FROM accounts WHERE id = 1 FOR UPDATE;
+COMMIT;
+```
+
+**Short Transactions:**
+
+```sql
+-- Keep transactions as short as possible
+BEGIN;
+-- Only necessary operations
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+COMMIT;
+
+-- Do processing outside transaction
+-- ...
+
+BEGIN;
+-- Final update
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;
+```
+
+#### Handling Deadlocks
 
 ```javascript
-class NestedTransaction {
-  constructor(trx) {
-    this.trx = trx;
-    this.savepoint = null;
-  }
-  
-  async begin() {
-    this.savepoint = `sp_${Date.now()}_${Math.random()}`;
-    await this.trx.raw(`SAVEPOINT ${this.savepoint}`);
-  }
-  
-  async commit() {
-    if (this.savepoint) {
-      await this.trx.raw(`RELEASE SAVEPOINT ${this.savepoint}`);
-      this.savepoint = null;
+// Application-level retry logic
+async function transferMoney(fromId, toId, amount) {
+  const maxRetries = 3;
+  let attempt = 0;
+
+  while (attempt < maxRetries) {
+    try {
+      await db.transaction(async (trx) => {
+        await trx('accounts')
+          .where('id', fromId)
+          .update('balance', db.raw('balance - ?', [amount]));
+
+        await trx('accounts')
+          .where('id', toId)
+          .update('balance', db.raw('balance + ?', [amount]));
+      });
+      return;  // Success
+    } catch (error) {
+      if (error.code === '40P01') {  // Deadlock error code
+        attempt++;
+        await sleep(100 * attempt);  // Exponential backoff
+      } else {
+        throw error;  // Other errors
+      }
     }
   }
-  
-  async rollback() {
-    if (this.savepoint) {
-      await this.trx.raw(`ROLLBACK TO SAVEPOINT ${this.savepoint}`);
-      this.savepoint = null;
+
+  throw new Error('Max retries exceeded');
+}
+```
+
+### Transaction Timeout and Retry
+
+#### Setting Timeouts
+
+**PostgreSQL:**
+
+```sql
+-- Statement timeout
+SET statement_timeout = '30s';
+
+-- Lock timeout
+SET lock_timeout = '5s';
+
+-- Idle in transaction timeout
+SET idle_in_transaction_session_timeout = '10min';
+```
+
+**MySQL:**
+
+```sql
+-- Lock wait timeout
+SET innodb_lock_wait_timeout = 5;
+
+-- Transaction read-only timeout
+SET tx_read_only = 1;
+```
+
+#### Retry Logic
+
+```javascript
+class TransactionRetry {
+  constructor(options = {}) {
+    this.maxRetries = options.maxRetries || 3;
+    this.retryDelay = options.retryDelay || 100;
+    this.backoffMultiplier = options.backoffMultiplier || 2;
+  }
+
+  async execute(fn) {
+    let attempt = 0;
+    let lastError;
+
+    while (attempt < this.maxRetries) {
+      try {
+        return await fn();
+      } catch (error) {
+        lastError = error;
+
+        if (this.isRetryableError(error)) {
+          attempt++;
+          const delay = this.retryDelay * Math.pow(this.backoffMultiplier, attempt - 1);
+          await this.sleep(delay);
+        } else {
+          throw error;
+        }
+      }
     }
+
+    throw lastError;
+  }
+
+  isRetryableError(error) {
+    const retryableCodes = [
+      '40P01',  // Deadlock
+      '40001',  // Serialization failure
+      '08006',  // Connection failure
+    ];
+    return retryableCodes.includes(error.code);
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
 
 // Usage
-await db.transaction(async (trx) => {
-  // Outer transaction
-  await trx('accounts').where('id', 1).update({ balance: 900 });
-  
-  const nested = new NestedTransaction(trx);
-  await nested.begin();
-  
-  try {
-    // Nested transaction
-    await trx('accounts').where('id', 2).update({ balance: 1100 });
-    
-    // If something goes wrong, rollback only nested
-    await nested.rollback();
-    
-    // Continue outer transaction
-    await trx('accounts').where('id', 3).update({ balance: 1050 });
-  } catch (error) {
-    await nested.rollback();
-    throw error;
-  }
+const retry = new TransactionRetry({ maxRetries: 3 });
+
+await retry.execute(async () => {
+  await db.transaction(async (trx) => {
+    // Transaction operations
+  });
 });
 ```
 
-## Distributed Transactions
+### Transaction Patterns in ORMs
 
-### Two-Phase Commit (2PC)
-
-A protocol that ensures all participating databases either commit or rollback together.
-
-**Phase 1: Prepare**
-
-```sql
--- Coordinator asks all participants to prepare
--- Database 1
-PREPARE TRANSACTION 'transfer_1';
-
--- Database 2
-PREPARE TRANSACTION 'transfer_2';
-```
-
-**Phase 2: Commit or Rollback**
-
-```sql
--- If all participants prepared successfully
--- Database 1
-COMMIT PREPARED 'transfer_1';
-
--- Database 2
-COMMIT PREPARED 'transfer_2';
-
--- If any participant failed
--- Database 1
-ROLLBACK PREPARED 'transfer_1';
-
--- Database 2
-ROLLBACK PREPARED 'transfer_2';
-```
-
-### Three-Phase Commit (3PC)
-
-An extension of 2PC that adds a pre-commit phase to reduce blocking.
-
-**Phase 1: Can Commit?**
-
-```sql
--- Coordinator asks: Can you commit?
--- Participants respond with YES or NO
-```
-
-**Phase 2: Pre-Commit**
-
-```sql
--- If all said YES, coordinator sends PRE-COMMIT
--- Participants acknowledge and wait
-```
-
-**Phase 3: Do Commit**
-
-```sql
--- Coordinator sends COMMIT or ABORT
--- Participants finalize
-```
-
-### XA Transactions
-
-Standard protocol for distributed transactions.
-
-```javascript
-const xa = require('mysql2/promise');
-
-async function distributedTransfer() {
-  const conn1 = await xa.createConnection({ host: 'db1', ... });
-  const conn2 = await xa.createConnection({ host: 'db2', ... });
-  
-  const xid = 'transfer_' + Date.now();
-  
-  try {
-    // Start XA transaction
-    await conn1.query(`XA START '${xid}'`);
-    await conn2.query(`XA START '${xid}'`);
-    
-    // Execute operations
-    await conn1.query('UPDATE accounts SET balance = balance - 100 WHERE id = 1');
-    await conn2.query('UPDATE accounts SET balance = balance + 100 WHERE id = 1');
-    
-    // End XA transaction
-    await conn1.query(`XA END '${xid}'`);
-    await conn2.query(`XA END '${xid}'`);
-    
-    // Prepare phase
-    await conn1.query(`XA PREPARE '${xid}'`);
-    await conn2.query(`XA PREPARE '${xid}'`);
-    
-    // Commit phase
-    await conn1.query(`XA COMMIT '${xid}'`);
-    await conn2.query(`XA COMMIT '${xid}'`);
-  } catch (error) {
-    // Rollback
-    await conn1.query(`XA ROLLBACK '${xid}'`);
-    await conn2.query(`XA ROLLBACK '${xid}'`);
-    throw error;
-  }
-}
-```
-
-## Transaction Patterns in ORMs
-
-### Prisma
+#### Prisma
 
 ```typescript
 import { PrismaClient } from '@prisma/client';
@@ -855,7 +649,7 @@ await prisma.$transaction(async (tx) => {
     where: { id: 1 },
     data: { balance: { decrement: 100 } },
   });
-  
+
   await tx.account.update({
     where: { id: 2 },
     data: { balance: { increment: 100 } },
@@ -868,11 +662,11 @@ await prisma.$transaction(
     const account = await tx.account.findUnique({
       where: { id: 1 },
     });
-    
+
     if (account.balance < 100) {
       throw new Error('Insufficient balance');
     }
-    
+
     await tx.account.update({
       where: { id: 1 },
       data: { balance: { decrement: 100 } },
@@ -886,7 +680,7 @@ await prisma.$transaction(
 );
 ```
 
-### TypeORM
+#### TypeORM
 
 ```typescript
 import { DataSource, IsolationLevel } from 'typeorm';
@@ -898,7 +692,7 @@ await dataSource.transaction(async (manager) => {
   await manager.update(Account, 1, {
     balance: () => `balance - 100`,
   });
-  
+
   await manager.update(Account, 2, {
     balance: () => `balance + 100`,
   });
@@ -920,11 +714,11 @@ try {
   await queryRunner.manager.update(Account, 1, {
     balance: () => `balance - 100`,
   });
-  
+
   await queryRunner.manager.update(Account, 2, {
     balance: () => `balance + 100`,
   });
-  
+
   await queryRunner.commitTransaction();
 } catch (error) {
   await queryRunner.rollbackTransaction();
@@ -934,7 +728,7 @@ try {
 }
 ```
 
-### SQLAlchemy (Python)
+#### SQLAlchemy (Python)
 
 ```python
 from sqlalchemy import create_engine, text
@@ -981,110 +775,6 @@ with Session() as session:
         raise
 ```
 
-## Performance Implications
-
-### Transaction Size
-
-**Large transactions can cause:**
-- Increased lock contention
-- Longer rollback times
-- More memory usage
-- Reduced concurrency
-
-**Best practices:**
-- Keep transactions short
-- Process data in batches
-- Avoid long-running queries
-- Commit frequently
-
-### Lock Contention
-
-```sql
--- Analyze lock contention
-SELECT * FROM pg_stat_activity 
-WHERE wait_event_type = 'Lock';
-
--- In MySQL
-SELECT * FROM information_schema.INNODB_LOCKS;
-SELECT * FROM information_schema.INNODB_LOCK_WAITS;
-```
-
-### Monitoring Transactions
-
-```sql
--- PostgreSQL: Long-running transactions
-SELECT pid, 
-       now() - xact_start AS duration,
-       query
-FROM pg_stat_activity 
-WHERE state IN ('idle in transaction', 'active')
-  AND now() - xact_start > interval '5 minutes';
-
--- MySQL: Long-running transactions
-SELECT trx_id, 
-       trx_started, 
-       TIMESTAMPDIFF(SECOND, trx_started, NOW()) AS duration
-FROM information_schema.INNODB_TRX
-WHERE TIMESTAMPDIFF(SECOND, trx_started, NOW()) > 300;
-```
-
-## Testing Transactions
-
-### Unit Testing
-
-```javascript
-describe('Money Transfer', () => {
-  it('should transfer money atomically', async () => {
-    await db('accounts').insert([
-      { id: 1, balance: 1000 },
-      { id: 2, balance: 500 },
-    ]);
-    
-    await transferMoney(1, 2, 100);
-    
-    const accounts = await db('accounts').orderBy('id');
-    expect(accounts[0].balance).toBe(900);
-    expect(accounts[1].balance).toBe(600);
-  });
-  
-  it('should rollback on insufficient balance', async () => {
-    await db('accounts').insert([
-      { id: 1, balance: 50 },
-      { id: 2, balance: 500 },
-    ]);
-    
-    await expect(transferMoney(1, 2, 100)).rejects.toThrow();
-    
-    const accounts = await db('accounts').orderBy('id');
-    expect(accounts[0].balance).toBe(50);  // Unchanged
-    expect(accounts[1].balance).toBe(500); // Unchanged
-  });
-});
-```
-
-### Integration Testing
-
-```javascript
-describe('Transaction Isolation', () => {
-  it('should prevent dirty reads at READ COMMITTED', async () => {
-    const trx1 = await db.transaction();
-    const trx2 = await db.transaction();
-    
-    await trx1('accounts').where('id', 1).update({ balance: 0 });
-    
-    // trx2 should not see uncommitted change
-    const balance = await trx2('accounts')
-      .where('id', 1)
-      .first();
-    
-    expect(balance.balance).not.toBe(0);
-    
-    await trx1.rollback();
-    await trx2.commit();
-  });
-});
-```
-
 ## Best Practices
 
 1. **Transaction Design**
@@ -1112,13 +802,14 @@ describe('Transaction Isolation', () => {
    - Test isolation levels
 
 5. **Distributed Transactions**
-   - Consider the Saga pattern for microservices
+   - Consider Saga pattern for microservices
    - Use 2PC only when necessary
    - Be aware of performance implications
    - Have compensation logic ready
 
 ## Related Skills
 
-- `04-database/database-optimization`
-- `04-database/prisma-guide`
-- `09-microservices/saga-pattern`
+- [`04-database/database-optimization`](04-database/database-optimization/SKILL.md)
+- [`04-database/database-locking`](04-database/database-locking/SKILL.md)
+- [`09-microservices/saga-pattern`](09-microservices/saga-pattern/SKILL.md)
+- [`04-database/connection-pooling`](04-database/connection-pooling/SKILL.md)

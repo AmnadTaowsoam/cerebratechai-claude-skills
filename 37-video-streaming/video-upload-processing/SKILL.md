@@ -1,8 +1,18 @@
+---
+name: Video Upload & Processing
+description: Handling video file uploads, transcoding, thumbnail generation, and delivery using S3 storage, FFmpeg processing, job queues, and CDN delivery for scalable video processing pipelines.
+---
+
 # Video Upload & Processing
+
+> **Current Level:** Advanced  
+> **Domain:** Video Streaming / Media Processing
+
+---
 
 ## Overview
 
-Video upload and processing handles file uploads, transcoding, thumbnail generation, and delivery. This guide covers S3 storage, FFmpeg processing, and CDN delivery.
+Video upload and processing handles file uploads, transcoding, thumbnail generation, and delivery. This guide covers S3 storage, FFmpeg processing, and CDN delivery for building video processing systems that handle uploads efficiently and deliver optimized content.
 
 ## Video Upload Patterns
 
@@ -543,9 +553,113 @@ export class StorageOptimizer {
 9. **Cleanup** - Clean up temporary files
 10. **Monitoring** - Monitor processing pipeline
 
-## Resources
+---
+
+## Quick Start
+
+### Video Upload
+
+```typescript
+// Presigned URL for direct upload
+async function getUploadUrl(filename: string): Promise<string> {
+  const s3Client = new S3Client({})
+  const command = new PutObjectCommand({
+    Bucket: process.env.S3_BUCKET,
+    Key: `videos/${filename}`,
+    ContentType: 'video/mp4'
+  })
+  
+  return await getSignedUrl(s3Client, command, { expiresIn: 3600 })
+}
+
+// Process video after upload
+async function processVideo(s3Key: string) {
+  // Download from S3
+  const video = await downloadFromS3(s3Key)
+  
+  // Transcode
+  await transcodeVideo(video, [
+    { resolution: '1080p', bitrate: '5M' },
+    { resolution: '720p', bitrate: '2.5M' },
+    { resolution: '480p', bitrate: '1M' }
+  ])
+  
+  // Generate thumbnail
+  await generateThumbnail(video)
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Upload**: Resumable uploads for large files
+- [ ] **Queue Processing**: Queue for async processing
+- [ ] **Progress Tracking**: Track and display progress
+- [ ] **Error Handling**: Handle processing errors
+- [ ] **Thumbnails**: Generate multiple thumbnails
+- [ ] **Transcoding**: Transcode to multiple formats
+- [ ] **Metadata**: Extract video metadata
+- [ ] **Storage**: Optimize storage costs
+- [ ] **CDN**: Use CDN for delivery
+- [ ] **Cleanup**: Clean up temporary files
+- [ ] **Monitoring**: Monitor processing pipeline
+- [ ] **Documentation**: Document processing workflow
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Synchronous Processing
+
+```typescript
+// ❌ Bad - Blocking
+await uploadVideo(file)
+await transcodeVideo(file)  // Blocks!
+await generateThumbnail(file)
+// User waits!
+```
+
+```typescript
+// ✅ Good - Async processing
+await uploadVideo(file)
+await queueProcessing(file.id)  // Non-blocking
+// User can continue
+```
+
+### ❌ Don't: No Progress
+
+```typescript
+// ❌ Bad - No progress
+await uploadVideo(file)
+// User doesn't know progress!
+```
+
+```typescript
+// ✅ Good - Progress tracking
+const upload = await uploadVideo(file, {
+  onProgress: (progress) => {
+    updateProgressBar(progress)
+  }
+})
+```
+
+---
+
+## Integration Points
+
+- **Video Transcoding** (`37-video-streaming/video-transcoding/`) - Transcoding patterns
+- **CDN Delivery** (`37-video-streaming/cdn-delivery/`) - Video delivery
+- **Adaptive Bitrate** (`37-video-streaming/adaptive-bitrate/`) - ABR streaming
+
+---
+
+## Further Reading
 
 - [FFmpeg Documentation](https://ffmpeg.org/documentation.html)
 - [AWS S3](https://aws.amazon.com/s3/)
+- [Video Processing Best Practices](https://www.brightcove.com/en/resources/video-processing/)
+
+## Resources
 - [BullMQ](https://docs.bullmq.io/)
 - [fluent-ffmpeg](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg)

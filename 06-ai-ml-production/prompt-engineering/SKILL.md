@@ -1,7 +1,40 @@
+---
+name: Prompt Engineering
+description: Comprehensive guide for LLM prompt engineering techniques and best practices
+---
+
 # Prompt Engineering
 
 ## Overview
 Comprehensive guide for LLM prompt engineering techniques and best practices.
+
+## Prerequisites
+
+- Basic understanding of Large Language Models (LLMs)
+- Familiarity with AI/ML concepts
+- Experience with using AI assistants or chatbots
+- Understanding of natural language communication
+- Knowledge of programming concepts (for code generation tasks)
+
+## Key Concepts
+
+- **Zero-Shot Prompting**: Asking the model to perform a task without providing examples
+- **Few-Shot Prompting**: Providing examples to guide the model's understanding and output
+- **Chain-of-Thought (CoT)**: Guiding the model to show its reasoning process step by step
+- **ReAct (Reasoning + Acting)**: Combining reasoning with action-oriented prompts for problem solving
+- **Self-Consistency**: Generating multiple reasoning paths and finding consensus
+- **Prompt Templates**: Reusable prompt patterns with variable substitution
+- **System Messages**: Setting behavior and personality of the AI assistant
+- **Context Management**: Handling long conversations and documents within token limits
+- **Output Formatting**: Guiding the model to produce structured, parseable output
+- **Constraints and Controls**: Setting clear boundaries on what the model should and shouldn't do
+- **Temperature**: Controls randomness in model output (low = deterministic, high = creative)
+- **Top P (Nucleus Sampling)**: Controls cumulative probability threshold for output diversity
+- **Max Tokens**: Controls maximum length of output
+- **Stop Sequences**: Define strings that stop generation for structured output
+- **Prompt Versioning**: Managing different versions of prompts for testing and deployment
+- **Anti-Patterns**: Common prompt engineering mistakes to avoid
+- **Model-Specific Tips**: Optimization strategies for different LLM providers (GPT, Claude, Llama, Mistral)
 
 ---
 
@@ -2174,6 +2207,14 @@ for anomaly in anomalies:
 ```
 
 ---
+
+## Related Skills
+
+- [`06-ai-ml-production/llm-integration`](06-ai-ml-production/llm-integration/SKILL.md)
+- [`06-ai-ml-production/llm-function-calling`](06-ai-ml-production/llm-function-calling/SKILL.md)
+- [`06-ai-ml-production/llm-guardrails`](06-ai-ml-production/llm-guardrails/SKILL.md)
+- [`06-ai-ml-production/agent-patterns`](06-ai-ml-production/agent-patterns/SKILL.md)
+- [`06-ai-ml-production/embedding-models`](06-ai-ml-production/embedding-models/SKILL.md)
 
 ## Additional Resources
 

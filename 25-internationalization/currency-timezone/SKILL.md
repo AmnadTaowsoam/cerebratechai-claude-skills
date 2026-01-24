@@ -1,4 +1,18 @@
+---
+name: Currency and Timezone
+description: Handling currency conversion, formatting, and timezone management for global applications to support users worldwide with local currency and time display.
+---
+
 # Currency and Timezone
+
+> **Current Level:** Intermediate  
+> **Domain:** Internationalization / Backend
+
+---
+
+## Overview
+
+Currency and timezone handling is essential for global applications. Effective currency and timezone management ensures users see prices and times in their local format, supports multi-currency payments, and complies with local regulations.
 
 ## Why Currency and Timezone Matter
 
@@ -920,3 +934,100 @@ function PriceDisplay({ priceUSD, userCurrency, userLocale }) {
 - [ ] Cache exchange rates
 - [ ] Handle rounding correctly
 - [ ] Allow user to switch currency
+```
+
+---
+
+## Quick Start
+
+### Currency Formatting
+
+```javascript
+const formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD'
+})
+
+formatter.format(1234.56)  // "$1,234.56"
+```
+
+### Timezone Conversion
+
+```javascript
+const date = new Date('2024-01-15T10:00:00Z')
+
+// Convert to user timezone
+const userTimezone = 'America/New_York'
+const formatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: userTimezone,
+  dateStyle: 'full',
+  timeStyle: 'long'
+})
+
+formatter.format(date)  // "Monday, January 15, 2024 at 5:00:00 AM EST"
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Currency Storage**: Store prices in base currency
+- [ ] **Currency Conversion**: Real-time or cached conversion rates
+- [ ] **Currency Formatting**: Format according to locale
+- [ ] **Timezone Storage**: Store all times in UTC
+- [ ] **Timezone Conversion**: Convert to user timezone for display
+- [ ] **Date Formatting**: Format dates according to locale
+- [ ] **User Preferences**: Allow users to set currency and timezone
+- [ ] **API Integration**: Integrate with currency exchange APIs
+- [ ] **Caching**: Cache exchange rates
+- [ ] **Testing**: Test with various locales
+- [ ] **Documentation**: Document currency and timezone handling
+- [ ] **Compliance**: Comply with local regulations
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Store in User Currency
+
+```javascript
+// ❌ Bad - Store in user currency
+const price = { amount: 100, currency: 'USD' }  // User changes currency!
+```
+
+```javascript
+// ✅ Good - Store in base currency
+const price = { amount: 100, currency: 'USD' }  // Base currency
+// Convert on display
+const displayPrice = convertCurrency(price, userCurrency)
+```
+
+### ❌ Don't: Store Local Time
+
+```javascript
+// ❌ Bad - Store local time
+const createdAt = new Date('2024-01-15 10:00:00')  // Which timezone?
+```
+
+```javascript
+// ✅ Good - Store UTC
+const createdAt = new Date('2024-01-15T10:00:00Z')  // UTC
+// Convert on display
+const displayTime = convertToUserTimezone(createdAt, userTimezone)
+```
+
+---
+
+## Integration Points
+
+- **i18n Setup** (`25-internationalization/i18n-setup/`) - Internationalization
+- **Localization** (`25-internationalization/localization/`) - Content localization
+- **Payment Gateways** (`30-ecommerce/payment-gateways/`) - Multi-currency payments
+
+---
+
+## Further Reading
+
+- [Intl API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl)
+- [Currency Exchange APIs](https://www.exchangerate-api.com/)
+- [Timezone Database](https://www.iana.org/time-zones)

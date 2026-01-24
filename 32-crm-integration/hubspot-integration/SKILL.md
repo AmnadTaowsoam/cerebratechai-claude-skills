@@ -1,8 +1,18 @@
+---
+name: HubSpot Integration
+description: Integrating with HubSpot inbound marketing and sales platform using comprehensive APIs for CRM objects, workflows, webhooks, contacts, deals, and marketing automation.
+---
+
 # HubSpot Integration
+
+> **Current Level:** Intermediate  
+> **Domain:** CRM / Marketing Integration
+
+---
 
 ## Overview
 
-HubSpot is an inbound marketing and sales platform with comprehensive APIs. This guide covers CRM objects, workflows, webhooks, and integration patterns.
+HubSpot is an inbound marketing and sales platform with comprehensive APIs. This guide covers CRM objects, workflows, webhooks, and integration patterns for syncing data and automating marketing and sales processes.
 
 ## Authentication
 
@@ -488,9 +498,133 @@ export class LeadScoringService {
 9. **Monitoring** - Monitor API usage
 10. **Security** - Secure API keys and tokens
 
-## Resources
+---
+
+## Quick Start
+
+### HubSpot Client
+
+```typescript
+const hubspot = require('@hubspot/api-client')
+
+const client = new hubspot.Client({
+  accessToken: process.env.HUBSPOT_API_TOKEN
+})
+
+// Create contact
+async function createContact(contact: Contact) {
+  const response = await client.crm.contacts.basicApi.create({
+    properties: {
+      firstname: contact.firstName,
+      lastname: contact.lastName,
+      email: contact.email
+    }
+  })
+  return response
+}
+
+// Create deal
+async function createDeal(deal: Deal) {
+  const response = await client.crm.deals.basicApi.create({
+    properties: {
+      dealname: deal.name,
+      amount: deal.value,
+      dealstage: deal.stage,
+      pipeline: deal.pipeline
+    },
+    associations: [{
+      to: { id: deal.contactId },
+      types: [{
+        associationCategory: 'HUBSPOT_DEFINED',
+        associationTypeId: 3  // Contact to Deal
+      }]
+    }]
+  })
+  return response
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **API Access**: HubSpot API access configured
+- [ ] **Authentication**: OAuth or API key setup
+- [ ] **Rate Limiting**: Respect API limits
+- [ ] **Batch Operations**: Use batch APIs
+- [ ] **Webhooks**: Set up webhooks
+- [ ] **Error Handling**: Handle API errors
+- [ ] **Data Sync**: Sync data bidirectionally
+- [ ] **Workflows**: HubSpot workflows
+- [ ] **Testing**: Test with HubSpot
+- [ ] **Documentation**: Document integration
+- [ ] **Monitoring**: Monitor API usage
+- [ ] **Support**: HubSpot support access
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Ignore Rate Limits
+
+```typescript
+// ❌ Bad - No rate limiting
+for (const contact of contacts) {
+  await createContact(contact)  // May hit limits!
+}
+```
+
+```typescript
+// ✅ Good - Rate limiting
+const rateLimiter = require('rate-limiter-flexible')
+const limiter = new rateLimiter.RateLimiter({
+  points: 100,  // 100 requests
+  duration: 10  // per 10 seconds
+})
+
+for (const contact of contacts) {
+  await limiter.consume('hubspot')
+  await createContact(contact)
+}
+```
+
+### ❌ Don't: No Error Handling
+
+```typescript
+// ❌ Bad - No error handling
+await client.crm.contacts.basicApi.create(contact)
+// What if it fails?
+```
+
+```typescript
+// ✅ Good - Error handling
+try {
+  await client.crm.contacts.basicApi.create(contact)
+} catch (error) {
+  if (error.statusCode === 409) {
+    // Duplicate contact
+    await updateContact(contact)
+  } else {
+    throw error
+  }
+}
+```
+
+---
+
+## Integration Points
+
+- **Salesforce Integration** (`32-crm-integration/salesforce-integration/`) - Alternative CRM
+- **Lead Management** (`32-crm-integration/lead-management/`) - Lead sync
+- **Marketing Automation** (`28-marketing-integration/marketing-automation/`) - Marketing sync
+
+---
+
+## Further Reading
 
 - [HubSpot API Documentation](https://developers.hubspot.com/docs/api/overview)
 - [CRM API](https://developers.hubspot.com/docs/api/crm/understanding-the-crm)
+
+## Resources
 - [Webhooks](https://developers.hubspot.com/docs/api/webhooks)
 - [OAuth](https://developers.hubspot.com/docs/api/oauth-quickstart-guide)

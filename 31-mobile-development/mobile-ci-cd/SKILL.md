@@ -1,10 +1,24 @@
+---
+name: Mobile CI/CD Pipelines
+description: Automating building, testing, and deploying mobile applications using GitHub Actions, Fastlane automation, code signing, and App Store submission automation.
+---
+
 # Mobile CI/CD Pipelines
+
+> **Current Level:** Intermediate  
+> **Domain:** Mobile Development / DevOps
+
+---
 
 ## Overview
 
-Mobile CI/CD automates building, testing, and deploying mobile applications. This guide covers GitHub Actions, Fastlane automation, code signing, and App Store submission automation.
+Mobile CI/CD automates building, testing, and deploying mobile applications. This guide covers GitHub Actions, Fastlane automation, code signing, and App Store submission automation for streamlining mobile app development and release processes.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [CI/CD for Mobile](#ci-cd-for-mobile)
 2. [GitHub Actions for Mobile](#github-actions-for-mobile)
@@ -1815,6 +1829,124 @@ const monitorAndRollback = async (platform: 'ios' | 'android') => {
 ```
 
 ---
+
+---
+
+## Quick Start
+
+### Fastlane Setup
+
+```ruby
+# Fastfile
+platform :ios do
+  lane :beta do
+    increment_build_number
+    build_app(scheme: "MyApp")
+    upload_to_testflight
+  end
+  
+  lane :release do
+    increment_build_number
+    build_app(scheme: "MyApp")
+    upload_to_app_store
+  end
+end
+
+platform :android do
+  lane :beta do
+    gradle(task: "assembleRelease")
+    upload_to_play_store(track: "internal")
+  end
+end
+```
+
+### GitHub Actions
+
+```yaml
+name: Mobile CI/CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Fastlane
+        run: bundle install
+      - name: Build and Deploy
+        run: fastlane beta
+```
+
+---
+
+## Production Checklist
+
+- [ ] **CI/CD Setup**: GitHub Actions or similar configured
+- [ ] **Fastlane**: Fastlane automation set up
+- [ ] **Code Signing**: Automated code signing
+- [ ] **Build Automation**: Automated builds
+- [ ] **Testing**: Automated testing in CI
+- [ ] **App Store**: Automated App Store submission
+- [ ] **Version Management**: Automated versioning
+- [ ] **Release Notes**: Automated release notes
+- [ ] **Monitoring**: Monitor build status
+- [ ] **Secrets**: Secure secrets management
+- [ ] **Documentation**: Document CI/CD process
+- [ ] **Rollback**: Rollback procedures
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Manual Builds
+
+```markdown
+# ❌ Bad - Manual process
+1. Build locally
+2. Upload to TestFlight
+3. Wait for processing
+4. Submit for review
+# Slow and error-prone!
+```
+
+```markdown
+# ✅ Good - Automated
+git push → CI builds → Auto-deploy to TestFlight
+# Fast and reliable
+```
+
+### ❌ Don't: Expose Secrets
+
+```yaml
+# ❌ Bad - Secrets in code
+env:
+  APP_STORE_API_KEY: "abc123"  # Exposed!
+```
+
+```yaml
+# ✅ Good - GitHub Secrets
+env:
+  APP_STORE_API_KEY: ${{ secrets.APP_STORE_API_KEY }}
+```
+
+---
+
+## Integration Points
+
+- **App Distribution** (`31-mobile-development/app-distribution/`) - Distribution process
+- **React Native Patterns** (`31-mobile-development/react-native-patterns/`) - App patterns
+- **CI/CD** (`15-devops-infrastructure/ci-cd-github-actions/`) - CI/CD patterns
+
+---
+
+## Further Reading
+
+- [Fastlane Documentation](https://docs.fastlane.tools/)
+- [GitHub Actions for Mobile](https://github.com/actions/virtual-environments)
+- [Mobile CI/CD Best Practices](https://www.raywenderlich.com/books/fastlane-tutorial)
 
 ## Resources
 

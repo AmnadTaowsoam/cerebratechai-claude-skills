@@ -1,8 +1,354 @@
 # FastAPI Patterns and Best Practices
 
-## 1. Project Structure
+---
 
-### Recommended Structure
+## 1. Executive Summary & Strategic Necessity
+
+### 1.1 Context (ภาษาไทย)
+
+FastAPI เป็น modern, fast (high-performance) web framework สำหรับ building APIs ด้วย Python 3.6+ โดยใช้ standard Python type hints ซึ่งช่วยให้ developers สร้าง APIs ได้รวดเร็ว, maintainable, และ type-safe
+
+FastAPI ประกอบด้วย:
+- **Type Hints** - Standard Python type hints สำหรับ automatic validation
+- **Pydantic** - Data validation ด้วย Pydantic models
+- **Async Support** - Native async/await support
+- **OpenAPI** - Automatic OpenAPI documentation
+- **Dependency Injection** - Powerful dependency injection system
+- **WebSocket Support** - Built-in WebSocket support
+
+### 1.2 Business Impact (ภาษาไทย)
+
+**ผลกระทบทางธุรกิจ:**
+
+1. **เพิ่ม Development Velocity** - FastAPI ช่วยเพิ่ม development velocity ได้ถึง 40-60%
+2. **ลด Bugs** - Automatic validation ช่วยลด bugs ได้ถึง 30-40%
+3. **เพิ่ม Performance** - High-performance framework ช่วยเพิ่ม API performance
+4. **ลด Documentation Time** - Auto-generated documentation ช่วยลด documentation time
+5. **ปรับปรุง Type Safety** - Type hints ช่วยเพิ่ม type safety
+
+### 1.3 Product Thinking (ภาษาไทย)
+
+**มุมมองด้านผลิตภัณฑ์:**
+
+1. **Type-Safe** - APIs ต้อง type-safe ด้วย Python type hints
+2. **Validated** - APIs ต้อง validated ด้วย Pydantic
+3. **Documented** - APIs ต้อง auto-documented ด้วย OpenAPI
+4. **Async** - APIs ต้อง async สำหรับ high performance
+5. **Testable** - APIs ต้อง testable ง่าย
+
+---
+
+## 2. Technical Deep Dive (The "How-to")
+
+### 2.1 Core Logic
+
+FastAPI ประกอบด้วย:
+
+1. **Application** - FastAPI application instance
+2. **Router** - Routing system สำหรับ mapping URLs ไปยัง endpoints
+3. **Pydantic Models** - Data validation ด้วย Pydantic
+4. **Dependency Injection** - Dependency injection system
+5. **Middleware** - Middleware สำหรับ request/response processing
+6. **Background Tasks** - Background tasks สำหรับ async operations
+7. **WebSocket** - WebSocket support
+
+### 2.2 Architecture Diagram Requirements
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              FastAPI Architecture                    │
+├─────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Client Layer                         │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Browser    │  │  Mobile     │  │  API Client │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Middleware Stack                      │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  CORS       │  │  Logging    │  │  Auth       │  │   │
+│  │  │  Middleware│  │  Middleware │  │  Middleware │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Routing Layer                        │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Routes     │  │  Endpoints  │  │  Routers    │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Dependency Injection Layer           │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Database   │  │  Services   │  │  Utilities  │  │   │
+│  │  │  Dependencies│  │            │  │            │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+│  ┌───────────────────────────────────────────────────┐   │
+│  │              Data Layer                           │   │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌───────────┐  │   │
+│  │  │  Pydantic   │  │  Models     │  │  Schemas    │  │   │
+│  │  │  Models     │  │            │  │            │  │   │
+│  │  └─────────────┘  └─────────────┘  └───────────┘  │   │
+│  └───────────────────────────────────────────────────┘   │
+│                           │                                     │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 2.3 Implementation Workflow
+
+**Step 1: Initialize FastAPI App**
+
+```python
+# app/main.py
+from fastapi import FastAPI
+from app.core.config import settings
+
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    version=settings.VERSION,
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
+```
+
+**Step 2: Add Routes**
+
+```python
+# app/api/v1/endpoints/users.py
+from fastapi import APIRouter
+
+router = APIRouter()
+
+@router.get("/users")
+async def get_users():
+    return {"users": []}
+```
+
+**Step 3: Include Router**
+
+```python
+# app/main.py
+from app.api.v1.api import api_router
+
+app.include_router(api_router, prefix=settings.API_V1_STR)
+```
+
+---
+
+## 3. Tooling & Tech Stack
+
+### 3.1 Enterprise Tools
+
+| Tool | Purpose | Version | License |
+|------|---------|---------|---------|
+| FastAPI | Web Framework | ^0.104.0 | MIT |
+| Pydantic | Data Validation | ^2.5.0 | MIT |
+| SQLAlchemy | ORM | ^2.0.0 | MIT |
+| Pytest | Testing Framework | ^7.4.0 | MIT |
+| httpx | Async HTTP Client | ^0.25.0 | BSD-3-Clause |
+| uvicorn | ASGI Server | ^0.24.0 | BSD-3-Clause |
+| alembic | Database Migration | ^1.12.0 | MIT |
+| redis-py | Redis Client | ^5.0.0 | MIT |
+
+### 3.2 Configuration Essentials
+
+**Pydantic Settings:**
+```python
+# app/core/config.py
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import List
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+    )
+
+    PROJECT_NAME: str = "My API"
+    VERSION: str = "1.0.0"
+    API_V1_STR: str = "/api/v1"
+
+    # Security
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    # Database
+    DATABASE_URL: str
+
+    # CORS
+    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+
+    # Redis
+    REDIS_URL: str = "redis://localhost:6379"
+
+    # Email
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str
+    SMTP_PASSWORD: str
+    EMAILS_FROM_EMAIL: str = "noreply@example.com"
+
+
+settings = Settings()
+```
+
+**Database Configuration:**
+```python
+# app/core/database.py
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from app.core.config import settings
+
+engine = create_engine(settings.DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+```
+
+---
+
+## 4. Standards, Compliance & Security
+
+### 4.1 International Standards
+
+- **OpenAPI 3.0** - OpenAPI Specification
+- **REST API Standards** - RESTful API Design Standards
+- **OWASP** - Security Best Practices
+- **GDPR** - Data Protection สำหรับ API Data
+- **HIPAA** - Healthcare Data Protection
+
+### 4.2 Security Protocol
+
+FastAPI ต้องปฏิบัติตามหลักความปลอดภัย:
+
+1. **Input Validation** - Validate ข้อมูลทั้ง client แล server
+2. **Authentication** - ใช้ JWT หรือ OAuth2
+3. **Authorization** - Implement role-based access control
+4. **CORS** - Configure CORS อย่างเหมาะสม
+5. **HTTPS** - ใช้ HTTPS สำหรับ production
+6. **Rate Limiting** - จำกัดจำนวน requests
+
+### 4.3 Explainability
+
+FastAPI ต้องสามารถอธิบายได้ว่า:
+
+1. **Request Flow** - ทำไม request ถูก process อย่างไร
+2. **Validation** - ทำไม data ถูก validate อย่างไร
+3. **Error Handling** - ทำไม errors ถูก handle อย่างไร
+4. **Response Format** - ทำไม responses ถูก format อย่างไร
+
+---
+
+## 5. Unit Economics & Performance Metrics (KPIs)
+
+### 5.1 Cost Calculation
+
+| Metric | Calculation | Target |
+|--------|-------------|--------|
+| Response Time | Average response time | < 50ms |
+| Throughput | Requests per second | > 2000 req/s |
+| Error Rate | Errors / Total Requests | < 1% |
+| Memory Usage | Memory per request | < 5 MB |
+| CPU Usage | CPU utilization | < 60% |
+
+### 5.2 Key Performance Indicators
+
+**Technical Metrics:**
+
+1. **Response Time** - Average response time
+2. **Throughput** - Requests per second
+3. **Error Rate** - Error rate
+4. **Memory Usage** - Memory usage
+
+**Business Metrics:**
+
+1. **API Availability** - API uptime
+2. **User Satisfaction** - CSAT score
+3. **Support Tickets** - Support tickets จาก API issues
+4. **Time to Resolution** - Average time to resolve issues
+
+---
+
+## 6. Strategic Recommendations (CTO Insights)
+
+### 6.1 Phase Rollout
+
+**Phase 1: Foundation (Week 1-2)**
+- Initialize FastAPI app
+- Setup project structure
+- Add basic routes
+- Implement Pydantic models
+
+**Phase 2: Advanced Features (Week 3-4)**
+- Add dependency injection
+- Implement authentication
+- Add middleware
+- Setup database
+
+**Phase 3: Integration (Week 5-6)**
+- Add background tasks
+- Implement WebSocket support
+- Add file uploads
+- Setup testing
+
+**Phase 4: Production (Week 7-8)**
+- Optimize performance
+- Setup monitoring
+- Documentation and training
+- Best practices documentation
+
+### 6.2 Pitfalls to Avoid
+
+1. **Poor Type Hints** - ไม่ใช้ type hints อย่างถูกต้อง
+2. **Missing Validation** - ไม่ validate input
+3. **Poor Error Handling** - ไม่ handle errors อย่างเหมาะสม
+4. **No Documentation** - ไม่ document APIs
+5. **Poor Performance** - ไม่ optimize performance
+6. **No Testing** - ไม่ test endpoints
+
+### 6.3 Best Practices Checklist
+
+- [ ] ใช้ Python type hints สำหรับ type safety
+- [ ] Implement Pydantic models สำหรับ validation
+- [ ] Use async/await สำหรับ async operations
+- [ ] Implement dependency injection
+- [ ] Add authentication แล authorization
+- [ ] Use middleware สำหรับ cross-cutting concerns
+- [ ] Implement proper error handling
+- [ ] Add background tasks สำหรับ async operations
+- [ ] Test endpoints ด้วย Pytest
+- [ ] Use OpenAPI documentation
+- [ ] Add CORS configuration
+- [ ] Implement rate limiting
+- [ ] Use WebSocket สำหรับ real-time features
+- [ ] Add file upload support
+- [ ] Monitor performance แล errors
+
+---
+
+## 7. Implementation Examples
+
+### 7.1 Project Structure
+
+**Recommended Structure:**
 ```
 app/
 ├── __init__.py
@@ -46,7 +392,7 @@ app/
     └── helpers.py
 ```
 
-### Main Application Setup
+**Main Application Setup:**
 ```python
 # app/main.py
 from fastapi import FastAPI
@@ -87,9 +433,9 @@ async def shutdown_event():
     pass
 ```
 
-## 2. Application Setup
+### 7.2 Application Setup
 
-### Configuration with Pydantic Settings
+**Configuration with Pydantic Settings:**
 ```python
 # app/core/config.py
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -114,7 +460,7 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str
-    
+
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000"]
 
@@ -132,7 +478,7 @@ class Settings(BaseSettings):
 settings = Settings()
 ```
 
-### Database Setup
+**Database Setup:**
 ```python
 # app/core/database.py
 from sqlalchemy import create_engine
@@ -154,9 +500,9 @@ def get_db():
         db.close()
 ```
 
-## 3. Pydantic Models
+### 7.3 Pydantic Models
 
-### Request Models
+**Request Models:**
 ```python
 # app/schemas/user.py
 from pydantic import BaseModel, EmailStr, Field, validator
@@ -171,7 +517,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8, max_length=100)
-    
+
     @validator("password")
     def validate_password(cls, v):
         if not any(c.isupper() for c in v):
@@ -222,7 +568,7 @@ class TokenPayload(BaseModel):
     sub: int | None = None
 ```
 
-### Response Models
+**Response Models:**
 ```python
 # app/schemas/common.py
 from pydantic import BaseModel, Field
@@ -252,9 +598,9 @@ class ErrorResponse(BaseModel):
     details: Optional[dict] = None
 ```
 
-## 4. Dependency Injection
+### 7.4 Dependency Injection
 
-### Common Dependencies
+**Common Dependencies:**
 ```python
 # app/core/deps.py
 from typing import Generator, Optional
@@ -280,7 +626,7 @@ async def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
+
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
@@ -288,11 +634,11 @@ async def get_current_user(
         token_data = TokenPayload(**payload)
     except JWTError:
         raise credentials_exception
-    
+
     user = db.query(User).filter(User.id == token_data.sub).first()
     if not user:
         raise credentials_exception
-    
+
     return user
 
 
@@ -314,7 +660,7 @@ async def get_current_active_superuser(
     return current_user
 ```
 
-### Custom Dependencies
+**Custom Dependencies:**
 ```python
 # Pagination dependency
 from fastapi import Depends, Query
@@ -327,7 +673,6 @@ async def get_pagination(
 ) -> dict:
     return {"skip": skip, "limit": limit}
 
-
 # Usage in endpoint
 @app.get("/users")
 async def get_users(
@@ -338,9 +683,9 @@ async def get_users(
     return {"items": users, "total": len(users)}
 ```
 
-## 5. Async Patterns
+### 7.5 Async Patterns
 
-### Async Database Operations
+**Async Database Operations:**
 ```python
 # Using asyncpg with SQLAlchemy
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
@@ -359,7 +704,6 @@ async def get_async_db() -> AsyncSession:
     async with AsyncSessionLocal() as session:
         yield session
 
-
 # Async endpoint
 from fastapi import Depends
 from app.core.database import get_async_db
@@ -371,7 +715,7 @@ async def get_users_async(db: AsyncSession = Depends(get_async_db)):
     return users
 ```
 
-### Async External API Calls
+**Async External API Calls:**
 ```python
 import httpx
 from fastapi import HTTPException
@@ -401,7 +745,7 @@ async def get_external_data():
     return data
 ```
 
-### Concurrent Requests
+**Concurrent Requests:**
 ```python
 import asyncio
 from typing import List
@@ -414,13 +758,13 @@ async def fetch_multiple_users(user_ids: List[int]) -> List[dict]:
             for uid in user_ids
         ]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         users = []
         for response in responses:
             if isinstance(response, Exception):
                 continue
             users.append(response.json())
-        
+
         return users
 
 
@@ -431,9 +775,9 @@ async def get_users_batch(user_ids: str = Query(...)):
     return users
 ```
 
-## 6. Error Handling
+### 7.6 Error Handling
 
-### Custom Exception Handler
+**Custom Exception Handler:**
 ```python
 # app/core/exceptions.py
 from typing import Any, Dict, Optional, Union
@@ -475,7 +819,7 @@ class ConflictException(AppException):
         super().__init__(status_code=status.HTTP_409_CONFLICT, detail=detail)
 ```
 
-### Global Exception Handler
+**Global Exception Handler:**
 ```python
 # app/core/exception_handlers.py
 from fastapi import Request, status
@@ -519,7 +863,7 @@ async def validation_exception_handler(
             "message": error["msg"],
             "type": error["type"]
         })
-    
+
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
@@ -531,7 +875,7 @@ async def validation_exception_handler(
     )
 ```
 
-### Register Exception Handlers
+**Register Exception Handlers:**
 ```python
 # app/main.py
 from fastapi import FastAPI, Request
@@ -551,9 +895,9 @@ app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 ```
 
-## 7. Middleware
+### 7.7 Middleware
 
-### Logging Middleware
+**Logging Middleware:**
 ```python
 # app/middleware/logging.py
 import time
@@ -565,13 +909,13 @@ from app.utils.logger import logger
 class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         start_time = time.time()
-        
+
         # Process request
         response = await call_next(request)
-        
+
         # Calculate duration
         process_time = (time.time() - start_time) * 1000
-        
+
         # Log request
         logger.info({
             "method": request.method,
@@ -580,10 +924,10 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             "process_time_ms": round(process_time, 2),
             "client": request.client.host if request.client else None,
         })
-        
+
         # Add custom header
         response.headers["X-Process-Time"] = str(process_time)
-        
+
         return response
 
 
@@ -591,7 +935,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 app.add_middleware(LoggingMiddleware)
 ```
 
-### Request ID Middleware
+**Request ID Middleware:**
 ```python
 import uuid
 from fastapi import Request
@@ -602,14 +946,14 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         request_id = str(uuid.uuid4())
         request.state.request_id = request_id
-        
+
         response = await call_next(request)
         response.headers["X-Request-ID"] = request_id
-        
+
         return response
 ```
 
-### Timing Middleware
+**Timing Middleware:**
 ```python
 import time
 from fastapi import Request
@@ -619,18 +963,18 @@ from starlette.middleware.base import BaseHTTPMiddleware
 class TimingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         start_time = time.time()
-        
+
         response = await call_next(request)
-        
+
         process_time = time.time() - start_time
         response.headers["X-Response-Time"] = str(process_time)
-        
+
         return response
 ```
 
-## 8. Background Tasks
+### 7.8 Background Tasks
 
-### Simple Background Task
+**Simple Background Task:**
 ```python
 from fastapi import FastAPI, BackgroundTasks
 from app.utils.email import send_email
@@ -645,11 +989,11 @@ async def send_notification(
 ):
     # Add task to background
     background_tasks.add_task(send_email, email, "Welcome!")
-    
+
     return {"message": "Email will be sent in background"}
 ```
 
-### Background Task with Dependencies
+**Background Task with Dependencies:**
 ```python
 from app.core.database import get_db
 from app.models.user import User
@@ -670,11 +1014,11 @@ async def ping_user(
     # Pass db session to background task
     db = next(get_db())
     background_tasks.add_task(process_user_update, user_id, db)
-    
+
     return {"message": "Ping recorded"}
 ```
 
-### Long-running Background Task
+**Long-running Background Task:**
 ```python
 import asyncio
 from fastapi import BackgroundTasks
@@ -690,13 +1034,13 @@ async def long_running_task(task_id: str):
 async def start_task(background_tasks: BackgroundTasks):
     task_id = str(uuid.uuid4())
     background_tasks.add_task(long_running_task, task_id)
-    
+
     return {"task_id": task_id, "status": "started"}
 ```
 
-## 9. WebSocket Support
+### 7.9 WebSocket Support
 
-### Basic WebSocket
+**Basic WebSocket:**
 ```python
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from typing import List
@@ -726,7 +1070,7 @@ manager = ConnectionManager()
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: int):
     await manager.connect(websocket)
-    
+
     try:
         while True:
             data = await websocket.receive_text()
@@ -736,7 +1080,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
         await manager.broadcast(f"Client {client_id} left")
 ```
 
-### WebSocket with Authentication
+**WebSocket with Authentication:**
 ```python
 from fastapi import WebSocket, WebSocketException, status, Query
 from jose import jwt
@@ -764,9 +1108,9 @@ async def protected_websocket(
     await websocket.send_json({"message": "Authenticated", "user": user})
 ```
 
-## 10. File Uploads
+### 7.10 File Uploads
 
-### Single File Upload
+**Single File Upload:**
 ```python
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import FileResponse
@@ -781,12 +1125,12 @@ UPLOAD_DIR = "uploads"
 async def upload_file(file: UploadFile = File(...)):
     # Create upload directory if not exists
     os.makedirs(UPLOAD_DIR, exist_ok=True)
-    
+
     # Save file
     file_location = f"{UPLOAD_DIR}/{file.filename}"
     with open(file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    
+
     return {
         "filename": file.filename,
         "location": file_location
@@ -798,11 +1142,11 @@ async def download_file(filename: str):
     file_path = f"{UPLOAD_DIR}/{filename}"
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
-    
+
     return FileResponse(file_path)
 ```
 
-### Multiple File Upload
+**Multiple File Upload:**
 ```python
 from typing import List
 
@@ -810,23 +1154,22 @@ from typing import List
 @app.post("/upload-multiple")
 async def upload_multiple_files(files: List[UploadFile] = File(...)):
     uploaded_files = []
-    
+
     for file in files:
         file_location = f"{UPLOAD_DIR}/{file.filename}"
         with open(file_location, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         uploaded_files.append(file.filename)
-    
+
     return {
         "filenames": uploaded_files,
         "count": len(uploaded_files)
     }
 ```
 
-### File Upload with Validation
+**File Upload with Validation:**
 ```python
 from fastapi import UploadFile, File, HTTPException, status
-
 
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif"}
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
@@ -840,18 +1183,18 @@ def validate_file(file: UploadFile) -> UploadFile:
             status_code=400,
             detail=f"File extension {file_ext} not allowed"
         )
-    
+
     # Check file size
     file.file.seek(0, 2)  # Seek to end
     file_size = file.file.tell()
     file.file.seek(0)  # Seek back to start
-    
+
     if file_size > MAX_FILE_SIZE:
         raise HTTPException(
             status_code=400,
             detail=f"File size exceeds {MAX_FILE_SIZE} bytes"
         )
-    
+
     return file
 
 
@@ -860,13 +1203,13 @@ async def upload_image(file: UploadFile = Depends(validate_file)):
     file_location = f"{UPLOAD_DIR}/{file.filename}"
     with open(file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    
+
     return {"filename": file.filename}
 ```
 
-## 11. Testing with Pytest
+### 7.11 Testing with Pytest
 
-### Test Configuration
+**Test Configuration:**
 ```python
 # tests/conftest.py
 import pytest
@@ -900,14 +1243,14 @@ def client(db):
             yield db
         finally:
             pass
-    
+
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides = {}
 ```
 
-### Endpoint Tests
+**Endpoint Tests:**
 ```python
 # tests/test_users.py
 from fastapi.testclient import TestClient
@@ -920,9 +1263,9 @@ def test_create_user(client: TestClient):
         "full_name": "Test User",
         "password": "Test123456"
     }
-    
+
     response = client.post("/api/v1/users/", json=user_data)
-    
+
     assert response.status_code == 201
     data = response.json()
     assert data["email"] == user_data["email"]
@@ -939,10 +1282,10 @@ def test_get_users(client: TestClient, db):
     user = User(**user_data.dict(), hashed_password="hashed")
     db.add(user)
     db.commit()
-    
+
     # Get users
     response = client.get("/api/v1/users/")
-    
+
     assert response.status_code == 200
     data = response.json()
     assert len(data["items"]) == 1
@@ -951,12 +1294,12 @@ def test_get_users(client: TestClient, db):
 
 def test_get_user_not_found(client: TestClient):
     response = client.get("/api/v1/users/999")
-    
+
     assert response.status_code == 404
     assert "not found" in response.json()["message"].lower()
 ```
 
-### Async Tests
+**Async Tests:**
 ```python
 import pytest
 from httpx import AsyncClient
@@ -969,9 +1312,9 @@ async def test_async_endpoint():
         assert response.status_code == 200
 ```
 
-## 12. Auto-documentation
+### 7.12 Auto-documentation
 
-### Custom OpenAPI Schema
+**Custom OpenAPI Schema:**
 ```python
 # app/main.py
 from fastapi import FastAPI
@@ -1005,7 +1348,7 @@ app = FastAPI(
 )
 ```
 
-### Custom Response Examples
+**Custom Response Examples:**
 ```python
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
@@ -1055,7 +1398,7 @@ async def get_user(user_id: int):
     pass
 ```
 
-### Security Documentation
+**Security Documentation:**
 ```python
 from fastapi import FastAPI, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -1075,3 +1418,13 @@ async def protected_endpoint(
 ):
     return {"message": "Access granted"}
 ```
+
+---
+
+## 8. Related Skills
+
+- `03-backend-api/error-handling`
+- `03-backend-api/validation`
+- `03-backend-api/middleware`
+- `01-foundations/python-standards`
+- `14-monitoring-observability`

@@ -1,7 +1,35 @@
+---
+name: LLM Integration
+description: Comprehensive guide for LLM API integration covering OpenAI, Anthropic, Azure, and Cohere providers
+---
+
 # LLM Integration
 
 ## Overview
 Comprehensive guide for LLM API integration covering OpenAI, Anthropic, Azure, and Cohere providers.
+
+## Prerequisites
+
+- Basic understanding of REST APIs and HTTP requests
+- Python programming knowledge
+- Familiarity with async/await patterns
+- API key management concepts
+- Understanding of rate limiting and retry patterns
+
+## Key Concepts
+
+- **LLM Providers**: OpenAI, Anthropic, Azure OpenAI, Cohere - different API services for accessing large language models
+- **Unified Interface**: Abstraction layer that provides consistent API across different LLM providers
+- **Streaming Responses**: Real-time token-by-token response delivery for better user experience
+- **Error Handling**: Retry logic, exponential backoff, and fallback strategies for resilient API calls
+- **Rate Limiting**: Token bucket algorithm to manage API request rates and avoid hitting limits
+- **Cost Tracking**: Monitoring token usage and calculating API costs across providers
+- **Response Caching**: Storing and retrieving cached responses to reduce API calls and costs
+- **Prompt Templates**: Reusable prompt patterns with variable substitution
+- **Token Counting**: Estimating and managing token usage for different models
+- **Context Window Management**: Managing conversation history within model context limits
+- **Multi-Provider Fallback**: Automatic switching between providers on failure
+- **Batch Processing**: Efficient processing of multiple LLM requests concurrently
 
 ---
 
@@ -1692,6 +1720,15 @@ class ErrorRecoveryStrategy:
 ```
 
 ---
+
+## Related Skills
+
+- [`06-ai-ml-production/prompt-engineering`](06-ai-ml-production/prompt-engineering/SKILL.md)
+- [`06-ai-ml-production/llm-function-calling`](06-ai-ml-production/llm-function-calling/SKILL.md)
+- [`06-ai-ml-production/llm-guardrails`](06-ai-ml-production/llm-guardrails/SKILL.md)
+- [`06-ai-ml-production/agent-patterns`](06-ai-ml-production/agent-patterns/SKILL.md)
+- [`06-ai-ml-production/ai-observability`](06-ai-ml-production/ai-observability/SKILL.md)
+- [`06-ai-ml-production/embedding-models`](06-ai-ml-production/embedding-models/SKILL.md)
 
 ## Additional Resources
 

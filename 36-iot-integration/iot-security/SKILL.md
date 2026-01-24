@@ -1,8 +1,18 @@
+---
+name: IoT Security
+description: Protecting IoT devices, data, and networks from cyber threats through device authentication, encryption, secure boot, certificate management, and compliance with security standards.
+---
+
 # IoT Security
+
+> **Current Level:** Advanced  
+> **Domain:** IoT / Security
+
+---
 
 ## Overview
 
-IoT security protects devices, data, and networks from cyber threats. This guide covers authentication, encryption, secure boot, and compliance.
+IoT security protects devices, data, and networks from cyber threats. This guide covers authentication, encryption, secure boot, and compliance for securing IoT deployments at scale with proper device identity and data protection.
 
 ## IoT Security Challenges
 
@@ -568,6 +578,121 @@ class IoTSecurityScanner:
 8. **Monitoring** - Monitor for security events
 9. **Testing** - Regular security audits
 10. **Compliance** - Follow industry standards
+
+---
+
+## Quick Start
+
+### Device Certificate
+
+```python
+from cryptography import x509
+from cryptography.hazmat.primitives import hashes, serialization
+
+# Generate device certificate
+def generate_device_certificate(device_id: str, private_key):
+    subject = issuer = x509.Name([
+        x509.NameAttribute(x509.NameOID.COMMON_NAME, device_id)
+    ])
+    
+    cert = x509.CertificateBuilder().subject_name(
+        subject
+    ).issuer_name(
+        issuer
+    ).public_key(
+        private_key.public_key()
+    ).serial_number(
+        x509.random_serial_number()
+    ).not_valid_before(
+        datetime.utcnow()
+    ).not_valid_after(
+        datetime.utcnow() + timedelta(days=365)
+    ).add_extension(
+        x509.BasicConstraints(ca=False, path_length=None),
+        critical=True
+    ).sign(private_key, hashes.SHA256())
+    
+    return cert
+```
+
+### Secure Communication
+
+```python
+import ssl
+
+# TLS connection
+context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+context.load_verify_locations('ca-cert.pem')
+context.load_cert_chain('device-cert.pem', 'device-key.pem')
+
+# Connect with TLS
+conn = socket.create_connection((host, port))
+tls_conn = context.wrap_socket(conn, server_hostname=host)
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Device Authentication**: Strong device authentication
+- [ ] **Encryption**: Encrypt all communications (TLS/DTLS)
+- [ ] **Certificates**: Certificate lifecycle management
+- [ ] **Secure Boot**: Verify firmware integrity
+- [ ] **Key Management**: Secure key storage
+- [ ] **Updates**: Secure OTA updates
+- [ ] **Access Control**: Device access control
+- [ ] **Monitoring**: Security monitoring
+- [ ] **Compliance**: Meet security standards
+- [ ] **Documentation**: Document security practices
+- [ ] **Testing**: Security testing
+- [ ] **Incident Response**: Incident response plan
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Default Credentials
+
+```python
+# ❌ Bad - Default credentials
+device.connect(username='admin', password='admin')
+# Easy to hack!
+```
+
+```python
+# ✅ Good - Unique credentials
+device.connect(
+    certificate='device-cert.pem',
+    private_key='device-key.pem'
+)
+```
+
+### ❌ Don't: No Encryption
+
+```python
+# ❌ Bad - No encryption
+socket.send(data)  # Plain text!
+```
+
+```python
+# ✅ Good - TLS encryption
+tls_socket.send(data)  # Encrypted
+```
+
+---
+
+## Integration Points
+
+- **Device Management** (`36-iot-integration/device-management/`) - Device lifecycle
+- **IoT Protocols** (`36-iot-integration/iot-protocols/`) - Secure protocols
+- **Edge Computing** (`36-iot-integration/edge-computing/`) - Edge security
+
+---
+
+## Further Reading
+
+- [IoT Security Best Practices](https://owasp.org/www-project-internet-of-things/)
+- [Device Certificate Management](https://aws.amazon.com/iot-core/features/device-management/)
 
 ## Resources
 

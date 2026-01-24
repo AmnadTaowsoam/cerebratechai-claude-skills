@@ -1,4 +1,18 @@
+---
+name: KPI (Key Performance Indicator) Metrics
+description: Defining, tracking, and measuring key performance indicators that demonstrate how effectively an organization is achieving key business objectives.
+---
+
 # KPI (Key Performance Indicator) Metrics
+
+> **Current Level:** Intermediate  
+> **Domain:** Business Analytics / Strategy
+
+---
+
+## Overview
+
+KPIs are measurable values that demonstrate how effectively an organization is achieving key business objectives. Effective KPIs are aligned with business goals, actionable, trackable over time, and drive decision-making.
 
 ## What are KPIs
 
@@ -655,14 +669,141 @@ Acquisition ──▶ Activation ──▶ Retention ──▶ Referral ──�
 | Rule of 40 | > 40 |
 | Customer Satisfaction | > 4.5/5 |
 
-## Summary Checklist
+---
 
-### KPI Selection
+## Quick Start
 
-- [ ] Align with business goals
-- [ ] Ensure measurability
-- [ ] Verify actionability
-- [ ] Set realistic targets
+### Define KPI
+
+```markdown
+# KPI: Monthly Recurring Revenue (MRR)
+
+## Definition
+Total predictable revenue generated from subscriptions per month
+
+## Formula
+MRR = Sum of all monthly subscription fees
+
+## Target
+$100,000 by end of Q2
+
+## Measurement
+- Tracked: Daily
+- Reported: Weekly
+- Reviewed: Monthly
+
+## Owner
+VP of Sales
+```
+
+### Track KPI
+
+```javascript
+// KPI tracking service
+class KPITracker {
+  async trackKPI(kpiId, value, timestamp) {
+    await db.kpiMetrics.create({
+      data: {
+        kpiId,
+        value,
+        timestamp,
+        period: 'monthly'
+      }
+    })
+  }
+  
+  async getKPI(kpiId, period) {
+    return await db.kpiMetrics.findMany({
+      where: { kpiId, period },
+      orderBy: { timestamp: 'desc' }
+    })
+  }
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **KPI Definition**: Clear definition and formula
+- [ ] **Alignment**: Aligned with business goals
+- [ ] **Measurability**: Can be measured accurately
+- [ ] **Targets**: Realistic targets set
+- [ ] **Tracking**: Automated tracking system
+- [ ] **Reporting**: Regular reporting schedule
+- [ ] **Dashboard**: KPI dashboard for visibility
+- [ ] **Ownership**: Clear KPI ownership
+- [ ] **Review**: Regular review and adjustment
+- [ ] **Action**: Actionable insights from KPIs
+- [ ] **Documentation**: Document KPI definitions
+- [ ] **Updates**: Update KPIs as business evolves
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Too Many KPIs
+
+```markdown
+# ❌ Bad - Too many KPIs
+- KPI 1
+- KPI 2
+- KPI 3
+# ... 50 more KPIs
+```
+
+```markdown
+# ✅ Good - Focused KPIs
+- Revenue (Primary)
+- Customer Acquisition Cost (Primary)
+- Customer Lifetime Value (Primary)
+# 5-7 key KPIs maximum
+```
+
+### ❌ Don't: Vague Definitions
+
+```markdown
+# ❌ Bad - Vague
+KPI: User Engagement
+```
+
+```markdown
+# ✅ Good - Specific
+KPI: Daily Active Users (DAU)
+Definition: Number of unique users who open the app in a day
+Formula: COUNT(DISTINCT user_id) WHERE date = today
+```
+
+### ❌ Don't: No Targets
+
+```markdown
+# ❌ Bad - No target
+KPI: Revenue
+Current: $50,000
+```
+
+```markdown
+# ✅ Good - With target
+KPI: Monthly Recurring Revenue
+Current: $50,000
+Target: $100,000 by Q2
+Progress: 50%
+```
+
+---
+
+## Integration Points
+
+- **Dashboard Design** (`23-business-analytics/dashboard-design/`) - KPI visualization
+- **Business Intelligence** (`23-business-analytics/business-intelligence/`) - BI tools
+- **SQL for Analytics** (`23-business-analytics/sql-for-analytics/`) - KPI queries
+
+---
+
+## Further Reading
+
+- [KPI Best Practices](https://www.klipfolio.com/resources/articles/what-is-a-key-performance-indicator-kpi)
+- [OKR vs KPI](https://www.whatmatters.com/resources/okr-vs-kpi)
 - [ ] Define clearly
 
 ### KPI Tracking

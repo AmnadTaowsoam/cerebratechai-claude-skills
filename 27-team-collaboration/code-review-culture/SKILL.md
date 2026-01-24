@@ -1,4 +1,18 @@
+---
+name: Code Review Culture
+description: Building a positive code review culture that catches bugs, shares knowledge, maintains code quality, and builds team trust through effective review practices.
+---
+
 # Code Review Culture
+
+> **Current Level:** Intermediate  
+> **Domain:** Team Collaboration / Code Quality
+
+---
+
+## Overview
+
+Code review culture is essential for maintaining code quality, sharing knowledge, and building team trust. Effective code review practices catch bugs before production, ensure consistent standards, help onboard new team members, and foster collaborative improvement.
 
 ## Why Code Review Matters
 
@@ -10,9 +24,13 @@
 | **Onboard New Team Members** | Learn codebase through reviews |
 | **Build Team Trust** | Collaborative improvement |
 
-## Code Review Objectives
+---
 
-### Correctness
+## Core Concepts
+
+### Code Review Objectives
+
+#### Correctness
 
 ```javascript
 // Does it work?
@@ -918,3 +936,130 @@ bitbucket pr merge
 - [ ] Update documentation
 - [ ] Re-request review
 - [ ] Merge when approved
+```
+
+---
+
+## Quick Start
+
+### Code Review Checklist
+
+```markdown
+# Code Review Checklist
+
+## Functionality
+- [ ] Code works as intended
+- [ ] Edge cases handled
+- [ ] Error handling present
+
+## Code Quality
+- [ ] Follows style guide
+- [ ] No code duplication
+- [ ] Proper naming conventions
+
+## Testing
+- [ ] Tests included
+- [ ] Tests pass
+- [ ] Coverage adequate
+
+## Documentation
+- [ ] Comments where needed
+- [ ] README updated if needed
+- [ ] API docs updated
+```
+
+### Review Template
+
+```markdown
+## Review Comments
+
+### Critical Issues
+- [ ] Issue 1: [Description]
+- [ ] Issue 2: [Description]
+
+### Suggestions
+- [ ] Suggestion 1: [Description]
+- [ ] Suggestion 2: [Description]
+
+### Questions
+- [ ] Question 1: [Description]
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Review Process**: Clear review process defined
+- [ ] **Reviewers**: Appropriate reviewers assigned
+- [ ] **Timeline**: Reasonable review timeline (24-48 hours)
+- [ ] **Automation**: Automated checks (linting, tests) in CI
+- [ ] **Guidelines**: Code review guidelines documented
+- [ ] **Culture**: Positive, constructive review culture
+- [ ] **Training**: Team trained on review practices
+- [ ] **Metrics**: Track review metrics (time, approval rate)
+- [ ] **Feedback**: Regular feedback on review quality
+- [ ] **Tools**: Appropriate review tools configured
+- [ ] **Documentation**: Review decisions documented
+- [ ] **Escalation**: Process for resolving disagreements
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Personal Attacks
+
+```markdown
+# ❌ Bad - Personal
+"This code is terrible. You should know better."
+```
+
+```markdown
+# ✅ Good - Constructive
+"Consider using a more descriptive variable name here. 
+'data' could be 'userProfile' to be clearer."
+```
+
+### ❌ Don't: Nitpicking
+
+```markdown
+# ❌ Bad - Minor style issue
+"Add a space after the comma"
+```
+
+```markdown
+# ✅ Good - Focus on important issues
+"Consider extracting this logic into a separate function 
+for better testability and reusability."
+```
+
+### ❌ Don't: Blocking Without Explanation
+
+```markdown
+# ❌ Bad - No context
+"Needs work"
+```
+
+```markdown
+# ✅ Good - Clear feedback
+"This function is doing too much. Consider splitting into:
+1. Data fetching
+2. Data transformation
+3. Data validation
+
+This will improve testability."
+```
+
+---
+
+## Integration Points
+
+- **Code Review** (`01-foundations/code-review/`) - Review best practices
+- **Git Workflow** (`01-foundations/git-workflow/`) - PR workflow
+- **Onboarding** (`27-team-collaboration/onboarding/`) - Review for new members
+
+---
+
+## Further Reading
+
+- [Google Code Review Guide](https://google.github.io/eng-practices/review/)
+- [Code Review Best Practices](https://github.com/google/eng-practices/blob/master/review/README.md)

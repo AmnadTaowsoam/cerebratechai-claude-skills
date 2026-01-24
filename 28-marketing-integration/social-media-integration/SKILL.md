@@ -1,10 +1,24 @@
+---
+name: Social Media API Integration
+description: Connecting applications with social platforms for posting content, user authentication, analytics, and engagement tracking using OAuth flows, APIs, and webhooks.
+---
+
 # Social Media API Integration
+
+> **Current Level:** Intermediate  
+> **Domain:** Marketing / Integration
+
+---
 
 ## Overview
 
-Social media API integration enables applications to connect with social platforms for posting content, user authentication, analytics, and engagement tracking.
+Social media API integration enables applications to connect with social platforms for posting content, user authentication, analytics, and engagement tracking. Effective integration includes OAuth authentication, rate limiting, webhook handling, and proper error management.
 
-## Table of Contents
+---
+
+## Core Concepts
+
+### Table of Contents
 
 1. [OAuth Flows for Social Platforms](#oauth-flows-for-social-platforms)
 2. [Facebook/Meta API](#facebookmeta-api)
@@ -1911,6 +1925,127 @@ async function handleSocialMediaError(error: any, platform: string): Promise<nev
 ```
 
 ---
+
+---
+
+## Quick Start
+
+### Facebook API Integration
+
+```javascript
+const { Facebook } = require('fb')
+
+const fb = new Facebook({
+  appId: process.env.FB_APP_ID,
+  appSecret: process.env.FB_APP_SECRET
+})
+
+// Post to page
+async function postToFacebook(pageId, message) {
+  const accessToken = await getPageAccessToken(pageId)
+  
+  await fb.api(`/${pageId}/feed`, 'post', {
+    message: message,
+    access_token: accessToken
+  })
+}
+```
+
+### Twitter API Integration
+
+```javascript
+const Twitter = require('twitter')
+
+const client = new Twitter({
+  consumer_key: process.env.TWITTER_API_KEY,
+  consumer_secret: process.env.TWITTER_API_SECRET,
+  access_token_key: process.env.TWITTER_ACCESS_TOKEN,
+  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
+})
+
+// Tweet
+async function tweet(message) {
+  await client.post('statuses/update', { status: message })
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **OAuth Setup**: OAuth flows configured for platforms
+- [ ] **API Keys**: Secure API keys and tokens
+- [ ] **Rate Limiting**: Handle rate limits properly
+- [ ] **Error Handling**: Handle API errors gracefully
+- [ ] **Webhooks**: Set up webhooks for events
+- [ ] **Social Login**: Social login integration
+- [ ] **Sharing**: Social sharing buttons
+- [ ] **Open Graph**: Open Graph tags for sharing
+- [ ] **Analytics**: Track social media metrics
+- [ ] **Testing**: Test with real accounts
+- [ ] **Documentation**: Document integration
+- [ ] **Monitoring**: Monitor API usage
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Expose API Keys
+
+```javascript
+// ❌ Bad - API keys in code
+const client = new Twitter({
+  consumer_key: 'abc123',  // Exposed!
+  consumer_secret: 'def456'
+})
+```
+
+```javascript
+// ✅ Good - Environment variables
+const client = new Twitter({
+  consumer_key: process.env.TWITTER_API_KEY,
+  consumer_secret: process.env.TWITTER_API_SECRET
+})
+```
+
+### ❌ Don't: Ignore Rate Limits
+
+```javascript
+// ❌ Bad - No rate limiting
+for (const post of posts) {
+  await tweet(post)  // May hit rate limit!
+}
+```
+
+```javascript
+// ✅ Good - Rate limiting
+const rateLimiter = require('rate-limiter-flexible')
+const limiter = new rateLimiter.RateLimiter({
+  points: 300,  // 300 tweets
+  duration: 900  // per 15 minutes
+})
+
+for (const post of posts) {
+  await limiter.consume('twitter')
+  await tweet(post)
+}
+```
+
+---
+
+## Integration Points
+
+- **OAuth2** (`10-authentication-authorization/oauth2/`) - OAuth flows
+- **Email Marketing** (`28-marketing-integration/email-marketing/`) - Multi-channel
+- **Analytics** (`23-business-analytics/`) - Social analytics
+
+---
+
+## Further Reading
+
+- [Facebook Graph API](https://developers.facebook.com/docs/graph-api)
+- [Twitter API](https://developer.twitter.com/en/docs)
+- [LinkedIn API](https://docs.microsoft.com/en-us/linkedin/)
 
 ## Resources
 

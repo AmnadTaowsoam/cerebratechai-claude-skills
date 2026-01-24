@@ -1,8 +1,20 @@
+---
+name: Security Audit
+description: Systematic examination of an organization's security controls, policies, and procedures to identify vulnerabilities, assess compliance, validate controls, and ensure security standards are met.
+---
+
 # Security Audit
 
-## What is Security Audit
+> **Current Level:** Intermediate  
+> **Domain:** Security / Compliance
 
-A security audit is a systematic examination of an organization's security controls, policies, and procedures to identify vulnerabilities and ensure compliance with security standards.
+---
+
+## Overview
+
+A security audit is a systematic examination of an organization's security controls, policies, and procedures to identify vulnerabilities and ensure compliance with security standards. Effective security audits include comprehensive reviews, risk assessment, compliance checking, and actionable recommendations.
+
+## What is Security Audit
 
 ### Security Audit Goals
 
@@ -580,6 +592,111 @@ openssl version
 - [ ] Findings documented
 - [ ] Risks assessed
 - [ ] Recommendations made
+```
+
+---
+
+## Quick Start
+
+### Security Audit Checklist
+
+```markdown
+# Security Audit Checklist
+
+## Authentication & Authorization
+- [ ] Strong password policies
+- [ ] Multi-factor authentication
+- [ ] Role-based access control
+- [ ] Session management
+
+## Data Protection
+- [ ] Encryption at rest
+- [ ] Encryption in transit
+- [ ] Data backup
+- [ ] Data retention policies
+
+## Network Security
+- [ ] Firewall rules
+- [ ] Network segmentation
+- [ ] Intrusion detection
+- [ ] VPN access
+
+## Application Security
+- [ ] Input validation
+- [ ] Output encoding
+- [ ] Error handling
+- [ ] Security headers
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Audit Plan**: Security audit plan documented
+- [ ] **Team**: Audit team assembled
+- [ ] **Scope**: Audit scope defined
+- [ ] **Tools**: Audit tools selected
+- [ ] **Review**: Review security controls
+- [ ] **Compliance**: Check compliance requirements
+- [ ] **Documentation**: Document all findings
+- [ ] **Risk Assessment**: Assess security risks
+- [ ] **Recommendations**: Provide recommendations
+- [ ] **Remediation**: Track remediation
+- [ ] **Follow-up**: Follow-up audits
+- [ ] **Reporting**: Regular audit reports
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Follow-up
+
+```markdown
+# ❌ Bad - Audit but no action
+Security audit completed
+Findings: 50 vulnerabilities
+Actions taken: 0
+```
+
+```markdown
+# ✅ Good - Act on findings
+Security audit completed
+Findings: 50 vulnerabilities
+Actions taken: 45 fixed, 5 in progress
+```
+
+### ❌ Don't: Surface-Level Audit
+
+```markdown
+# ❌ Bad - Surface-level only
+Checked: Password policy
+# No deep review!
+```
+
+```markdown
+# ✅ Good - Comprehensive audit
+Checked:
+- Password policy
+- Implementation
+- Enforcement
+- Monitoring
+# Deep review
+```
+
+---
+
+## Integration Points
+
+- **Penetration Testing** (`24-security-practices/penetration-testing/`) - Security testing
+- **Vulnerability Management** (`24-security-practices/vulnerability-management/`) - Vulnerability handling
+- **OWASP Top 10** (`24-security-practices/owasp-top-10/`) - Security standards
+
+---
+
+## Further Reading
+
+- [Security Audit Guide](https://www.isaca.org/resources/security-audit)
+- [NIST Security Framework](https://www.nist.gov/cyberframework)
 - [ ] Report delivered
 
 ### Follow-up

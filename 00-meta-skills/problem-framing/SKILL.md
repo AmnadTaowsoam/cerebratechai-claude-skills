@@ -1,4 +1,124 @@
-# Problem Framing & Ambiguity Resolution
+### **02: Problem Framing & Ambiguity Resolution**
+
+> 
+> **Current Level:** Expert (Enterprise Scale) 
+> 
+> 
+> **Domain:** Meta Skills / Communication 
+> 
+
+---
+
+### **1. Executive Summary & Strategic Necessity**
+
+* **Context:** ในโลกปี 2025-2026 การทำงานระหว่าง AI Agents และมนุษย์มีความซับซ้อนเพิ่มขึ้นอย่างมาก การทำความเข้าใจปัญหาที่ชัดเจนก่อนเริ่มทำงานเป็นทักษะสำคัญที่ช่วยลดการสร้างผลลัพธ์ที่ผิดพลาด (Hallucinations) และประหยัดเวลาในการทำงานซ้ำ
+* **Business Impact:** การทำความเข้าใจปัญหาที่ดีช่วย:
+  - เพิ่มอัตราความสำเร็จในการทำงานครั้งแรก (First-shot Success Rate)
+  - ลดเวลาที่ใช้ในการทำงานซ้ำ (Re-work)
+  - เพิ่มความพึงพอใจของลูกค้า
+  - ลดต้นทุนในการพัฒนาและการแก้ไข
+  - เพิ่มประสิทธิภาพของทีม AI/Dev
+* **Product Thinking:** ทักษะนี้ช่วยแก้ปัญหา (Pain Point) ให้กับ:
+  - AI Agents ที่ต้องการทำความเข้าใจคำสั่งที่ไม่ชัดเจน
+  - ผู้ใช้งานที่ต้องการผลลัพธ์ที่ตรงตามความต้องการ
+  - ทีมพัฒนาที่ต้องการลดการสื่อสารกลับไปมา
+  - ผู้บริหารที่ต้องการความมั่นใจในการลงทุน
+
+### **2. Technical Deep Dive (The "How-to")**
+
+* **Core Logic:** Problem Framing เป็นกระบวนการที่ช่วยให้ AI Agents ตรวจสอบและทำความเข้าใจคำสั่งที่ได้รับก่อนเริ่มปฏิบัติงาน โดยใช้กลไกต่อไปนี้:
+  - **Ambiguity Detection:** การตรวจสอบคำสั่งที่ไม่ชัดเจน (Lazy Prompts, Missing Context, Undefined Success Criteria)
+  - **Stop-and-Ask Protocol:** การหยุดและถามคำถามเพื่อขอข้อมูลเพิ่มเติม
+  - **Question Formulation:** การสร้างคำถามที่มีประสิทธิภาพ (Specific, Actionable, Non-leading, Prioritized, Multiple-choice)
+  - **Problem Restatement:** การยืนยันความเข้าใจโดยการเขียนปัญหาใหม่ด้วยคำของตัวเอง
+
+* **Architecture Diagram Requirements:** แผนผังสถาปัตยกรรมที่ต้องมี:
+  - **Decision Flow Diagram:** แผนผังแสดงการตัดสินใจว่าจะดำเนินการหรือถามเพิ่มเติม
+  - **Question Template Library:** คลัง Template สำหรับการถามคำถาม
+  - **Ambiguity Detection Rules:** กฎการตรวจสอบความไม่ชัดเจน
+  - **Context Gathering Workflow:** กระบวนการเก็บข้อมูลเพิ่มเติม
+
+* **Implementation Workflow:**
+  1. **Receive Task:** รับคำสั่งงาน
+  2. **Detect Ambiguity:** ตรวจสอบความชัดเจนของคำสั่ง
+  3. **Stop and Identify Gaps:** หยุดและระบุข้อมูลที่ขาดหาย
+  4. **Formulate Clarifying Questions:** สร้างคำถามเพื่อขอข้อมูลเพิ่มเติม
+  5. **Present Options to User:** นำเสนอตัวเลือกให้ผู้ใช้งาน
+  6. **Receive Clarification:** รับข้อมูลเพิ่มเติมจากผู้ใช้งาน
+  7. **Restate Problem:** เขียนปัญหาใหม่ด้วยคำของตัวเอง
+  8. **Confirm Understanding:** ขอยืนยันจากผู้ใช้งาน
+  9. **Proceed with Implementation:** ดำเนินการตามที่ตกลง
+
+### **3. Tooling & Tech Stack**
+
+* **Enterprise Tools:** เครื่องมือระดับอุตสาหกรรมที่เลือกใช้:
+  - **Prompt Engineering Tools:** LangChain, PromptPerfect, PromptBase
+  - **Documentation Platforms:** Confluence, Notion, GitHub Wiki
+  - **Collaboration Tools:** Slack, Microsoft Teams, Discord
+  - **Version Control:** Git, GitHub, GitLab
+  - **Testing Tools:** Jest, PyTest, Playwright
+
+* **Configuration Essentials:** ส่วนประกอบสำคัญในการตั้งค่า:
+  - **Question Templates:** Template มาตรฐานสำหรับการถามคำถาม
+  - **Ambiguity Detection Rules:** กฎการตรวจสอบความไม่ชัดเจน
+  - **Context Gathering Prompts:** Prompt สำหรับเก็บข้อมูลเพิ่มเติม
+  - **Restatement Template:** Template สำหรับการเขียนปัญหาใหม่
+  - **Integration with AI Models:** การผนวกกับ AI Models เช่น GPT-4, Claude, etc.
+
+### **4. Standards, Compliance & Security**
+
+* **International Standards:** มาตรฐานที่เกี่ยวข้อง:
+  - **ISO/IEC 9241:** Ergonomics of Human-System Interaction
+  - **ISO/IEC 25010:** Software Quality Model
+  - **IEEE 830:** Recommended Practice for Software Requirements Specifications
+
+* **Security Protocol:** กลไกการป้องกัน:
+  - **Input Validation:** การตรวจสอบและ sanitize ข้อมูลที่รับมา
+  - **Context Sanitization:** การลบข้อมูลที่เป็นความลับจาก context
+  - **Access Control:** การควบคุมการเข้าถึงข้อมูล
+  - **Audit Logging:** การบันทึกการโต้ตอบเพื่อการตรวจสอบ
+
+* **Explainability:** ความสามารถในการอธิบาย:
+  - **Reasoning Documentation:** การบันทึกเหตุผลของการตัดสินใจ
+  - **Question Rationale:** การอธิบายเหตุผลของการถามคำถาม
+  - **Assumption Tracking:** การติดตามสมมติที่ใช้ในการทำความเข้าใจ
+  - **Decision Transparency:** การแสดงให้เห็นกระบวนการตัดสินใจ
+
+### **5. Unit Economics & Performance Metrics (KPIs)**
+
+* **Cost Calculation:** สูตรการคำนวณต้นทุนต่อหน่วย (COGS):
+  ```
+  Total Cost = (Clarification Time × Hourly Rate) + (Re-work Time Avoided × Hourly Rate)
+  
+  ROI = (Re-work Cost Saved - Clarification Cost) / Clarification Cost × 100%
+  
+  Re-work Cost Saved = (Average Re-work Hours × Hourly Rate) × (Tasks Avoided)
+  ```
+
+* **Key Performance Indicators:** ตัวชี้วัดความสำเร็จทางเทคนิค:
+  - **First-shot Success Rate:** % ของงานที่สำเร็จในครั้งแรก (Target: > 80%)
+  - **Clarification Time:** เวลาเฉลี่ยในการถามคำถามเพื่อชี้แจ้ง (Target: < 5 min)
+  - **Re-work Rate:** % ของงานที่ต้องทำใหม่ (Target: < 10%)
+  - **User Satisfaction:** ความพึงพอใจของผู้ใช้งาน (Target: > 4/5)
+  - **Ambiguity Detection Accuracy:** % ของความไม่ชัดเจนที่ตรวจพบ (Target: > 90%)
+
+### **6. Strategic Recommendations (CTO Insights)**
+
+* **Phase Rollout:** คำแนะนำในการทยอยเริ่มใช้งาน:
+  1. **Phase 1 (Months 1-2):** สร้าง Template และ Guidelines, ฝึกอบรมทีม
+  2. **Phase 2 (Months 3-4):** เริ่มใช้ Stop-and-Ask Protocol ในงานจริง
+  3. **Phase 3 (Months 5-6):** วัดผลและปรับปรุง Template และกฎ
+  4. **Phase 4 (Year 2+):** ขยายไปยังทุกทีม, สร้าง Culture ของการทำความเข้าใจ
+
+* **Pitfalls to Avoid:** ข้อควรระวังที่มักจะผิดพลาด:
+  - **Over-clarifying:** หลีกเลี่ยงการถามคำถามที่ไม่ส่งผลต่อการแก้ปัญหา
+  - **Leading Questions:** หลีกเลี่ยงการถามคำถามที่บอกคำตอบ
+  - **Skipping Restatement:** ต้องยืนยันความเข้าใจเสมอ
+  - **Assuming Intent:** หลีกเลี่ยงการเดาความต้องการของผู้ใช้งาน
+  - **Not Offering Options:** ควรให้ตัวเลือกเมื่อเหมาะสม
+  - **Ignoring Context:** ต้องใช้ context ที่มีอยู่ให้เป็นประโยชน์
+
+---
 
 ## Overview
 

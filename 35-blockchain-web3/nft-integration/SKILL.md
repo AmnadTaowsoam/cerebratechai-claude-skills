@@ -1,8 +1,18 @@
+---
+name: NFT Integration
+description: Integrating Non-Fungible Tokens (NFTs) as unique digital assets on blockchain using ERC-721, ERC-1155 standards, minting, metadata management, and marketplace integration.
+---
+
 # NFT Integration
+
+> **Current Level:** Advanced  
+> **Domain:** Blockchain / Web3
+
+---
 
 ## Overview
 
-NFTs (Non-Fungible Tokens) are unique digital assets on the blockchain. This guide covers ERC-721, ERC-1155, minting, metadata, and marketplace integration.
+NFTs (Non-Fungible Tokens) are unique digital assets on the blockchain. This guide covers ERC-721, ERC-1155, minting, metadata, and marketplace integration for building NFT-based applications.
 
 ## NFT Standards
 
@@ -543,10 +553,229 @@ export class OpenSeaService {
 9. **Provenance** - Track NFT history
 10. **Testing** - Test thoroughly before mainnet
 
-## Resources
+---
+
+## Quick Start
+
+### NFT Minting
+
+```typescript
+import { ethers } from 'ethers'
+
+// Mint ERC-721 NFT
+async function mintNFT(
+  contractAddress: string,
+  to: string,
+  tokenURI: string
+): Promise<string> {
+  const contract = new ethers.Contract(
+    contractAddress,
+    ERC721_ABI,
+    signer
+  )
+  
+  const tx = await contract.mint(to, tokenURI)
+  await tx.wait()
+  
+  return tx.hash
+}
+
+// Get NFT metadata
+async function getNFTMetadata(tokenId: number): Promise<NFTMetadata> {
+  const contract = new ethers.Contract(contractAddress, ERC721_ABI, provider)
+  const tokenURI = await contract.tokenURI(tokenId)
+  
+  // Fetch from IPFS
+  const metadata = await fetchFromIPFS(tokenURI)
+  return metadata
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **NFT Standard**: Choose ERC-721 or ERC-1155
+- [ ] **Metadata Standards**: Follow metadata standards
+- [ ] **IPFS Storage**: Use IPFS for decentralized storage
+- [ ] **Gas Optimization**: Optimize minting costs
+- [ ] **Royalties**: Implement ERC-2981 for royalties
+- [ ] **Marketplace**: Marketplace integration
+- [ ] **Security**: Audit contracts
+- [ ] **Testing**: Test on testnets
+- [ ] **Documentation**: Document NFT structure
+- [ ] **Monitoring**: Monitor minting and transfers
+- [ ] **Compliance**: Meet legal requirements
+- [ ] **Support**: User support for NFTs
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Store Metadata On-Chain
+
+```solidity
+// ❌ Bad - Store metadata on-chain
+struct NFT {
+  string name;
+  string description;
+  string image;
+  // Expensive gas costs!
+}
+```
+
+```solidity
+// ✅ Good - Store metadata off-chain (IPFS)
+mapping(uint256 => string) public tokenURI;
+// Store only URI, metadata on IPFS
+```
+
+### ❌ Don't: No Royalties
+
+```solidity
+// ❌ Bad - No royalties
+function transfer(address to, uint256 tokenId) {
+  // Creator gets nothing on resale!
+}
+```
+
+```solidity
+// ✅ Good - ERC-2981 royalties
+function royaltyInfo(uint256 tokenId, uint256 salePrice)
+  external view returns (address, uint256)
+{
+  return (creator, salePrice * royaltyPercentage / 10000)
+}
+```
+
+---
+
+## Integration Points
+
+- **Smart Contracts** (`35-blockchain-web3/smart-contracts/`) - Contract development
+- **Wallet Connection** (`35-blockchain-web3/wallet-connection/`) - User wallets
+- **Web3 Integration** (`35-blockchain-web3/web3-integration/`) - Web3 patterns
+
+---
+
+## Further Reading
 
 - [ERC-721](https://eips.ethereum.org/EIPS/eip-721)
 - [ERC-1155](https://eips.ethereum.org/EIPS/eip-1155)
+- [ERC-2981 (Royalties)](https://eips.ethereum.org/EIPS/eip-2981)
+
+---
+
+## Quick Start
+
+### NFT Minting
+
+```typescript
+import { ethers } from 'ethers'
+
+// Mint ERC-721 NFT
+async function mintNFT(
+  contractAddress: string,
+  to: string,
+  tokenURI: string
+): Promise<string> {
+  const contract = new ethers.Contract(
+    contractAddress,
+    ERC721_ABI,
+    signer
+  )
+  
+  const tx = await contract.mint(to, tokenURI)
+  await tx.wait()
+  
+  return tx.hash
+}
+
+// Get NFT metadata
+async function getNFTMetadata(tokenId: number): Promise<NFTMetadata> {
+  const contract = new ethers.Contract(contractAddress, ERC721_ABI, provider)
+  const tokenURI = await contract.tokenURI(tokenId)
+  
+  // Fetch from IPFS
+  const metadata = await fetchFromIPFS(tokenURI)
+  return metadata
+}
+```
+
+---
+
+## Production Checklist
+
+- [ ] **NFT Standard**: Choose ERC-721 or ERC-1155
+- [ ] **Metadata Standards**: Follow metadata standards
+- [ ] **IPFS Storage**: Use IPFS for decentralized storage
+- [ ] **Gas Optimization**: Optimize minting costs
+- [ ] **Royalties**: Implement ERC-2981 for royalties
+- [ ] **Marketplace**: Marketplace integration
+- [ ] **Security**: Audit contracts
+- [ ] **Testing**: Test on testnets
+- [ ] **Documentation**: Document NFT structure
+- [ ] **Monitoring**: Monitor minting and transfers
+- [ ] **Compliance**: Meet legal requirements
+- [ ] **Support**: User support for NFTs
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: Store Metadata On-Chain
+
+```solidity
+// ❌ Bad - Store metadata on-chain
+struct NFT {
+  string name;
+  string description;
+  string image;
+  // Expensive gas costs!
+}
+```
+
+```solidity
+// ✅ Good - Store metadata off-chain (IPFS)
+mapping(uint256 => string) public tokenURI;
+// Store only URI, metadata on IPFS
+```
+
+### ❌ Don't: No Royalties
+
+```solidity
+// ❌ Bad - No royalties
+function transfer(address to, uint256 tokenId) {
+  // Creator gets nothing on resale!
+}
+```
+
+```solidity
+// ✅ Good - ERC-2981 royalties
+function royaltyInfo(uint256 tokenId, uint256 salePrice)
+  external view returns (address, uint256)
+{
+  return (creator, salePrice * royaltyPercentage / 10000)
+}
+```
+
+---
+
+## Integration Points
+
+- **Smart Contracts** (`35-blockchain-web3/smart-contracts/`) - Contract development
+- **Wallet Connection** (`35-blockchain-web3/wallet-connection/`) - User wallets
+- **Web3 Integration** (`35-blockchain-web3/web3-integration/`) - Web3 patterns
+
+---
+
+## Further Reading
+
+- [ERC-721](https://eips.ethereum.org/EIPS/eip-721)
+- [ERC-1155](https://eips.ethereum.org/EIPS/eip-1155)
+- [ERC-2981 (Royalties)](https://eips.ethereum.org/EIPS/eip-2981)
+
+## Resources
 - [NFT.Storage](https://nft.storage/)
 - [OpenSea API](https://docs.opensea.io/)
 - [ERC-2981 Royalties](https://eips.ethereum.org/EIPS/eip-2981)

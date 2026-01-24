@@ -1,8 +1,20 @@
+---
+name: Rollback Strategies
+description: Reverting to a previous version of application or infrastructure after a deployment causes issues, including automated rollback, database rollback, and blue-green rollback strategies.
+---
+
 # Rollback Strategies
 
-## What is Rollback
+> **Current Level:** Intermediate  
+> **Domain:** DevOps / Deployment
 
-Rollback is the process of reverting to a previous version of your application or infrastructure after a deployment causes issues.
+---
+
+## Overview
+
+Rollback is the process of reverting to a previous version of your application or infrastructure after a deployment causes issues. Effective rollback strategies include automated rollback triggers, database migration rollbacks, and blue-green deployment rollbacks to minimize downtime and data loss.
+
+## What is Rollback
 
 ### Core Concept
 
@@ -740,3 +752,111 @@ terraform apply rollback.tfplan
 - [ ] Better code review
 - [ ] More gradual rollouts
 - [ ] Feature flags for risky changes
+```
+
+---
+
+## Quick Start
+
+### Kubernetes Rollback
+
+```bash
+# Rollback deployment
+kubectl rollout undo deployment/myapp
+
+# Rollback to specific revision
+kubectl rollout undo deployment/myapp --to-revision=3
+
+# Check rollout history
+kubectl rollout history deployment/myapp
+```
+
+### Database Migration Rollback
+
+```typescript
+// Prisma migration rollback
+npx prisma migrate resolve --rolled-back 20240115123456_add_column
+
+// Or create down migration
+npx prisma migrate dev --create-only --name rollback_add_column
+```
+
+---
+
+## Production Checklist
+
+- [ ] **Rollback Plan**: Document rollback procedures
+- [ ] **Automated Rollback**: Set up automated rollback triggers
+- [ ] **Database Rollback**: Plan database migration rollbacks
+- [ ] **Monitoring**: Monitor for rollback triggers
+- [ ] **Testing**: Test rollback procedures
+- [ ] **Communication**: Notify team of rollbacks
+- [ ] **Documentation**: Document rollback steps
+- [ ] **Version Control**: Keep previous versions available
+- [ ] **Backup**: Backup before deployment
+- [ ] **Recovery**: Test recovery procedures
+- [ ] **Post-mortem**: Analyze rollback causes
+- [ ] **Prevention**: Improve to prevent future rollbacks
+
+---
+
+## Anti-patterns
+
+### ❌ Don't: No Rollback Plan
+
+```yaml
+# ❌ Bad - Deploy without rollback plan
+apiVersion: apps/v1
+kind: Deployment
+# No rollback strategy!
+```
+
+```yaml
+# ✅ Good - With rollback strategy
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  revisionHistoryLimit: 10  # Keep revisions for rollback
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+```
+
+### ❌ Don't: Destructive Migrations
+
+```sql
+-- ❌ Bad - Destructive migration
+ALTER TABLE users DROP COLUMN email  -- Can't rollback!
+```
+
+```sql
+-- ✅ Good - Reversible migration
+-- Up migration
+ALTER TABLE users ADD COLUMN email_new VARCHAR(255);
+UPDATE users SET email_new = email;
+ALTER TABLE users DROP COLUMN email;
+ALTER TABLE users RENAME COLUMN email_new TO email;
+
+-- Down migration (rollback)
+ALTER TABLE users ADD COLUMN email_old VARCHAR(255);
+UPDATE users SET email_old = email;
+ALTER TABLE users DROP COLUMN email;
+ALTER TABLE users RENAME COLUMN email_old TO email;
+```
+
+---
+
+## Integration Points
+
+- **Canary Deployment** (`26-deployment-strategies/canary-deployment/`) - Gradual rollout
+- **Blue-Green Deployment** (`26-deployment-strategies/blue-green-deployment/`) - Zero-downtime
+- **Monitoring** (`14-monitoring-observability/`) - Rollback triggers
+
+---
+
+## Further Reading
+
+- [Kubernetes Rollback](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#rolling-back-a-deployment)
+- [Database Migration Rollback](https://www.prisma.io/docs/concepts/components/prisma-migrate)
